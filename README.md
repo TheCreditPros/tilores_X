@@ -70,7 +70,7 @@ curl https://tilores-unified-api-production.up.railway.app/health
 ### Customer Search via AnythingLLM
 Simply ask in AnythingLLM:
 - "Find customer with client ID 1648647"
-- "Get credit report for Dawn Bruton" 
+- "Get credit report for Dawn Bruton"
 - "What is customer 1881899's email address?"
 
 ### Direct API Call
@@ -130,15 +130,37 @@ python test_simplified_runner.py
 | Anthropic | claude-3-haiku, claude-3-sonnet | ✅ Working |
 | Google | gemini-pro, gemini-flash | ✅ Working |
 
+*For detailed model specifications and use cases, see [Architecture Documentation](memory-bank/tilores_X_memory_bank_architecture_README.md#supported-models--providers)*
+
+---
+
+## 📚 Related Documentation
+
+### Project Context & Background
+- **[Project Overview](memory-bank/tilores_X_memory_bank_project-overview.md)** - What Tilores_X is and its relationship to legacy systems
+- **[Project Status](memory-bank/tilores_X_memory_bank_project-status.md)** - Current development status and achievements
+- **[Architecture Documentation](memory-bank/tilores_X_memory_bank_architecture_README.md)** - Detailed technical architecture and components
+
+### Development & Operations
+- **[Setup Guide](memory-bank/tilores_X_memory_bank_SETUP_GUIDE.md)** - Complete environment setup and configuration
+- **[Migration Guide](memory-bank/tilores_X_memory_bank_migration-from-legacy.md)** - Transitioning from legacy Tilores-Jul10
+- **[Decision Records](memory-bank/tilores_X_memory_bank_decisions_README.md)** - Architectural decisions and rationale
+
+### Development Tracking
+- **[Development Log](memory-bank/tilores_X_memory_bank_updates_development-log.md)** - Ongoing development progress
+- **[Status Reports](memory-bank/tilores_X_memory_bank_status-reports_README.md)** - Regular project status updates
+
 ---
 
 ## 🚀 Production Status
 
 ✅ **Ready for Production**: Simplified, tested, and optimized for AnythingLLM
-✅ **Clean Codebase**: Removed obsolete components and complexity  
+✅ **Clean Codebase**: Removed obsolete components and complexity
 ✅ **Performance Optimized**: Focus on core functionality
 ✅ **AnythingLLM Compatible**: Direct integration via `/chat/invoke`
 ✅ **Monitoring Ready**: LangSmith tracing active
+
+*For detailed component information and system design, see [Architecture Documentation](memory-bank/tilores_X_memory_bank_architecture_README.md)*
 
 ---
 
