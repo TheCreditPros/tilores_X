@@ -1,0 +1,31 @@
+# Ultra-Minimal Requirements for AnythingLLM Integration
+# Only dependencies actually used in main_enhanced.py + core_app.py
+
+# Core FastAPI
+fastapi>=0.115.3
+uvicorn>=0.25.0
+python-dotenv==1.0.0
+
+# Tilores integration (required)
+tilores-langchain==0.2.0
+
+# Essential LangChain (base package required by tilores-langchain)
+langchain>=0.2.0
+langchain-openai>=0.1.25
+langchain-core>=0.2.39
+
+# Multi-provider support (only what core_app.py uses)
+langchain-anthropic>=0.1.0
+langchain-google-genai>=0.1.0
+langchain-groq>=0.1.0
+
+# Optional: LangSmith tracing (if LANGSMITH_API_KEY provided)
+langsmith>=0.1.0
+
+# OpenAI API Compliance Requirements
+tiktoken>=0.5.0  # Token counting for usage field
+fastapi-sse>=1.1.0  # Server-Sent Events for streaming
+
+# Redis Caching for Performance (Phase VI)
+redis>=5.0.0
+hiredis>=2.0.0  # High-performance Redis parser
