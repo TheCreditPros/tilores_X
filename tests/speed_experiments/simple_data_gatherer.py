@@ -6,6 +6,7 @@ Uses direct API calls to get real customer data
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 import requests
@@ -16,11 +17,7 @@ def get_customer_data_via_api():
     """Get customer data using direct API calls to our production endpoint"""
 
     # The correct test email addresses
-    test_emails = [
-        "blessedwina@aol.com",
-        "lelisguardado@sbcglobal.net",
-        "migdaliareyes53@gmail.com"
-    ]
+    test_emails = ["blessedwina@aol.com", "lelisguardado@sbcglobal.net", "migdaliareyes53@gmail.com"]
 
     api_url = "https://tiloresx-production.up.railway.app/v1/chat/completions"
 
@@ -41,12 +38,12 @@ def get_customer_data_via_api():
                     "messages": [
                         {
                             "role": "user",
-                            "content": f"Find customer with email {email} and get their complete profile including name, phone, client ID, and credit score"
+                            "content": f"Find customer with email {email} and get their complete profile including name, phone, client ID, and credit score",
                         }
                     ],
-                    "max_tokens": 500
+                    "max_tokens": 500,
                 },
-                timeout=30
+                timeout=30,
             )
 
             if response.status_code == 200:
@@ -60,21 +57,13 @@ def get_customer_data_via_api():
 
             else:
                 print(f"❌ API error: {response.status_code}")
-                real_customers.append({
-                    "email": email,
-                    "name": "API Error",
-                    "error": f"HTTP {response.status_code}",
-                    "status": "failed"
-                })
+                real_customers.append(
+                    {"email": email, "name": "API Error", "error": f"HTTP {response.status_code}", "status": "failed"}
+                )
 
         except Exception as e:
             print(f"❌ Error processing {email}: {e}")
-            real_customers.append({
-                "email": email,
-                "name": "Request Failed",
-                "error": str(e),
-                "status": "failed"
-            })
+            real_customers.append({"email": email, "name": "Request Failed", "error": str(e), "status": "failed"})
 
     return real_customers
 
@@ -84,11 +73,7 @@ def extract_customer_info(response_text, email):
 
     response = str(response_text)
 
-    customer_data = {
-        "email": email,
-        "raw_response": response,
-        "status": "success"
-    }
+    customer_data = {"email": email, "raw_response": response, "status": "success"}
 
     # Extract name using common patterns
     import re
@@ -118,7 +103,7 @@ def extract_customer_info(response_text, email):
     client_id_patterns = [
         r"(?:Client ID|CLIENT_ID):\s*(\d+)",
         r"ID:\s*(\d{6,8})",
-        r"\b(\d{7,8})\b"  # 7-8 digit numbers
+        r"\b(\d{7,8})\b",  # 7-8 digit numbers
     ]
 
     for pattern in client_id_patterns:
@@ -128,10 +113,7 @@ def extract_customer_info(response_text, email):
             break
 
     # Extract phone
-    phone_patterns = [
-        r"(?:Phone|PHONE_EXTERNAL):\s*([\d\-\(\)\s]+)",
-        r"\b(\d{3}[-\.\s]?\d{3}[-\.\s]?\d{4})\b"
-    ]
+    phone_patterns = [r"(?:Phone|PHONE_EXTERNAL):\s*([\d\-\(\)\s]+)", r"\b(\d{3}[-\.\s]?\d{3}[-\.\s]?\d{4})\b"]
 
     for pattern in phone_patterns:
         match = re.search(pattern, response)
@@ -143,7 +125,7 @@ def extract_customer_info(response_text, email):
     credit_patterns = [
         r"(?:Credit Score|STARTING_CREDIT_SCORE):\s*(\d{3})",
         r"Score:\s*(\d{3})",
-        r"\b(\d{3})\b.*(?:credit|score)"
+        r"\b(\d{3})\b.*(?:credit|score)",
     ]
 
     for pattern in credit_patterns:
@@ -176,7 +158,7 @@ def main():
     # Save the results
     output_file = "tests/speed_experiments/real_customer_data.json"
 
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         json.dump(customers, f, indent=2)
 
     print(f"\n💾 Customer data saved to: {output_file}")

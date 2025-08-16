@@ -311,28 +311,15 @@ class MultiProviderLLMEngine:
                         "class": ChatGroq,
                         "real_name": "llama-3.3-70b-versatile",
                     },
-                    # ULTRA-FAST: Speculative decoding - 1,665 tokens/sec!
-                    "llama-3.3-70b-specdec": {
-                        "provider": "groq",
-                        "class": ChatGroq,
-                        "real_name": "llama-3.3-70b-specdec",
-                    },
                     "deepseek-r1-distill-llama-70b": {
                         "provider": "groq",
                         "class": ChatGroq,
                         "real_name": "deepseek-r1-distill-llama-70b",
                     },
-                    # Additional fast Groq models
-                    "mixtral-8x7b-32768": {
-                        "provider": "groq",
-                        "class": ChatGroq,
-                        "real_name": "mixtral-8x7b-32768",
-                    },
-                    "llama-3.2-90b-text-preview": {
-                        "provider": "groq",
-                        "class": ChatGroq,
-                        "real_name": "llama-3.2-90b-text-preview",
-                    },
+                    # DEPRECATED GROQ MODELS (decommissioned by Groq as of Aug 2025)
+                    # "llama-3.3-70b-specdec": DEPRECATED - use llama-3.3-70b-versatile
+                    # "mixtral-8x7b-32768": DEPRECATED - use llama-3.3-70b-versatile
+                    # "llama-3.2-90b-text-preview": DEPRECATED - use deepseek-r1-distill-llama-70b
                 }
             )
 
@@ -1700,23 +1687,22 @@ query_router = QueryRouter()
 def _get_fastest_available_model() -> str:
     """Get the default base model, prioritizing llama-3.3-70b-versatile"""
 
-    # Ordered by preference - SPEED OPTIMIZED with new ultra-fast models
+    # Ordered by preference - UPDATED with working models only (Aug 2025)
     preferred_models = [
-        "llama-3.3-70b-specdec",  # ULTRA-FAST: 1,665 tokens/sec with speculative decoding!
-        "llama-3.3-70b-versatile",  # 276 tokens/sec - Very fast Groq model
-        "mixtral-8x7b-32768",  # 500+ tokens/sec - Fast Groq MoE model
-        "deepseek-r1-distill-llama-70b",  # 0.825s production avg - fastest distilled
-        "llama-3.2-90b-text-preview",  # 330 tokens/sec - Large fast model
+        "llama-3.3-70b-versatile",  # ~600ms avg - Fastest working Groq model
+        "gpt-3.5-turbo",  # 1.016s production avg - Fast OpenAI
+        "gpt-4o-mini",  # 1.915s production avg - Balanced speed/quality
+        "deepseek-r1-distill-llama-70b",  # ~3.5s avg - Cost-effective reasoning
         "gpt-5-mini",  # Latest OpenAI model
-        "claude-opus-4",  # Latest Claude model (most capable)
-        "claude-sonnet-4",  # Latest Claude model (fast)
-        "gpt-3.5-turbo",  # 1.016s production avg
-        "gpt-4o-mini",  # 1.915s production avg
+        "claude-3-haiku",  # Fast Anthropic model
         "gemini-1.5-flash-002",  # 2.2s avg - FAST Gemini
         "gpt-4o",  # 2.789s production avg
+        "claude-3-sonnet",  # Advanced reasoning
         "gpt-4.1-mini",  # Fallback
-        "claude-3-haiku",  # Fallback
-        "claude-3-sonnet",  # Fallback
+        # DEPRECATED MODELS REMOVED:
+        # "llama-3.3-70b-specdec" - decommissioned by Groq
+        # "mixtral-8x7b-32768" - decommissioned by Groq
+        # "llama-3.2-90b-text-preview" - decommissioned by Groq
     ]
 
     # Return the preferred model (llama-3.3-70b-versatile first)
@@ -1761,7 +1747,6 @@ def run_chain(
         # TEMPORARILY DISABLE LangSmith tracing to fix callback conflict
         # TODO: Fix callback conflict properly in future version
         langsmith_callbacks = []
-        trace_metadata = {}
 
         # Disable LangSmith to prevent callback conflicts
         print("📊 LangSmith tracing temporarily disabled to fix callback conflict")

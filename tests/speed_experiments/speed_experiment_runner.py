@@ -26,14 +26,9 @@ class LangSmithSpeedExperimentRunner:
             "description": f"Speed and accuracy testing for {len(models)} fastest models",
             "models": models,
             "scenarios": self._get_credit_scenarios(),
-            "metrics": [
-                "response_time_ms",
-                "tokens_per_second",
-                "accuracy_score",
-                "credit_data_completeness"
-            ],
+            "metrics": ["response_time_ms", "tokens_per_second", "accuracy_score", "credit_data_completeness"],
             "langsmith_project": self.langsmith_project,
-            "created_at": time.time()
+            "created_at": time.time(),
         }
         return config
 
@@ -46,19 +41,19 @@ class LangSmithSpeedExperimentRunner:
                 {
                     "turn": 1,
                     "role": "user",
-                    "content": f"Hello, I need information about customer {customer_data.get('name', 'Unknown')}"
+                    "content": f"Hello, I need information about customer {customer_data.get('name', 'Unknown')}",
                 },
                 {
                     "turn": 2,
                     "role": "user",
-                    "content": f"Can you get me the credit report for customer ID {customer_data.get('customer_id')}?"
-                }
+                    "content": f"Can you get me the credit report for customer ID {customer_data.get('customer_id')}?",
+                },
             ],
             "expected_data": {
                 "customer_name": customer_data.get("name"),
                 "credit_score": customer_data.get("credit_score"),
-                "has_credit_report": customer_data.get("has_credit_report", False)
-            }
+                "has_credit_report": customer_data.get("has_credit_report", False),
+            },
         }
         return scenario
 
@@ -71,12 +66,8 @@ class LangSmithSpeedExperimentRunner:
             response = requests.post(
                 f"{self.api_url}/v1/chat/completions",
                 headers={"Content-Type": "application/json"},
-                json={
-                    "model": model_name,
-                    "messages": [{"role": "user", "content": message}],
-                    "max_tokens": 500
-                },
-                timeout=30
+                json={"model": model_name, "messages": [{"role": "user", "content": message}], "max_tokens": 500},
+                timeout=30,
             )
 
             end_time = time.time()
@@ -94,14 +85,14 @@ class LangSmithSpeedExperimentRunner:
                     "response_time_ms": response_time_ms,
                     "tokens_per_second": tokens_per_second,
                     "success": True,
-                    "content_length": len(content)
+                    "content_length": len(content),
                 }
             else:
                 return {
                     "response_time_ms": response_time_ms,
                     "tokens_per_second": 0,
                     "success": False,
-                    "error": f"HTTP {response.status_code}"
+                    "error": f"HTTP {response.status_code}",
                 }
 
         except Exception as e:
@@ -110,7 +101,7 @@ class LangSmithSpeedExperimentRunner:
                 "response_time_ms": (end_time - start_time) * 1000,
                 "tokens_per_second": 0,
                 "success": False,
-                "error": str(e)
+                "error": str(e),
             }
 
     def evaluate_response_accuracy(self, response: str, expected_data: Dict) -> Dict[str, Any]:
@@ -149,7 +140,7 @@ class LangSmithSpeedExperimentRunner:
             "accuracy_score": accuracy_score,
             "max_score": 100,
             "details": details,
-            "response_length": len(response)
+            "response_length": len(response),
         }
 
     def validate_with_graphql_curl(self, customer_data: Dict) -> Dict[str, Any]:
@@ -160,7 +151,7 @@ class LangSmithSpeedExperimentRunner:
             "validation_method": "graphql_curl",
             "customer_id": customer_data.get("customer_id"),
             "query_executed": False,
-            "note": "GraphQL validation implementation pending"
+            "note": "GraphQL validation implementation pending",
         }
 
     def _get_credit_scenarios(self) -> List[Dict]:
@@ -171,20 +162,20 @@ class LangSmithSpeedExperimentRunner:
                 "name": "John Smith",
                 "email": "john.smith@techcorp.com",
                 "has_credit_report": True,
-                "credit_score": 750
+                "credit_score": 750,
             },
             {
                 "customer_id": "1992837",
                 "name": "Sarah Johnson",
                 "email": "sarah.johnson@healthcare.org",
                 "has_credit_report": True,
-                "credit_score": 820
+                "credit_score": 820,
             },
             {
                 "customer_id": "2003948",
                 "name": "Michael Brown",
                 "email": "mike.brown@retail.com",
                 "has_credit_report": True,
-                "credit_score": 680
-            }
+                "credit_score": 680,
+            },
         ]

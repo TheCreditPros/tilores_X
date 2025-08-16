@@ -10,23 +10,24 @@ REAL_TEST_CUSTOMERS = [
         "raw_response": "I encountered an error: langchain_core.language_models.chat_models.BaseChatModel.generate_prompt() got multiple values for keyword argument 'callbacks'. Please try again.",
         "status": "success",
         "name": "Unknown Customer",
-        "has_credit_report": false
+        "has_credit_report": False,
     },
     {
         "email": "lelisguardado@sbcglobal.net",
         "raw_response": "I encountered an error: langchain_core.language_models.chat_models.BaseChatModel.generate_prompt() got multiple values for keyword argument 'callbacks'. Please try again.",
         "status": "success",
         "name": "Unknown Customer",
-        "has_credit_report": false
+        "has_credit_report": False,
     },
     {
         "email": "migdaliareyes53@gmail.com",
         "raw_response": "I encountered an error: langchain_core.language_models.chat_models.BaseChatModel.generate_prompt() got multiple values for keyword argument 'callbacks'. Please try again.",
         "status": "success",
         "name": "Unknown Customer",
-        "has_credit_report": false
-    }
+        "has_credit_report": False,
+    },
 ]
+
 
 def get_real_customers():
     """Get the real customer test data"""

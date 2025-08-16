@@ -26,11 +26,7 @@ class ConversationalCreditScenarios:
                     "turn_number": 1,
                     "role": "user",
                     "content": f"Hello, I need to look up information for customer {customer_data.get('name', 'Unknown')}",
-                    "expected_response_elements": [
-                        "greeting",
-                        "customer_acknowledgment",
-                        "data_request"
-                    ]
+                    "expected_response_elements": ["greeting", "customer_acknowledgment", "data_request"],
                 },
                 {
                     "turn_number": 2,
@@ -40,19 +36,15 @@ class ConversationalCreditScenarios:
                         "credit_score",
                         "utilization_data",
                         "payment_history",
-                        "account_details"
-                    ]
-                }
+                        "account_details",
+                    ],
+                },
             ],
             "success_criteria": {
                 "min_response_time_ms": 2000,
                 "max_response_time_ms": 10000,
-                "required_data_points": [
-                    "customer_name",
-                    "credit_score",
-                    "account_information"
-                ]
-            }
+                "required_data_points": ["customer_name", "credit_score", "account_information"],
+            },
         }
 
         return scenario
@@ -64,27 +56,23 @@ class ConversationalCreditScenarios:
             "customer_identifier": {
                 "customer_id": customer_data.get("customer_id"),
                 "email": customer_data.get("email"),
-                "name": customer_data.get("name")
+                "name": customer_data.get("name"),
             },
             "request_content": f"Get me the complete credit report for {customer_data.get('name')} (ID: {customer_data.get('customer_id')}). I need to see their current credit score, utilization rates, payment history, and any recent inquiries.",
             "expected_response_structure": {
                 "customer_info": {
                     "name": customer_data.get("name"),
                     "id": customer_data.get("customer_id"),
-                    "email": customer_data.get("email")
+                    "email": customer_data.get("email"),
                 },
                 "credit_data": {
                     "score": customer_data.get("credit_score"),
                     "utilization": "percentage",
                     "payment_history": "status",
-                    "inquiries": "list"
-                }
+                    "inquiries": "list",
+                },
             },
-            "quality_metrics": {
-                "completeness_score": 0,
-                "accuracy_score": 0,
-                "response_time_ms": 0
-            }
+            "quality_metrics": {"completeness_score": 0, "accuracy_score": 0, "response_time_ms": 0},
         }
 
         return request
@@ -113,8 +101,16 @@ class ConversationalCreditScenarios:
 
         # Check for credit-related terminology (25 points)
         credit_terms = [
-            "credit", "score", "utilization", "payment", "history",
-            "inquiry", "account", "balance", "limit", "report"
+            "credit",
+            "score",
+            "utilization",
+            "payment",
+            "history",
+            "inquiry",
+            "account",
+            "balance",
+            "limit",
+            "report",
         ]
         terms_found = sum(1 for term in credit_terms if term.lower() in response.lower())
         term_score = min(terms_found * 3, 25)  # Max 25 points
@@ -145,7 +141,7 @@ class ConversationalCreditScenarios:
             "max_score": max_score,
             "accuracy_percentage": accuracy_percentage,
             "details": details,
-            "grade": self._get_grade(accuracy_percentage)
+            "grade": self._get_grade(accuracy_percentage),
         }
 
     def create_batch_scenarios(self, customers: List[Dict]) -> List[Dict[str, Any]]:
@@ -157,12 +153,14 @@ class ConversationalCreditScenarios:
             two_turn = self.create_two_turn_scenario(customer)
             credit_request = self.create_credit_report_request(customer)
 
-            scenarios.append({
-                "customer_id": customer.get("customer_id"),
-                "customer_name": customer.get("name"),
-                "two_turn_scenario": two_turn,
-                "credit_request_scenario": credit_request
-            })
+            scenarios.append(
+                {
+                    "customer_id": customer.get("customer_id"),
+                    "customer_name": customer.get("name"),
+                    "two_turn_scenario": two_turn,
+                    "credit_request_scenario": credit_request,
+                }
+            )
 
         return scenarios
 

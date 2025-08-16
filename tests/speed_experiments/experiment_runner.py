@@ -23,42 +23,22 @@ class ComprehensiveSpeedExperimentRunner:
 
         # 6 fastest models from README
         self.fastest_models = [
-            {
-                "id": "llama-3.3-70b-specdec",
-                "provider": "groq",
-                "speed": "1,665 tok/s",
-                "expected_response_time": 1.0
-            },
-            {
-                "id": "llama-3.3-70b-versatile",
-                "provider": "groq",
-                "speed": "276 tok/s",
-                "expected_response_time": 2.0
-            },
-            {
-                "id": "mixtral-8x7b-32768",
-                "provider": "groq",
-                "speed": "500+ tok/s",
-                "expected_response_time": 1.5
-            },
+            {"id": "llama-3.3-70b-specdec", "provider": "groq", "speed": "1,665 tok/s", "expected_response_time": 1.0},
+            {"id": "llama-3.3-70b-versatile", "provider": "groq", "speed": "276 tok/s", "expected_response_time": 2.0},
+            {"id": "mixtral-8x7b-32768", "provider": "groq", "speed": "500+ tok/s", "expected_response_time": 1.5},
             {
                 "id": "deepseek-r1-distill-llama-70b",
                 "provider": "groq",
                 "speed": "0.825s avg",
-                "expected_response_time": 1.0
+                "expected_response_time": 1.0,
             },
             {
                 "id": "llama-3.2-90b-text-preview",
                 "provider": "groq",
                 "speed": "330 tok/s",
-                "expected_response_time": 2.0
+                "expected_response_time": 2.0,
             },
-            {
-                "id": "gpt-3.5-turbo",
-                "provider": "openai",
-                "speed": "1.016s avg",
-                "expected_response_time": 1.5
-            }
+            {"id": "gpt-3.5-turbo", "provider": "openai", "speed": "1.016s avg", "expected_response_time": 1.5},
         ]
 
         # Test customers with credit data
@@ -68,22 +48,22 @@ class ComprehensiveSpeedExperimentRunner:
                 "name": "John Smith",
                 "email": "john.smith@techcorp.com",
                 "has_credit_report": True,
-                "credit_score": 750
+                "credit_score": 750,
             },
             {
                 "customer_id": "1992837",
                 "name": "Sarah Johnson",
                 "email": "sarah.johnson@healthcare.org",
                 "has_credit_report": True,
-                "credit_score": 820
+                "credit_score": 820,
             },
             {
                 "customer_id": "2003948",
                 "name": "Michael Brown",
                 "email": "mike.brown@retail.com",
                 "has_credit_report": True,
-                "credit_score": 680
-            }
+                "credit_score": 680,
+            },
         ]
 
     def run_comprehensive_experiment(self) -> Dict[str, Any]:
@@ -96,7 +76,7 @@ class ComprehensiveSpeedExperimentRunner:
             "start_time": time.time(),
             "models_tested": len(self.fastest_models),
             "customers_tested": len(self.test_customers),
-            "results": {}
+            "results": {},
         }
 
         # Test each model
@@ -119,11 +99,7 @@ class ComprehensiveSpeedExperimentRunner:
         model_results = {
             "model_info": model,
             "customer_tests": {},
-            "performance_metrics": {
-                "avg_response_time": 0,
-                "avg_accuracy_score": 0,
-                "success_rate": 0
-            }
+            "performance_metrics": {"avg_response_time": 0, "avg_accuracy_score": 0, "success_rate": 0},
         }
 
         response_times = []
@@ -139,20 +115,13 @@ class ComprehensiveSpeedExperimentRunner:
             scenario = self.scenario_creator.create_two_turn_scenario(customer)
 
             # Test both turns of the conversation
-            customer_results = {
-                "customer_info": customer,
-                "scenario": scenario,
-                "turn_results": []
-            }
+            customer_results = {"customer_info": customer, "scenario": scenario, "turn_results": []}
 
             for turn in scenario["turns"]:
                 total_tests += 1
 
                 # Measure speed
-                speed_result = self.speed_runner.measure_response_speed(
-                    model["id"],
-                    turn["content"]
-                )
+                speed_result = self.speed_runner.measure_response_speed(model["id"], turn["content"])
 
                 if speed_result["success"]:
                     successful_tests += 1
@@ -163,24 +132,21 @@ class ComprehensiveSpeedExperimentRunner:
                     simulated_response = f"Customer {customer['name']} found. Credit score: {customer['credit_score']}. Account information available."
 
                     # Evaluate accuracy
-                    accuracy_result = self.speed_runner.evaluate_response_accuracy(
-                        simulated_response,
-                        customer
-                    )
+                    accuracy_result = self.speed_runner.evaluate_response_accuracy(simulated_response, customer)
                     accuracy_scores.append(accuracy_result["accuracy_score"])
 
                     turn_result = {
                         "turn_number": turn["turn_number"],
                         "speed_result": speed_result,
                         "accuracy_result": accuracy_result,
-                        "success": True
+                        "success": True,
                     }
                 else:
                     turn_result = {
                         "turn_number": turn["turn_number"],
                         "speed_result": speed_result,
                         "accuracy_result": {"accuracy_score": 0},
-                        "success": False
+                        "success": False,
                     }
 
                 customer_results["turn_results"].append(turn_result)
@@ -203,12 +169,14 @@ class ComprehensiveSpeedExperimentRunner:
 
         for model_id, model_results in results["results"].items():
             metrics = model_results["performance_metrics"]
-            model_performance.append({
-                "model_id": model_id,
-                "avg_response_time": metrics["avg_response_time"],
-                "avg_accuracy_score": metrics["avg_accuracy_score"],
-                "success_rate": metrics["success_rate"]
-            })
+            model_performance.append(
+                {
+                    "model_id": model_id,
+                    "avg_response_time": metrics["avg_response_time"],
+                    "avg_accuracy_score": metrics["avg_accuracy_score"],
+                    "success_rate": metrics["success_rate"],
+                }
+            )
 
         # Sort by combined score (speed + accuracy)
         for model in model_performance:
@@ -227,7 +195,7 @@ class ComprehensiveSpeedExperimentRunner:
             "customers_tested": results["customers_tested"],
             "performance_ranking": model_performance,
             "best_model": model_performance[0] if model_performance else None,
-            "recommendations": self._generate_recommendations(model_performance)
+            "recommendations": self._generate_recommendations(model_performance),
         }
 
         return summary
@@ -240,22 +208,30 @@ class ComprehensiveSpeedExperimentRunner:
             return ["No performance data available for recommendations"]
 
         best_model = performance_data[0]
-        recommendations.append(f"🏆 Best overall model: {best_model['model_id']} (combined score: {best_model['combined_score']:.1f})")
+        recommendations.append(
+            f"🏆 Best overall model: {best_model['model_id']} (combined score: {best_model['combined_score']:.1f})"
+        )
 
         # Speed recommendations
         fastest_model = min(performance_data, key=lambda x: x["avg_response_time"])
         if fastest_model["avg_response_time"] < 2000:  # Less than 2 seconds
-            recommendations.append(f"⚡ Fastest model: {fastest_model['model_id']} ({fastest_model['avg_response_time']:.0f}ms avg)")
+            recommendations.append(
+                f"⚡ Fastest model: {fastest_model['model_id']} ({fastest_model['avg_response_time']:.0f}ms avg)"
+            )
 
         # Accuracy recommendations
         most_accurate = max(performance_data, key=lambda x: x["avg_accuracy_score"])
         if most_accurate["avg_accuracy_score"] > 80:
-            recommendations.append(f"🎯 Most accurate model: {most_accurate['model_id']} ({most_accurate['avg_accuracy_score']:.1f}% accuracy)")
+            recommendations.append(
+                f"🎯 Most accurate model: {most_accurate['model_id']} ({most_accurate['avg_accuracy_score']:.1f}% accuracy)"
+            )
 
         # Success rate recommendations
         most_reliable = max(performance_data, key=lambda x: x["success_rate"])
         if most_reliable["success_rate"] > 95:
-            recommendations.append(f"✅ Most reliable model: {most_reliable['model_id']} ({most_reliable['success_rate']:.1f}% success rate)")
+            recommendations.append(
+                f"✅ Most reliable model: {most_reliable['model_id']} ({most_reliable['success_rate']:.1f}% success rate)"
+            )
 
         return recommendations
 
@@ -277,10 +253,7 @@ class ComprehensiveSpeedExperimentRunner:
 
                 # Evaluate response quality
                 if curl_result["success"]:
-                    quality_result = self.graphql_validator.evaluate_response_quality(
-                        curl_result["data"],
-                        customer
-                    )
+                    quality_result = self.graphql_validator.evaluate_response_quality(curl_result["data"], customer)
                 else:
                     quality_result = {"quality_score": 0, "response_valid": False}
 
@@ -288,15 +261,11 @@ class ComprehensiveSpeedExperimentRunner:
                     "customer": customer,
                     "query_length": len(query),
                     "curl_result": curl_result,
-                    "quality_result": quality_result
+                    "quality_result": quality_result,
                 }
 
             except Exception as e:
-                validation_results[customer["customer_id"]] = {
-                    "customer": customer,
-                    "error": str(e),
-                    "success": False
-                }
+                validation_results[customer["customer_id"]] = {"customer": customer, "error": str(e), "success": False}
 
         return validation_results
 

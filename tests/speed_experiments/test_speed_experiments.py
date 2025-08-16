@@ -16,38 +16,13 @@ FASTEST_MODELS = [
         "id": "llama-3.3-70b-specdec",
         "provider": "groq",
         "speed": "1,665 tok/s",
-        "expected_response_time": 1.0  # seconds
+        "expected_response_time": 1.0,  # seconds
     },
-    {
-        "id": "llama-3.3-70b-versatile",
-        "provider": "groq",
-        "speed": "276 tok/s",
-        "expected_response_time": 2.0
-    },
-    {
-        "id": "mixtral-8x7b-32768",
-        "provider": "groq",
-        "speed": "500+ tok/s",
-        "expected_response_time": 1.5
-    },
-    {
-        "id": "deepseek-r1-distill-llama-70b",
-        "provider": "groq",
-        "speed": "0.825s avg",
-        "expected_response_time": 1.0
-    },
-    {
-        "id": "llama-3.2-90b-text-preview",
-        "provider": "groq",
-        "speed": "330 tok/s",
-        "expected_response_time": 2.0
-    },
-    {
-        "id": "gpt-3.5-turbo",
-        "provider": "openai",
-        "speed": "1.016s avg",
-        "expected_response_time": 1.5
-    }
+    {"id": "llama-3.3-70b-versatile", "provider": "groq", "speed": "276 tok/s", "expected_response_time": 2.0},
+    {"id": "mixtral-8x7b-32768", "provider": "groq", "speed": "500+ tok/s", "expected_response_time": 1.5},
+    {"id": "deepseek-r1-distill-llama-70b", "provider": "groq", "speed": "0.825s avg", "expected_response_time": 1.0},
+    {"id": "llama-3.2-90b-text-preview", "provider": "groq", "speed": "330 tok/s", "expected_response_time": 2.0},
+    {"id": "gpt-3.5-turbo", "provider": "openai", "speed": "1.016s avg", "expected_response_time": 1.5},
 ]
 
 # Test credit report scenarios from test_data.py
@@ -57,23 +32,24 @@ CREDIT_SCENARIOS = [
         "name": "John Smith",
         "email": "john.smith@techcorp.com",
         "has_credit_report": True,
-        "credit_score": 750
+        "credit_score": 750,
     },
     {
         "customer_id": "1992837",
         "name": "Sarah Johnson",
         "email": "sarah.johnson@healthcare.org",
         "has_credit_report": True,
-        "credit_score": 820
+        "credit_score": 820,
     },
     {
         "customer_id": "2003948",
         "name": "Michael Brown",
         "email": "mike.brown@retail.com",
         "has_credit_report": True,
-        "credit_score": 680
-    }
+        "credit_score": 680,
+    },
 ]
+
 
 class TestLangSmithSpeedExperiments:
     """Test suite for LangSmith speed experiments framework"""
@@ -119,6 +95,7 @@ class TestLangSmithSpeedExperiments:
             runner = LangSmithSpeedExperimentRunner()
             runner.validate_with_graphql_curl(CREDIT_SCENARIOS[0])
 
+
 class TestConversationalCreditScenarios:
     """Test suite for conversational credit report scenarios"""
 
@@ -145,6 +122,7 @@ class TestConversationalCreditScenarios:
         with pytest.raises(NotImplementedError):
             scenarios = ConversationalCreditScenarios()
             scenarios.score_credit_response_accuracy("test response", CREDIT_SCENARIOS[0])
+
 
 class TestGraphQLValidation:
     """Test suite for GraphQL curl validation"""
@@ -173,6 +151,7 @@ class TestGraphQLValidation:
             validator = GraphQLValidator()
             validator.evaluate_response_quality("test response", CREDIT_SCENARIOS[0])
 
+
 class TestLangSmithCLIIntegration:
     """Test suite for LangSmith CLI integration"""
 
@@ -199,6 +178,7 @@ class TestLangSmithCLIIntegration:
         with pytest.raises(NotImplementedError):
             cli = LangSmithCLI()
             cli.analyze_experiment_results("test-experiment-id")
+
 
 # Integration test scenarios
 class TestEndToEndSpeedExperiments:
@@ -227,6 +207,7 @@ class TestEndToEndSpeedExperiments:
         with pytest.raises(NotImplementedError):
             pipeline = SpeedExperimentPipeline()
             pipeline.generate_remediation_recommendations("test results")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

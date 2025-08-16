@@ -38,7 +38,7 @@ class GraphQLValidator:
             else:
                 search_params = f'"FIRST_NAME": "Unknown"'
 
-        query = f'''{{
+        query = f"""{{
             search(input: {{
                 searchParams: {{{search_params}}}
                 recordFieldsToQuery: {{
@@ -68,7 +68,7 @@ class GraphQLValidator:
                     }}
                 }}
             }}
-        }}'''
+        }}"""
 
         return query.strip()
 
@@ -82,21 +82,21 @@ class GraphQLValidator:
             # Prepare curl command
             curl_cmd = [
                 "curl",
-                "-X", "POST",
+                "-X",
+                "POST",
                 self.tilores_api_url,
-                "-H", "Content-Type: application/json",
-                "-H", f"Authorization: Bearer {self._access_token}",
-                "-d", json.dumps({"query": query}),
-                "--max-time", "30"
+                "-H",
+                "Content-Type: application/json",
+                "-H",
+                f"Authorization: Bearer {self._access_token}",
+                "-d",
+                json.dumps({"query": query}),
+                "--max-time",
+                "30",
             ]
 
             # Execute curl command
-            result = subprocess.run(
-                curl_cmd,
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+            result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 try:
@@ -105,32 +105,24 @@ class GraphQLValidator:
                         "success": True,
                         "data": response_data,
                         "response_time": "measured_by_curl",
-                        "customer_id": customer_data.get("customer_id")
+                        "customer_id": customer_data.get("customer_id"),
                     }
                 except json.JSONDecodeError as e:
-                    return {
-                        "success": False,
-                        "error": f"JSON decode error: {e}",
-                        "raw_output": result.stdout[:500]
-                    }
+                    return {"success": False, "error": f"JSON decode error: {e}", "raw_output": result.stdout[:500]}
             else:
                 return {
                     "success": False,
                     "error": f"Curl failed with code {result.returncode}",
-                    "stderr": result.stderr[:500]
+                    "stderr": result.stderr[:500],
                 }
 
         except subprocess.TimeoutExpired:
-            return {
-                "success": False,
-                "error": "Request timeout (30s)",
-                "customer_id": customer_data.get("customer_id")
-            }
+            return {"success": False, "error": "Request timeout (30s)", "customer_id": customer_data.get("customer_id")}
         except Exception as e:
             return {
                 "success": False,
                 "error": f"Execution error: {str(e)}",
-                "customer_id": customer_data.get("customer_id")
+                "customer_id": customer_data.get("customer_id"),
             }
 
     def evaluate_response_quality(self, response: str, expected_data: Dict) -> Dict[str, Any]:
@@ -191,7 +183,7 @@ class GraphQLValidator:
                 "quality_score": quality_score,
                 "max_score": 100,
                 "details": details,
-                "response_valid": quality_score > 0
+                "response_valid": quality_score > 0,
             }
 
         except Exception as e:
@@ -199,7 +191,7 @@ class GraphQLValidator:
                 "quality_score": 0,
                 "max_score": 100,
                 "details": {"evaluation_error": str(e)},
-                "response_valid": False
+                "response_valid": False,
             }
 
     def _get_access_token(self):
@@ -207,11 +199,15 @@ class GraphQLValidator:
         try:
             curl_cmd = [
                 "curl",
-                "-X", "POST",
+                "-X",
+                "POST",
                 self.token_url,
-                "-H", "Content-Type: application/x-www-form-urlencoded",
-                "-d", f"grant_type=client_credentials&client_id={self.client_id}&client_secret={self.client_secret}",
-                "--max-time", "10"
+                "-H",
+                "Content-Type: application/x-www-form-urlencoded",
+                "-d",
+                f"grant_type=client_credentials&client_id={self.client_id}&client_secret={self.client_secret}",
+                "--max-time",
+                "10",
             ]
 
             result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=10)

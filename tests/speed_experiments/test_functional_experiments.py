@@ -28,11 +28,7 @@ def test_conversational_scenarios_functionality():
     """Test that conversational scenarios work functionally"""
     scenarios = ConversationalCreditScenarios()
 
-    customer_data = {
-        "customer_id": "123",
-        "name": "Test Customer",
-        "credit_score": 750
-    }
+    customer_data = {"customer_id": "123", "name": "Test Customer", "credit_score": 750}
 
     # Test two-turn scenario creation
     scenario = scenarios.create_two_turn_scenario(customer_data)
@@ -48,11 +44,7 @@ def test_graphql_validator_functionality():
     """Test that GraphQL validator works functionally"""
     validator = GraphQLValidator()
 
-    customer_data = {
-        "customer_id": "123",
-        "name": "Test Customer",
-        "email": "test@example.com"
-    }
+    customer_data = {"customer_id": "123", "name": "Test Customer", "email": "test@example.com"}
 
     # Test query building
     query = validator.build_credit_report_query(customer_data)
@@ -66,10 +58,7 @@ def test_accuracy_scoring():
     """Test accuracy scoring functionality"""
     scenarios = ConversationalCreditScenarios()
 
-    expected_data = {
-        "name": "John Smith",
-        "credit_score": 750
-    }
+    expected_data = {"name": "John Smith", "credit_score": 750}
 
     # Test with good response
     good_response = "Customer John Smith found. Credit score: 750. Payment history shows good standing."
