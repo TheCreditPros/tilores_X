@@ -367,6 +367,11 @@ class MultiProviderLLMEngine:
         # Initialize LangSmith observability
         self.langsmith_client = None
         self.langchain_tracer = None
+        
+        # Load environment FIRST before any initialization
+        self._load_environment()
+        
+        # Now initialize LangSmith with loaded environment
         self._init_langsmith()
 
         # Initialize Tilores after LangSmith setup
@@ -448,10 +453,8 @@ class MultiProviderLLMEngine:
             import os
             import time
 
-            # LOAD ENVIRONMENT - Support master .env file in project root
-            self._load_environment()
-
             # ENVIRONMENT VALIDATION - Prevent configuration drift
+            # (Environment already loaded in __init__ before LangSmith)
             print("🔍 Validating environment configuration...")
             required_vars = [
                 "TILORES_API_URL",
