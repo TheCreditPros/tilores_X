@@ -457,7 +457,7 @@ async def list_models():
     models = llm_engine.get_available_models()
     return {
         "object": "list",
-        "data": [model.dict() for model in models]
+        "data": [model.model_dump() for model in models]
     }
 
 

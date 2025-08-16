@@ -13,7 +13,7 @@ from tilores import TiloresAPI
 from tilores_langchain import TiloresTools
 
 # Import debug configuration
-from utils.debug_config import setup_logging, debug_print
+from utils.debug_config import setup_logging
 
 # Set up module logger
 logger = setup_logging(__name__)
