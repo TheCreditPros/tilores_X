@@ -32,7 +32,11 @@ class GraphQLValidator:
         elif customer_id:
             search_params = f'"CLIENT_ID": "{customer_id}"'
         else:
-            search_params = f'"FIRST_NAME": "{customer_data.get("name", "").split()[0]}"'
+            name_parts = customer_data.get("name", "").split()
+            if name_parts:
+                search_params = f'"FIRST_NAME": "{name_parts[0]}"'
+            else:
+                search_params = f'"FIRST_NAME": "Unknown"'
 
         query = f'''{{
             search(input: {{

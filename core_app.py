@@ -367,10 +367,10 @@ class MultiProviderLLMEngine:
         # Initialize LangSmith observability
         self.langsmith_client = None
         self.langchain_tracer = None
-        
+
         # Load environment FIRST before any initialization
         self._load_environment()
-        
+
         # Now initialize LangSmith with loaded environment
         self._init_langsmith()
 
@@ -1758,30 +1758,13 @@ def run_chain(
         if engine is None:
             raise RuntimeError("Engine initialization failed")
 
-        # Initialize LangSmith tracing context
+        # TEMPORARILY DISABLE LangSmith tracing to fix callback conflict
+        # TODO: Fix callback conflict properly in future version
         langsmith_callbacks = []
         trace_metadata = {}
 
-        if hasattr(engine, "langchain_tracer") and engine.langchain_tracer is not None:
-            langsmith_callbacks.append(engine.langchain_tracer)
-
-            # Add metadata for comprehensive observability
-            trace_metadata.update(
-                {
-                    "model": model,
-                    "provider": engine.get_provider(model),
-                    "message_count": len(messages) if isinstance(messages, list) else 1,
-                    "stream": stream,
-                    "tilores_tools_available": bool(engine.tools),
-                    "tool_count": len(engine.tools) if engine.tools else 0,
-                }
-            )
-
-            # Add customer context if available
-            if customer_data:
-                trace_metadata["has_customer_context"] = True
-
-            print("📊 LangSmith tracing enabled for this request")
+        # Disable LangSmith to prevent callback conflicts
+        print("📊 LangSmith tracing temporarily disabled to fix callback conflict")
 
         # Handle both legacy string input and new conversation format
         if isinstance(messages, str):
@@ -2035,22 +2018,9 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
             # Non-streaming path (existing logic)
             print(f"🔍 INVOKING LLM WITH TOOLS: {type(llm_with_tools).__name__}")
 
-            # LangSmith: Create trace context for LLM invocation
-            invoke_kwargs = {}
-            if langsmith_callbacks:
-                invoke_kwargs["callbacks"] = langsmith_callbacks
-                # Add trace metadata as config
-                invoke_kwargs["config"] = {
-                    "metadata": trace_metadata,
-                    "tags": [
-                        f"provider_{engine.get_provider(model)}",
-                        f"model_{model.replace('/', '_')}",
-                        "llm_invocation",
-                    ],
-                }
-                print("📊 LangSmith: Tracing LLM invocation with metadata")
-
-            response = llm_with_tools.invoke(llm_messages, **invoke_kwargs)
+            # FIXED: Remove all LangSmith callback handling to prevent conflicts
+            # Direct invocation without callback complications
+            response = llm_with_tools.invoke(llm_messages)
 
             # DEBUG: Check if tools were called
             has_tool_calls = hasattr(response, "tool_calls") and bool(response.tool_calls)
