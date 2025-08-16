@@ -264,8 +264,6 @@ class TestProviderRetryMechanisms:
                 headers={"Authorization": "Bearer test-key"},
             )
 
-            elapsed_time = time.time() - start_time
-
             # In integration tests, the system may handle failures differently
             # Focus on whether the system responds appropriately
             assert response.status_code in [200, 500]

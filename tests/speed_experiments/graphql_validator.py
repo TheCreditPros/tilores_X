@@ -36,7 +36,7 @@ class GraphQLValidator:
             if name_parts:
                 search_params = f'"FIRST_NAME": "{name_parts[0]}"'
             else:
-                search_params = f'"FIRST_NAME": "Unknown"'
+                search_params = '"FIRST_NAME": "Unknown"'
 
         query = f"""{{
             search(input: {{

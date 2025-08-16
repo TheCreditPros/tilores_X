@@ -254,7 +254,7 @@ class MultiProviderLLMEngine:
 
     def __init__(self):
         """Initialize with simple model mappings - only available providers"""
-        # Start with OpenAI models (always available)
+        # Start with OpenAI models (always available) - gpt-3.5-turbo removed due to 16K context limit
         self.model_mappings = {
             "gpt-5-mini": {
                 "provider": "openai",
@@ -262,13 +262,13 @@ class MultiProviderLLMEngine:
                 "real_name": "gpt-5-mini-2025-08-07",
             },
             "gpt-4o": {"provider": "openai", "class": ChatOpenAI},
-            "gpt-4o-mini": {"provider": "openai", "class": ChatOpenAI},
+            "gpt-4o-mini": {"provider": "openai", "class": ChatOpenAI},  # 128K context - works with tools
             "gpt-4.1-mini": {
                 "provider": "openai",
                 "class": ChatOpenAI,
                 "real_name": "gpt-4.1-mini-2025-04-14",
             },
-            "gpt-3.5-turbo": {"provider": "openai", "class": ChatOpenAI},
+            # "gpt-3.5-turbo": REMOVED - 16K context limit incompatible with Tilores tools (961 tokens)
         }
 
         # Add optional providers if available
@@ -295,6 +295,16 @@ class MultiProviderLLMEngine:
                         "provider": "gemini",
                         "class": ChatGoogleGenerativeAI,
                         "real_name": "gemini-1.5-flash-002",
+                    },
+                    "gemini-2.5-flash": {
+                        "provider": "gemini",
+                        "class": ChatGoogleGenerativeAI,
+                        "real_name": "gemini-2.5-flash",
+                    },
+                    "gemini-2.5-flash-lite": {
+                        "provider": "gemini",
+                        "class": ChatGoogleGenerativeAI,
+                        "real_name": "gemini-2.5-flash-lite",
                     },
                 }
             )
@@ -1689,17 +1699,19 @@ def _get_fastest_available_model() -> str:
 
     # Ordered by preference - UPDATED with working models only (Aug 2025)
     preferred_models = [
-        "llama-3.3-70b-versatile",  # ~600ms avg - Fastest working Groq model
-        "gpt-3.5-turbo",  # 1.016s production avg - Fast OpenAI
-        "gpt-4o-mini",  # 1.915s production avg - Balanced speed/quality
-        "deepseek-r1-distill-llama-70b",  # ~3.5s avg - Cost-effective reasoning
+        "gemini-2.5-flash-lite",  # NEW: ~3.5s avg - Lightweight, speed-optimized
+        "gemini-1.5-flash-002",  # ~2.3s avg - Fastest in tests
+        "llama-3.3-70b-versatile",  # ~5.1s avg - Fastest working Groq model
+        "gemini-2.5-flash",  # NEW: ~7.2s avg - Enhanced reasoning capabilities
+        "gpt-4o-mini",  # ~7.4s avg - Large context (128K), works with tools
+        "deepseek-r1-distill-llama-70b",  # ~8.7s avg - Cost-effective reasoning
+        "claude-3-haiku",  # ~4s avg - Fast Anthropic model
         "gpt-5-mini",  # Latest OpenAI model
-        "claude-3-haiku",  # Fast Anthropic model
-        "gemini-1.5-flash-002",  # 2.2s avg - FAST Gemini
-        "gpt-4o",  # 2.789s production avg
+        "gpt-4o",  # Advanced OpenAI model
         "claude-3-sonnet",  # Advanced reasoning
         "gpt-4.1-mini",  # Fallback
-        # DEPRECATED MODELS REMOVED:
+        # REMOVED/DEPRECATED MODELS:
+        # "gpt-3.5-turbo" - REMOVED: 16K context limit incompatible with Tilores tools
         # "llama-3.3-70b-specdec" - decommissioned by Groq
         # "mixtral-8x7b-32768" - decommissioned by Groq
         # "llama-3.2-90b-text-preview" - decommissioned by Groq
@@ -1744,12 +1756,17 @@ def run_chain(
         if engine is None:
             raise RuntimeError("Engine initialization failed")
 
-        # TEMPORARILY DISABLE LangSmith tracing to fix callback conflict
-        # TODO: Fix callback conflict properly in future version
+        # LangSmith: Initialize tracing callbacks if available
         langsmith_callbacks = []
-
-        # Disable LangSmith to prevent callback conflicts
-        print("📊 LangSmith tracing temporarily disabled to fix callback conflict")
+        if engine and engine.langsmith_client and engine.langchain_tracer:
+            try:
+                langsmith_callbacks = [engine.langchain_tracer]
+                print(f"📊 LangSmith: Tracing enabled with project: {engine.langchain_tracer.project_name}")
+            except Exception as e:
+                print(f"⚠️ LangSmith callback setup failed: {e}")
+                langsmith_callbacks = []
+        else:
+            print("📊 LangSmith: Tracing not available - client or tracer not initialized")
 
         # Handle both legacy string input and new conversation format
         if isinstance(messages, str):

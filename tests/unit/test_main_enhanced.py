@@ -8,7 +8,6 @@ model listing, health checks, and token counting utilities.
 import json
 import pytest
 from unittest.mock import MagicMock, patch
-from fastapi.testclient import TestClient
 from main_enhanced import (
     app,
     count_tokens,

@@ -1,0 +1,9 @@
+{"spectrum": "customer_identity_resolution", "score": 0.998, "source": "direct_test", "model": "gpt-4o-mini", "timestamp": "2025-08-16T08:05:07.654814", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "customer_identity_resolution", "score": 0.953, "source": "direct_test", "model": "llama-3.3-70b-versatile", "timestamp": "2025-08-16T08:05:07.655109", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "financial_analysis_depth", "score": 0.987, "source": "direct_test", "model": "gpt-4o-mini", "timestamp": "2025-08-16T08:05:07.655212", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "financial_analysis_depth", "score": 0.969, "source": "direct_test", "model": "llama-3.3-70b-versatile", "timestamp": "2025-08-16T08:05:07.655283", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "multi_field_data_integration", "score": 0.97, "source": "direct_test", "model": "gpt-4o-mini", "timestamp": "2025-08-16T08:05:07.655345", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "multi_field_data_integration", "score": 0.952, "source": "direct_test", "model": "llama-3.3-70b-versatile", "timestamp": "2025-08-16T08:05:07.655406", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "conversational_context_handling", "score": 0.958, "source": "direct_test", "model": "gpt-4o-mini", "timestamp": "2025-08-16T08:05:07.655464", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "conversational_context_handling", "score": 0.951, "source": "direct_test", "model": "llama-3.3-70b-versatile", "timestamp": "2025-08-16T08:05:07.655531", "metadata": {"test_run": "demo", "version": "1.0"}}
+{"spectrum": "professional_communication", "score": 0.9, "source": "user_feedback", "model": null, "timestamp": "2025-08-16T08:05:07.655612", "metadata": {"user_type": "business", "query_complexity": "medium"}}

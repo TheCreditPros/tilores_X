@@ -65,8 +65,8 @@ def test_accuracy_scoring():
     result = scenarios.score_credit_response_accuracy(good_response, expected_data)
 
     assert result["accuracy_score"] > 50
-    assert result["details"]["customer_identified"] == True
-    assert result["details"]["credit_score_mentioned"] == True
+    assert result["details"]["customer_identified"] is True
+    assert result["details"]["credit_score_mentioned"] is True
 
     # Test with poor response
     poor_response = "Hello"

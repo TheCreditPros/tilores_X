@@ -8,8 +8,7 @@ following pytest best practices and TDD principles.
 import asyncio
 import os
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Dict, Generator, Any
+from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 
 # Import application modules for testing
