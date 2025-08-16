@@ -271,6 +271,24 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
                 content = str(response["message"]["content"])
             else:
                 content = "I'm ready to help."
+        elif hasattr(response, "generations") and response.generations:
+            # Handle LLMResult format - extract from generations
+            try:
+                first_generation = response.generations[0]
+                if hasattr(first_generation, "text"):
+                    content = str(first_generation.text)
+                elif isinstance(first_generation, list) and len(first_generation) > 0:
+                    first_item = first_generation[0]
+                    if hasattr(first_item, "text"):
+                        content = str(first_item.text)
+                    elif hasattr(first_item, "message") and hasattr(first_item.message, "content"):
+                        content = str(first_item.message.content)
+                    else:
+                        content = str(first_item)
+                else:
+                    content = str(first_generation)
+            except (AttributeError, IndexError, TypeError):
+                content = "I'm ready to help."
         else:
             content_str = str(response)
             if len(content_str) > 500 or "LLMResult" in content_str or "token_usage" in content_str:
