@@ -1749,7 +1749,6 @@ def run_chain(
     """
     try:
         # Ensure engine is initialized
-        global engine
         initialize_engine()
 
         # Safety check - should not happen after initialize_engine()
