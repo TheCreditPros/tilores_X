@@ -16,7 +16,7 @@ from main_openai_compatible import (
     ChatCompletionRequest,
     ChatCompletionResponse,
     ModelInfo,
-    MultiProviderLLMEngine
+    MultiProviderLLMEngine,
 )
 
 
@@ -33,12 +33,7 @@ class TestPydanticModels:
         """Test ChatCompletionRequest model with all fields."""
         messages = [ChatMessage(role="user", content="Test message")]
         request = ChatCompletionRequest(
-            model="gpt-4o",
-            messages=messages,
-            max_tokens=100,
-            temperature=0.8,
-            stream=True,
-            user="test_user"
+            model="gpt-4o", messages=messages, max_tokens=100, temperature=0.8, stream=True, user="test_user"
         )
 
         assert request.model == "gpt-4o"
@@ -67,7 +62,7 @@ class TestPydanticModels:
             model="gpt-4o",
             choices=[{"index": 0, "message": {"role": "assistant", "content": "Test"}}],
             usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
-            system_fingerprint="fp_test"
+            system_fingerprint="fp_test",
         )
 
         assert response.id == "test-id"
@@ -80,12 +75,7 @@ class TestPydanticModels:
 
     def test_model_info_creation(self):
         """Test ModelInfo model creation."""
-        model = ModelInfo(
-            id="gpt-4o",
-            object="model",
-            created=1234567890,
-            owned_by="openai"
-        )
+        model = ModelInfo(id="gpt-4o", object="model", created=1234567890, owned_by="openai")
 
         assert model.id == "gpt-4o"
         assert model.object == "model"
@@ -96,7 +86,7 @@ class TestPydanticModels:
 class TestMultiProviderLLMEngine:
     """Test the MultiProviderLLMEngine class."""
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     def test_engine_initialization(self, mock_get_encoding):
         """Test engine initialization with model mappings and tokenizer."""
         mock_tokenizer = MagicMock()
@@ -114,7 +104,7 @@ class TestMultiProviderLLMEngine:
         mock_get_encoding.assert_called_once_with("cl100k_base")
         assert engine.tokenizer == mock_tokenizer
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     def test_get_available_models(self, mock_get_encoding):
         """Test getting list of available models."""
         mock_tokenizer = MagicMock()
@@ -140,7 +130,7 @@ class TestMultiProviderLLMEngine:
         assert gpt_model.owned_by == "openai"
         assert isinstance(gpt_model.created, int)
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     def test_count_tokens(self, mock_get_encoding):
         """Test token counting functionality."""
         mock_tokenizer = MagicMock()
@@ -153,7 +143,7 @@ class TestMultiProviderLLMEngine:
         assert token_count == 3
         mock_tokenizer.encode.assert_called_once_with("Hello, world!")
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     def test_count_message_tokens(self, mock_get_encoding):
         """Test counting tokens in message list."""
         mock_tokenizer = MagicMock()
@@ -161,10 +151,7 @@ class TestMultiProviderLLMEngine:
         mock_get_encoding.return_value = mock_tokenizer
 
         engine = MultiProviderLLMEngine()
-        messages = [
-            ChatMessage(role="user", content="Hello world"),
-            ChatMessage(role="assistant", content="Hi there")
-        ]
+        messages = [ChatMessage(role="user", content="Hello world"), ChatMessage(role="assistant", content="Hi there")]
 
         token_count = engine.count_message_tokens(messages)
 
@@ -173,7 +160,7 @@ class TestMultiProviderLLMEngine:
         # Plus 4 tokens overhead per message + 2 for conversation = 6 + 8 + 2 = 16
         assert token_count == 16
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_generate_response_unsupported_model(self, mock_get_encoding):
@@ -182,17 +169,14 @@ class TestMultiProviderLLMEngine:
         mock_get_encoding.return_value = mock_tokenizer
 
         engine = MultiProviderLLMEngine()
-        request = ChatCompletionRequest(
-            model="unsupported-model",
-            messages=[ChatMessage(role="user", content="Test")]
-        )
+        request = ChatCompletionRequest(model="unsupported-model", messages=[ChatMessage(role="user", content="Test")])
 
         with pytest.raises(Exception) as exc_info:
             await engine.generate_response(request)
 
         assert "Model unsupported-model not supported" in str(exc_info.value)
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_enhance_messages_with_tilores(self, mock_get_encoding):
         """Test message enhancement with Tilores context."""
@@ -211,7 +195,7 @@ class TestMultiProviderLLMEngine:
         assert "get_customer_credit_report" in enhanced[0].content
         assert enhanced[1] == original_messages[0]
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_mock_response_credit_query(self, mock_get_encoding):
         """Test mock response generation for credit queries."""
@@ -221,14 +205,14 @@ class TestMultiProviderLLMEngine:
         engine = MultiProviderLLMEngine()
         messages = [ChatMessage(role="user", content="Get credit report for customer 123")]
 
-        with patch('main_openai_compatible.get_customer_credit_report') as mock_credit:
+        with patch("main_openai_compatible.get_customer_credit_report") as mock_credit:
             mock_credit.return_value = "Credit report data"
             response = await engine._generate_mock_response(messages, "gpt-4o")
 
             assert response == "Credit report data"
             mock_credit.assert_called_once_with("123")
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_mock_response_credit_comparison(self, mock_get_encoding):
         """Test mock response generation for credit comparison."""
@@ -238,14 +222,14 @@ class TestMultiProviderLLMEngine:
         engine = MultiProviderLLMEngine()
         messages = [ChatMessage(role="user", content="Compare credit for 123 and 456")]
 
-        with patch('main_openai_compatible.compare_customer_credit_profiles') as mock_compare:
+        with patch("main_openai_compatible.compare_customer_credit_profiles") as mock_compare:
             mock_compare.return_value = "Comparison data"
             response = await engine._generate_mock_response(messages, "gpt-4o")
 
             assert response == "Comparison data"
             mock_compare.assert_called_once_with("123, 456")
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_mock_response_field_discovery(self, mock_get_encoding):
         """Test mock response generation for field discovery."""
@@ -255,14 +239,14 @@ class TestMultiProviderLLMEngine:
         engine = MultiProviderLLMEngine()
         messages = [ChatMessage(role="user", content="Discover available fields")]
 
-        with patch('main_openai_compatible.discover_tilores_fields') as mock_discover:
+        with patch("main_openai_compatible.discover_tilores_fields") as mock_discover:
             mock_discover.return_value = "Field discovery data"
             response = await engine._generate_mock_response(messages, "gpt-4o")
 
             assert response == "Field discovery data"
             mock_discover.assert_called_once_with("all")
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_mock_response_default(self, mock_get_encoding):
         """Test mock response generation for generic queries."""
@@ -278,7 +262,7 @@ class TestMultiProviderLLMEngine:
         assert "Tilores" in response
         assert "customer data analysis" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_credit_report_no_identifier(self, mock_get_encoding):
         """Test credit report handler when no identifier is found."""
@@ -290,7 +274,7 @@ class TestMultiProviderLLMEngine:
 
         assert "Please provide a client ID" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_credit_report_with_error(self, mock_get_encoding):
         """Test credit report handler when function raises error."""
@@ -299,13 +283,13 @@ class TestMultiProviderLLMEngine:
 
         engine = MultiProviderLLMEngine()
 
-        with patch('main_openai_compatible.get_customer_credit_report') as mock_credit:
+        with patch("main_openai_compatible.get_customer_credit_report") as mock_credit:
             mock_credit.side_effect = Exception("Test error")
             response = await engine._handle_credit_report("credit report for 123")
 
             assert "Error retrieving credit report: Test error" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_credit_comparison_insufficient_identifiers(self, mock_get_encoding):
         """Test credit comparison with insufficient identifiers."""
@@ -317,7 +301,7 @@ class TestMultiProviderLLMEngine:
 
         assert "Please provide at least 2 client identifiers" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_credit_comparison_with_error(self, mock_get_encoding):
         """Test credit comparison handler when function raises error."""
@@ -326,13 +310,13 @@ class TestMultiProviderLLMEngine:
 
         engine = MultiProviderLLMEngine()
 
-        with patch('main_openai_compatible.compare_customer_credit_profiles') as mock_compare:
+        with patch("main_openai_compatible.compare_customer_credit_profiles") as mock_compare:
             mock_compare.side_effect = Exception("Test error")
             response = await engine._handle_credit_comparison("compare 123 and 456")
 
             assert "Error comparing credit profiles: Test error" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_field_discovery_stats(self, mock_get_encoding):
         """Test field discovery handler for stats query."""
@@ -344,7 +328,7 @@ class TestMultiProviderLLMEngine:
 
         assert "310+ fields available" in response
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_handle_field_discovery_with_error(self, mock_get_encoding):
         """Test field discovery handler when function raises error."""
@@ -353,7 +337,7 @@ class TestMultiProviderLLMEngine:
 
         engine = MultiProviderLLMEngine()
 
-        with patch('main_openai_compatible.discover_tilores_fields') as mock_discover:
+        with patch("main_openai_compatible.discover_tilores_fields") as mock_discover:
             mock_discover.side_effect = Exception("Test error")
             response = await engine._handle_field_discovery("discover fields")
 
@@ -407,7 +391,7 @@ class TestAPIEndpoints:
         assert "created" in model
         assert "owned_by" in model
 
-    @patch('main_openai_compatible.llm_engine.generate_response')
+    @patch("main_openai_compatible.llm_engine.generate_response")
     def test_chat_completions_endpoint_success(self, mock_generate):
         """Test chat completions endpoint success case."""
         mock_response = ChatCompletionResponse(
@@ -417,14 +401,11 @@ class TestAPIEndpoints:
             model="gpt-4o",
             choices=[{"index": 0, "message": {"role": "assistant", "content": "Test response"}}],
             usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
-            system_fingerprint="fp_test"
+            system_fingerprint="fp_test",
         )
         mock_generate.return_value = mock_response
 
-        request_data = {
-            "model": "gpt-4o",
-            "messages": [{"role": "user", "content": "Hello"}]
-        }
+        request_data = {"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}]}
 
         response = self.client.post("/v1/chat/completions", json=request_data)
 
@@ -433,22 +414,19 @@ class TestAPIEndpoints:
         assert data["id"] == "test-id"
         assert data["model"] == "gpt-4o"
 
-    @patch('main_openai_compatible.llm_engine.generate_response')
+    @patch("main_openai_compatible.llm_engine.generate_response")
     def test_chat_completions_endpoint_error(self, mock_generate):
         """Test chat completions endpoint error handling."""
         mock_generate.side_effect = Exception("Test error")
 
-        request_data = {
-            "model": "gpt-4o",
-            "messages": [{"role": "user", "content": "Hello"}]
-        }
+        request_data = {"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}]}
 
         response = self.client.post("/v1/chat/completions", json=request_data)
 
         assert response.status_code == 500
         assert "Test error" in response.json()["detail"]
 
-    @patch('main_openai_compatible.discover_tilores_fields')
+    @patch("main_openai_compatible.discover_tilores_fields")
     def test_field_discovery_endpoint_success(self, mock_discover):
         """Test field discovery endpoint success case."""
         mock_discover.return_value = "Field discovery result"
@@ -460,7 +438,7 @@ class TestAPIEndpoints:
         assert data["result"] == "Field discovery result"
         mock_discover.assert_called_once_with("customer")
 
-    @patch('main_openai_compatible.discover_tilores_fields')
+    @patch("main_openai_compatible.discover_tilores_fields")
     def test_field_discovery_endpoint_default_category(self, mock_discover):
         """Test field discovery endpoint with default category."""
         mock_discover.return_value = "All fields"
@@ -472,7 +450,7 @@ class TestAPIEndpoints:
         assert data["result"] == "All fields"
         mock_discover.assert_called_once_with("all")
 
-    @patch('main_openai_compatible.discover_tilores_fields')
+    @patch("main_openai_compatible.discover_tilores_fields")
     def test_field_discovery_endpoint_error(self, mock_discover):
         """Test field discovery endpoint error handling."""
         mock_discover.side_effect = Exception("Discovery error")
@@ -482,7 +460,7 @@ class TestAPIEndpoints:
         assert response.status_code == 500
         assert "Discovery error" in response.json()["detail"]
 
-    @patch('main_openai_compatible.get_customer_credit_report')
+    @patch("main_openai_compatible.get_customer_credit_report")
     def test_credit_report_endpoint_success(self, mock_credit):
         """Test credit report endpoint success case."""
         mock_credit.return_value = "Credit report data"
@@ -494,7 +472,7 @@ class TestAPIEndpoints:
         assert data["result"] == "Credit report data"
         mock_credit.assert_called_once_with("12345")
 
-    @patch('main_openai_compatible.get_customer_credit_report')
+    @patch("main_openai_compatible.get_customer_credit_report")
     def test_credit_report_endpoint_error(self, mock_credit):
         """Test credit report endpoint error handling."""
         mock_credit.side_effect = Exception("Credit error")
@@ -504,7 +482,7 @@ class TestAPIEndpoints:
         assert response.status_code == 500
         assert "Credit error" in response.json()["detail"]
 
-    @patch('main_openai_compatible.compare_customer_credit_profiles')
+    @patch("main_openai_compatible.compare_customer_credit_profiles")
     def test_credit_comparison_endpoint_success(self, mock_compare):
         """Test credit comparison endpoint success case."""
         mock_compare.return_value = "Comparison result"
@@ -517,7 +495,7 @@ class TestAPIEndpoints:
         assert data["result"] == "Comparison result"
         mock_compare.assert_called_once_with("123, 456, 789")
 
-    @patch('main_openai_compatible.compare_customer_credit_profiles')
+    @patch("main_openai_compatible.compare_customer_credit_profiles")
     def test_credit_comparison_endpoint_error(self, mock_compare):
         """Test credit comparison endpoint error handling."""
         mock_compare.side_effect = Exception("Comparison error")
@@ -532,7 +510,7 @@ class TestAPIEndpoints:
 class TestStreamingResponse:
     """Test streaming response functionality."""
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_streaming_response(self, mock_get_encoding):
         """Test streaming response generation."""
@@ -542,26 +520,22 @@ class TestStreamingResponse:
 
         engine = MultiProviderLLMEngine()
         request = ChatCompletionRequest(
-            model="gpt-4o",
-            messages=[ChatMessage(role="user", content="Hello")],
-            stream=True
+            model="gpt-4o", messages=[ChatMessage(role="user", content="Hello")], stream=True
         )
 
         model_config = engine.model_mappings["gpt-4o"]
         input_tokens = 10
         messages = [ChatMessage(role="user", content="Hello")]
 
-        with patch.object(engine, '_generate_mock_response') as mock_gen:
+        with patch.object(engine, "_generate_mock_response") as mock_gen:
             mock_gen.return_value = "Hello world test"
 
-            response = await engine._generate_streaming_response(
-                request, model_config, input_tokens, messages
-            )
+            response = await engine._generate_streaming_response(request, model_config, input_tokens, messages)
 
             assert isinstance(response, StreamingResponse)
             assert response.media_type == "text/plain"
 
-    @patch('tiktoken.get_encoding')
+    @patch("tiktoken.get_encoding")
     @pytest.mark.asyncio
     async def test_generate_complete_response(self, mock_get_encoding):
         """Test complete response generation."""
@@ -570,21 +544,16 @@ class TestStreamingResponse:
         mock_get_encoding.return_value = mock_tokenizer
 
         engine = MultiProviderLLMEngine()
-        request = ChatCompletionRequest(
-            model="gpt-4o",
-            messages=[ChatMessage(role="user", content="Hello")]
-        )
+        request = ChatCompletionRequest(model="gpt-4o", messages=[ChatMessage(role="user", content="Hello")])
 
         model_config = engine.model_mappings["gpt-4o"]
         input_tokens = 10
         messages = [ChatMessage(role="user", content="Hello")]
 
-        with patch.object(engine, '_generate_mock_response') as mock_gen:
+        with patch.object(engine, "_generate_mock_response") as mock_gen:
             mock_gen.return_value = "Test response"
 
-            response = await engine._generate_complete_response(
-                request, model_config, input_tokens, messages
-            )
+            response = await engine._generate_complete_response(request, model_config, input_tokens, messages)
 
             assert isinstance(response, ChatCompletionResponse)
             assert response.model == "gpt-4o"
@@ -598,8 +567,8 @@ class TestStreamingResponse:
 class TestIntegrationWithDependencies:
     """Test integration with external dependencies."""
 
-    @patch('tiktoken.get_encoding')
-    @patch('main_openai_compatible.get_customer_credit_report')
+    @patch("tiktoken.get_encoding")
+    @patch("main_openai_compatible.get_customer_credit_report")
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_full_generate_response_credit_query(self, mock_credit, mock_get_encoding):
@@ -611,8 +580,7 @@ class TestIntegrationWithDependencies:
 
         engine = MultiProviderLLMEngine()
         request = ChatCompletionRequest(
-            model="gpt-4o",
-            messages=[ChatMessage(role="user", content="Get credit report for 123")]
+            model="gpt-4o", messages=[ChatMessage(role="user", content="Get credit report for 123")]
         )
 
         response = await engine.generate_response(request)
@@ -620,8 +588,8 @@ class TestIntegrationWithDependencies:
         assert isinstance(response, ChatCompletionResponse)
         assert response.choices[0]["message"]["content"] == "Full credit report"
 
-    @patch('tiktoken.get_encoding')
-    @patch('main_openai_compatible.discover_tilores_fields')
+    @patch("tiktoken.get_encoding")
+    @patch("main_openai_compatible.discover_tilores_fields")
     @pytest.mark.asyncio
     @pytest.mark.asyncio
     async def test_full_generate_response_field_discovery(self, mock_discover, mock_get_encoding):
@@ -633,8 +601,7 @@ class TestIntegrationWithDependencies:
 
         engine = MultiProviderLLMEngine()
         request = ChatCompletionRequest(
-            model="gpt-4o",
-            messages=[ChatMessage(role="user", content="Discover customer fields")]
+            model="gpt-4o", messages=[ChatMessage(role="user", content="Discover customer fields")]
         )
 
         response = await engine.generate_response(request)

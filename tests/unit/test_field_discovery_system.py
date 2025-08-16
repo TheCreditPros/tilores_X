@@ -10,8 +10,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from aiohttp import ClientResponseError
 
 from field_discovery_system import (
-    TiloresFieldDiscovery, discover_tilores_fields, get_field_discovery_stats,
-    field_discovery
+    TiloresFieldDiscovery,
+    discover_tilores_fields,
+    get_field_discovery_stats,
+    field_discovery,
 )
 
 
@@ -34,7 +36,7 @@ class TestTiloresFieldDiscoveryInitialization:
     @pytest.mark.unit
     def test_field_discovery_initialization_with_defaults(self):
         """Test field discovery initialization with default values."""
-        with patch.dict('os.environ', {}, clear=True):
+        with patch.dict("os.environ", {}, clear=True):
             discovery = TiloresFieldDiscovery()
 
             assert "ly325mgfwk.execute-api.us-east-1.amazonaws.com" in discovery.api_url
@@ -45,7 +47,7 @@ class TestTiloresFieldDiscoveryInitialization:
     @pytest.mark.unit
     def test_field_discovery_initialization_partial_env(self):
         """Test field discovery initialization with partial environment configuration."""
-        with patch.dict('os.environ', {'TILORES_API_URL': 'https://custom.api.com'}, clear=True):
+        with patch.dict("os.environ", {"TILORES_API_URL": "https://custom.api.com"}, clear=True):
             discovery = TiloresFieldDiscovery()
 
             assert discovery.api_url == "https://custom.api.com"
@@ -61,11 +63,7 @@ class TestOAuth2Authentication:
         """Test successful OAuth2 token retrieval."""
         discovery = TiloresFieldDiscovery()
 
-        mock_token_response = {
-            "access_token": "test_access_token_12345",
-            "token_type": "Bearer",
-            "expires_in": 3600
-        }
+        mock_token_response = {"access_token": "test_access_token_12345", "token_type": "Bearer", "expires_in": 3600}
 
         # Create a proper async context manager mock
         mock_response = AsyncMock()
@@ -79,7 +77,7 @@ class TestOAuth2Authentication:
             context_manager.__aexit__ = AsyncMock(return_value=None)
             return context_manager
 
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session.post = mock_post_context  # Not async - returns context manager directly
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -96,7 +94,7 @@ class TestOAuth2Authentication:
     @pytest.mark.asyncio
     async def test_get_access_token_missing_credentials(self):
         """Test OAuth2 token retrieval with missing credentials."""
-        with patch.dict('os.environ', {}, clear=True):
+        with patch.dict("os.environ", {}, clear=True):
             discovery = TiloresFieldDiscovery()
 
             with pytest.raises(Exception) as exc_info:
@@ -110,11 +108,11 @@ class TestOAuth2Authentication:
         """Test OAuth2 token retrieval with HTTP error."""
         discovery = TiloresFieldDiscovery()
 
-        with patch('aiohttp.ClientSession') as mock_session:
+        with patch("aiohttp.ClientSession") as mock_session:
             mock_response = AsyncMock()
-            mock_response.raise_for_status = AsyncMock(side_effect=ClientResponseError(
-                request_info=MagicMock(), history=MagicMock(), status=401
-            ))
+            mock_response.raise_for_status = AsyncMock(
+                side_effect=ClientResponseError(request_info=MagicMock(), history=MagicMock(), status=401)
+            )
 
             mock_post = AsyncMock()
             mock_post.__aenter__ = AsyncMock(return_value=mock_response)
@@ -145,7 +143,7 @@ class TestOAuth2Authentication:
             context_manager.__aexit__ = AsyncMock(return_value=None)
             return context_manager
 
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session.post = mock_post_error  # Not async - returns context manager directly
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -179,7 +177,7 @@ class TestOAuth2Authentication:
             context_manager.__aexit__ = AsyncMock(return_value=None)
             return context_manager
 
-        with patch('aiohttp.ClientSession') as mock_session_class:
+        with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = AsyncMock()
             mock_session.post = mock_post_context  # Not async - returns context manager directly
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -209,8 +207,13 @@ class TestFieldDiscovery:
 
         # Verify all expected categories
         expected_categories = [
-            "customer_fields", "credit_fields", "product_fields",
-            "interaction_fields", "transaction_fields", "relationship_fields", "system_fields"
+            "customer_fields",
+            "credit_fields",
+            "product_fields",
+            "interaction_fields",
+            "transaction_fields",
+            "relationship_fields",
+            "system_fields",
         ]
         for category in expected_categories:
             assert category in fields
@@ -276,12 +279,12 @@ class TestFieldDiscovery:
 
         # Verify reasonable field counts per category
         assert len(fields["customer_fields"]) >= 20  # Should have substantial customer fields
-        assert len(fields["credit_fields"]) >= 25    # Should have comprehensive credit fields
-        assert len(fields["product_fields"]) >= 10   # Should have product fields
+        assert len(fields["credit_fields"]) >= 25  # Should have comprehensive credit fields
+        assert len(fields["product_fields"]) >= 10  # Should have product fields
         assert len(fields["interaction_fields"]) >= 15  # Should have interaction fields
         assert len(fields["transaction_fields"]) >= 15  # Should have transaction fields
         assert len(fields["relationship_fields"]) >= 10  # Should have relationship fields
-        assert len(fields["system_fields"]) >= 10    # Should have system fields
+        assert len(fields["system_fields"]) >= 10  # Should have system fields
 
 
 class TestFieldStatistics:
@@ -333,8 +336,13 @@ class TestFieldStatistics:
         stats = await discovery.get_field_statistics()
 
         expected_categories = [
-            "customer_fields", "credit_fields", "product_fields",
-            "interaction_fields", "transaction_fields", "relationship_fields", "system_fields"
+            "customer_fields",
+            "credit_fields",
+            "product_fields",
+            "interaction_fields",
+            "transaction_fields",
+            "relationship_fields",
+            "system_fields",
         ]
 
         for category in expected_categories:
@@ -427,7 +435,7 @@ class TestDiscoverTiloresFieldsTool:
         """Test discover_tilores_fields tool output formatting."""
         result = await discover_tilores_fields.ainvoke({"category": "customer"})
 
-        lines = result.split('\n')
+        lines = result.split("\n")
 
         # Check header format
         assert lines[0].startswith("=== CUSTOMER FIELDS")
@@ -513,7 +521,7 @@ class TestErrorHandling:
         discovery_with_error = TiloresFieldDiscovery()
         discovery_with_error.discover_all_fields = AsyncMock(side_effect=Exception("Test error"))
 
-        with patch('field_discovery_system.field_discovery', discovery_with_error):
+        with patch("field_discovery_system.field_discovery", discovery_with_error):
             result = await discover_tilores_fields.ainvoke({"category": "customer"})
 
             assert isinstance(result, str)
@@ -528,7 +536,7 @@ class TestErrorHandling:
         discovery_with_error = TiloresFieldDiscovery()
         discovery_with_error.get_field_statistics = AsyncMock(side_effect=Exception("Stats error"))
 
-        with patch('field_discovery_system.field_discovery', discovery_with_error):
+        with patch("field_discovery_system.field_discovery", discovery_with_error):
             result = await get_field_discovery_stats.ainvoke({})
 
             assert isinstance(result, str)

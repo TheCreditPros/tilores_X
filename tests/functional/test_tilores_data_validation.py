@@ -17,6 +17,7 @@ from fastapi.testclient import TestClient
 
 # Import the FastAPI app
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from main_openai_compatible import app
@@ -35,7 +36,7 @@ class TestTiloresDataValidation:
             "expected_age": 51,
             "expected_location": "De Soto, Missouri",
             "expected_email": "brutonda@gmail.com",
-            "description": "Primary validated test customer"
+            "description": "Primary validated test customer",
         }
     ]
 
@@ -61,12 +62,15 @@ class TestTiloresDataValidation:
         """Make a customer search request and analyze response."""
         start_time = time.time()
 
-        response = self.client.post("/v1/chat/completions", json={
-            "model": model,
-            "messages": [{"role": "user", "content": query}],
-            "temperature": 0.0,  # Deterministic for testing
-            "max_tokens": 1500
-        })
+        response = self.client.post(
+            "/v1/chat/completions",
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": query}],
+                "temperature": 0.0,  # Deterministic for testing
+                "max_tokens": 1500,
+            },
+        )
 
         response_time = (time.time() - start_time) * 1000
 
@@ -75,12 +79,7 @@ class TestTiloresDataValidation:
         data = response.json()
         content = data["choices"][0]["message"]["content"]
 
-        return {
-            "response": data,
-            "content": content,
-            "response_time_ms": response_time,
-            "query": query
-        }
+        return {"response": data, "content": content, "response_time_ms": response_time, "query": query}
 
     def test_validated_customer_search_by_client_id(self):
         """Test customer search with validated test record using client ID."""
@@ -96,7 +95,7 @@ class TestTiloresDataValidation:
             "name_dawn": "dawn" in content,
             "name_bruton": "bruton" in content,
             "email_present": "brutonda" in content or "gmail.com" in content,
-            "location_missouri": "missouri" in content or "de soto" in content
+            "location_missouri": "missouri" in content or "de soto" in content,
         }
 
         passed_checks = sum(accuracy_checks.values())
@@ -135,7 +134,7 @@ class TestTiloresDataValidation:
             "email_found": "brutonda" in content,
             "gmail_domain": "gmail" in content,
             "customer_name": "dawn" in content or "bruton" in content,
-            "data_present": len(content) > 100  # Substantial response
+            "data_present": len(content) > 100,  # Substantial response
         }
 
         passed_checks = sum(email_checks.values())
@@ -160,7 +159,7 @@ class TestTiloresDataValidation:
             "location_info": any(term in content.lower() for term in ["address", "city", "state", "location"]),
             "account_info": any(term in content.lower() for term in ["account", "customer", "id", "client"]),
             "activity_data": any(term in content.lower() for term in ["activity", "transaction", "payment"]),
-            "substantial_content": len(content) > 200  # Comprehensive response
+            "substantial_content": len(content) > 200,  # Comprehensive response
         }
 
         comprehensiveness_score = (sum(data_elements.values()) / len(data_elements)) * 100
@@ -188,13 +187,15 @@ class TestTiloresDataValidation:
             "credit_mentioned": "credit" in content,
             "score_or_rating": any(term in content for term in ["score", "rating", "analysis"]),
             "financial_data": any(term in content for term in ["payment", "account", "financial"]),
-            "meaningful_response": len(content) > 50
+            "meaningful_response": len(content) > 50,
         }
 
         credit_functionality_score = (sum(credit_indicators.values()) / len(credit_indicators)) * 100
 
         self.data_accuracy_scores["credit_functionality"] = credit_functionality_score
-        self.test_results["credit_analysis"] = credit_functionality_score >= 50  # Lower threshold as credit may not always be available
+        self.test_results["credit_analysis"] = (
+            credit_functionality_score >= 50
+        )  # Lower threshold as credit may not always be available
 
         print("\n💳 Credit Analysis Test:")
         print(f"   Credit functionality: {credit_functionality_score:.1f}%")
@@ -207,7 +208,7 @@ class TestTiloresDataValidation:
         queries = [
             f"Find customer {test_record['client_id']}",
             f"Search for client ID {test_record['client_id']}",
-            f"Look up customer with ID {test_record['client_id']}"
+            f"Look up customer with ID {test_record['client_id']}",
         ]
 
         responses = []
@@ -239,7 +240,7 @@ class TestTiloresDataValidation:
         invalid_queries = [
             "Find customer with client ID 9999999",
             "Search for customer nonexistent@example.com",
-            "Look up customer John Nonexistent"
+            "Look up customer John Nonexistent",
         ]
 
         handled_correctly = 0
@@ -250,8 +251,13 @@ class TestTiloresDataValidation:
 
             # Check for appropriate "not found" handling
             not_found_indicators = [
-                "not found", "no results", "no customer", "not located",
-                "unable to find", "no records", "does not exist"
+                "not found",
+                "no results",
+                "no customer",
+                "not located",
+                "unable to find",
+                "no records",
+                "does not exist",
             ]
 
             if any(indicator in content for indicator in not_found_indicators):
@@ -281,7 +287,7 @@ class TestTiloresDataValidation:
             "contains_data": any(term in content.lower() for term in ["dawn", "bruton", "customer"]),
             "well_formatted": not content.startswith("Error") and len(content.strip()) > 0,
             "professional_tone": not any(term in content.lower() for term in ["sorry", "can't", "unable"]),
-            "fast_response": result["response_time_ms"] < 5000
+            "fast_response": result["response_time_ms"] < 5000,
         }
 
         quality_score = (sum(quality_metrics.values()) / len(quality_metrics)) * 100

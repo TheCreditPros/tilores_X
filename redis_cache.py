@@ -4,6 +4,7 @@ Redis Cache Manager for Tilores Unified API.
 Provides intelligent caching for customer data, field discovery,
 LLM responses, and credit reports with graceful fallback.
 """
+
 import hashlib
 import json
 import os
@@ -11,6 +12,7 @@ from typing import Any, Dict, Optional
 
 try:
     import redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -32,7 +34,7 @@ class RedisCacheManager:
 
     def __init__(self, enable_l1_cache: bool = True, l1_max_size: int = 100, l1_ttl: int = 300):
         """Initialize Redis connection with graceful fallback and optional L1 cache.
-        
+
         Args:
             enable_l1_cache: Enable in-memory L1 cache for ultra-fast access
             l1_max_size: Maximum items in L1 memory cache
@@ -40,50 +42,44 @@ class RedisCacheManager:
         """
         self.redis_client: Any = None
         self.cache_available = False
-        
+
         # L1 in-memory cache configuration
         self.enable_l1 = enable_l1_cache
         self.l1_cache = {} if enable_l1_cache else None
         self.l1_timestamps = {} if enable_l1_cache else None
         self.l1_max_size = l1_max_size
         self.l1_ttl = l1_ttl
-        
+
         # Performance metrics
-        self.stats = {
-            "l1_hits": 0,
-            "l1_misses": 0,
-            "l2_hits": 0,
-            "l2_misses": 0,
-            "total_queries": 0
-        }
+        self.stats = {"l1_hits": 0, "l1_misses": 0, "l2_hits": 0, "l2_misses": 0, "total_queries": 0}
 
         if REDIS_AVAILABLE:
             self._connect_to_redis()
-            
+
         if enable_l1_cache:
-            debug_print(f"Two-tier cache initialized (L1: {l1_max_size} items, L2: {'Redis' if self.cache_available else 'Disabled'})", "🚀")
+            debug_print(
+                f"Two-tier cache initialized (L1: {l1_max_size} items, L2: {'Redis' if self.cache_available else 'Disabled'})",
+                "🚀",
+            )
 
     def _connect_to_redis(self):
         """Connect to Redis with Railway and local environment support."""
         try:
             # Railway Redis URL (production)
-            redis_url = os.getenv('REDIS_URL')
+            redis_url = os.getenv("REDIS_URL")
             if redis_url:
                 self.redis_client = redis.from_url(
-                    redis_url,
-                    decode_responses=True,
-                    socket_connect_timeout=5,
-                    socket_timeout=5
+                    redis_url, decode_responses=True, socket_connect_timeout=5, socket_timeout=5
                 )
             else:
                 # Local Redis (development)
                 self.redis_client = redis.Redis(
-                    host=os.getenv('REDIS_HOST', 'localhost'),
-                    port=int(os.getenv('REDIS_PORT', 6379)),
-                    password=os.getenv('REDIS_PASSWORD'),
+                    host=os.getenv("REDIS_HOST", "localhost"),
+                    port=int(os.getenv("REDIS_PORT", 6379)),
+                    password=os.getenv("REDIS_PASSWORD"),
                     decode_responses=True,
                     socket_connect_timeout=5,
-                    socket_timeout=5
+                    socket_timeout=5,
                 )
 
             # Test connection
@@ -98,7 +94,6 @@ class RedisCacheManager:
             self.redis_client = None
             self.cache_available = False
 
-
     def _generate_cache_key(self, prefix: str, identifier: str) -> str:
         """Generate consistent cache key with namespace."""
         # Hash long identifiers for consistent key length
@@ -109,7 +104,7 @@ class RedisCacheManager:
     def get_tilores_fields(self, api_instance_id: str) -> Optional[str]:
         """Get cached Tilores field discovery results."""
         cache_key = self._generate_cache_key("fields", api_instance_id)
-        
+
         # Check L1 cache first if enabled
         if self.enable_l1 and cache_key in self.l1_cache:
             if self._is_l1_valid(cache_key):
@@ -120,7 +115,7 @@ class RedisCacheManager:
                 # Remove expired entry
                 del self.l1_cache[cache_key]
                 del self.l1_timestamps[cache_key]
-        
+
         if not self.cache_available or not self.redis_client:
             return None
 
@@ -130,38 +125,40 @@ class RedisCacheManager:
             if result:
                 self.stats["l2_hits"] += 1
                 debug_print(f"L2 Cache HIT: Tilores fields for {api_instance_id}", "🎯")
-                
+
                 # Store in L1 cache if enabled
                 if self.enable_l1:
                     self._store_in_l1(cache_key, str(result))
-                
+
                 return str(result)
             return None
         except Exception as e:
             logger.error(f"Cache read error: {e}")
             debug_print(f"Cache read error: {e}", "⚠️")
             return None
-    
+
     def _is_l1_valid(self, key: str) -> bool:
         """Check if L1 cache entry is still valid."""
         if key not in self.l1_timestamps:
             return False
         import time
+
         age = time.time() - self.l1_timestamps[key]
         return age < self.l1_ttl
-    
+
     def _store_in_l1(self, key: str, value: Any):
         """Store value in L1 cache with eviction if needed."""
         if not self.enable_l1:
             return
-            
+
         # Evict oldest entries if cache is full
         if len(self.l1_cache) >= self.l1_max_size:
             oldest_key = min(self.l1_timestamps, key=self.l1_timestamps.get)
             del self.l1_cache[oldest_key]
             del self.l1_timestamps[oldest_key]
-        
+
         import time
+
         self.l1_cache[key] = value
         self.l1_timestamps[key] = time.time()
 
@@ -229,8 +226,7 @@ class RedisCacheManager:
             debug_print(f"Cache read error: {e}", "⚠️")
             return None
 
-    def set_customer_search(self, search_params_hash: str,
-                            search_results: Dict):
+    def set_customer_search(self, search_params_hash: str, search_results: Dict):
         """Cache customer search results (1 hour TTL)."""
         if not self.cache_available or not self.redis_client:
             return
@@ -238,11 +234,7 @@ class RedisCacheManager:
         try:
             cache_key = self._generate_cache_key("search", search_params_hash)
             # 1 hour TTL for customer search results
-            self.redis_client.setex(
-                cache_key,
-                3600,
-                json.dumps(search_results)
-            )
+            self.redis_client.setex(cache_key, 3600, json.dumps(search_results))
             debug_print(f"Cached customer search {search_params_hash[:12]}", "💾")
         except Exception as e:
             logger.error(f"Cache write error: {e}")
@@ -280,8 +272,7 @@ class RedisCacheManager:
             logger.error(f"Cache write error: {e}")
             debug_print(f"Cache write error: {e}", "⚠️")
 
-    def generate_query_hash(self, query: str, model: str = "",
-                            context: str = "") -> str:
+    def generate_query_hash(self, query: str, model: str = "", context: str = "") -> str:
         """Generate consistent hash for LLM query caching."""
         # Combine query, model, and context for unique cache key
         combined = f"{query}|{model}|{context}"
@@ -296,27 +287,13 @@ class RedisCacheManager:
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics for monitoring."""
         if not self.cache_available or not self.redis_client:
-            return {
-                "status": "unavailable",
-                "cache_available": False,
-                "redis_connected": False
-            }
+            return {"status": "unavailable", "cache_available": False, "redis_connected": False}
 
         try:
             # Get basic Redis stats
-            return {
-                "status": "available",
-                "cache_available": True,
-                "redis_connected": True,
-                "redis_info": "available"
-            }
+            return {"status": "available", "cache_available": True, "redis_connected": True, "redis_info": "available"}
         except Exception as e:
-            return {
-                "status": "error",
-                "cache_available": False,
-                "redis_connected": False,
-                "error": str(e)
-            }
+            return {"status": "error", "cache_available": False, "redis_connected": False, "error": str(e)}
 
     def clear_cache(self, pattern: Optional[str] = None) -> int:
         """Clear cache entries matching pattern or all if no pattern."""

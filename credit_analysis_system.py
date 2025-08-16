@@ -14,6 +14,7 @@ from langchain.tools import tool
 @dataclass
 class CreditProfile:
     """Professional credit profile data structure."""
+
     client_id: str
     name: str
     credit_score: Optional[int] = None
@@ -32,8 +33,13 @@ class AdvancedCreditAnalyzer:
 
     def __init__(self):
         # Tilores API URLs - long URLs require noqa for line length
-        self.api_url = os.getenv("TILORES_API_URL") or "https://ly325mgfwk.execute-api.us-east-1.amazonaws.com"  # noqa E501
-        self.token_url = os.getenv("TILORES_TOKEN_URL") or "https://saas-swidepnf-tilores.auth.us-east-1.amazoncognito.com/oauth2/token"  # noqa E501
+        self.api_url = (
+            os.getenv("TILORES_API_URL") or "https://ly325mgfwk.execute-api.us-east-1.amazonaws.com"
+        )  # noqa E501
+        self.token_url = (
+            os.getenv("TILORES_TOKEN_URL")
+            or "https://saas-swidepnf-tilores.auth.us-east-1.amazoncognito.com/oauth2/token"
+        )  # noqa E501
         self.client_id = os.getenv("TILORES_CLIENT_ID")
         self.client_secret = os.getenv("TILORES_CLIENT_SECRET")
         self.access_token = None
@@ -51,8 +57,8 @@ class AdvancedCreditAnalyzer:
                     data={
                         "grant_type": "client_credentials",
                         "client_id": self.client_id,
-                        "client_secret": self.client_secret
-                    }
+                        "client_secret": self.client_secret,
+                    },
                 ) as response:
                     response.raise_for_status()
                     token_data = await response.json()
@@ -113,20 +119,14 @@ class AdvancedCreditAnalyzer:
             else:
                 search_params["FIRST_NAME"] = client_identifier
 
-        payload = {
-            "query": graphql_query,
-            "variables": {"search_params": {"parameters": search_params}}
-        }
+        payload = {"query": graphql_query, "variables": {"search_params": {"parameters": search_params}}}
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     self.api_url,
-                    headers={
-                        "Authorization": f"Bearer {self.access_token}",
-                        "Content-Type": "application/json"
-                    },
-                    json=payload
+                    headers={"Authorization": f"Bearer {self.access_token}", "Content-Type": "application/json"},
+                    json=payload,
                 ) as response:
                     response.raise_for_status()
                     return await response.json()
@@ -144,51 +144,47 @@ class AdvancedCreditAnalyzer:
         insights = entity.get("recordInsights", {})
 
         # Extract core information
-        first_name = insights.get('FIRST_NAME', ['Unknown'])[0]
-        last_name = insights.get('LAST_NAME', ['Unknown'])[0]
+        first_name = insights.get("FIRST_NAME", ["Unknown"])[0]
+        last_name = insights.get("LAST_NAME", ["Unknown"])[0]
         name = f"{first_name} {last_name}"
-        client_id = insights.get('CLIENT_ID', ['Unknown'])[0]
+        client_id = insights.get("CLIENT_ID", ["Unknown"])[0]
 
         # Extract credit scores
-        current_score = insights.get('CURRENT_CREDIT_SCORE', [None])[0]
-        starting_score = insights.get('STARTING_CREDIT_SCORE', [None])[0]
-        fico_score = insights.get('FICO_SCORE', [None])[0]
+        current_score = insights.get("CURRENT_CREDIT_SCORE", [None])[0]
+        starting_score = insights.get("STARTING_CREDIT_SCORE", [None])[0]
+        fico_score = insights.get("FICO_SCORE", [None])[0]
 
         # Use the most recent/relevant score
         credit_score = None
-        if current_score and current_score != 'N/A':
-            credit_score = (int(current_score)
-                            if str(current_score).isdigit() else None)
-        elif fico_score and fico_score != 'N/A':
-            credit_score = (int(fico_score)
-                            if str(fico_score).isdigit() else None)
-        elif starting_score and starting_score != 'N/A':
-            credit_score = (int(starting_score)
-                            if str(starting_score).isdigit() else None)
+        if current_score and current_score != "N/A":
+            credit_score = int(current_score) if str(current_score).isdigit() else None
+        elif fico_score and fico_score != "N/A":
+            credit_score = int(fico_score) if str(fico_score).isdigit() else None
+        elif starting_score and starting_score != "N/A":
+            credit_score = int(starting_score) if str(starting_score).isdigit() else None
 
         # Extract additional credit factors
-        credit_util_raw = insights.get('CREDIT_UTILIZATION', [None])[0]
+        credit_util_raw = insights.get("CREDIT_UTILIZATION", [None])[0]
         credit_utilization = None
-        if credit_util_raw and credit_util_raw != 'N/A':
+        if credit_util_raw and credit_util_raw != "N/A":
             try:
-                util_str = str(credit_util_raw).replace('%', '')
+                util_str = str(credit_util_raw).replace("%", "")
                 credit_utilization = float(util_str)
             except (ValueError, AttributeError):
                 credit_utilization = None
 
-        payment_history = insights.get('PAYMENT_HISTORY', ['Unknown'])[0]
-        credit_age = insights.get('CREDIT_AGE', ['Unknown'])[0]
-        hard_inquiries = insights.get('HARD_INQUIRIES', [0])[0]
-        derogatory_marks = insights.get('DEROGATORY_MARKS', [0])[0]
-        credit_mix = insights.get('CREDIT_MIX', ['Unknown'])[0]
+        payment_history = insights.get("PAYMENT_HISTORY", ["Unknown"])[0]
+        credit_age = insights.get("CREDIT_AGE", ["Unknown"])[0]
+        hard_inquiries = insights.get("HARD_INQUIRIES", [0])[0]
+        derogatory_marks = insights.get("DEROGATORY_MARKS", [0])[0]
+        credit_mix = insights.get("CREDIT_MIX", ["Unknown"])[0]
 
         # Bureau reports
-        transunion_report = insights.get('TRANSUNION_REPORT', ['N/A'])[0]
+        transunion_report = insights.get("TRANSUNION_REPORT", ["N/A"])[0]
 
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            credit_score, credit_utilization, payment_history,
-            hard_inquiries, derogatory_marks
+            credit_score, credit_utilization, payment_history, hard_inquiries, derogatory_marks
         )
 
         return CreditProfile(
@@ -199,19 +195,20 @@ class AdvancedCreditAnalyzer:
             credit_utilization=credit_utilization,
             payment_history=payment_history,
             credit_age=credit_age,
-            recent_inquiries=(int(hard_inquiries)
-                              if str(hard_inquiries).isdigit() else 0),
-            derogatory_marks=(int(derogatory_marks)
-                              if str(derogatory_marks).isdigit() else 0),
+            recent_inquiries=(int(hard_inquiries) if str(hard_inquiries).isdigit() else 0),
+            derogatory_marks=(int(derogatory_marks) if str(derogatory_marks).isdigit() else 0),
             credit_mix=credit_mix,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
-    def _generate_recommendations(self, credit_score: Optional[int],
-                                  credit_utilization: Optional[float],
-                                  payment_history: str,
-                                  hard_inquiries: int,
-                                  derogatory_marks: int) -> List[str]:
+    def _generate_recommendations(
+        self,
+        credit_score: Optional[int],
+        credit_utilization: Optional[float],
+        payment_history: str,
+        hard_inquiries: int,
+        derogatory_marks: int,
+    ) -> List[str]:
         """Generate personalized credit improvement recommendations."""
         recommendations = []
 
@@ -233,11 +230,9 @@ class AdvancedCreditAnalyzer:
         # Utilization recommendations
         if credit_utilization:
             if credit_utilization > 30:
-                recommendations.append(f"⚠️ High utilization at "
-                                       f"{credit_utilization:.1f}% - pay down")
+                recommendations.append(f"⚠️ High utilization at " f"{credit_utilization:.1f}% - pay down")
             elif credit_utilization > 10:
-                recommendations.append(f"💡 Optimize utilization from "
-                                       f"{credit_utilization:.1f}% to <10%")
+                recommendations.append(f"💡 Optimize utilization from " f"{credit_utilization:.1f}% to <10%")
 
         # Payment history recommendations
         if payment_history and "late" in payment_history.lower():
@@ -290,9 +285,7 @@ class AdvancedCreditAnalyzer:
                 else:
                     utilization_status = "🔴 VERY HIGH"
 
-                comparison.append(f"• {profile.name}: "
-                                  f"{profile.credit_utilization:.1f}% "
-                                  f"({utilization_status})")
+                comparison.append(f"• {profile.name}: " f"{profile.credit_utilization:.1f}% " f"({utilization_status})")
             else:
                 comparison.append(f"• {profile.name}: N/A")
 
@@ -343,9 +336,7 @@ async def get_customer_credit_report(client_identifier: str) -> str:
     - Risk assessment
     """
     try:
-        credit_data = await credit_analyzer.get_comprehensive_credit_data(
-            client_identifier
-        )
+        credit_data = await credit_analyzer.get_comprehensive_credit_data(client_identifier)
 
         if "error" in credit_data:
             return f"Error retrieving credit data: {credit_data['error']}"
@@ -384,8 +375,7 @@ async def get_customer_credit_report(client_identifier: str) -> str:
                 utilization_status = "🟡"
             else:
                 utilization_status = "🔴"
-            report.append(f"• Utilization: {profile.credit_utilization:.1f}% "
-                          f"{utilization_status}")
+            report.append(f"• Utilization: {profile.credit_utilization:.1f}% " f"{utilization_status}")
         else:
             report.append("• Utilization: N/A")
 
@@ -402,17 +392,14 @@ async def get_customer_credit_report(client_identifier: str) -> str:
                 inquiry_status = "🟡"
             else:
                 inquiry_status = "🔴"
-            report.append(f"• Recent Inquiries: {profile.recent_inquiries} "
-                          f"{inquiry_status}")
+            report.append(f"• Recent Inquiries: {profile.recent_inquiries} " f"{inquiry_status}")
 
         if profile.derogatory_marks is not None:
             derrog_status = "🟢" if profile.derogatory_marks == 0 else "🔴"
-            report.append(f"• Derogatory Marks: {profile.derogatory_marks} "
-                          f"{derrog_status}")
+            report.append(f"• Derogatory Marks: {profile.derogatory_marks} " f"{derrog_status}")
 
         # Bureau Reports
-        if (profile.transunion_report and
-                profile.transunion_report != "N/A"):
+        if profile.transunion_report and profile.transunion_report != "N/A":
             report.append("\n📋 BUREAU REPORTS:")
             report.append("• TransUnion: Available")
 
@@ -451,9 +438,7 @@ async def compare_customer_credit_profiles(client_identifiers: str) -> str:
         # Get credit profiles for all clients
         profiles = []
         for identifier in identifiers:
-            credit_data = await credit_analyzer.get_comprehensive_credit_data(
-                identifier
-            )
+            credit_data = await credit_analyzer.get_comprehensive_credit_data(identifier)
 
             if "error" not in credit_data:
                 profile = credit_analyzer.analyze_credit_profile(credit_data)

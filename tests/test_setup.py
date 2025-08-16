@@ -26,6 +26,7 @@ def test_environment():
     print("\n2. Core Imports:")
     try:
         import fastapi
+
         print(f"✅ FastAPI {fastapi.__version__}")
     except ImportError as e:
         print(f"❌ FastAPI import failed: {e}")
@@ -33,6 +34,7 @@ def test_environment():
 
     try:
         import uvicorn
+
         print(f"✅ Uvicorn {uvicorn.__version__}")
     except ImportError as e:
         print(f"❌ Uvicorn import failed: {e}")
@@ -40,6 +42,7 @@ def test_environment():
 
     try:
         import redis
+
         print(f"✅ Redis {redis.__version__}")
     except ImportError as e:
         print(f"❌ Redis import failed: {e}")
@@ -47,6 +50,7 @@ def test_environment():
 
     try:
         import langchain
+
         print(f"✅ LangChain {langchain.__version__}")
     except ImportError as e:
         print(f"❌ LangChain import failed: {e}")
@@ -62,6 +66,7 @@ def test_environment():
     print("\n3. Redis Cache Manager:")
     try:
         from redis_cache import RedisCacheManager
+
         cache_manager = RedisCacheManager()
         print("✅ Redis cache manager imported")
 
@@ -82,6 +87,7 @@ def test_environment():
     print("\n4. Core Application:")
     try:
         from core_app import initialize_engine  # , MultiProviderLLMEngine  # Unused
+
         print("✅ Core application imported")
 
         # Test engine initialization

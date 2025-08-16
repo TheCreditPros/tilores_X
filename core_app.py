@@ -22,6 +22,7 @@ logger = setup_logging(__name__)
 try:
     from langsmith import Client as LangSmithClient
     from langchain.callbacks.tracers import LangChainTracer
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LangSmithClient = None
@@ -31,10 +32,12 @@ except ImportError:
 # Redis cache for performance optimization (Phase VI)
 try:
     from .redis_cache import cache_manager
+
     CACHE_AVAILABLE = True
 except ImportError:
     try:
         from redis_cache import cache_manager
+
         CACHE_AVAILABLE = True
     except ImportError:
         cache_manager = None
@@ -113,10 +116,7 @@ class QueryRouter:
             r"\b(mathematics|math|calculation|arithmetic)\b",
         ]
 
-        self.general_regex = [
-            re.compile(p, re.IGNORECASE) for p in self.general_patterns
-        ]
-
+        self.general_regex = [re.compile(p, re.IGNORECASE) for p in self.general_patterns]
 
     def should_use_tilores_tools(self, query: str) -> bool:
         """Determine if query needs Tilores tools - simplified to trust LLM intelligence"""
@@ -134,12 +134,14 @@ class QueryRouter:
             from utils.context_extraction import IDPatterns
 
             # Quick check for any customer identifiers
-            has_customer_data = any([
-                IDPatterns.extract_email(query),
-                IDPatterns.extract_client_id(query),
-                IDPatterns.extract_salesforce_id(query),
-                IDPatterns.extract_phone(query)
-            ])
+            has_customer_data = any(
+                [
+                    IDPatterns.extract_email(query),
+                    IDPatterns.extract_client_id(query),
+                    IDPatterns.extract_salesforce_id(query),
+                    IDPatterns.extract_phone(query),
+                ]
+            )
 
             if has_customer_data:
                 return True  # Definitely needs Tilores tools
@@ -158,10 +160,11 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
     # Check cache first for significant performance improvement
     if CACHE_AVAILABLE and cache_manager:
         # Use API URL as cache key for field discovery
-        api_url = getattr(tilores_api, 'api_url', 'default')
+        api_url = getattr(tilores_api, "api_url", "default")
         cached_fields = cache_manager.get_tilores_fields(api_url)
         if cached_fields:
             import json
+
             try:
                 fields_dict = json.loads(cached_fields)
                 print(f"🔥 Cache HIT: Field discovery ({len(fields_dict)} fields)")
@@ -202,9 +205,7 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
             "CreditResponseCreditFileBorrower",  # 8 fields - borrower file data
         ]
 
-        for type_info in (
-            schema_result.get("data", {}).get("__schema", {}).get("types", [])
-        ):
+        for type_info in schema_result.get("data", {}).get("__schema", {}).get("types", []):
             type_name = type_info.get("name", "")
             if type_name == "Record" and type_info.get("fields"):
                 # Only include Record type fields that can be accessed directly
@@ -232,22 +233,16 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
                 for field_name in field_names:
                     all_fields[field_name] = True
 
-        print(
-            f"🔍 Comprehensive field discovery: {len(all_fields)} total fields from {len(relevant_types)} types"
-        )
+        print(f"🔍 Comprehensive field discovery: {len(all_fields)} total fields from {len(relevant_types)} types")
         return all_fields
 
     except Exception as e:
         logger.error(f"Schema discovery failed: {e}")
         # Fallback to basic Record fields if comprehensive discovery fails
         try:
-            for type_info in (
-                schema_result.get("data", {}).get("__schema", {}).get("types", [])
-            ):
+            for type_info in schema_result.get("data", {}).get("__schema", {}).get("types", []):
                 if type_info.get("name") == "Record":
-                    field_names = [
-                        field["name"] for field in type_info.get("fields", [])
-                    ]
+                    field_names = [field["name"] for field in type_info.get("fields", [])]
                     return {field: True for field in field_names}
         except Exception:
             pass
@@ -256,7 +251,6 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
 
 class MultiProviderLLMEngine:
     """Ultra-minimal multi-provider LLM engine with OpenAI-compatible interface"""
-
 
     def __init__(self):
         """Initialize with simple model mappings - only available providers"""
@@ -378,7 +372,6 @@ class MultiProviderLLMEngine:
         # Initialize Tilores after LangSmith setup
         self._init_tilores()
 
-
     def _load_environment(self):
         """Load environment variables from .env file (current dir -> parent -> project root)"""
         try:
@@ -399,24 +392,17 @@ class MultiProviderLLMEngine:
             for env_path in possible_env_paths:
                 if env_path.exists():
                     print(f"📁 Loading environment from: {env_path}")
-                    load_dotenv(
-                        env_path, override=False
-                    )  # Don't override existing env vars
+                    load_dotenv(env_path, override=False)  # Don't override existing env vars
                     env_loaded = True
                     break
 
             if not env_loaded:
-                print(
-                    "⚠️  No .env file found - using system environment variables only"
-                )
+                print("⚠️  No .env file found - using system environment variables only")
 
         except ImportError:
-            print(
-                "⚠️  python-dotenv not available - using system environment variables only"
-            )
+            print("⚠️  python-dotenv not available - using system environment variables only")
         except Exception as e:
             print(f"⚠️  Error loading .env file: {e}")
-
 
     def _init_langsmith(self):
         """Initialize LangSmith observability with graceful degradation."""
@@ -426,6 +412,7 @@ class MultiProviderLLMEngine:
 
         try:
             import os
+
             # Check if LangSmith is enabled in environment
             langsmith_enabled = os.getenv("LANGSMITH_TRACING", "false")
             if langsmith_enabled.lower() not in ("true", "1", "yes", "on"):
@@ -433,9 +420,7 @@ class MultiProviderLLMEngine:
                 return
 
             # Get API key
-            api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv(
-                "LANGCHAIN_API_KEY"
-            )
+            api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY")
             if not api_key:
                 print("📊 LangSmith API key not found - tracing disabled")
                 return
@@ -444,17 +429,10 @@ class MultiProviderLLMEngine:
             self.langsmith_client = LangSmithClient(api_key=api_key)
 
             # Get project name from environment
-            project_name = (
-                os.getenv("LANGSMITH_PROJECT") or
-                os.getenv("LANGCHAIN_PROJECT") or
-                "tilores_unified"
-            )
+            project_name = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT") or "tilores_unified"
 
             # Initialize LangChain tracer with project name
-            self.langchain_tracer = LangChainTracer(
-                client=self.langsmith_client,
-                project_name=project_name
-            )
+            self.langchain_tracer = LangChainTracer(client=self.langsmith_client, project_name=project_name)
 
             print(f"✅ LangSmith initialized - Project: {project_name}")
 
@@ -463,7 +441,6 @@ class MultiProviderLLMEngine:
             print("📊 Observability disabled - continuing without tracing")
             self.langsmith_client = None
             self.langchain_tracer = None
-
 
     def _init_tilores(self):
         """Initialize Tilores components with error handling and timeout protection"""
@@ -488,15 +465,14 @@ class MultiProviderLLMEngine:
                 print(f"❌ CRITICAL: Missing required Tilores variables: {missing_vars}")
                 print("💡 Check your .env file configuration")
                 print("💡 Run: python config/env-validation.py for detailed validation")
-                raise Exception(
-                    f"Missing critical Tilores configuration: {missing_vars}"
-                )
+                raise Exception(f"Missing critical Tilores configuration: {missing_vars}")
 
             print("✅ All required Tilores variables present")
 
             # Use optimized timeout configuration
             try:
                 from utils.timeout_config import get_timeout_manager
+
                 timeout_mgr = get_timeout_manager()
                 timeout_seconds = timeout_mgr.get_timeout("tilores_init")
                 retry_config = timeout_mgr.get_retry_config()
@@ -530,29 +506,19 @@ class MultiProviderLLMEngine:
 
             for attempt in range(max_retries):
                 try:
-                    print(
-                        f"🚀 Starting Tilores initialization attempt {attempt + 1}/{max_retries}..."
-                    )
-                    print(
-                        f"⏱️  Using {timeout_seconds}s timeout for Railway environment"
-                    )
+                    print(f"🚀 Starting Tilores initialization attempt {attempt + 1}/{max_retries}...")
+                    print(f"⏱️  Using {timeout_seconds}s timeout for Railway environment")
 
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=1
-                    ) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                         future = executor.submit(TiloresAPI.from_environ)
                         self.tilores = future.result(timeout=timeout_seconds)
-                        print(
-                            f"✅ TiloresAPI initialized successfully (attempt {attempt + 1})"
-                        )
+                        print(f"✅ TiloresAPI initialized successfully (attempt {attempt + 1})")
                         break
 
                 except concurrent.futures.TimeoutError:
                     elapsed_msg = f"⏰ TiloresAPI timeout on attempt {attempt + 1}/{max_retries} (>{timeout_seconds}s)"
                     print(elapsed_msg)
-                    print(
-                        "🔍 Railway environment may have higher network latency than local (~3s)"
-                    )
+                    print("🔍 Railway environment may have higher network latency than local (~3s)")
 
                     if attempt == max_retries - 1:
                         print(f"❌ FINAL TIMEOUT: All {max_retries} attempts exhausted")
@@ -566,17 +532,13 @@ class MultiProviderLLMEngine:
                     time.sleep(delay)
 
                 except Exception as e:
-                    print(
-                        f"❌ TiloresAPI error on attempt {attempt + 1}/{max_retries}: {e}"
-                    )
+                    print(f"❌ TiloresAPI error on attempt {attempt + 1}/{max_retries}: {e}")
                     print(f"🔍 Error type: {type(e).__name__}")
                     print(f"🔍 Error details: {str(e)[:200]}...")  # Truncate long errors
 
                     if attempt == max_retries - 1:
                         print(f"❌ FINAL ERROR: All {max_retries} attempts failed")
-                        raise Exception(
-                            f"TiloresAPI initialization failed after {max_retries} attempts: {e}"
-                        )
+                        raise Exception(f"TiloresAPI initialization failed after {max_retries} attempts: {e}")
 
                     delay = base_delay * (2**attempt)
                     print(f"⏳ Retrying in {delay}s...")
@@ -592,8 +554,8 @@ class MultiProviderLLMEngine:
             tool_dict = {
                 "search": tilores_tools.search,
                 "fetchEntity": tilores_tools.entity_edges,
-                "creditReport": getattr(tilores_tools, 'credit_report', None),
-                "fieldDiscovery": getattr(tilores_tools, 'field_discovery', None)
+                "creditReport": getattr(tilores_tools, "credit_report", None),
+                "fieldDiscovery": getattr(tilores_tools, "field_discovery", None),
             }
 
             # Initialize the function executor
@@ -602,14 +564,10 @@ class MultiProviderLLMEngine:
 
             # Get all available fields dynamically with timeout protection
             # Use shorter timeout for field discovery to prevent hanging
-            field_discovery_timeout = min(
-                30, timeout_seconds / 2
-            )  # Max 30s or half init timeout
+            field_discovery_timeout = min(30, timeout_seconds / 2)  # Max 30s or half init timeout
             try:
                 start_time = time.time()
-                print(
-                    f"🔍 Starting field discovery with {field_discovery_timeout}s timeout..."
-                )
+                print(f"🔍 Starting field discovery with {field_discovery_timeout}s timeout...")
 
                 # Run field discovery with timeout protection
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
@@ -617,19 +575,13 @@ class MultiProviderLLMEngine:
                     self.all_fields = future.result(timeout=field_discovery_timeout)
 
                 discovery_time = time.time() - start_time
-                print(
-                    f"🔍 Discovered {len(self.all_fields)} fields from Tilores schema in {discovery_time:.1f}s"
-                )
+                print(f"🔍 Discovered {len(self.all_fields)} fields from Tilores schema in {discovery_time:.1f}s")
 
                 if discovery_time > 10:
-                    print(
-                        f"⚠️ Field discovery took {discovery_time:.1f}s - Railway environment has higher latency"
-                    )
+                    print(f"⚠️ Field discovery took {discovery_time:.1f}s - Railway environment has higher latency")
 
             except concurrent.futures.TimeoutError:
-                print(
-                    f"⏰ Field discovery timeout ({field_discovery_timeout}s) - using essential field set"
-                )
+                print(f"⏰ Field discovery timeout ({field_discovery_timeout}s) - using essential field set")
                 # Fallback to essential fields only
                 self.all_fields = {
                     "EMAIL": True,
@@ -671,9 +623,7 @@ class MultiProviderLLMEngine:
                 record_lookup_tool,
                 credit_report_tool,
             ]
-            print(
-                f"🎉 Tilores initialization completed successfully with {len(self.tools)} tools available"
-            )
+            print(f"🎉 Tilores initialization completed successfully with {len(self.tools)} tools available")
         except Exception as e:
             print(f"❌ CRITICAL: Tilores initialization failed completely: {e}")
             print(f"🔍 Error type: {type(e).__name__}")
@@ -681,7 +631,6 @@ class MultiProviderLLMEngine:
             print("💡 Check network connectivity to Tilores endpoints")
             self.tilores = None
             self.tools = []
-
 
     def _create_smart_search_tool(self, tilores_tools):
         """Create a search tool that adapts field selection based on model provider"""
@@ -734,7 +683,6 @@ class MultiProviderLLMEngine:
         }
 
         @tool
-
         def tilores_smart_search(query: str) -> str:
             """
             Smart customer search with provider-aware field selection.
@@ -771,13 +719,11 @@ class MultiProviderLLMEngine:
 
         return tilores_smart_search
 
-
     def _create_comprehensive_search_tool(self, tilores_tools):
         """Create a comprehensive search tool with ALL fields for detailed follow-up queries"""
         from langchain.tools import tool
 
         @tool
-
         def tilores_comprehensive_search(query: str) -> str:
             """
             Comprehensive customer search with ALL 285+ fields for detailed analysis.
@@ -822,13 +768,11 @@ class MultiProviderLLMEngine:
 
         return tilores_comprehensive_search
 
-
     def _create_unified_search_tool(self, tilores_tools):
         """Create a unified search tool that adapts field selection based on provider capabilities"""
         from langchain.tools import tool
 
         @tool
-
         def tilores_search(query: str) -> str:
             """
             Search for customers with basic profile and contact information.
@@ -864,13 +808,12 @@ class MultiProviderLLMEngine:
                 if CACHE_AVAILABLE and cache_manager:
                     import hashlib
                     import json
+
                     # Create cache key from search parameters
-                    cache_key = hashlib.md5(
-                        json.dumps(search_params, sort_keys=True).encode()
-                    ).hexdigest()
+                    cache_key = hashlib.md5(json.dumps(search_params, sort_keys=True).encode()).hexdigest()
                     cached_result = cache_manager.get_customer_search(cache_key)
                     if cached_result:
-                        search_value = 'unknown'
+                        search_value = "unknown"
                         if search_params and search_params.values():
                             values_list = list(search_params.values())
                             if values_list:
@@ -889,6 +832,7 @@ class MultiProviderLLMEngine:
                     # Use optimized timeout for search operations
                     try:
                         from utils.timeout_config import get_timeout_manager
+
                         timeout_mgr = get_timeout_manager()
                         timeout_seconds = timeout_mgr.get_timeout("search_operation")
                     except ImportError:
@@ -898,9 +842,7 @@ class MultiProviderLLMEngine:
                     start_time = time.time()
 
                     # Use ThreadPoolExecutor with timeout for search operation
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=1
-                    ) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                         future = executor.submit(
                             search_tool.invoke,
                             {
@@ -922,9 +864,7 @@ class MultiProviderLLMEngine:
                             return result
                         except concurrent.futures.TimeoutError:
                             elapsed = time.time() - start_time
-                            print(
-                                f"⏰ Search timed out after {elapsed:.1f}s, trying minimal fields..."
-                            )
+                            print(f"⏰ Search timed out after {elapsed:.1f}s, trying minimal fields...")
                             # Cancel the future and fall through to essential fields fallback
                             future.cancel()
                             raise Exception(f"Search timeout after {timeout_seconds}s")
@@ -988,15 +928,12 @@ class MultiProviderLLMEngine:
 
         return tilores_search
 
-
     def _parse_query_string(self, query: str) -> dict:
         """Parse a natural language query to extract search parameters"""
         import re
 
         # Email extraction
-        email_match = re.search(
-            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", query
-        )
+        email_match = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", query)
         if email_match:
             return {"EMAIL": email_match.group()}
 
@@ -1018,11 +955,7 @@ class MultiProviderLLMEngine:
 
         # Try case-insensitive pattern for names like "dawn bruton"
         name_match_flexible = re.search(r"\b([a-zA-Z]+)\s+([a-zA-Z]+)\b", query.lower())
-        if (
-            name_match_flexible
-            and len(name_match_flexible.group(1)) > 2
-            and len(name_match_flexible.group(2)) > 2
-        ):
+        if name_match_flexible and len(name_match_flexible.group(1)) > 2 and len(name_match_flexible.group(2)) > 2:
             return {
                 "FIRST_NAME": name_match_flexible.group(1).capitalize(),
                 "LAST_NAME": name_match_flexible.group(2).capitalize(),
@@ -1031,13 +964,11 @@ class MultiProviderLLMEngine:
         # Default fallback - return the query as a generic search
         return {"GENERAL_SEARCH": query}
 
-
     def _create_record_lookup_tool(self):
         """Create a custom tool for looking up records by ID using entityByRecord"""
         from langchain.tools import tool
 
         @tool
-
         def tilores_record_lookup(record_id: str) -> str:
             """
             Look up a customer record by Salesforce record ID (like 003Ux00000WCmXtIAL).
@@ -1098,9 +1029,7 @@ class MultiProviderLLMEngine:
                         # If we didn't find the exact record ID, look for any record with data
                         if not target_record or not target_record.get("EMAIL"):
                             for record in records:
-                                if record.get(
-                                    "EMAIL"
-                                ):  # Found a record with actual data
+                                if record.get("EMAIL"):  # Found a record with actual data
                                     target_record = record
                                     break
 
@@ -1128,16 +1057,12 @@ class MultiProviderLLMEngine:
 
         return tilores_record_lookup
 
-
     def _create_credit_report_tool(self):
         """Create a tool for retrieving comprehensive credit report data"""
         from langchain.tools import tool
 
         @tool
-
-        def get_customer_credit_report(
-            customer_id: str = None, client_id: str = None, email: str = None
-        ) -> str:
+        def get_customer_credit_report(customer_id: str = None, client_id: str = None, email: str = None) -> str:
             """
             *** MANDATORY: USE THIS FUNCTION FOR ALL CREDIT AND FINANCIAL ANALYSIS QUESTIONS ***
 
@@ -1234,9 +1159,7 @@ class MultiProviderLLMEngine:
                     result_str = str(result)
                     if "Error" in result_str or "No entities found" in result_str:
                         return f"Unable to retrieve credit report - customer not found or error accessing data: {result_str}"
-                    credit_info = self._extract_credit_information(
-                        result_str, search_params
-                    )
+                    credit_info = self._extract_credit_information(result_str, search_params)
 
                 return credit_info
 
@@ -1244,7 +1167,6 @@ class MultiProviderLLMEngine:
                 return f"Error retrieving credit report: {str(e)}"
 
         return get_customer_credit_report
-
 
     def _extract_credit_from_dict(self, result_dict: dict, search_params: dict) -> str:
         """Extract credit information from unified search dictionary result"""
@@ -1294,10 +1216,7 @@ class MultiProviderLLMEngine:
 
                 # Extract specific credit scores
                 for field_entry in all_credit_fields:
-                    if any(
-                        term in field_entry.lower()
-                        for term in ["score", "credit_score", "starting_credit"]
-                    ):
+                    if any(term in field_entry.lower() for term in ["score", "credit_score", "starting_credit"]):
                         # Extract numeric score if possible
                         import re
 
@@ -1305,9 +1224,7 @@ class MultiProviderLLMEngine:
                         if score_match:
                             credit_report["credit_scores"].append(score_match.group(1))
 
-                return self._format_comprehensive_credit_report(
-                    credit_report, customer_info
-                )
+                return self._format_comprehensive_credit_report(credit_report, customer_info)
             else:
                 # No credit fields found, but customer exists
                 return self._format_no_credit_data_report(customer_info, result_dict)
@@ -1315,10 +1232,7 @@ class MultiProviderLLMEngine:
         except Exception as e:
             return f"Error processing credit data: {str(e)}"
 
-
-    def _format_comprehensive_credit_report(
-        self, credit_report: dict, customer_info: dict
-    ) -> str:
+    def _format_comprehensive_credit_report(self, credit_report: dict, customer_info: dict) -> str:
         """Format a comprehensive credit report using Credit Pros advisor approach"""
 
         # Extract customer name for personalized greeting
@@ -1338,9 +1252,7 @@ class MultiProviderLLMEngine:
         # Check for credit bureau data
         raw_data_str = "\n".join(credit_report.get("raw_credit_data", []))
         has_credit_response = "CREDIT_RESPONSE" in raw_data_str
-        has_transunion_data = (
-            "TRANSUNION_REPORT" in raw_data_str or "TransUnion" in raw_data_str
-        )
+        has_transunion_data = "TRANSUNION_REPORT" in raw_data_str or "TransUnion" in raw_data_str
 
         # Look for credit indicators
         credit_indicators = [
@@ -1353,11 +1265,7 @@ class MultiProviderLLMEngine:
             "BALANCE",
             "PAYMENT_HISTORY",
         ]
-        found_indicators = [
-            indicator
-            for indicator in credit_indicators
-            if indicator in raw_data_str.upper()
-        ]
+        found_indicators = [indicator for indicator in credit_indicators if indicator in raw_data_str.upper()]
 
         # Use the Credit Pros advisor approach
         return self._generate_credit_advisor_response(
@@ -1369,10 +1277,7 @@ class MultiProviderLLMEngine:
             raw_data_str,
         )
 
-
-    def _format_no_credit_data_report(
-        self, customer_info: dict, full_result: dict
-    ) -> str:
+    def _format_no_credit_data_report(self, customer_info: dict, full_result: dict) -> str:
         """Format report using Credit Pros advisor approach even when limited credit data"""
 
         # Extract customer name for personalized greeting
@@ -1402,9 +1307,7 @@ class MultiProviderLLMEngine:
 
         # Check for credit bureau data
         has_credit_response = "CREDIT_RESPONSE" in raw_data_str
-        has_transunion_data = (
-            "TRANSUNION_REPORT" in raw_data_str or "TransUnion" in raw_data_str
-        )
+        has_transunion_data = "TRANSUNION_REPORT" in raw_data_str or "TransUnion" in raw_data_str
 
         # Look for credit indicators
         credit_indicators = [
@@ -1417,11 +1320,7 @@ class MultiProviderLLMEngine:
             "BALANCE",
             "PAYMENT_HISTORY",
         ]
-        found_indicators = [
-            indicator
-            for indicator in credit_indicators
-            if indicator in raw_data_str.upper()
-        ]
+        found_indicators = [indicator for indicator in credit_indicators if indicator in raw_data_str.upper()]
 
         # Use the Credit Pros advisor approach even for limited data
         return self._generate_credit_advisor_response(
@@ -1432,7 +1331,6 @@ class MultiProviderLLMEngine:
             found_indicators,
             raw_data_str,
         )
-
 
     def _extract_credit_information(self, result_str: str, search_params: dict) -> str:
         """Extract and provide intelligent credit analysis using Credit Pros advisor approach"""
@@ -1477,9 +1375,7 @@ class MultiProviderLLMEngine:
 
         # Extract credit bureau data and CREDIT_RESPONSE information
         has_credit_response = "CREDIT_RESPONSE" in result_str
-        has_transunion_data = (
-            "TRANSUNION_REPORT" in result_str or "TransUnion" in result_str
-        )
+        has_transunion_data = "TRANSUNION_REPORT" in result_str or "TransUnion" in result_str
 
         # Look for credit account indicators in the data
         credit_indicators = [
@@ -1492,11 +1388,7 @@ class MultiProviderLLMEngine:
             "BALANCE",
             "PAYMENT_HISTORY",
         ]
-        found_indicators = [
-            indicator
-            for indicator in credit_indicators
-            if indicator in result_str.upper()
-        ]
+        found_indicators = [indicator for indicator in credit_indicators if indicator in result_str.upper()]
 
         # Generate intelligent credit analysis using Credit Pros advisor approach
         return self._generate_credit_advisor_response(
@@ -1507,7 +1399,6 @@ class MultiProviderLLMEngine:
             found_indicators,
             result_str,
         )
-
 
     def _generate_credit_advisor_response(
         self,
@@ -1535,23 +1426,19 @@ class MultiProviderLLMEngine:
             elif credit_score >= 700:
                 response += "**Credit Rating:** Good (700-749)\n"
                 response += "**Risk Assessment:** Low risk borrower\n"
-                response += ("**Lending Status:** Approved for most credit products with "
-                                            "competitive rates\n")
+                response += "**Lending Status:** Approved for most credit products with " "competitive rates\n"
             elif credit_score >= 650:
                 response += "**Credit Rating:** Fair (650-699)\n"
                 response += "**Risk Assessment:** Moderate risk borrower\n"
-                response += ("**Lending Status:** Limited approval options, higher interest rates "
-                                            "likely\n")
+                response += "**Lending Status:** Limited approval options, higher interest rates " "likely\n"
             elif credit_score >= 600:
                 response += "**Credit Rating:** Poor (600-649)\n"
                 response += "**Risk Assessment:** High risk borrower\n"
-                response += ("**Lending Status:** Secured products recommended, focus on "
-                                            "rebuilding\n")
+                response += "**Lending Status:** Secured products recommended, focus on " "rebuilding\n"
             else:
                 response += "**Credit Rating:** Very Poor (Below 600)\n"
                 response += "**Risk Assessment:** Very high risk borrower\n"
-                response += ("**Lending Status:** Limited to secured products, significant "
-                                            "rebuilding needed\n")
+                response += "**Lending Status:** Limited to secured products, significant " "rebuilding needed\n"
         else:
             response += "## Credit Score Status\n\n"
             response += "**Current Credit Score:** Not available in current data\n"
@@ -1562,20 +1449,14 @@ class MultiProviderLLMEngine:
 
         if has_credit_response:
             response += "**Credit Report Status:** Comprehensive credit bureau data available\n"
-            response += ("**Data Sources:** Full tradeline information, payment history, and "
-                                        "inquiry records\n")
-            response += (
-                        "**Analysis Capability:** Complete credit profile analysis possible\n"
-            )
+            response += "**Data Sources:** Full tradeline information, payment history, and " "inquiry records\n"
+            response += "**Analysis Capability:** Complete credit profile analysis possible\n"
         elif has_transunion_data:
             response += "**Bureau Data:** TransUnion credit report data available\n"
-            response += (
-                        "**Analysis Status:** Credit report analysis ready for processing\n"
-            )
+            response += "**Analysis Status:** Credit report analysis ready for processing\n"
         else:
             response += "**Credit Data Status:** Limited data available in current search results\n"
-            response += ("**Recommendation:** Full credit report pull recommended for "
-                                        "comprehensive analysis\n")
+            response += "**Recommendation:** Full credit report pull recommended for " "comprehensive analysis\n"
 
         # Analyze credit utilization and debt data
         import re
@@ -1603,14 +1484,11 @@ class MultiProviderLLMEngine:
             max_debt = max(total_debt)
             response += f"**Debt Identified:** ${max_debt:,.2f} in potential revolving balances\n"
             response += "**Utilization Impact:** Affects credit utilization ratio calculation\n"
-            response += ("**Analysis Required:** Credit limits needed to calculate utilization "
-                                        "percentage\n")
+            response += "**Analysis Required:** Credit limits needed to calculate utilization " "percentage\n"
         else:
             response += "**Debt Status:** No specific debt amounts identified in current data\n"
-            response += ("**Data Limitation:** Account balances may require direct credit "
-                                        "report access\n")
-            response += ("**Recommendation:** Pull detailed credit report for complete "
-                                        "utilization analysis\n")
+            response += "**Data Limitation:** Account balances may require direct credit " "report access\n"
+            response += "**Recommendation:** Pull detailed credit report for complete " "utilization analysis\n"
 
         # Credit improvement analysis and recommendations
         response += "\n## Credit Improvement Analysis\n\n"
@@ -1625,39 +1503,28 @@ class MultiProviderLLMEngine:
                 response += "- Establish consistent payment patterns\n"
             elif credit_score < 650:
                 response += "**Priority Actions:**\n"
-                response += ("- Maintain consistent payment history (most impactful for this score "
-                                            "range)\n")
+                response += "- Maintain consistent payment history (most impactful for this score " "range)\n"
                 response += "- Lower credit utilization to under 30%\n"
                 response += "- Monitor credit report for negative items\n"
-                response += (
-                            "- Consider authorized user status on established accounts\n"
-                )
+                response += "- Consider authorized user status on established accounts\n"
 
                 response += "\n**Focus Areas:**\n"
                 response += "- Maintain consistent payment history\n"
                 response += "- Lower credit utilization to under 30%\n"
                 response += "- Monitor credit report for negative items\n"
-                response += (
-                            "- Consider authorized user status on established accounts\n"
-                )
+                response += "- Consider authorized user status on established accounts\n"
             elif credit_score < 700:
                 response += "**Optimization Strategies:**\n"
-                response += (
-                            "- Reduce credit utilization to under 10% for score optimization\n"
-                )
+                response += "- Reduce credit utilization to under 10% for score optimization\n"
                 response += "- Maintain perfect payment history\n"
-                response += (
-                            "- Consider credit limit increases to improve utilization ratio\n"
-                )
+                response += "- Consider credit limit increases to improve utilization ratio\n"
                 response += "- Review credit mix and account age factors\n"
             else:
                 response += "**Maintenance Strategies:**\n"
                 response += "- Continue current payment patterns\n"
                 response += "- Keep utilization under 5% for optimal scoring\n"
                 response += "- Monitor credit for unauthorized activities\n"
-                response += (
-                            "- Consider strategic credit applications for better products\n"
-                )
+                response += "- Consider strategic credit applications for better products\n"
         else:
             response += "**Assessment Required:**\n"
             response += "- Pull comprehensive credit report for baseline analysis\n"
@@ -1674,35 +1541,24 @@ class MultiProviderLLMEngine:
             "current",
             "on time",
         ]
-        payment_data = [
-            term for term in payment_indicators if term.lower() in raw_data.lower()
-        ]
+        payment_data = [term for term in payment_indicators if term.lower() in raw_data.lower()]
 
         if payment_data:
-            response += (f"**Payment Indicators Found:** {len(payment_data)} payment-related "
-                                        f"data points\n")
-            response += (
-                        "**Analysis Required:** Detailed payment pattern review needed\n"
-            )
+            response += f"**Payment Indicators Found:** {len(payment_data)} payment-related " f"data points\n"
+            response += "**Analysis Required:** Detailed payment pattern review needed\n"
         else:
-            response += ("**Payment History:** No specific payment-related data in current "
-                                        "search results\n")
-            response += ("**Payment Indicators:** Limited payment indicators available without "
-                                        "full credit report\n")
-            response += ("**Recommendation:** Full credit report required for payment history "
-                                        "analysis\n")
+            response += "**Payment History:** No specific payment-related data in current " "search results\n"
+            response += "**Payment Indicators:** Limited payment indicators available without " "full credit report\n"
+            response += "**Recommendation:** Full credit report required for payment history " "analysis\n"
 
         return response
-
 
     def _format_credit_report(self, credit_report: dict, raw_result: str) -> str:
         """Format extracted credit information into a readable report"""
 
         # Check if we have any credit-specific data
         has_credit_data = (
-            credit_report["credit_scores"]
-            or credit_report["credit_summary"]
-            or credit_report["raw_credit_data"]
+            credit_report["credit_scores"] or credit_report["credit_summary"] or credit_report["raw_credit_data"]
         )
 
         if not has_credit_data:
@@ -1738,9 +1594,7 @@ class MultiProviderLLMEngine:
 
         # Credit scores
         if credit_report["credit_scores"]:
-            report += (
-                f"**Credit Scores**: {', '.join(credit_report['credit_scores'])}\n\n"
-            )
+            report += f"**Credit Scores**: {', '.join(credit_report['credit_scores'])}\n\n"
 
         # Credit summary
         if credit_report["credit_summary"]:
@@ -1754,13 +1608,10 @@ class MultiProviderLLMEngine:
             report += "\n"
 
         # Add note about data processing
-        report += (
-            "**Note**: Credit report data extracted from available customer records. "
-        )
+        report += "**Note**: Credit report data extracted from available customer records. "
         report += "Additional details may be available through direct credit bureau integration.\n\n"
 
         return report
-
 
     def get_model(self, model_name: str = "llama-3.3-70b-versatile", **kwargs):
         """Get model instance from any provider using OpenAI-compatible interface"""
@@ -1812,11 +1663,9 @@ class MultiProviderLLMEngine:
             # Fallback to fastest model llama-3.3-70b-versatile
             return ChatGroq(model="llama-3.3-70b-versatile", **kwargs)
 
-
     def get_provider(self, model_name: str) -> str:
         """Get provider name for a model"""
         return self.model_mappings.get(model_name, {}).get("provider", "openai")
-
 
     def get_llm_with_tools(self, model_name: str, **kwargs):
         """Get LLM with tools bound - with enhanced debugging"""
@@ -1833,13 +1682,10 @@ class MultiProviderLLMEngine:
 
         return llm.bind_tools(self.tools)
 
-
     def list_models(self) -> list:
         """List all available models"""
-        return [
-            {"id": model, "provider": mapping["provider"]}
-            for model, mapping in self.model_mappings.items()
-        ]
+        return [{"id": model, "provider": mapping["provider"]} for model, mapping in self.model_mappings.items()]
+
 
 # Global engine instance - initialized after dotenv loading
 engine = None
@@ -1914,20 +1760,20 @@ def run_chain(
         langsmith_callbacks = []
         trace_metadata = {}
 
-        if (hasattr(engine, 'langchain_tracer') and
-            engine.langchain_tracer is not None):
+        if hasattr(engine, "langchain_tracer") and engine.langchain_tracer is not None:
             langsmith_callbacks.append(engine.langchain_tracer)
 
             # Add metadata for comprehensive observability
-            trace_metadata.update({
-                "model": model,
-                "provider": engine.get_provider(model),
-                "message_count": len(messages) if isinstance(messages, list)
-                               else 1,
-                "stream": stream,
-                "tilores_tools_available": bool(engine.tools),
-                "tool_count": len(engine.tools) if engine.tools else 0
-            })
+            trace_metadata.update(
+                {
+                    "model": model,
+                    "provider": engine.get_provider(model),
+                    "message_count": len(messages) if isinstance(messages, list) else 1,
+                    "stream": stream,
+                    "tilores_tools_available": bool(engine.tools),
+                    "tool_count": len(engine.tools) if engine.tools else 0,
+                }
+            )
 
             # Add customer context if available
             if customer_data:
@@ -1960,15 +1806,16 @@ def run_chain(
             if CACHE_AVAILABLE and cache_manager and not stream:
                 import hashlib
                 import json
+
                 # Create cache key from query + model + conversation
                 cache_data = {
                     "query": user_input,
                     "model": model,
-                    "conversation": conversation_history[-3:] if conversation_history else []  # Last 3 messages for context
+                    "conversation": (
+                        conversation_history[-3:] if conversation_history else []
+                    ),  # Last 3 messages for context
                 }
-                cache_key = hashlib.md5(
-                    json.dumps(cache_data, sort_keys=True).encode()
-                ).hexdigest()
+                cache_key = hashlib.md5(json.dumps(cache_data, sort_keys=True).encode()).hexdigest()
                 cached_response = cache_manager.get_llm_response(cache_key)
                 if cached_response:
                     print(f"🔥 Cache HIT: LLM response for model {model}")
@@ -1977,9 +1824,7 @@ def run_chain(
             print("🔍 Cache MISS: Generating LLM response...")
 
             llm = engine.get_model(model, **kwargs)
-            system_prompt = (
-                "You are a helpful AI assistant. Provide accurate, concise responses."
-            )
+            system_prompt = "You are a helpful AI assistant. Provide accurate, concise responses."
 
             # Build messages with conversation history for context
             llm_messages = [{"role": "system", "content": system_prompt}]
@@ -1990,9 +1835,7 @@ def run_chain(
                 return llm.stream(llm_messages)
             else:
                 response = llm.invoke(llm_messages)
-                final_response = (
-                    response.content if hasattr(response, "content") else str(response)
-                )
+                final_response = response.content if hasattr(response, "content") else str(response)
 
                 # Cache successful LLM response for 24 hours
                 if CACHE_AVAILABLE and cache_manager and final_response:
@@ -2008,12 +1851,8 @@ def run_chain(
         # Tilores tools are required - no fallback to direct LLM
         if not engine.tools:
             print("🚨 CRITICAL: No tools available in production!")
-            print(
-                f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}"
-            )
-            print(
-                "   This explains why LLM gives generic responses instead of calling tools"
-            )
+            print(f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}")
+            print("   This explains why LLM gives generic responses instead of calling tools")
             return f"❌ DEBUG: Tilores tools not available in production. Engine state: {len(engine.tools) if engine and engine.tools else 'No tools initialized'}. This is why customer searches fail."
 
         # DEBUG: Log tool availability
@@ -2117,7 +1956,6 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     tool_args = tool_call["args"]
                     tool_id = tool_call.get("id", f"call_{tool_name}")
 
-
                     def execute_tool():
                         for tool in engine.tools:
                             if tool.name == tool_name:
@@ -2145,10 +1983,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                         asyncio.set_event_loop(loop)
                         tool_results = loop.run_until_complete(
                             asyncio.gather(
-                                *[
-                                    execute_tool_call_async(tool_call)
-                                    for tool_call in initial_response.tool_calls
-                                ]
+                                *[execute_tool_call_async(tool_call) for tool_call in initial_response.tool_calls]
                             )
                         )
                         loop.close()
@@ -2183,9 +2018,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                             )
 
                 # Log context size after tool results
-                total_chars_with_tools = sum(
-                    len(str(msg.get("content", ""))) for msg in llm_messages
-                )
+                total_chars_with_tools = sum(len(str(msg.get("content", ""))) for msg in llm_messages)
                 estimated_tokens_with_tools = total_chars_with_tools // 4
 
                 if estimated_tokens_with_tools > limit:
@@ -2210,17 +2043,15 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     "tags": [
                         f"provider_{engine.get_provider(model)}",
                         f"model_{model.replace('/', '_')}",
-                        "llm_invocation"
-                    ]
+                        "llm_invocation",
+                    ],
                 }
                 print("📊 LangSmith: Tracing LLM invocation with metadata")
 
             response = llm_with_tools.invoke(llm_messages, **invoke_kwargs)
 
             # DEBUG: Check if tools were called
-            has_tool_calls = hasattr(response, "tool_calls") and bool(
-                response.tool_calls
-            )
+            has_tool_calls = hasattr(response, "tool_calls") and bool(response.tool_calls)
             print(f"🎯 LLM RESPONSE: Tool calls = {has_tool_calls}")
             if has_tool_calls:
                 print(f"   Tools called: {[tc['name'] for tc in response.tool_calls]}")
@@ -2237,9 +2068,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 # Extract customer identifier from the query
                 import re
 
-                email_match = re.search(
-                    r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", user_input
-                )
+                email_match = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", user_input)
                 client_id_match = re.search(r"\b\d{6,8}\b", user_input)
                 record_id_match = re.search(r"\b003[A-Za-z0-9]+\b", user_input)
 
@@ -2266,12 +2095,8 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                         if tool.name == "tilores_search":
                             print("🔧 Invoking tilores_search manually...")
                             # CRITICAL FIX: Use correct parameter structure for tilores_search
-                            tool_result = tool.invoke(
-                                search_query
-                            )  # Pass search_query directly, not wrapped in dict
-                            print(
-                                f"✅ FORCED TOOL RESULT: {len(str(tool_result))} characters"
-                            )
+                            tool_result = tool.invoke(search_query)  # Pass search_query directly, not wrapped in dict
+                            print(f"✅ FORCED TOOL RESULT: {len(str(tool_result))} characters")
                             return f"Found customer information: {tool_result}"
                     return "❌ DEBUG: tilores_search tool not found in available tools"
                 except Exception as e:
@@ -2282,11 +2107,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
         max_iterations = 5  # Prevent infinite loops
         iteration = 0
 
-        while (
-            hasattr(response, "tool_calls")
-            and response.tool_calls
-            and iteration < max_iterations
-        ):
+        while hasattr(response, "tool_calls") and response.tool_calls and iteration < max_iterations:
             iteration += 1
             # Add the assistant's response with tool calls to the conversation
             llm_messages.append(
@@ -2299,6 +2120,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
             # Execute each tool call - optimized for async concurrent execution
             import asyncio
+
             # ThreadPoolExecutor imported at top of file
 
             async def execute_tool_call_async(tool_call):
@@ -2306,7 +2128,6 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 tool_name = tool_call["name"]
                 tool_args = tool_call["args"]
                 tool_id = tool_call.get("id", f"call_{tool_name}")
-
 
                 def execute_tool():
                     # LangSmith: Log tool execution start
@@ -2319,21 +2140,21 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     for tool in engine.tools:
                         if tool.name == tool_name:
                             try:
-                                tool_start_time = __import__('time').time()
+                                tool_start_time = __import__("time").time()
                                 result = tool.invoke(tool_args)
-                                tool_duration = __import__('time').time() - tool_start_time
+                                tool_duration = __import__("time").time() - tool_start_time
 
                                 # LangSmith: Log successful tool execution
                                 if langsmith_callbacks and engine.langsmith_client:
                                     try:
-                                        print(f"📊 LangSmith: Tool {tool_name} completed in "
-                                              f"{tool_duration:.2f}s")
+                                        print(f"📊 LangSmith: Tool {tool_name} completed in " f"{tool_duration:.2f}s")
                                     except Exception:
                                         pass  # Graceful degradation
 
                                 return result
                             except Exception as tool_error:
                                 import traceback
+
                                 traceback.print_exc()
 
                                 # LangSmith: Log tool execution error
@@ -2370,12 +2191,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 tool_results = loop.run_until_complete(
-                    asyncio.gather(
-                        *[
-                            execute_tool_call_async(tool_call)
-                            for tool_call in response.tool_calls
-                        ]
-                    )
+                    asyncio.gather(*[execute_tool_call_async(tool_call) for tool_call in response.tool_calls])
                 )
                 loop.close()
 
@@ -2395,9 +2211,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                                 tool_result = tool.invoke(tool_args)
                                 break
                             except Exception as tool_error:
-                                tool_result = (
-                                    f"Error executing {tool_name}: {str(tool_error)}"
-                                )
+                                tool_result = f"Error executing {tool_name}: {str(tool_error)}"
                                 import traceback
 
                                 traceback.print_exc()
@@ -2414,9 +2228,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     )
 
             # Check context size before next iteration
-            total_chars_current = sum(
-                len(str(msg.get("content", ""))) for msg in llm_messages
-            )
+            total_chars_current = sum(len(str(msg.get("content", ""))) for msg in llm_messages)
             estimated_tokens_current = total_chars_current // 4
 
             if estimated_tokens_current > limit:
@@ -2455,9 +2267,7 @@ def create_enhanced_prompt_for_groq(user_input: str) -> str:
         "sephus",
     ]
 
-    is_customer_query = any(
-        indicator.lower() in user_input.lower() for indicator in customer_indicators
-    )
+    is_customer_query = any(indicator.lower() in user_input.lower() for indicator in customer_indicators)
 
     if is_customer_query:
         return """You are a customer service assistant with access to customer data.

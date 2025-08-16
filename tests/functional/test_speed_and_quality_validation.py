@@ -17,6 +17,7 @@ from fastapi.testclient import TestClient
 
 # Import the FastAPI app
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from main_openai_compatible import app
@@ -34,7 +35,7 @@ class TestSpeedAndQualityValidation:
         "simple_query_ms": 3000,
         "customer_query_ms": 8000,
         "complex_query_ms": 12000,
-        "streaming_first_chunk_ms": 2000
+        "streaming_first_chunk_ms": 2000,
     }
 
     # Quality assessment criteria
@@ -42,7 +43,7 @@ class TestSpeedAndQualityValidation:
         "min_response_length": 20,
         "max_response_length": 3000,
         "expected_accuracy_percent": 70,
-        "professional_tone_required": True
+        "professional_tone_required": True,
     }
 
     @classmethod
@@ -64,7 +65,9 @@ class TestSpeedAndQualityValidation:
         if cls.missing_env_vars:
             pytest.skip(f"Missing API keys: {cls.missing_env_vars}")
 
-    def measure_request_speed(self, endpoint: str, method: str = "GET", json_data: Optional[Dict] = None) -> Dict[str, Any]:
+    def measure_request_speed(
+        self, endpoint: str, method: str = "GET", json_data: Optional[Dict] = None
+    ) -> Dict[str, Any]:
         """Measure the speed of an API request."""
         start_time = time.time()
 
@@ -81,24 +84,32 @@ class TestSpeedAndQualityValidation:
             "response": response,
             "response_time_ms": response_time,
             "status_code": response.status_code,
-            "endpoint": endpoint
+            "endpoint": endpoint,
         }
 
     def assess_response_quality(self, content: str, query_type: str = "general") -> Dict[str, Any]:
         """Assess the quality of an LLM response."""
         quality_metrics = {
-            "length_appropriate": self.QUALITY_CRITERIA["min_response_length"] <= len(content) <= self.QUALITY_CRITERIA["max_response_length"],
+            "length_appropriate": self.QUALITY_CRITERIA["min_response_length"]
+            <= len(content)
+            <= self.QUALITY_CRITERIA["max_response_length"],
             "not_empty": len(content.strip()) > 0,
-            "no_error_indicators": not any(indicator in content.lower() for indicator in ["error", "failed", "unable to", "sorry"]),
-            "coherent_structure": len(content.split('.')) >= 2,  # At least 2 sentences
-            "contains_useful_info": len(content.split()) >= 10   # At least 10 words
+            "no_error_indicators": not any(
+                indicator in content.lower() for indicator in ["error", "failed", "unable to", "sorry"]
+            ),
+            "coherent_structure": len(content.split(".")) >= 2,  # At least 2 sentences
+            "contains_useful_info": len(content.split()) >= 10,  # At least 10 words
         }
 
         # Query-specific quality checks
         if query_type == "customer":
-            quality_metrics["customer_specific"] = any(term in content.lower() for term in ["customer", "client", "id", "name"])
+            quality_metrics["customer_specific"] = any(
+                term in content.lower() for term in ["customer", "client", "id", "name"]
+            )
         elif query_type == "technical":
-            quality_metrics["technical_content"] = any(term in content.lower() for term in ["system", "api", "data", "response"])
+            quality_metrics["technical_content"] = any(
+                term in content.lower() for term in ["system", "api", "data", "response"]
+            )
 
         quality_score = (sum(quality_metrics.values()) / len(quality_metrics)) * 100
 
@@ -106,7 +117,7 @@ class TestSpeedAndQualityValidation:
             "quality_score": quality_score,
             "metrics": quality_metrics,
             "response_length": len(content),
-            "word_count": len(content.split())
+            "word_count": len(content.split()),
         }
 
     def test_health_check_speed(self):
@@ -153,19 +164,22 @@ class TestSpeedAndQualityValidation:
 
         assert speed <= target * 1.5, f"Model discovery too slow: {speed}ms"
 
-    @pytest.mark.parametrize("model,expected_speed_category", [
-        ("gpt-4o-mini", "fast"),
-        ("gpt-4o", "medium"),
-        ("claude-3-haiku-20240307", "fast"),
-        ("llama-3.1-8b-instant", "very_fast")
-    ])
+    @pytest.mark.parametrize(
+        "model,expected_speed_category",
+        [
+            ("gpt-4o-mini", "fast"),
+            ("gpt-4o", "medium"),
+            ("claude-3-haiku-20240307", "fast"),
+            ("llama-3.1-8b-instant", "very_fast"),
+        ],
+    )
     def test_simple_query_speed_by_model(self, model, expected_speed_category):
         """Test simple query speed across different models."""
         query_data = {
             "model": model,
             "messages": [{"role": "user", "content": "What is 2+2? Give a brief answer."}],
             "temperature": 0.1,
-            "max_tokens": 100
+            "max_tokens": 100,
         }
 
         result = self.measure_request_speed("/v1/chat/completions", "POST", query_data)
@@ -185,12 +199,7 @@ class TestSpeedAndQualityValidation:
         self.quality_scores[f"simple_query_{model}"] = quality["quality_score"]
 
         # Speed expectations by category
-        speed_thresholds = {
-            "very_fast": 1500,
-            "fast": 2500,
-            "medium": 4000,
-            "slow": 6000
-        }
+        speed_thresholds = {"very_fast": 1500, "fast": 2500, "medium": 4000, "slow": 6000}
 
         target_speed = speed_thresholds.get(expected_speed_category, 3000)
         speed_passed = speed <= target_speed
@@ -212,7 +221,7 @@ class TestSpeedAndQualityValidation:
             "model": "gpt-4o-mini",  # Fast model for customer queries
             "messages": [{"role": "user", "content": "Find customer with client ID 1648647"}],
             "temperature": 0.0,
-            "max_tokens": 1000
+            "max_tokens": 1000,
         }
 
         result = self.measure_request_speed("/v1/chat/completions", "POST", query_data)
@@ -261,7 +270,7 @@ class TestSpeedAndQualityValidation:
             "model": "gpt-4o-mini",
             "messages": [{"role": "user", "content": "Count from 1 to 3"}],
             "stream": True,
-            "max_tokens": 50
+            "max_tokens": 50,
         }
 
         start_time = time.time()
@@ -293,7 +302,7 @@ class TestSpeedAndQualityValidation:
             query_data = {
                 "model": "gpt-4o-mini",
                 "messages": [{"role": "user", "content": "What is the current time? Just give a brief response."}],
-                "max_tokens": 50
+                "max_tokens": 50,
             }
             return self.measure_request_speed("/v1/chat/completions", "POST", query_data)
 

@@ -10,11 +10,7 @@ from unittest.mock import patch
 from dataclasses import asdict
 
 # Import the components to test
-from credit_analysis_system import (
-    CreditProfile,
-    AdvancedCreditAnalyzer,
-    credit_analyzer
-)
+from credit_analysis_system import CreditProfile, AdvancedCreditAnalyzer, credit_analyzer
 
 
 @pytest.mark.unit
@@ -23,10 +19,7 @@ class TestCreditProfile:
 
     def test_credit_profile_creation_minimal(self):
         """Test creating credit profile with minimal required fields"""
-        profile = CreditProfile(
-            client_id="12345",
-            name="John Doe"
-        )
+        profile = CreditProfile(client_id="12345", name="John Doe")
 
         assert profile.client_id == "12345"
         assert profile.name == "John Doe"
@@ -55,7 +48,7 @@ class TestCreditProfile:
             recent_inquiries=2,
             derogatory_marks=0,
             credit_mix="Good",
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
         assert profile.client_id == "12345"
@@ -104,12 +97,15 @@ class TestAdvancedCreditAnalyzer:
 
     def test_analyzer_initialization_with_env(self):
         """Test analyzer initialization with environment variables"""
-        with patch.dict(os.environ, {
-            "TILORES_API_URL": "https://custom-api.example.com",
-            "TILORES_TOKEN_URL": "https://custom-token.example.com",
-            "TILORES_CLIENT_ID": "test-client-id",
-            "TILORES_CLIENT_SECRET": "test-client-secret"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://custom-api.example.com",
+                "TILORES_TOKEN_URL": "https://custom-token.example.com",
+                "TILORES_CLIENT_ID": "test-client-id",
+                "TILORES_CLIENT_SECRET": "test-client-secret",
+            },
+        ):
             analyzer = AdvancedCreditAnalyzer()
 
             assert analyzer.api_url == "https://custom-api.example.com"
@@ -127,7 +123,7 @@ class TestAdvancedCreditAnalyzer:
         analyzer.client_secret = "test-secret"
 
         # Use patch.object to mock the entire method instead of aiohttp internals
-        with patch.object(analyzer, 'get_access_token', return_value="test-token-123") as mock_method:
+        with patch.object(analyzer, "get_access_token", return_value="test-token-123") as mock_method:
             token = await analyzer.get_access_token()
 
             assert token == "test-token-123"
@@ -154,20 +150,18 @@ class TestAdvancedCreditAnalyzer:
         mock_credit_data = {
             "data": {
                 "search": {
-                    "entities": [{
-                        "id": "entity-123",
-                        "recordInsights": {
-                            "FIRST_NAME": ["John"],
-                            "LAST_NAME": ["Doe"],
-                            "CREDIT_SCORE": ["720"]
+                    "entities": [
+                        {
+                            "id": "entity-123",
+                            "recordInsights": {"FIRST_NAME": ["John"], "LAST_NAME": ["Doe"], "CREDIT_SCORE": ["720"]},
                         }
-                    }]
+                    ]
                 }
             }
         }
 
         # Mock the method directly instead of aiohttp internals
-        with patch.object(analyzer, 'get_comprehensive_credit_data', return_value=mock_credit_data):
+        with patch.object(analyzer, "get_comprehensive_credit_data", return_value=mock_credit_data):
             result = await analyzer.get_comprehensive_credit_data("john.doe@example.com")
 
             assert result == mock_credit_data
@@ -178,25 +172,27 @@ class TestAdvancedCreditAnalyzer:
         analyzer = AdvancedCreditAnalyzer()
 
         # Mock the _generate_recommendations method to avoid type conversion issue
-        with patch.object(analyzer, '_generate_recommendations', return_value=["Test recommendation"]):
+        with patch.object(analyzer, "_generate_recommendations", return_value=["Test recommendation"]):
             credit_data = {
                 "data": {
                     "search": {
-                        "entities": [{
-                            "recordInsights": {
-                                "FIRST_NAME": ["John"],
-                                "LAST_NAME": ["Doe"],
-                                "CLIENT_ID": ["12345"],
-                                "CURRENT_CREDIT_SCORE": ["720"],
-                                "CREDIT_UTILIZATION": ["15.5"],
-                                "PAYMENT_HISTORY": ["Excellent"],
-                                "CREDIT_AGE": ["5 years"],
-                                "HARD_INQUIRIES": ["2"],
-                                "DEROGATORY_MARKS": ["0"],
-                                "CREDIT_MIX": ["Good"],
-                                "TRANSUNION_REPORT": ["Available"]
+                        "entities": [
+                            {
+                                "recordInsights": {
+                                    "FIRST_NAME": ["John"],
+                                    "LAST_NAME": ["Doe"],
+                                    "CLIENT_ID": ["12345"],
+                                    "CURRENT_CREDIT_SCORE": ["720"],
+                                    "CREDIT_UTILIZATION": ["15.5"],
+                                    "PAYMENT_HISTORY": ["Excellent"],
+                                    "CREDIT_AGE": ["5 years"],
+                                    "HARD_INQUIRIES": ["2"],
+                                    "DEROGATORY_MARKS": ["0"],
+                                    "CREDIT_MIX": ["Good"],
+                                    "TRANSUNION_REPORT": ["Available"],
+                                }
                             }
-                        }]
+                        ]
                     }
                 }
             }
@@ -221,13 +217,7 @@ class TestAdvancedCreditAnalyzer:
         """Test credit profile analysis with no entities"""
         analyzer = AdvancedCreditAnalyzer()
 
-        credit_data = {
-            "data": {
-                "search": {
-                    "entities": []
-                }
-            }
-        }
+        credit_data = {"data": {"search": {"entities": []}}}
 
         profile = analyzer.analyze_credit_profile(credit_data)
         assert profile is None
@@ -249,16 +239,18 @@ class TestAdvancedCreditAnalyzer:
         credit_data = {
             "data": {
                 "search": {
-                    "entities": [{
-                        "recordInsights": {
-                            "FIRST_NAME": ["John"],
-                            "LAST_NAME": ["Doe"],
-                            "CLIENT_ID": ["12345"],
-                            "CURRENT_CREDIT_SCORE": ["720"],
-                            "FICO_SCORE": ["715"],
-                            "STARTING_CREDIT_SCORE": ["700"]
+                    "entities": [
+                        {
+                            "recordInsights": {
+                                "FIRST_NAME": ["John"],
+                                "LAST_NAME": ["Doe"],
+                                "CLIENT_ID": ["12345"],
+                                "CURRENT_CREDIT_SCORE": ["720"],
+                                "FICO_SCORE": ["715"],
+                                "STARTING_CREDIT_SCORE": ["700"],
+                            }
                         }
-                    }]
+                    ]
                 }
             }
         }
@@ -274,14 +266,16 @@ class TestAdvancedCreditAnalyzer:
         credit_data = {
             "data": {
                 "search": {
-                    "entities": [{
-                        "recordInsights": {
-                            "FIRST_NAME": ["John"],
-                            "LAST_NAME": ["Doe"],
-                            "CLIENT_ID": ["12345"],
-                            "CREDIT_UTILIZATION": ["invalid%"]
+                    "entities": [
+                        {
+                            "recordInsights": {
+                                "FIRST_NAME": ["John"],
+                                "LAST_NAME": ["Doe"],
+                                "CLIENT_ID": ["12345"],
+                                "CREDIT_UTILIZATION": ["invalid%"],
+                            }
                         }
-                    }]
+                    ]
                 }
             }
         }
@@ -299,7 +293,7 @@ class TestAdvancedCreditAnalyzer:
             credit_utilization=45.0,
             payment_history="Late payments",
             hard_inquiries=5,
-            derogatory_marks=2
+            derogatory_marks=2,
         )
 
         assert isinstance(recommendations, list)
@@ -315,11 +309,7 @@ class TestAdvancedCreditAnalyzer:
         analyzer = AdvancedCreditAnalyzer()
 
         recommendations = analyzer._generate_recommendations(
-            credit_score=780,
-            credit_utilization=5.0,
-            payment_history="Excellent",
-            hard_inquiries=1,
-            derogatory_marks=0
+            credit_score=780, credit_utilization=5.0, payment_history="Excellent", hard_inquiries=1, derogatory_marks=0
         )
 
         assert isinstance(recommendations, list)
@@ -332,11 +322,7 @@ class TestAdvancedCreditAnalyzer:
         analyzer = AdvancedCreditAnalyzer()
 
         recommendations = analyzer._generate_recommendations(
-            credit_score=None,
-            credit_utilization=None,
-            payment_history="Unknown",
-            hard_inquiries=0,
-            derogatory_marks=0
+            credit_score=None, credit_utilization=None, payment_history="Unknown", hard_inquiries=0, derogatory_marks=0
         )
 
         assert isinstance(recommendations, list)
@@ -373,13 +359,19 @@ class TestAdvancedCreditAnalyzer:
 
         profiles = [
             CreditProfile(
-                client_id="1", name="John Doe", credit_score=720,
-                credit_utilization=15.0, recommendations=["Maintain habits"]
+                client_id="1",
+                name="John Doe",
+                credit_score=720,
+                credit_utilization=15.0,
+                recommendations=["Maintain habits"],
             ),
             CreditProfile(
-                client_id="2", name="Jane Smith", credit_score=650,
-                credit_utilization=35.0, recommendations=["Reduce utilization"]
-            )
+                client_id="2",
+                name="Jane Smith",
+                credit_score=650,
+                credit_utilization=35.0,
+                recommendations=["Reduce utilization"],
+            ),
         ]
 
         comparison = analyzer.compare_credit_profiles(profiles)
@@ -417,23 +409,25 @@ class TestCreditAnalysisIntegration:
         mock_credit_data = {
             "data": {
                 "search": {
-                    "entities": [{
-                        "recordInsights": {
-                            "FIRST_NAME": ["John"],
-                            "LAST_NAME": ["Doe"],
-                            "CLIENT_ID": ["12345"],
-                            "CURRENT_CREDIT_SCORE": ["720"],
-                            "CREDIT_UTILIZATION": ["15.0"],
-                            "PAYMENT_HISTORY": ["Excellent"],
-                            "TRANSUNION_REPORT": ["Available"]
+                    "entities": [
+                        {
+                            "recordInsights": {
+                                "FIRST_NAME": ["John"],
+                                "LAST_NAME": ["Doe"],
+                                "CLIENT_ID": ["12345"],
+                                "CURRENT_CREDIT_SCORE": ["720"],
+                                "CREDIT_UTILIZATION": ["15.0"],
+                                "PAYMENT_HISTORY": ["Excellent"],
+                                "TRANSUNION_REPORT": ["Available"],
+                            }
                         }
-                    }]
+                    ]
                 }
             }
         }
 
         # Test the full workflow: get data -> analyze -> generate recommendations
-        with patch.object(analyzer, 'get_comprehensive_credit_data', return_value=mock_credit_data):
+        with patch.object(analyzer, "get_comprehensive_credit_data", return_value=mock_credit_data):
             # Get credit data
             credit_data = await analyzer.get_comprehensive_credit_data("john.doe@example.com")
 
@@ -462,7 +456,7 @@ class TestCreditAnalysisIntegration:
             name="John Doe",
             credit_score=720,
             credit_utilization=15.0,
-            recommendations=["Maintain good habits"]
+            recommendations=["Maintain good habits"],
         )
 
         profile2 = CreditProfile(
@@ -470,7 +464,7 @@ class TestCreditAnalysisIntegration:
             name="Jane Smith",
             credit_score=650,
             credit_utilization=35.0,
-            recommendations=["Reduce credit utilization"]
+            recommendations=["Reduce credit utilization"],
         )
 
         # Test comparison
@@ -493,16 +487,18 @@ class TestCreditAnalysisIntegration:
         credit_data = {
             "data": {
                 "search": {
-                    "entities": [{
-                        "recordInsights": {
-                            "FIRST_NAME": ["Test"],
-                            "LAST_NAME": ["User"],
-                            "CLIENT_ID": ["12345"],
-                            "CURRENT_CREDIT_SCORE": ["750"],
-                            "FICO_SCORE": ["740"],
-                            "STARTING_CREDIT_SCORE": ["720"]
+                    "entities": [
+                        {
+                            "recordInsights": {
+                                "FIRST_NAME": ["Test"],
+                                "LAST_NAME": ["User"],
+                                "CLIENT_ID": ["12345"],
+                                "CURRENT_CREDIT_SCORE": ["750"],
+                                "FICO_SCORE": ["740"],
+                                "STARTING_CREDIT_SCORE": ["720"],
+                            }
                         }
-                    }]
+                    ]
                 }
             }
         }
@@ -521,7 +517,7 @@ class TestCreditAnalysisIntegration:
             credit_utilization=45.0,
             payment_history="Late payments",
             hard_inquiries=6,
-            derogatory_marks=3
+            derogatory_marks=3,
         )
 
         assert any("CRITICAL" in rec for rec in poor_recs)
@@ -532,11 +528,7 @@ class TestCreditAnalysisIntegration:
 
         # Test excellent credit recommendations
         excellent_recs = analyzer._generate_recommendations(
-            credit_score=800,
-            credit_utilization=5.0,
-            payment_history="Excellent",
-            hard_inquiries=1,
-            derogatory_marks=0
+            credit_score=800, credit_utilization=5.0, payment_history="Excellent", hard_inquiries=1, derogatory_marks=0
         )
 
         assert any("EXCELLENT" in rec for rec in excellent_recs)
@@ -551,11 +543,11 @@ class TestGlobalCreditAnalyzer:
         """Test that global credit analyzer instance exists and is properly configured"""
         assert credit_analyzer is not None
         assert isinstance(credit_analyzer, AdvancedCreditAnalyzer)
-        assert hasattr(credit_analyzer, 'api_url')
-        assert hasattr(credit_analyzer, 'token_url')
-        assert hasattr(credit_analyzer, 'client_id')
-        assert hasattr(credit_analyzer, 'client_secret')
-        assert hasattr(credit_analyzer, 'access_token')
+        assert hasattr(credit_analyzer, "api_url")
+        assert hasattr(credit_analyzer, "token_url")
+        assert hasattr(credit_analyzer, "client_id")
+        assert hasattr(credit_analyzer, "client_secret")
+        assert hasattr(credit_analyzer, "access_token")
 
     def test_search_parameter_generation(self):
         """Test search parameter generation for different identifier types"""
@@ -564,7 +556,7 @@ class TestGlobalCreditAnalyzer:
             ("12345", "CLIENT_ID"),
             ("john.doe@example.com", "EMAIL"),
             ("John Doe", "FIRST_NAME"),  # Should also have LAST_NAME
-            ("SingleName", "FIRST_NAME")  # Single name
+            ("SingleName", "FIRST_NAME"),  # Single name
         ]
 
         for identifier, expected_key in test_cases:

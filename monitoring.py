@@ -13,6 +13,7 @@ from typing import Any, Dict, Optional
 # Redis cache for metrics storage (optional)
 try:
     from redis_cache import cache_manager
+
     CACHE_AVAILABLE = True
 except ImportError:
     cache_manager = None
@@ -45,19 +46,10 @@ class TiloresMonitor:
     def start_timer(self, operation_name: str, metadata: Optional[Dict] = None) -> str:
         """Start timing an operation"""
         timer_id = f"{operation_name}_{int(time.time() * 1000)}"
-        self.active_timers[timer_id] = {
-            "start": time.time(),
-            "operation": operation_name,
-            "metadata": metadata or {}
-        }
+        self.active_timers[timer_id] = {"start": time.time(), "operation": operation_name, "metadata": metadata or {}}
         return timer_id
 
-    def end_timer(
-        self,
-        timer_id: str,
-        success: bool = True,
-        error: Optional[str] = None
-    ) -> float:
+    def end_timer(self, timer_id: str, success: bool = True, error: Optional[str] = None) -> float:
         """End timing an operation and record metrics"""
         if timer_id not in self.active_timers:
             self.logger.warning(f"Timer {timer_id} not found")
@@ -71,14 +63,16 @@ class TiloresMonitor:
         self.performance_metrics[operation].append(duration)
 
         # Record API call
-        self.api_calls.append({
-            "operation": operation,
-            "duration": duration,
-            "success": success,
-            "error": error,
-            "timestamp": datetime.now().isoformat(),
-            "metadata": timer_info["metadata"]
-        })
+        self.api_calls.append(
+            {
+                "operation": operation,
+                "duration": duration,
+                "success": success,
+                "error": error,
+                "timestamp": datetime.now().isoformat(),
+                "metadata": timer_info["metadata"],
+            }
+        )
 
         # Log the operation
         if success:
@@ -101,14 +95,7 @@ class TiloresMonitor:
 
         return duration
 
-    def track_api_call(
-        self,
-        function_name: str,
-        execution_time: float,
-        success: bool,
-        error: str = None,
-        **kwargs
-    ):
+    def track_api_call(self, function_name: str, execution_time: float, success: bool, error: str = None, **kwargs):
         """Track API call metrics"""
         self.request_counts[function_name] += 1
 
@@ -117,36 +104,29 @@ class TiloresMonitor:
             self.provider_usage[kwargs["provider"]] += 1
 
         # Record the call
-        self.api_calls.append({
-            "function": function_name,
-            "execution_time": execution_time,
-            "success": success,
-            "error": error,
-            "timestamp": datetime.now().isoformat(),
-            **kwargs
-        })
+        self.api_calls.append(
+            {
+                "function": function_name,
+                "execution_time": execution_time,
+                "success": success,
+                "error": error,
+                "timestamp": datetime.now().isoformat(),
+                **kwargs,
+            }
+        )
 
         if success:
-            self.logger.info(
-                f"✅ {function_name} completed successfully in {execution_time:.3f}s"
-            )
+            self.logger.info(f"✅ {function_name} completed successfully in {execution_time:.3f}s")
         else:
-            self.logger.warning(
-                f"⚠️ {function_name} failed in {execution_time:.3f}s: {error}"
-            )
+            self.logger.warning(f"⚠️ {function_name} failed in {execution_time:.3f}s: {error}")
 
-    def record_error(
-        self,
-        function_name: str,
-        error_msg: str,
-        context: Dict[str, Any] = None
-    ):
+    def record_error(self, function_name: str, error_msg: str, context: Dict[str, Any] = None):
         """Record error information"""
         error_entry = {
             "function": function_name,
             "error": error_msg,
             "context": context or {},
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         self.error_log.append(error_entry)
@@ -176,21 +156,14 @@ class TiloresMonitor:
             if engine and engine.tilores:
                 return {
                     "status": "connected",
-                    "api_url": getattr(engine.tilores.api, 'api_url', 'unknown'),
+                    "api_url": getattr(engine.tilores.api, "api_url", "unknown"),
                     "tools_available": len(engine.tools) if engine.tools else 0,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
             else:
-                return {
-                    "status": "disconnected",
-                    "timestamp": datetime.now().isoformat()
-                }
+                return {"status": "disconnected", "timestamp": datetime.now().isoformat()}
         except Exception as e:
-            return {
-                "status": "error",
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }
+            return {"status": "error", "error": str(e), "timestamp": datetime.now().isoformat()}
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get comprehensive metrics summary"""
@@ -204,7 +177,7 @@ class TiloresMonitor:
                     "avg": sum(times) / len(times),
                     "min": min(times),
                     "max": max(times),
-                    "count": len(times)
+                    "count": len(times),
                 }
 
         # Calculate success rate
@@ -228,11 +201,12 @@ class TiloresMonitor:
             "recent_errors": recent_errors,
             "field_coverage": {
                 "avg_fields_per_call": (
-                    self.field_coverage_stats["total_fields"] /
-                    self.field_coverage_stats["total_calls"]
-                ) if self.field_coverage_stats["total_calls"] > 0 else 0
+                    (self.field_coverage_stats["total_fields"] / self.field_coverage_stats["total_calls"])
+                    if self.field_coverage_stats["total_calls"] > 0
+                    else 0
+                )
             },
-            "tilores_connectivity": self.track_tilores_connectivity()
+            "tilores_connectivity": self.track_tilores_connectivity(),
         }
 
     def get_health_status(self) -> Dict[str, Any]:
@@ -244,7 +218,7 @@ class TiloresMonitor:
         issues = []
 
         # Check success rate
-        success_rate = float(metrics["success_rate"].rstrip('%'))
+        success_rate = float(metrics["success_rate"].rstrip("%"))
         if success_rate < 95:
             health = "degraded" if success_rate > 80 else "unhealthy"
             issues.append(f"Low success rate: {metrics['success_rate']}")
@@ -266,9 +240,9 @@ class TiloresMonitor:
             "metrics_summary": {
                 "total_requests": metrics["total_requests"],
                 "success_rate": metrics["success_rate"],
-                "tilores_status": metrics["tilores_connectivity"]["status"]
+                "tilores_status": metrics["tilores_connectivity"]["status"],
             },
-            "timestamp": metrics["timestamp"]
+            "timestamp": metrics["timestamp"],
         }
 
 

@@ -16,7 +16,7 @@ from redis_cache import cache_manager
 # List of high-priority customers
 customers = [
     "john.smith@techcorp.com",
-    "sarah.johnson@healthcare.org", 
+    "sarah.johnson@healthcare.org",
     "555-123-4567",
     "1881899"  # Client ID
 ]
@@ -110,19 +110,19 @@ results = warmer.warm_from_config(config)
 @limiter.limit("10/hour")
 async def prewarm_cache(request: Request, customers: List[str]):
     """Pre-warm cache for specified customers (admin only)"""
-    
+
     from utils.cache_prewarm import prewarm_customers
     from core_app import engine
     from redis_cache import cache_manager
-    
+
     results = prewarm_customers(
         tilores_api=engine.tilores,
         cache_manager=cache_manager,
         customer_list=customers
     )
-    
+
     success_count = sum(1 for v in results.values() if v)
-    
+
     return {
         "status": "success",
         "pre_warmed": success_count,
@@ -136,17 +136,17 @@ async def startup_prewarm():
     from utils.cache_prewarm import PHONE_APP_PREWARM_CONFIG, prewarm_customers
     from core_app import engine
     from redis_cache import cache_manager
-    
+
     # Pre-warm high priority customers
     customers = PHONE_APP_PREWARM_CONFIG["high_priority_customers"]
-    
+
     print(f"🔥 Pre-warming {len(customers)} customers on startup...")
     results = prewarm_customers(
         tilores_api=engine.tilores,
         cache_manager=cache_manager,
         customer_list=customers
     )
-    
+
     success = sum(1 for v in results.values() if v)
     print(f"✅ Pre-warmed {success}/{len(customers)} customers")
 ```
@@ -158,14 +158,14 @@ async def startup_prewarm():
 ```python
 def prepare_for_call(phone_number: str):
     """Prepare cache before phone call"""
-    
+
     # Check if already cached
     cached, source = cache_manager.tiered_cache.get_tilores_search(phone_number)
-    
+
     if not cached or source != "l1":
         # Pre-warm this specific customer
         warmer.warm_single_customer(phone_number)
-        
+
     return cached is not None
 
 # In your phone app
@@ -181,21 +181,21 @@ else:
 ```python
 def prepare_call_queue(queue: List[str]):
     """Pre-warm entire call queue"""
-    
+
     from utils.batch_processor import TiloresBatchProcessor
-    
+
     processor = TiloresBatchProcessor(
         tilores_api=engine.tilores,
         cache_manager=cache_manager,
         max_workers=5
     )
-    
+
     # Warm all customers in parallel
     results = processor.batch_search(queue)
-    
+
     # Count successes
     ready = sum(1 for r in results if not r.get("error"))
-    
+
     print(f"📞 Call queue ready: {ready}/{len(queue)} customers cached")
     return results
 
@@ -265,11 +265,11 @@ schedule.every().day.at("17:00").do(
 ```python
 def on_customer_update(customer_id: str):
     """Refresh cache when customer data changes"""
-    
+
     # Invalidate old cache
     cache_key = f"tilores:search:{customer_id}"
     cache_manager.redis_client.delete(cache_key)
-    
+
     # Pre-warm with fresh data
     warmer.warm_single_customer(customer_id)
 
@@ -284,10 +284,10 @@ async def customer_updated(customer_id: str):
 ```python
 def get_cache_metrics():
     """Get cache performance metrics"""
-    
+
     tiered_stats = cache_manager.tiered_cache.get_stats()
     warmer_stats = warmer.get_stats()
-    
+
     return {
         "cache_hit_rate": tiered_stats["hit_rate"],
         "l1_hit_rate": tiered_stats["l1_hit_rate"],
@@ -323,7 +323,7 @@ PREWARM_COMMON_SEARCHES=555-1234,555-5678
 # Load from database or config file
 def load_prewarm_config():
     """Load pre-warm configuration dynamically"""
-    
+
     # Could load from database, Redis, or file
     return {
         "customers": get_vip_customers_from_db(),
@@ -343,13 +343,13 @@ warmer.config.update(config)
 # Diagnose cache misses
 def analyze_cache_misses():
     stats = cache_manager.tiered_cache.get_stats()
-    
+
     if stats["l1_hit_rate"] < 50:
         print("L1 cache too small - increase l1_max_size")
-    
+
     if stats["l2_hit_rate"] < 70:
         print("TTL too short - increase cache TTL")
-    
+
     return stats
 ```
 
@@ -359,10 +359,10 @@ def analyze_cache_misses():
 def optimize_prewarm():
     # Increase parallel workers
     warmer.config["parallel_workers"] = 10
-    
+
     # Reduce data fetched
     warmer.config["fields_to_cache"] = ["EMAIL", "PHONE", "NAME"]
-    
+
     # Use batch processor
     if not warmer.batch_processor:
         warmer.batch_processor = TiloresBatchProcessor(
@@ -377,13 +377,13 @@ def optimize_prewarm():
 # Monitor and manage cache size
 def manage_cache_size():
     stats = cache_manager.tiered_cache.get_stats()
-    
+
     if stats["cache_size_kb"] > 10000:  # 10MB
         print("⚠️ Cache using significant memory")
-        
+
         # Reduce L1 size
         cache_manager.tiered_cache.l1_max_size = 25
-        
+
         # Clear old entries
         cache_manager.tiered_cache.clear_l1()
 ```
