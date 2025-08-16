@@ -552,8 +552,8 @@ class MultiProviderLLMEngine:
 
             # Create tool dictionary for function executor
             tool_dict = {
-                "search": tilores_tools.search,
-                "fetchEntity": tilores_tools.entity_edges,
+                "search": tilores_tools.search_tool(),
+                "fetchEntity": tilores_tools.edge_tool(),
                 "creditReport": getattr(tilores_tools, "credit_report", None),
                 "fieldDiscovery": getattr(tilores_tools, "field_discovery", None),
             }
