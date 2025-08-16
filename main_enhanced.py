@@ -83,6 +83,23 @@ class ChatCompletionResponse(BaseModel):
     system_fingerprint: Optional[str] = None
 
 
+class EmbeddingsRequest(BaseModel):
+    input: str
+    model: str = "text-embedding-ada-002"
+    encoding_format: str = "float"
+
+
+class CompletionRequest(BaseModel):
+    model: str = "gpt-3.5-turbo-instruct"
+    prompt: str
+    max_tokens: Optional[int] = 16
+    temperature: Optional[float] = 1.0
+    top_p: Optional[float] = 1.0
+    n: Optional[int] = 1
+    stream: bool = False
+    stop: Optional[str] = None
+
+
 # Token counting utilities for OpenAI compliance
 def count_tokens(text: str, model: str = "gpt-4") -> int:
     """Count tokens in text using tiktoken (OpenAI's tokenizer)"""
@@ -425,6 +442,68 @@ async def v1_root(request: Request):
     }
 
 
+@app.post("/v1/embeddings")
+@limiter.limit("100/minute")
+async def create_embeddings(request: Request, embeddings_request: EmbeddingsRequest):
+    """OpenAI-compatible embeddings endpoint"""
+    # Mock embeddings response for compatibility
+    return {
+        "object": "list",
+        "data": [
+            {
+                "object": "embedding",
+                "index": 0,
+                "embedding": [0.0] * 1536,  # Standard embedding dimension
+            }
+        ],
+        "model": embeddings_request.model,
+        "usage": {
+            "prompt_tokens": count_tokens(embeddings_request.input),
+            "total_tokens": count_tokens(embeddings_request.input),
+        },
+    }
+
+
+@app.post("/v1/completions")
+@limiter.limit("100/minute")
+async def create_completion(request: Request, completion_request: CompletionRequest):
+    """OpenAI-compatible legacy completions endpoint"""
+    # Convert to chat format for processing
+    messages = [{"role": "user", "content": completion_request.prompt}]
+
+    try:
+        response = run_chain(messages, model=completion_request.model)
+        content = str(response) if isinstance(response, str) else str(getattr(response, 'content', 'Response generated'))
+
+        return {
+            "id": generate_unique_id("cmpl"),
+            "object": "text_completion",
+            "created": int(datetime.utcnow().timestamp()),
+            "model": completion_request.model,
+            "choices": [
+                {
+                    "text": content,
+                    "index": 0,
+                    "logprobs": None,
+                    "finish_reason": determine_finish_reason(content, completion_request.max_tokens),
+                }
+            ],
+            "usage": {
+                "prompt_tokens": count_tokens(completion_request.prompt),
+                "completion_tokens": count_tokens(content),
+                "total_tokens": count_tokens(completion_request.prompt) + count_tokens(content),
+            },
+        }
+    except Exception as e:
+        return {
+            "error": {
+                "message": str(e),
+                "type": "internal_error",
+                "code": "completion_error",
+            }
+        }
+
+
 @app.get("/")
 @limiter.limit("1000/minute")
 async def root(request: Request):
@@ -444,10 +523,14 @@ async def root(request: Request):
                 "Unique request IDs",
                 "System fingerprinting",
                 "Proper finish reasons",
+                "Embeddings API",
+                "Legacy completions API",
             ],
         },
         "endpoints": {
             "chat_completions": "/v1/chat/completions",
+            "completions": "/v1/completions",
+            "embeddings": "/v1/embeddings",
             "models": "/v1/models",
             "health": "/health",
             "v1_root": "/v1",
