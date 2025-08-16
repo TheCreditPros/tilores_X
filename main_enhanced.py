@@ -403,6 +403,28 @@ async def get_metrics(request: Request):
     return monitor.get_metrics()
 
 
+@app.get("/v1")
+@limiter.limit("1000/minute")
+async def v1_root(request: Request):
+    """OpenAI v1 API root endpoint for AnythingLLM validation"""
+    available_models = get_available_models()
+
+    return {
+        "object": "api",
+        "version": "v1",
+        "service": "Tilores API for AnythingLLM",
+        "openai_compatible": True,
+        "endpoints": {
+            "chat_completions": "/v1/chat/completions",
+            "models": "/v1/models"
+        },
+        "models": {
+            "total": len(available_models),
+            "available": [model["id"] for model in available_models]
+        }
+    }
+
+
 @app.get("/")
 @limiter.limit("1000/minute")
 async def root(request: Request):
@@ -428,6 +450,7 @@ async def root(request: Request):
             "chat_completions": "/v1/chat/completions",
             "models": "/v1/models",
             "health": "/health",
+            "v1_root": "/v1",
         },
         "models": {
             "total": len(available_models),
