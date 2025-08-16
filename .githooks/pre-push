@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Pre-push hook to validate deployment readiness
+echo "🚀 Running pre-push deployment checks..."
+
+# Check for required deployment files
+echo "📋 Checking deployment configuration..."
+if [ ! -f "railway.json" ]; then
+    echo "❌ railway.json is missing!"
+    exit 1
+fi
+
+if [ ! -f "nixpacks.toml" ]; then
+    echo "❌ nixpacks.toml is missing!"
+    exit 1
+fi
+
+if [ ! -f "Procfile" ]; then
+    echo "❌ Procfile is missing!"
+    exit 1
+fi
+
+if [ ! -f "requirements.txt" ]; then
+    echo "❌ requirements.txt is missing!"
+    exit 1
+fi
+
+# Activate virtual environment if it exists
+if [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+fi
+
+# Validate JSON syntax
+echo "🔍 Validating railway.json..."
+python3 -c "import json; json.load(open('railway.json'))" 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "❌ railway.json has invalid JSON syntax!"
+    exit 1
+fi
+
+# Quick Python syntax check on main files
+echo "🐍 Checking Python syntax..."
+python3 -m py_compile main_enhanced.py 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "❌ main_enhanced.py has syntax errors!"
+    exit 1
+fi
+
+python3 -m py_compile core_app.py 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "❌ core_app.py has syntax errors!"
+    exit 1
+fi
+
+echo "✅ All pre-push checks passed!"
+echo "📦 Pushing to GitHub will trigger Railway deployment..."
+echo "🔍 Check deployment status at: https://railway.com/project/09db04c8-03ac-4661-b2fd-b631d7209c3d"
