@@ -22,6 +22,7 @@ from slowapi.errors import RateLimitExceeded
 
 from core_app import get_available_models, initialize_engine, run_chain
 from monitoring import monitor
+from virtuous_cycle_api import virtuous_cycle_manager
 
 # LangSmith observability imports
 try:
@@ -438,6 +439,33 @@ async def get_metrics(request: Request):
     return monitor.get_metrics()
 
 
+@app.get("/v1/virtuous-cycle/status")
+@limiter.limit("100/minute")
+async def virtuous_cycle_status(request: Request):
+    """Get Virtuous Cycle monitoring and optimization status"""
+    return virtuous_cycle_manager.get_status()
+
+
+@app.post("/v1/virtuous-cycle/trigger")
+@limiter.limit("10/minute")  # Lower limit for manual optimization triggers
+async def trigger_virtuous_cycle(request: Request):
+    """Manually trigger Virtuous Cycle optimization"""
+    try:
+        # Get request body for trigger reason
+        body = await request.json() if request.headers.get("content-type") == "application/json" else {}
+        reason = body.get("reason", "Manual API trigger")
+
+        result = await virtuous_cycle_manager.trigger_manual_optimization(reason)
+        return result
+
+    except Exception as e:
+        return {
+            "success": False,
+            "reason": f"Trigger failed: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+
 @app.get("/v1")
 @limiter.limit("1000/minute")
 async def v1_root(request: Request):
@@ -559,6 +587,61 @@ async def root(request: Request):
             "list": [model["id"] for model in available_models],
         },
     }
+
+
+# Background task management
+background_tasks = []
+
+
+async def startup_background_tasks():
+    """Start background tasks for Virtuous Cycle monitoring."""
+    try:
+        # Start Virtuous Cycle monitoring
+        monitoring_task = asyncio.create_task(
+            virtuous_cycle_manager.start_monitoring()
+        )
+        background_tasks.append(monitoring_task)
+
+        print("🚀 Virtuous Cycle monitoring started")
+
+    except Exception as e:
+        print(f"⚠️ Failed to start background tasks: {e}")
+
+
+async def shutdown_background_tasks():
+    """Shutdown background tasks gracefully."""
+    try:
+        # Stop Virtuous Cycle monitoring
+        await virtuous_cycle_manager.stop_monitoring()
+
+        # Cancel all background tasks
+        for task in background_tasks:
+            if not task.done():
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+
+        print("🛑 Background tasks stopped")
+
+    except Exception as e:
+        print(f"⚠️ Error stopping background tasks: {e}")
+
+
+# Add startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Application startup event."""
+    print("🚀 Starting Tilores API with Virtuous Cycle integration")
+    await startup_background_tasks()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Application shutdown event."""
+    print("🛑 Shutting down Tilores API")
+    await shutdown_background_tasks()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,26 @@
+{
+  "gemini-1.5-flash-002": {
+    "experiment_name": "gemini_comparison_gemini_1_5_flash_002_1755345114",
+    "avg_speed_score": 0,
+    "avg_accuracy_score": 0,
+    "avg_quality_score": 0,
+    "avg_response_time_ms": 46.29,
+    "success": true
+  },
+  "gemini-2.5-flash": {
+    "experiment_name": "gemini_comparison_gemini_2_5_flash_1755345116",
+    "avg_speed_score": 0,
+    "avg_accuracy_score": 0,
+    "avg_quality_score": 0,
+    "avg_response_time_ms": 60.82,
+    "success": true
+  },
+  "gemini-2.5-flash-lite": {
+    "experiment_name": "gemini_comparison_gemini_2_5_flash_lite_1755345117",
+    "avg_speed_score": 0,
+    "avg_accuracy_score": 0,
+    "avg_quality_score": 0,
+    "avg_response_time_ms": 55.02,
+    "success": true
+  }
+}

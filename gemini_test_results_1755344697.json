@@ -1,0 +1,140 @@
+[
+  {
+    "model_id": "gemini-1.5-flash-002",
+    "name": "Gemini 1.5 Flash",
+    "version": "1.5",
+    "available": true,
+    "tests": [
+      {
+        "type": "simple",
+        "query": "What is 2+2?...",
+        "success": true,
+        "response_time": 370.22,
+        "response_length": 9,
+        "has_expected_elements": true,
+        "sample_response": "2 + 2 = 4"
+      },
+      {
+        "type": "reasoning",
+        "query": "Explain why water expands when it freezes, and wha...",
+        "success": true,
+        "response_time": 3135.06,
+        "response_length": 2461,
+        "has_expected_elements": true,
+        "sample_response": "Water expands when it freezes due to the unique structure of its molecules and the hydrogen bonds between them.  \n\nIn liquid water, molecules are relatively close together but can move freely, constan..."
+      },
+      {
+        "type": "customer_data",
+        "query": "Find customer with email blessedwina@aol.com and p...",
+        "success": true,
+        "response_time": 549.81,
+        "response_length": 224,
+        "has_expected_elements": true,
+        "sample_response": "I do not have access to private customer databases.  To find the details for the customer with the email address blessedwina@aol.com, you will need to check your own customer relationship management (..."
+      },
+      {
+        "type": "complex_analysis",
+        "query": "Compare the advantages and disadvantages of micros...",
+        "success": true,
+        "response_time": 5177.33,
+        "response_length": 4164,
+        "has_expected_elements": true,
+        "sample_response": "For a startup with only 5 developers, the choice between microservices and monolithic architecture presents a significant trade-off.  Microservices offer long-term scalability but introduce considerab..."
+      }
+    ],
+    "average_response_time": 2308.1,
+    "error": null
+  },
+  {
+    "model_id": "gemini-2.5-flash",
+    "name": "Gemini 2.5 Flash",
+    "version": "2.5",
+    "available": true,
+    "tests": [
+      {
+        "type": "simple",
+        "query": "What is 2+2?...",
+        "success": true,
+        "response_time": 712.57,
+        "response_length": 7,
+        "has_expected_elements": true,
+        "sample_response": "2+2 = 4"
+      },
+      {
+        "type": "reasoning",
+        "query": "Explain why water expands when it freezes, and wha...",
+        "success": true,
+        "response_time": 10818.2,
+        "response_length": 2758,
+        "has_expected_elements": true,
+        "sample_response": "Water is a truly remarkable substance, and its expansion upon freezing is one of its most unusual and vital properties. Most substances contract when they freeze because their molecules pack more clos..."
+      },
+      {
+        "type": "customer_data",
+        "query": "Find customer with email blessedwina@aol.com and p...",
+        "success": true,
+        "response_time": 5311.26,
+        "response_length": 889,
+        "has_expected_elements": true,
+        "sample_response": "I cannot directly access or provide details for specific individuals or customer accounts, including those associated with an email address like blessedwina@aol.com.\n\nMy capabilities do not include re..."
+      },
+      {
+        "type": "complex_analysis",
+        "query": "Compare the advantages and disadvantages of micros...",
+        "success": true,
+        "response_time": 11986.0,
+        "response_length": 3024,
+        "has_expected_elements": true,
+        "sample_response": "For a startup with 5 developers, the choice between microservices and monolithic architecture is a critical one that heavily impacts initial development speed, operational overhead, and future scalabi..."
+      }
+    ],
+    "average_response_time": 7207.01,
+    "error": null
+  },
+  {
+    "model_id": "gemini-2.5-flash-lite",
+    "name": "Gemini 2.5 Flash Lite",
+    "version": "2.5-lite",
+    "available": true,
+    "tests": [
+      {
+        "type": "simple",
+        "query": "What is 2+2?...",
+        "success": true,
+        "response_time": 557.77,
+        "response_length": 9,
+        "has_expected_elements": true,
+        "sample_response": "2 + 2 = 4"
+      },
+      {
+        "type": "reasoning",
+        "query": "Explain why water expands when it freezes, and wha...",
+        "success": true,
+        "response_time": 5698.65,
+        "response_length": 5103,
+        "has_expected_elements": true,
+        "sample_response": "Water's unique behavior of expanding when it freezes is a direct consequence of its molecular structure and the way those molecules arrange themselves at different temperatures. This seemingly simple ..."
+      },
+      {
+        "type": "customer_data",
+        "query": "Find customer with email blessedwina@aol.com and p...",
+        "success": true,
+        "response_time": 1148.6,
+        "response_length": 930,
+        "has_expected_elements": true,
+        "sample_response": "I cannot directly access or retrieve customer details from any database, including customer information associated with the email address \"blessedwina@aol.com\".\n\nMy purpose is to be helpful and harmle..."
+      },
+      {
+        "type": "complex_analysis",
+        "query": "Compare the advantages and disadvantages of micros...",
+        "success": true,
+        "response_time": 6475.79,
+        "response_length": 8133,
+        "has_expected_elements": true,
+        "sample_response": "For a startup with 5 developers, the choice between microservices and monolithic architecture is a critical one that will significantly impact their development speed, scalability, and future growth. ..."
+      }
+    ],
+    "average_response_time": 3470.2,
+    "error": null
+  }
+]

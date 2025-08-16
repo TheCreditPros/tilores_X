@@ -7,7 +7,7 @@ ensuring graceful fallback behavior and proper cache operations.
 
 import json
 import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 from redis_cache import RedisCacheManager
 
 
@@ -60,7 +60,7 @@ class TestRedisCacheManagerInitialization:
             mock_getenv.return_value = "redis://test:6379/0"
             mock_redis_module.from_url.return_value = mock_redis_client
 
-            cache_manager = RedisCacheManager()
+            RedisCacheManager()
 
             mock_redis_module.from_url.assert_called_once_with(
                 "redis://test:6379/0", decode_responses=True, socket_connect_timeout=5, socket_timeout=5
@@ -83,7 +83,7 @@ class TestRedisCacheManagerInitialization:
             mock_getenv.side_effect = getenv_side_effect
             mock_redis_module.Redis.return_value = mock_redis_client
 
-            cache_manager = RedisCacheManager()
+            RedisCacheManager()
 
             mock_redis_module.Redis.assert_called_once_with(
                 host="test-host",

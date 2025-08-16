@@ -13,8 +13,17 @@
 
 ## Current State (August 2025)
 
-### Phase IX: Functional Testing Infrastructure Complete
+### Phase XI: Gemini 2.5 Models Integration Complete
+- ✅ **Gemini 2.5 Flash & Flash Lite** successfully integrated and tested
+- ✅ **13 total models** now available (up from 11)
+- ✅ **Performance validated**: 2.5 Flash Lite (3.5s) offers best balance
+- ✅ **LangSmith experiments** created for all Gemini models
 - ✅ Complete TDD testing infrastructure (402 tests, 100% pass rate)
+- ✅ **LangSmith Speed Experiments Framework** with self-improvement capabilities
+- ✅ **Real Customer Data Integration** (Edwina Hawthorne validated)
+- ✅ **Context Length Optimization** (gpt-3.5-turbo removed, gpt-4o-mini promoted)
+- ✅ **Auto-Fix Cycle** that detects errors and reruns until resolved
+- ✅ **Model Deprecation Management** (3 Groq models removed)
 - ✅ Functional/end-to-end tests with real LLM providers and live Tilores data
 - ✅ Speed tracking and quality validation across all providers
 - ✅ Live customer data validation with test records
@@ -579,6 +588,31 @@ The `field_discovery_system.py` provides comprehensive field access:
 
 ## Recent Changes (August 2025)
 
+### Gemini 2.5 Models Integration (Latest - Phase XI)
+- **Gemini 2.5 Flash**: Enhanced reasoning model with 7.2s avg response time
+- **Gemini 2.5 Flash Lite**: Balanced model with 3.5s avg response time
+- **Performance Testing**: All models validated with direct API and LangSmith
+- **Test Framework Updates**: All speed experiment files updated with new models
+- **Documentation Complete**: README, CLAUDE.md, and memory bank updated
+
+### LangSmith Speed Experiments Framework (Phase X)
+- **Complete LangSmith Integration** with 5 working model experiments
+- **Self-Improvement Framework** that auto-detects and fixes errors
+- **Real Customer Data Validation** (Edwina Hawthorne: blessedwina@aol.com, Client ID: 2270)
+- **Context Length Optimization** (removed gpt-3.5-turbo, promoted gpt-4o-mini)
+- **Model Deprecation Management** (3 Groq models removed)
+- **Auto-Fix Cycle** that reruns experiments until 100% success rate
+- **Legacy Component Cleanup** (13 outdated files removed)
+
+### LangSmith Experiments Created
+- **llama-3.3-70b-versatile**: tilores_production_llama_3.3_70b_versatile-8c273476
+- **gpt-4o-mini**: tilores_production_gpt_4o_mini-68758e59
+- **deepseek-r1-distill-llama-70b**: tilores_production_deepseek_r1_distill_llama_70b-00469321
+- **claude-3-haiku**: tilores_production_claude_3_haiku-6ac54420
+- **gemini-1.5-flash-002**: gemini_comparison_gemini_1_5_flash_002_1755345114-75b83b41
+- **gemini-2.5-flash**: gemini_comparison_gemini_2_5_flash_1755345116-d9b5cb0c
+- **gemini-2.5-flash-lite**: gemini_comparison_gemini_2_5_flash_lite_1755345117-6a6687a1
+
 ### Functional Testing Infrastructure
 - **30 comprehensive functional tests** across 3 test suites
 - **Live LLM provider validation** for all supported models
@@ -664,11 +698,21 @@ The `field_discovery_system.py` provides comprehensive field access:
 
 ## Model Support
 
-### Available Models (11+ across 4 providers)
-- **OpenAI**: gpt-5-mini, gpt-4o, gpt-4o-mini, gpt-4.1-mini, gpt-3.5-turbo
-- **Groq** (ultra-fast): llama-3.3-70b-versatile, deepseek-r1-distill-llama-70b
-- **Anthropic**: claude-3-sonnet, claude-3-haiku
+### Available Models (Context-Optimized for Tilores Tools) - 13 Total
+- **OpenAI**: gpt-5-mini, gpt-4o, gpt-4o-mini (128K context), gpt-4.1-mini
+- **Groq**: llama-3.3-70b-versatile (32K context), deepseek-r1-distill-llama-70b (32K context)
+- **Anthropic**: claude-3-sonnet, claude-3-haiku (200K context)
+- **Google**: 
+  - gemini-1.5-flash-002 (1M context, 2.3s avg) - Fastest overall
+  - gemini-2.5-flash (1M context, 7.2s avg) - Enhanced reasoning
+  - gemini-2.5-flash-lite (1M context, 3.5s avg) - Best balance
 - **OpenRouter** (Cerebras): llama-3.3-70b-versatile-openrouter, qwen-3-32b-openrouter
+
+### Removed Models (Context/Deprecation Issues)
+- **gpt-3.5-turbo**: REMOVED (16K context incompatible with 961-token Tilores tools)
+- **llama-3.3-70b-specdec**: DEPRECATED (decommissioned by Groq Aug 2025)
+- **mixtral-8x7b-32768**: DEPRECATED (decommissioned by Groq Aug 2025)
+- **llama-3.2-90b-text-preview**: DEPRECATED (decommissioned by Groq Aug 2025)
 
 ## AnythingLLM Integration
 

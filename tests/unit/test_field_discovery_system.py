@@ -446,7 +446,7 @@ class TestDiscoverTiloresFieldsTool:
         for i, line in enumerate(field_lines[:5]):  # Check first 5 field lines
             if line.strip():  # Skip empty lines
                 # Field format is " 1. FIELD_NAME" so check for number+period
-                assert f"{i+1}." in line.strip()
+                assert f"{i + 1}." in line.strip()
 
 
 class TestGetFieldDiscoveryStatsTool:
