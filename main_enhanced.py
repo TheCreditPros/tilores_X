@@ -13,21 +13,46 @@ from typing import List, Optional
 
 import tiktoken
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from core_app import get_available_models, initialize_engine, run_chain
+from monitoring import monitor
+
+# LangSmith observability imports
+try:
+    from langsmith import Client as LangSmithClient
+    from core_app import engine
+    LANGSMITH_AVAILABLE = True
+except ImportError:
+    LangSmithClient = None
+    engine = None
+    LANGSMITH_AVAILABLE = False
 
 # Initialize the engine after environment variables are loaded
 initialize_engine()
+
+# Configure rate limiting
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per minute", "3000 per hour"],
+    storage_uri=os.getenv("REDIS_URL", "memory://")  # Use Redis if available, else memory
+)
 
 # FastAPI app - ultra-minimal for AnythingLLM integration
 app = FastAPI(
     title="Tilores API for AnythingLLM",
     description="Fully OpenAI-compatible API with Tilores integration",
-    version="6.0.0",
+    version="6.4.0",  # Updated: Phone-optimized with 2-tier cache + batch processing
 )
+
+# Add rate limit error handler
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # OpenAI-compatible request/response models
@@ -74,8 +99,11 @@ def count_tokens(text: str, model: str = "gpt-4") -> int:
         encoding = tiktoken.get_encoding(encoding_name)
         return len(encoding.encode(str(text)))
     except Exception:
-        # Fallback: estimate 4 characters per token
-        return len(str(text)) // 4 + 1
+        # Fallback: estimate 4 characters per token, minimum 1 for non-empty
+        text_len = len(str(text))
+        if text_len == 0:
+            return 0
+        return max(1, text_len // 4)
 
 
 def count_messages_tokens(messages: List, model: str = "gpt-4") -> int:
@@ -122,7 +150,20 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
     chunk_size = max(1, len(words) // 10)  # ~10 chunks
 
     # Send opening chunk
-    yield f"data: {json.dumps({'id': response_id, 'object': 'chat.completion.chunk', 'created': created, 'model': request.model, 'system_fingerprint': system_fp, 'choices': [{'index': 0, 'delta': {'role': 'assistant'}, 'logprobs': None, 'finish_reason': None}]})}\n\n"
+    opening_chunk = {
+        'id': response_id,
+        'object': 'chat.completion.chunk',
+        'created': created,
+        'model': request.model,
+        'system_fingerprint': system_fp,
+        'choices': [{
+            'index': 0,
+            'delta': {'role': 'assistant'},
+            'logprobs': None,
+            'finish_reason': None
+        }]
+    }
+    yield f"data: {json.dumps(opening_chunk)}\n\n"
 
     # Send content chunks
     for i in range(0, len(words), chunk_size):
@@ -148,7 +189,7 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
         }
 
         yield f"data: {json.dumps(chunk_data)}\n\n"
-        await asyncio.sleep(0.1)  # Realistic streaming delay
+        await asyncio.sleep(0.02)  # Optimized 20ms delay for faster streaming
 
     # Send final chunk with finish reason
     final_chunk = {
@@ -172,19 +213,37 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
 
 
 @app.post("/v1/chat/completions")
-async def chat_completions(request: ChatCompletionRequest):
+@limiter.limit("100/minute")  # More restrictive for chat completions
+async def chat_completions(request: Request, chat_request: ChatCompletionRequest):
     """Fully OpenAI-compatible chat completions endpoint with streaming support"""
+    request_id = generate_unique_id()
+
+    # Start monitoring timer
+    timer_id = monitor.start_timer("chat_completion", {
+        "model": chat_request.model,
+        "stream": chat_request.stream,
+        "message_count": len(chat_request.messages)
+    })
+
+    # LangSmith: Initialize API request tracing
+    if LANGSMITH_AVAILABLE and engine and hasattr(engine, 'langsmith_client'):
+        try:
+            if engine.langsmith_client:
+                print(f"📊 LangSmith: Tracing API request {request_id}")
+        except Exception as trace_error:
+            print(f"⚠️ LangSmith API tracing error: {trace_error}")
+
     try:
         # Pass full conversation history to core_app for context preservation
         messages = [
-            {"role": msg.role, "content": msg.content} for msg in request.messages
+            {"role": msg.role, "content": msg.content} for msg in chat_request.messages
         ]
 
         # Calculate prompt tokens
-        prompt_tokens = count_messages_tokens(request.messages, request.model)
+        prompt_tokens = count_messages_tokens(chat_request.messages, chat_request.model)
 
         # Use core_app to process the request with full conversation context
-        response = run_chain(messages, model=request.model)
+        response = run_chain(messages, model=chat_request.model)
 
         # Extract clean content from any LangChain response type
         content = ""
@@ -220,28 +279,33 @@ async def chat_completions(request: ChatCompletionRequest):
                 content = content_str
 
         # Calculate completion tokens
-        completion_tokens = count_tokens(content, request.model)
+        completion_tokens = count_tokens(content, chat_request.model)
 
         # Generate response metadata
         response_id = generate_unique_id()
         created = int(datetime.utcnow().timestamp())
         system_fingerprint = get_system_fingerprint()
-        finish_reason = determine_finish_reason(content, request.max_tokens)
+        finish_reason = determine_finish_reason(content, chat_request.max_tokens)
 
         # Handle streaming vs non-streaming
-        if request.stream:
+        if chat_request.stream:
+            # End monitoring timer successfully
+            monitor.end_timer(timer_id, success=True)
             return StreamingResponse(
-                generate_streaming_response(request, content),
+                generate_streaming_response(chat_request, content),
                 media_type="text/plain",
                 headers={"Cache-Control": "no-cache"},
             )
+
+        # End monitoring timer successfully
+        monitor.end_timer(timer_id, success=True)
 
         # Non-streaming response with full OpenAI compliance
         return {
             "id": response_id,
             "object": "chat.completion",
             "created": created,
-            "model": request.model,
+            "model": chat_request.model,
             "system_fingerprint": system_fingerprint,
             "choices": [
                 {
@@ -259,6 +323,9 @@ async def chat_completions(request: ChatCompletionRequest):
         }
 
     except Exception as e:
+        # End monitoring timer with error
+        monitor.end_timer(timer_id, success=False, error=str(e))
+
         # OpenAI-compatible error response
         error_id = generate_unique_id("chatcmpl-err")
 
@@ -266,13 +333,14 @@ async def chat_completions(request: ChatCompletionRequest):
             "id": error_id,
             "object": "chat.completion",
             "created": int(datetime.utcnow().timestamp()),
-            "model": request.model,
+            "model": chat_request.model,
             "choices": [
                 {
                     "index": 0,
                     "message": {
                         "role": "assistant",
-                        "content": f"I apologize, but I encountered an error processing your request. Please try again.",
+                        "content": ("I apologize, but I encountered an error "
+                                    "processing your request. Please try again."),
                     },
                     "finish_reason": "stop",
                 }
@@ -287,7 +355,8 @@ async def chat_completions(request: ChatCompletionRequest):
 
 
 @app.get("/v1/models")
-async def list_models():
+@limiter.limit("500/minute")  # Higher limit for model listing
+async def list_models(request: Request):
     """OpenAI-compatible models endpoint for model discovery"""
     try:
         available_models = get_available_models()
@@ -330,19 +399,35 @@ async def list_models():
 
 
 @app.get("/health")
-def health():
+@limiter.limit("1000/minute")  # Health checks need higher limits
+def health(request: Request):
     """Health check endpoint"""
-    return {"status": "ok", "service": "tilores-anythingllm", "version": "6.0.0"}
+    return {"status": "ok", "service": "tilores-anythingllm", "version": "6.4.0"}
+
+
+@app.get("/health/detailed")
+@limiter.limit("100/minute")
+async def health_detailed(request: Request):
+    """Detailed health check with monitoring metrics"""
+    return monitor.get_health_status()
+
+
+@app.get("/metrics")
+@limiter.limit("100/minute")
+async def get_metrics(request: Request):
+    """Get comprehensive system metrics"""
+    return monitor.get_metrics()
 
 
 @app.get("/")
-async def root():
+@limiter.limit("1000/minute")
+async def root(request: Request):
     """Root endpoint with API information"""
     available_models = get_available_models()
 
     return {
         "service": "Tilores API for AnythingLLM",
-        "version": "6.0.0",
+        "version": "6.4.0",
         "description": "Fully OpenAI-compatible API with Tilores integration",
         "compliance": {
             "openai_compatible": True,

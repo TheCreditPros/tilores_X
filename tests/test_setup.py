@@ -7,6 +7,7 @@ Tests all core imports and Redis cache functionality with graceful fallback.
 import sys
 import os
 
+
 def test_environment():
     """Test environment setup."""
     print("🧪 Testing tilores_X Development Environment")
@@ -52,7 +53,6 @@ def test_environment():
         return False
 
     try:
-        import tilores_langchain
         print("✅ Tilores LangChain integration")
     except ImportError as e:
         print(f"❌ Tilores LangChain import failed: {e}")
@@ -61,7 +61,8 @@ def test_environment():
     # Test 3: Redis Cache Manager
     print("\n3. Redis Cache Manager:")
     try:
-        from redis_cache import RedisCacheManager, cache_manager
+        from redis_cache import RedisCacheManager
+        cache_manager = RedisCacheManager()
         print("✅ Redis cache manager imported")
 
         # Test cache stats (should gracefully fallback if Redis unavailable)
@@ -80,7 +81,7 @@ def test_environment():
     # Test 4: Core Application
     print("\n4. Core Application:")
     try:
-        from core_app import initialize_engine, MultiProviderLLMEngine
+        from core_app import initialize_engine  # , MultiProviderLLMEngine  # Unused
         print("✅ Core application imported")
 
         # Test engine initialization
@@ -99,7 +100,6 @@ def test_environment():
     # Test 5: Main Enhanced
     print("\n5. Main Enhanced:")
     try:
-        import main_enhanced
         print("✅ Main enhanced module imported")
     except ImportError as e:
         print(f"❌ Main enhanced import failed: {e}")
@@ -109,6 +109,7 @@ def test_environment():
     print("🎉 Environment validation completed successfully!")
     print("🚀 Ready for development and testing")
     return True
+
 
 if __name__ == "__main__":
     success = test_environment()

@@ -12,6 +12,22 @@ from langchain_openai import ChatOpenAI
 from tilores import TiloresAPI
 from tilores_langchain import TiloresTools
 
+# Import debug configuration
+from utils.debug_config import setup_logging, debug_print
+
+# Set up module logger
+logger = setup_logging(__name__)
+
+# LangSmith observability imports
+try:
+    from langsmith import Client as LangSmithClient
+    from langchain.callbacks.tracers import LangChainTracer
+    LANGSMITH_AVAILABLE = True
+except ImportError:
+    LangSmithClient = None
+    LangChainTracer = None
+    LANGSMITH_AVAILABLE = False
+
 # Redis cache for performance optimization (Phase VI)
 try:
     from .redis_cache import cache_manager
@@ -81,15 +97,18 @@ class QueryRouter:
             r"^\s*(thank\s+you|thanks|bye|goodbye)\b",  # "thank you", "bye", etc.
             r"^\s*how\s+are\s+you\b",  # "How are you?", "How are you doing?"
             # Common: Math in natural language (allow additional instructions)
-            r"^\s*what\s+is\s+\d+\s*[\+\-\*\/\%]\s*\d+\s*\??",  # "what is 2 + 2" (allow extra text)
-            r"^\s*what\s+is\s+\d+\s+(plus|minus|times|divided\s+by)\s+\d+\s*\??",  # "what is 2 plus 2" (allow extra text)
+            # "what is 2 + 2" (allow extra text)
+            r"^\s*what\s+is\s+\d+\s*[\+\-\*\/\%]\s*\d+\s*\??",
+            # "what is 2 plus 2" (allow extra text)
+            r"^\s*what\s+is\s+\d+\s+(plus|minus|times|divided\s+by)\s+\d+\s*\??",
             r"^\s*calculate\s+\d+\s*[\+\-\*\/\%]\s*\d+",  # "calculate 15 * 8" (allow extra text)
             # Moderate: Knowledge questions
             r"\bwhat\s+is\s+(the\s+)?(definition|meaning|capital|population)\b",
             r"\bwho\s+(was|is)\s+[a-zA-Z\s]+\s*\??\s*$",  # "Who was Albert Einstein?"
             r"\bwhat\s+time\s+is\s+it\b",  # "What time is it?"
             # General conversational patterns
-            r"^\s*(this\s+is\s+a\s+)?(test|testing|example)\s*$",  # "this is a test", "testing", "example" - but NOT in email addresses
+            # "this is a test", "testing", "example" - but NOT in email addresses
+            r"^\s*(this\s+is\s+a\s+)?(test|testing|example)\s*$",
             r"\bhow\s+(to|do|does)\b(?!.*\b(customer|client|find|search)\b)",
             r"\b(mathematics|math|calculation|arithmetic)\b",
         ]
@@ -97,6 +116,7 @@ class QueryRouter:
         self.general_regex = [
             re.compile(p, re.IGNORECASE) for p in self.general_patterns
         ]
+
 
     def should_use_tilores_tools(self, query: str) -> bool:
         """Determine if query needs Tilores tools - simplified to trust LLM intelligence"""
@@ -108,6 +128,23 @@ class QueryRouter:
 
         if obvious_general:
             return False  # Use general LLM for obvious general queries (math, greetings, etc.)
+
+        # Check for customer identifiers using advanced extraction
+        try:
+            from utils.context_extraction import IDPatterns
+
+            # Quick check for any customer identifiers
+            has_customer_data = any([
+                IDPatterns.extract_email(query),
+                IDPatterns.extract_client_id(query),
+                IDPatterns.extract_salesforce_id(query),
+                IDPatterns.extract_phone(query)
+            ])
+
+            if has_customer_data:
+                return True  # Definitely needs Tilores tools
+        except ImportError:
+            pass  # Fallback to default behavior if utils not available
 
         # Default: Give LLM access to tools and let it decide
         # The LLM is smart enough to:
@@ -173,10 +210,6 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
                 # Only include Record type fields that can be accessed directly
                 for field_info in type_info.get("fields", []):
                     field_name = field_info["name"]
-                    field_type = field_info.get("type", {})
-                    type_kind = field_type.get("kind") or field_type.get(
-                        "ofType", {}
-                    ).get("kind")
 
                     # Exclude complex nested objects that cause 422 errors
                     # CREDIT_RESPONSE is handled by dedicated credit function for complete access
@@ -205,7 +238,7 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
         return all_fields
 
     except Exception as e:
-        print(f"Schema discovery failed: {e}")
+        logger.error(f"Schema discovery failed: {e}")
         # Fallback to basic Record fields if comprehensive discovery fails
         try:
             for type_info in (
@@ -216,13 +249,14 @@ def get_all_tilores_fields(tilores_api) -> Dict[str, bool]:
                         field["name"] for field in type_info.get("fields", [])
                     ]
                     return {field: True for field in field_names}
-        except:
+        except Exception:
             pass
         return {}
 
 
 class MultiProviderLLMEngine:
     """Ultra-minimal multi-provider LLM engine with OpenAI-compatible interface"""
+
 
     def __init__(self):
         """Initialize with simple model mappings - only available providers"""
@@ -283,10 +317,27 @@ class MultiProviderLLMEngine:
                         "class": ChatGroq,
                         "real_name": "llama-3.3-70b-versatile",
                     },
+                    # ULTRA-FAST: Speculative decoding - 1,665 tokens/sec!
+                    "llama-3.3-70b-specdec": {
+                        "provider": "groq",
+                        "class": ChatGroq,
+                        "real_name": "llama-3.3-70b-specdec",
+                    },
                     "deepseek-r1-distill-llama-70b": {
                         "provider": "groq",
                         "class": ChatGroq,
                         "real_name": "deepseek-r1-distill-llama-70b",
+                    },
+                    # Additional fast Groq models
+                    "mixtral-8x7b-32768": {
+                        "provider": "groq",
+                        "class": ChatGroq,
+                        "real_name": "mixtral-8x7b-32768",
+                    },
+                    "llama-3.2-90b-text-preview": {
+                        "provider": "groq",
+                        "class": ChatGroq,
+                        "real_name": "llama-3.2-90b-text-preview",
                     },
                 }
             )
@@ -318,12 +369,19 @@ class MultiProviderLLMEngine:
         # Initialize Tilores components once
         self.tilores = None
         self.tools = []
+
+        # Initialize LangSmith observability
+        self.langsmith_client = None
+        self.langchain_tracer = None
+        self._init_langsmith()
+
+        # Initialize Tilores after LangSmith setup
         self._init_tilores()
+
 
     def _load_environment(self):
         """Load environment variables from .env file (current dir -> parent -> project root)"""
         try:
-            import os
             from pathlib import Path
 
             from dotenv import load_dotenv
@@ -359,12 +417,59 @@ class MultiProviderLLMEngine:
         except Exception as e:
             print(f"⚠️  Error loading .env file: {e}")
 
+
+    def _init_langsmith(self):
+        """Initialize LangSmith observability with graceful degradation."""
+        if not LANGSMITH_AVAILABLE:
+            print("📊 LangSmith not available - observability disabled")
+            return
+
+        try:
+            import os
+            # Check if LangSmith is enabled in environment
+            langsmith_enabled = os.getenv("LANGSMITH_TRACING", "false")
+            if langsmith_enabled.lower() not in ("true", "1", "yes", "on"):
+                print("📊 LangSmith tracing disabled in environment")
+                return
+
+            # Get API key
+            api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv(
+                "LANGCHAIN_API_KEY"
+            )
+            if not api_key:
+                print("📊 LangSmith API key not found - tracing disabled")
+                return
+
+            # Initialize LangSmith client
+            self.langsmith_client = LangSmithClient(api_key=api_key)
+
+            # Get project name from environment
+            project_name = (
+                os.getenv("LANGSMITH_PROJECT") or
+                os.getenv("LANGCHAIN_PROJECT") or
+                "tilores_unified"
+            )
+
+            # Initialize LangChain tracer with project name
+            self.langchain_tracer = LangChainTracer(
+                client=self.langsmith_client,
+                project_name=project_name
+            )
+
+            print(f"✅ LangSmith initialized - Project: {project_name}")
+
+        except Exception as e:
+            print(f"⚠️  LangSmith initialization failed: {e}")
+            print("📊 Observability disabled - continuing without tracing")
+            self.langsmith_client = None
+            self.langchain_tracer = None
+
+
     def _init_tilores(self):
         """Initialize Tilores components with error handling and timeout protection"""
         try:
             import os
             import time
-            from pathlib import Path
 
             # LOAD ENVIRONMENT - Support master .env file in project root
             self._load_environment()
@@ -389,12 +494,20 @@ class MultiProviderLLMEngine:
 
             print("✅ All required Tilores variables present")
 
-            # Set timeout from environment - Railway environment needs longer timeouts
-            # Local: ~3s, Railway: potentially 30-60s due to network latency
-            timeout_ms = int(
-                os.getenv("TILORES_TIMEOUT", "120000")
-            )  # Increased to 120s for Railway
-            timeout_seconds = timeout_ms / 1000
+            # Use optimized timeout configuration
+            try:
+                from utils.timeout_config import get_timeout_manager
+                timeout_mgr = get_timeout_manager()
+                timeout_seconds = timeout_mgr.get_timeout("tilores_init")
+                retry_config = timeout_mgr.get_retry_config()
+                max_retries = retry_config["max_retries"]
+                base_delay = retry_config["initial_delay"]
+            except ImportError:
+                # Fallback to environment variable
+                timeout_ms = int(os.getenv("TILORES_TIMEOUT", "30000"))
+                timeout_seconds = timeout_ms / 1000
+                max_retries = 3
+                base_delay = 0.5
 
             print(f"🔍 Initializing Tilores with {timeout_seconds}s timeout...")
 
@@ -438,7 +551,7 @@ class MultiProviderLLMEngine:
                     elapsed_msg = f"⏰ TiloresAPI timeout on attempt {attempt + 1}/{max_retries} (>{timeout_seconds}s)"
                     print(elapsed_msg)
                     print(
-                        f"🔍 Railway environment may have higher network latency than local (~3s)"
+                        "🔍 Railway environment may have higher network latency than local (~3s)"
                     )
 
                     if attempt == max_retries - 1:
@@ -470,6 +583,22 @@ class MultiProviderLLMEngine:
                     time.sleep(delay)
 
             tilores_tools = TiloresTools(self.tilores)
+
+            # Initialize function executor for centralized tool management
+            from utils.function_executor import initialize_function_executor
+            from monitoring import monitor
+
+            # Create tool dictionary for function executor
+            tool_dict = {
+                "search": tilores_tools.search,
+                "fetchEntity": tilores_tools.entity_edges,
+                "creditReport": getattr(tilores_tools, 'credit_report', None),
+                "fieldDiscovery": getattr(tilores_tools, 'field_discovery', None)
+            }
+
+            # Initialize the function executor
+            self.function_executor = initialize_function_executor(tool_dict, monitor)
+            print("✅ Function executor initialized for Tilores tools")
 
             # Get all available fields dynamically with timeout protection
             # Use shorter timeout for field discovery to prevent hanging
@@ -548,45 +677,11 @@ class MultiProviderLLMEngine:
         except Exception as e:
             print(f"❌ CRITICAL: Tilores initialization failed completely: {e}")
             print(f"🔍 Error type: {type(e).__name__}")
-            print(f"🔍 This will cause 'Tilores tools not available' responses")
-            print(f"💡 Check network connectivity to Tilores endpoints")
+            print("🔍 This will cause 'Tilores tools not available' responses")
+            print("💡 Check network connectivity to Tilores endpoints")
             self.tilores = None
             self.tools = []
 
-    def _create_comprehensive_search_tool(self):
-        """Create a search tool that automatically uses all available fields"""
-        from langchain.tools import tool
-
-        @tool
-        def tilores_comprehensive_search(searchParams: dict) -> str:
-            """
-            Search for customers using comprehensive field access (285+ fields automatically).
-
-            Args:
-                searchParams: Search criteria dict like {"EMAIL": "user@example.com"} or {"CLIENT_ID": "123456"}
-
-            Returns:
-                Complete customer information with all available data types
-            """
-            try:
-                from tilores_langchain import TiloresTools
-
-                tilores_tools = TiloresTools(self.tilores)
-                search_tool = tilores_tools.search_tool()
-
-                # Use all discovered fields automatically
-                result = search_tool.invoke(
-                    {
-                        "searchParams": searchParams,
-                        "recordFieldsToQuery": self.all_fields,
-                    }
-                )
-
-                return result
-            except Exception as e:
-                return f"Error searching with comprehensive fields: {str(e)}"
-
-        return tilores_comprehensive_search
 
     def _create_smart_search_tool(self, tilores_tools):
         """Create a search tool that adapts field selection based on model provider"""
@@ -639,6 +734,7 @@ class MultiProviderLLMEngine:
         }
 
         @tool
+
         def tilores_smart_search(query: str) -> str:
             """
             Smart customer search with provider-aware field selection.
@@ -675,11 +771,13 @@ class MultiProviderLLMEngine:
 
         return tilores_smart_search
 
+
     def _create_comprehensive_search_tool(self, tilores_tools):
         """Create a comprehensive search tool with ALL fields for detailed follow-up queries"""
         from langchain.tools import tool
 
         @tool
+
         def tilores_comprehensive_search(query: str) -> str:
             """
             Comprehensive customer search with ALL 285+ fields for detailed analysis.
@@ -724,11 +822,13 @@ class MultiProviderLLMEngine:
 
         return tilores_comprehensive_search
 
+
     def _create_unified_search_tool(self, tilores_tools):
         """Create a unified search tool that adapts field selection based on provider capabilities"""
         from langchain.tools import tool
 
         @tool
+
         def tilores_search(query: str) -> str:
             """
             Search for customers with basic profile and contact information.
@@ -770,21 +870,30 @@ class MultiProviderLLMEngine:
                     ).hexdigest()
                     cached_result = cache_manager.get_customer_search(cache_key)
                     if cached_result:
-                        print(f"🔥 Cache HIT: Customer search for "
-                              f"{list(search_params.values())[0] if search_params else 'unknown'}")
+                        search_value = 'unknown'
+                        if search_params and search_params.values():
+                            values_list = list(search_params.values())
+                            if values_list:
+                                search_value = values_list[0]
+                        print(f"🔥 Cache HIT: Customer search for {search_value}")
                         return cached_result
 
-                print(f"🔍 Cache MISS: Searching customer data...")
+                print("🔍 Cache MISS: Searching customer data...")
 
                 # Try comprehensive search first (all fields) with timeout protection
                 try:
-                    import asyncio
                     import concurrent.futures
+                    import os
                     import time
 
-                    # Get timeout from environment
-                    timeout_ms = int(os.getenv("TILORES_TIMEOUT", "30000"))
-                    timeout_seconds = timeout_ms / 1000
+                    # Use optimized timeout for search operations
+                    try:
+                        from utils.timeout_config import get_timeout_manager
+                        timeout_mgr = get_timeout_manager()
+                        timeout_seconds = timeout_mgr.get_timeout("search_operation")
+                    except ImportError:
+                        timeout_ms = int(os.getenv("TILORES_TIMEOUT", "5000"))
+                        timeout_seconds = timeout_ms / 1000
 
                     start_time = time.time()
 
@@ -808,7 +917,7 @@ class MultiProviderLLMEngine:
                             # Cache successful search results for 1 hour
                             if CACHE_AVAILABLE and cache_manager and result:
                                 cache_manager.set_customer_search(cache_key, result)
-                                print(f"✅ Cached search result for 1 hour")
+                                print("✅ Cached search result for 1 hour")
 
                             return result
                         except concurrent.futures.TimeoutError:
@@ -819,7 +928,7 @@ class MultiProviderLLMEngine:
                             # Cancel the future and fall through to essential fields fallback
                             future.cancel()
                             raise Exception(f"Search timeout after {timeout_seconds}s")
-                except Exception as comprehensive_error:
+                except Exception:
                     # If comprehensive fails (e.g., Groq payload limits), use essential fields
                     essential_fields = {
                         # Core customer profile
@@ -879,6 +988,7 @@ class MultiProviderLLMEngine:
 
         return tilores_search
 
+
     def _parse_query_string(self, query: str) -> dict:
         """Parse a natural language query to extract search parameters"""
         import re
@@ -921,11 +1031,13 @@ class MultiProviderLLMEngine:
         # Default fallback - return the query as a generic search
         return {"GENERAL_SEARCH": query}
 
+
     def _create_record_lookup_tool(self):
         """Create a custom tool for looking up records by ID using entityByRecord"""
         from langchain.tools import tool
 
         @tool
+
         def tilores_record_lookup(record_id: str) -> str:
             """
             Look up a customer record by Salesforce record ID (like 003Ux00000WCmXtIAL).
@@ -1016,11 +1128,13 @@ class MultiProviderLLMEngine:
 
         return tilores_record_lookup
 
+
     def _create_credit_report_tool(self):
         """Create a tool for retrieving comprehensive credit report data"""
         from langchain.tools import tool
 
         @tool
+
         def get_customer_credit_report(
             customer_id: str = None, client_id: str = None, email: str = None
         ) -> str:
@@ -1109,7 +1223,7 @@ class MultiProviderLLMEngine:
 
                 # Handle unified search response and extract credit data
                 if not result:
-                    return f"Unable to retrieve credit report - customer not found"
+                    return "Unable to retrieve credit report - customer not found"
 
                 # Check if result is a dict (from unified search) or string
                 if isinstance(result, dict):
@@ -1130,6 +1244,7 @@ class MultiProviderLLMEngine:
                 return f"Error retrieving credit report: {str(e)}"
 
         return get_customer_credit_report
+
 
     def _extract_credit_from_dict(self, result_dict: dict, search_params: dict) -> str:
         """Extract credit information from unified search dictionary result"""
@@ -1200,6 +1315,7 @@ class MultiProviderLLMEngine:
         except Exception as e:
             return f"Error processing credit data: {str(e)}"
 
+
     def _format_comprehensive_credit_report(
         self, credit_report: dict, customer_info: dict
     ) -> str:
@@ -1252,6 +1368,7 @@ class MultiProviderLLMEngine:
             found_indicators,
             raw_data_str,
         )
+
 
     def _format_no_credit_data_report(
         self, customer_info: dict, full_result: dict
@@ -1315,6 +1432,7 @@ class MultiProviderLLMEngine:
             found_indicators,
             raw_data_str,
         )
+
 
     def _extract_credit_information(self, result_str: str, search_params: dict) -> str:
         """Extract and provide intelligent credit analysis using Credit Pros advisor approach"""
@@ -1390,6 +1508,7 @@ class MultiProviderLLMEngine:
             result_str,
         )
 
+
     def _generate_credit_advisor_response(
         self,
         name: str,
@@ -1405,52 +1524,58 @@ class MultiProviderLLMEngine:
 
         if credit_score:
             # Professional credit score analysis
-            response += f"## Credit Score Analysis\n\n"
+            response += "## Credit Score Analysis\n\n"
             response += f"**Current Credit Score:** {credit_score}\n"
 
             # Provide professional score interpretation and risk assessment
             if credit_score >= 750:
-                response += f"**Credit Rating:** Excellent (750+)\n"
-                response += f"**Risk Assessment:** Very low risk borrower\n"
-                response += f"**Lending Status:** Qualifies for best available rates and terms\n"
+                response += "**Credit Rating:** Excellent (750+)\n"
+                response += "**Risk Assessment:** Very low risk borrower\n"
+                response += "**Lending Status:** Qualifies for best available rates and terms\n"
             elif credit_score >= 700:
-                response += f"**Credit Rating:** Good (700-749)\n"
-                response += f"**Risk Assessment:** Low risk borrower\n"
-                response += f"**Lending Status:** Approved for most credit products with competitive rates\n"
+                response += "**Credit Rating:** Good (700-749)\n"
+                response += "**Risk Assessment:** Low risk borrower\n"
+                response += ("**Lending Status:** Approved for most credit products with "
+                                            "competitive rates\n")
             elif credit_score >= 650:
-                response += f"**Credit Rating:** Fair (650-699)\n"
-                response += f"**Risk Assessment:** Moderate risk borrower\n"
-                response += f"**Lending Status:** Limited approval options, higher interest rates likely\n"
+                response += "**Credit Rating:** Fair (650-699)\n"
+                response += "**Risk Assessment:** Moderate risk borrower\n"
+                response += ("**Lending Status:** Limited approval options, higher interest rates "
+                                            "likely\n")
             elif credit_score >= 600:
-                response += f"**Credit Rating:** Poor (600-649)\n"
-                response += f"**Risk Assessment:** High risk borrower\n"
-                response += f"**Lending Status:** Secured products recommended, focus on rebuilding\n"
+                response += "**Credit Rating:** Poor (600-649)\n"
+                response += "**Risk Assessment:** High risk borrower\n"
+                response += ("**Lending Status:** Secured products recommended, focus on "
+                                            "rebuilding\n")
             else:
-                response += f"**Credit Rating:** Very Poor (Below 600)\n"
-                response += f"**Risk Assessment:** Very high risk borrower\n"
-                response += f"**Lending Status:** Limited to secured products, significant rebuilding needed\n"
+                response += "**Credit Rating:** Very Poor (Below 600)\n"
+                response += "**Risk Assessment:** Very high risk borrower\n"
+                response += ("**Lending Status:** Limited to secured products, significant "
+                                            "rebuilding needed\n")
         else:
-            response += f"## Credit Score Status\n\n"
-            response += f"**Current Credit Score:** Not available in current data\n"
-            response += f"**Action Required:** Credit report needs to be pulled for score analysis\n"
+            response += "## Credit Score Status\n\n"
+            response += "**Current Credit Score:** Not available in current data\n"
+            response += "**Action Required:** Credit report needs to be pulled for score analysis\n"
 
         # Analyze available credit data
-        response += f"\n## Available Credit Data\n\n"
+        response += "\n## Available Credit Data\n\n"
 
         if has_credit_response:
-            response += f"**Credit Report Status:** Comprehensive credit bureau data available\n"
-            response += f"**Data Sources:** Full tradeline information, payment history, and inquiry records\n"
+            response += "**Credit Report Status:** Comprehensive credit bureau data available\n"
+            response += ("**Data Sources:** Full tradeline information, payment history, and "
+                                        "inquiry records\n")
             response += (
-                f"**Analysis Capability:** Complete credit profile analysis possible\n"
+                        "**Analysis Capability:** Complete credit profile analysis possible\n"
             )
         elif has_transunion_data:
-            response += f"**Bureau Data:** TransUnion credit report data available\n"
+            response += "**Bureau Data:** TransUnion credit report data available\n"
             response += (
-                f"**Analysis Status:** Credit report analysis ready for processing\n"
+                        "**Analysis Status:** Credit report analysis ready for processing\n"
             )
         else:
-            response += f"**Credit Data Status:** Limited data available in current search results\n"
-            response += f"**Recommendation:** Full credit report pull recommended for comprehensive analysis\n"
+            response += "**Credit Data Status:** Limited data available in current search results\n"
+            response += ("**Recommendation:** Full credit report pull recommended for "
+                                        "comprehensive analysis\n")
 
         # Analyze credit utilization and debt data
         import re
@@ -1469,75 +1594,79 @@ class MultiProviderLLMEngine:
                     debt_amount = float(match.replace(",", ""))
                     if debt_amount > 0:
                         total_debt.append(debt_amount)
-                except:
+                except Exception:
                     continue
 
         # Utilization analysis
-        response += f"\n## Credit Utilization Analysis\n\n"
+        response += "\n## Credit Utilization Analysis\n\n"
         if total_debt:
             max_debt = max(total_debt)
             response += f"**Debt Identified:** ${max_debt:,.2f} in potential revolving balances\n"
-            response += f"**Utilization Impact:** Affects credit utilization ratio calculation\n"
-            response += f"**Analysis Required:** Credit limits needed to calculate utilization percentage\n"
+            response += "**Utilization Impact:** Affects credit utilization ratio calculation\n"
+            response += ("**Analysis Required:** Credit limits needed to calculate utilization "
+                                        "percentage\n")
         else:
-            response += f"**Debt Status:** No specific debt amounts identified in current data\n"
-            response += f"**Data Limitation:** Account balances may require direct credit report access\n"
-            response += f"**Recommendation:** Pull detailed credit report for complete utilization analysis\n"
+            response += "**Debt Status:** No specific debt amounts identified in current data\n"
+            response += ("**Data Limitation:** Account balances may require direct credit "
+                                        "report access\n")
+            response += ("**Recommendation:** Pull detailed credit report for complete "
+                                        "utilization analysis\n")
 
         # Credit improvement analysis and recommendations
-        response += f"\n## Credit Improvement Analysis\n\n"
+        response += "\n## Credit Improvement Analysis\n\n"
 
         if credit_score:
             if credit_score < 580:
-                response += f"**Priority Actions:**\n"
-                response += f"- Address payment history issues (35% of score impact)\n"
-                response += f"- Reduce credit utilization below 30%\n"
-                response += f"- Consider secured credit cards for credit rebuilding\n"
-                response += f"- Review credit report for errors and inaccuracies\n"
-                response += f"- Establish consistent payment patterns\n"
+                response += "**Priority Actions:**\n"
+                response += "- Address payment history issues (35% of score impact)\n"
+                response += "- Reduce credit utilization below 30%\n"
+                response += "- Consider secured credit cards for credit rebuilding\n"
+                response += "- Review credit report for errors and inaccuracies\n"
+                response += "- Establish consistent payment patterns\n"
             elif credit_score < 650:
-                response += f"**Priority Actions:**\n"
-                response += f"- Maintain consistent payment history (most impactful for this score range)\n"
-                response += f"- Lower credit utilization to under 30%\n"
-                response += f"- Monitor credit report for negative items\n"
+                response += "**Priority Actions:**\n"
+                response += ("- Maintain consistent payment history (most impactful for this score "
+                                            "range)\n")
+                response += "- Lower credit utilization to under 30%\n"
+                response += "- Monitor credit report for negative items\n"
                 response += (
-                    f"- Consider authorized user status on established accounts\n"
+                            "- Consider authorized user status on established accounts\n"
                 )
 
-                response += f"\n**Focus Areas:**\n"
-                response += f"- Maintain consistent payment history\n"
-                response += f"- Lower credit utilization to under 30%\n"
-                response += f"- Monitor credit report for negative items\n"
+                response += "\n**Focus Areas:**\n"
+                response += "- Maintain consistent payment history\n"
+                response += "- Lower credit utilization to under 30%\n"
+                response += "- Monitor credit report for negative items\n"
                 response += (
-                    f"- Consider authorized user status on established accounts\n"
+                            "- Consider authorized user status on established accounts\n"
                 )
             elif credit_score < 700:
-                response += f"**Optimization Strategies:**\n"
+                response += "**Optimization Strategies:**\n"
                 response += (
-                    f"- Reduce credit utilization to under 10% for score optimization\n"
+                            "- Reduce credit utilization to under 10% for score optimization\n"
                 )
-                response += f"- Maintain perfect payment history\n"
+                response += "- Maintain perfect payment history\n"
                 response += (
-                    f"- Consider credit limit increases to improve utilization ratio\n"
+                            "- Consider credit limit increases to improve utilization ratio\n"
                 )
-                response += f"- Review credit mix and account age factors\n"
+                response += "- Review credit mix and account age factors\n"
             else:
-                response += f"**Maintenance Strategies:**\n"
-                response += f"- Continue current payment patterns\n"
-                response += f"- Keep utilization under 5% for optimal scoring\n"
-                response += f"- Monitor credit for unauthorized activities\n"
+                response += "**Maintenance Strategies:**\n"
+                response += "- Continue current payment patterns\n"
+                response += "- Keep utilization under 5% for optimal scoring\n"
+                response += "- Monitor credit for unauthorized activities\n"
                 response += (
-                    f"- Consider strategic credit applications for better products\n"
+                            "- Consider strategic credit applications for better products\n"
                 )
         else:
-            response += f"**Assessment Required:**\n"
-            response += f"- Pull comprehensive credit report for baseline analysis\n"
-            response += f"- Establish current credit score and rating\n"
-            response += f"- Identify primary areas impacting creditworthiness\n"
-            response += f"- Develop targeted improvement strategy\n"
+            response += "**Assessment Required:**\n"
+            response += "- Pull comprehensive credit report for baseline analysis\n"
+            response += "- Establish current credit score and rating\n"
+            response += "- Identify primary areas impacting creditworthiness\n"
+            response += "- Develop targeted improvement strategy\n"
 
         # Payment history analysis
-        response += f"\n## Payment History Assessment\n\n"
+        response += "\n## Payment History Assessment\n\n"
         payment_indicators = [
             "late payment",
             "missed payment",
@@ -1550,16 +1679,21 @@ class MultiProviderLLMEngine:
         ]
 
         if payment_data:
-            response += f"**Payment Indicators Found:** {len(payment_data)} payment-related data points\n"
+            response += (f"**Payment Indicators Found:** {len(payment_data)} payment-related "
+                                        f"data points\n")
             response += (
-                f"**Analysis Required:** Detailed payment pattern review needed\n"
+                        "**Analysis Required:** Detailed payment pattern review needed\n"
             )
         else:
-            response += f"**Payment History:** No specific payment-related data in current search results\n"
-            response += f"**Payment Indicators:** Limited payment indicators available without full credit report\n"
-            response += f"**Recommendation:** Full credit report required for payment history analysis\n"
+            response += ("**Payment History:** No specific payment-related data in current "
+                                        "search results\n")
+            response += ("**Payment Indicators:** Limited payment indicators available without "
+                                        "full credit report\n")
+            response += ("**Recommendation:** Full credit report required for payment history "
+                                        "analysis\n")
 
         return response
+
 
     def _format_credit_report(self, credit_report: dict, raw_result: str) -> str:
         """Format extracted credit information into a readable report"""
@@ -1575,7 +1709,7 @@ class MultiProviderLLMEngine:
             # No credit-specific data found, but customer exists
             customer_info = credit_report["customer_info"]
             if customer_info:
-                report = f"## Credit Report Request\n\n"
+                report = "## Credit Report Request\n\n"
                 report += f"**Customer Found**: {customer_info.get('name', 'N/A')}\n"
                 report += f"**Client ID**: {customer_info.get('client_id', 'N/A')}\n"
                 report += f"**Email**: {customer_info.get('email', 'N/A')}\n\n"
@@ -1592,7 +1726,7 @@ class MultiProviderLLMEngine:
                 return f"## Credit Report Status\n\nCustomer search completed but no credit report data available.\n\nSearch result:\n{raw_result[:300]}..."
 
         # Format actual credit report data
-        report = f"## Credit Report\n\n"
+        report = "## Credit Report\n\n"
 
         # Customer information
         customer_info = credit_report["customer_info"]
@@ -1614,7 +1748,7 @@ class MultiProviderLLMEngine:
 
         # Raw credit data
         if credit_report["raw_credit_data"]:
-            report += f"**Credit Details**:\n"
+            report += "**Credit Details**:\n"
             for item in credit_report["raw_credit_data"]:
                 report += f"- {item}\n"
             report += "\n"
@@ -1626,6 +1760,7 @@ class MultiProviderLLMEngine:
         report += "Additional details may be available through direct credit bureau integration.\n\n"
 
         return report
+
 
     def get_model(self, model_name: str = "llama-3.3-70b-versatile", **kwargs):
         """Get model instance from any provider using OpenAI-compatible interface"""
@@ -1677,9 +1812,11 @@ class MultiProviderLLMEngine:
             # Fallback to fastest model llama-3.3-70b-versatile
             return ChatGroq(model="llama-3.3-70b-versatile", **kwargs)
 
+
     def get_provider(self, model_name: str) -> str:
         """Get provider name for a model"""
         return self.model_mappings.get(model_name, {}).get("provider", "openai")
+
 
     def get_llm_with_tools(self, model_name: str, **kwargs):
         """Get LLM with tools bound - with enhanced debugging"""
@@ -1696,13 +1833,13 @@ class MultiProviderLLMEngine:
 
         return llm.bind_tools(self.tools)
 
+
     def list_models(self) -> list:
         """List all available models"""
         return [
             {"id": model, "provider": mapping["provider"]}
             for model, mapping in self.model_mappings.items()
         ]
-
 
 # Global engine instance - initialized after dotenv loading
 engine = None
@@ -1714,16 +1851,19 @@ query_router = QueryRouter()
 def _get_fastest_available_model() -> str:
     """Get the default base model, prioritizing llama-3.3-70b-versatile"""
 
-    # Ordered by preference (default base model first) - llama-3.3-70b-versatile prioritized
+    # Ordered by preference - SPEED OPTIMIZED with new ultra-fast models
     preferred_models = [
-        "llama-3.3-70b-versatile",  # 2.049s - DEFAULT BASE MODEL (prioritized)
-        "deepseek-r1-distill-llama-70b",  # 0.825s production avg - fastest but secondary
+        "llama-3.3-70b-specdec",  # ULTRA-FAST: 1,665 tokens/sec with speculative decoding!
+        "llama-3.3-70b-versatile",  # 276 tokens/sec - Very fast Groq model
+        "mixtral-8x7b-32768",  # 500+ tokens/sec - Fast Groq MoE model
+        "deepseek-r1-distill-llama-70b",  # 0.825s production avg - fastest distilled
+        "llama-3.2-90b-text-preview",  # 330 tokens/sec - Large fast model
         "gpt-5-mini",  # Latest OpenAI model
         "claude-opus-4",  # Latest Claude model (most capable)
         "claude-sonnet-4",  # Latest Claude model (fast)
         "gpt-3.5-turbo",  # 1.016s production avg
         "gpt-4o-mini",  # 1.915s production avg
-        "gemini-1.5-flash-002",  # 2.2s avg - FAST Gemini (5.2s in LangSmith vs 30s+ for others)
+        "gemini-1.5-flash-002",  # 2.2s avg - FAST Gemini
         "gpt-4o",  # 2.789s production avg
         "gpt-4.1-mini",  # Fallback
         "claude-3-haiku",  # Fallback
@@ -1736,7 +1876,7 @@ def _get_fastest_available_model() -> str:
             for model in preferred_models:
                 if model in engine.model_mappings:
                     return model
-    except:
+    except Exception:
         pass
 
     # Default to base model if engine not ready
@@ -1763,12 +1903,37 @@ def run_chain(
     """
     try:
         # Ensure engine is initialized
+        global engine
         initialize_engine()
 
-        # Import engine from global scope after initialization
-        global engine
+        # Safety check - should not happen after initialize_engine()
         if engine is None:
-            engine = MultiProviderLLMEngine()
+            raise RuntimeError("Engine initialization failed")
+
+        # Initialize LangSmith tracing context
+        langsmith_callbacks = []
+        trace_metadata = {}
+
+        if (hasattr(engine, 'langchain_tracer') and
+            engine.langchain_tracer is not None):
+            langsmith_callbacks.append(engine.langchain_tracer)
+
+            # Add metadata for comprehensive observability
+            trace_metadata.update({
+                "model": model,
+                "provider": engine.get_provider(model),
+                "message_count": len(messages) if isinstance(messages, list)
+                               else 1,
+                "stream": stream,
+                "tilores_tools_available": bool(engine.tools),
+                "tool_count": len(engine.tools) if engine.tools else 0
+            })
+
+            # Add customer context if available
+            if customer_data:
+                trace_metadata["has_customer_context"] = True
+
+            print("📊 LangSmith tracing enabled for this request")
 
         # Handle both legacy string input and new conversation format
         if isinstance(messages, str):
@@ -1809,7 +1974,7 @@ def run_chain(
                     print(f"🔥 Cache HIT: LLM response for model {model}")
                     return cached_response
 
-            print(f"🔍 Cache MISS: Generating LLM response...")
+            print("🔍 Cache MISS: Generating LLM response...")
 
             llm = engine.get_model(model, **kwargs)
             system_prompt = (
@@ -1832,7 +1997,7 @@ def run_chain(
                 # Cache successful LLM response for 24 hours
                 if CACHE_AVAILABLE and cache_manager and final_response:
                     cache_manager.set_llm_response(cache_key, final_response)
-                    print(f"✅ Cached LLM response for 24 hours")
+                    print("✅ Cached LLM response for 24 hours")
 
                 return final_response
 
@@ -1842,19 +2007,19 @@ def run_chain(
 
         # Tilores tools are required - no fallback to direct LLM
         if not engine.tools:
-            print(f"🚨 CRITICAL: No tools available in production!")
+            print("🚨 CRITICAL: No tools available in production!")
             print(
                 f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}"
             )
             print(
-                f"   This explains why LLM gives generic responses instead of calling tools"
+                "   This explains why LLM gives generic responses instead of calling tools"
             )
             return f"❌ DEBUG: Tilores tools not available in production. Engine state: {len(engine.tools) if engine and engine.tools else 'No tools initialized'}. This is why customer searches fail."
 
         # DEBUG: Log tool availability
         print(f"🔧 TOOLS AVAILABLE: {len(engine.tools)} tools ready for customer query")
         for i, tool in enumerate(engine.tools):
-            print(f"   Tool {i+1}: {tool.name}")
+            print(f"   Tool {i + 1}: {tool.name}")
 
         # Get LLM with tools (simplified without caching)
         llm_with_tools = engine.get_llm_with_tools(model, **kwargs)
@@ -1863,9 +2028,8 @@ def run_chain(
         comprehensive_fields_text = ""
         if engine.all_fields:
             field_count = len(engine.all_fields)
-            sample_fields = list(engine.all_fields.keys())[
-                :20
-            ]  # Show first 20 as examples
+            sample_fields = list(engine.all_fields.keys())[:20]  # Show first 20 as examples
+            # Used in system prompt below via f-string interpolation
             comprehensive_fields_text = f"""
 AVAILABLE FIELDS ({field_count} total): {', '.join(sample_fields)}... and {field_count - 20} more fields.
 When using tilores_search, the system automatically optimizes field selection for maximum data access across all providers."""
@@ -1874,13 +2038,13 @@ When using tilores_search, the system automatically optimizes field selection fo
         system_prompt = f"""You are a customer service assistant with access to customer data tools.
 {comprehensive_fields_text}
 
-🚨 CRITICAL: YOU MUST USE TOOLS FOR ALL CUSTOMER QUERIES
+# CRITICAL: YOU MUST USE TOOLS FOR ALL CUSTOMER QUERIES
 
 For ANY customer query containing:
 - Email addresses (user@domain.com)
 - Customer IDs (numbers like 1881899)
 - Names (John Smith)
-- Record IDs (003Ux...)
+- Record IDs (ID003Ux...)
 - "Find customer", "Get customer", "Show customer"
 
 YOU MUST IMMEDIATELY call the tilores_search tool FIRST. Do NOT provide any response without calling tools first.
@@ -1899,7 +2063,7 @@ ALWAYS do:
 Available tools:
 1. tilores_search - Find customers by email, name, or ID. Returns comprehensive profile and activity data.
 2. tilores_entity_edges - Get detailed relationship and activity data for a specific entity ID. Use this when you have an entity ID from previous results.
-3. tilores_record_lookup - Direct lookup by Salesforce record ID (003Ux...). Returns basic profile only.
+3. tilores_record_lookup - Direct lookup by Salesforce record ID (ID003Ux...). Returns basic profile only.
 4. get_customer_credit_report - Get comprehensive credit analysis for a customer.
 
 FOR CALL HISTORY: Use tilores_search with the customer identifier (email, name, client_id). This returns all available data including calls, transactions, and relationships.
@@ -1953,6 +2117,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     tool_args = tool_call["args"]
                     tool_id = tool_call.get("id", f"call_{tool_name}")
 
+
                     def execute_tool():
                         for tool in engine.tools:
                             if tool.name == tool_name:
@@ -1990,7 +2155,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
                         # Add all tool results to messages
                         llm_messages.extend(tool_results)
-                    except Exception as async_error:
+                    except Exception:
                         # Fallback to sequential execution if async fails
                         for tool_call in initial_response.tool_calls:
                             tool_name = tool_call["name"]
@@ -2034,7 +2199,23 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
         else:
             # Non-streaming path (existing logic)
             print(f"🔍 INVOKING LLM WITH TOOLS: {type(llm_with_tools).__name__}")
-            response = llm_with_tools.invoke(llm_messages)
+
+            # LangSmith: Create trace context for LLM invocation
+            invoke_kwargs = {}
+            if langsmith_callbacks:
+                invoke_kwargs["callbacks"] = langsmith_callbacks
+                # Add trace metadata as config
+                invoke_kwargs["config"] = {
+                    "metadata": trace_metadata,
+                    "tags": [
+                        f"provider_{engine.get_provider(model)}",
+                        f"model_{model.replace('/', '_')}",
+                        "llm_invocation"
+                    ]
+                }
+                print("📊 LangSmith: Tracing LLM invocation with metadata")
+
+            response = llm_with_tools.invoke(llm_messages, **invoke_kwargs)
 
             # DEBUG: Check if tools were called
             has_tool_calls = hasattr(response, "tool_calls") and bool(
@@ -2047,11 +2228,11 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 print(
                     f"   Direct response (no tools): {response.content[:100] if hasattr(response, 'content') else str(response)[:100]}..."
                 )
-                print(f"🚨 PROBLEM: LLM not making tool calls in production!")
+                print("🚨 PROBLEM: LLM not making tool calls in production!")
 
                 # CRITICAL FIX: Force tool execution when LLM doesn't call tools automatically
                 # This handles the case where LLM has tools but doesn't use them
-                print(f"🔧 FORCING TOOL EXECUTION: Manually invoking tilores_search")
+                print("🔧 FORCING TOOL EXECUTION: Manually invoking tilores_search")
 
                 # Extract customer identifier from the query
                 import re
@@ -2083,7 +2264,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 try:
                     for tool in engine.tools:
                         if tool.name == "tilores_search":
-                            print(f"🔧 Invoking tilores_search manually...")
+                            print("🔧 Invoking tilores_search manually...")
                             # CRITICAL FIX: Use correct parameter structure for tilores_search
                             tool_result = tool.invoke(
                                 search_query
@@ -2092,7 +2273,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                                 f"✅ FORCED TOOL RESULT: {len(str(tool_result))} characters"
                             )
                             return f"Found customer information: {tool_result}"
-                    return f"❌ DEBUG: tilores_search tool not found in available tools"
+                    return "❌ DEBUG: tilores_search tool not found in available tools"
                 except Exception as e:
                     print(f"❌ FORCED TOOL ERROR: {e}")
                     return f"Error executing forced search: {str(e)}"
@@ -2118,7 +2299,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
             # Execute each tool call - optimized for async concurrent execution
             import asyncio
-            from concurrent.futures import ThreadPoolExecutor
+            # ThreadPoolExecutor imported at top of file
 
             async def execute_tool_call_async(tool_call):
                 """Execute a single tool call asynchronously"""
@@ -2126,16 +2307,51 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 tool_args = tool_call["args"]
                 tool_id = tool_call.get("id", f"call_{tool_name}")
 
+
                 def execute_tool():
+                    # LangSmith: Log tool execution start
+                    if langsmith_callbacks and engine.langsmith_client:
+                        try:
+                            print(f"📊 LangSmith: Tracing tool execution: {tool_name}")
+                        except Exception:
+                            pass  # Graceful degradation
+
                     for tool in engine.tools:
                         if tool.name == tool_name:
                             try:
-                                return tool.invoke(tool_args)
+                                tool_start_time = __import__('time').time()
+                                result = tool.invoke(tool_args)
+                                tool_duration = __import__('time').time() - tool_start_time
+
+                                # LangSmith: Log successful tool execution
+                                if langsmith_callbacks and engine.langsmith_client:
+                                    try:
+                                        print(f"📊 LangSmith: Tool {tool_name} completed in "
+                                              f"{tool_duration:.2f}s")
+                                    except Exception:
+                                        pass  # Graceful degradation
+
+                                return result
                             except Exception as tool_error:
                                 import traceback
-
                                 traceback.print_exc()
+
+                                # LangSmith: Log tool execution error
+                                if langsmith_callbacks and engine.langsmith_client:
+                                    try:
+                                        print(f"📊 LangSmith: Tool {tool_name} failed: {str(tool_error)}")
+                                    except Exception:
+                                        pass  # Graceful degradation
+
                                 return f"Error executing {tool_name}: {str(tool_error)}"
+
+                    # LangSmith: Log tool not found
+                    if langsmith_callbacks and engine.langsmith_client:
+                        try:
+                            print(f"📊 LangSmith: Tool not found: {tool_name}")
+                        except Exception:
+                            pass  # Graceful degradation
+
                     return f"Tool {tool_name} not found"
 
                 # Execute tool in thread pool for true async behavior
@@ -2165,7 +2381,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
                 # Add all tool results to messages
                 llm_messages.extend(tool_results)
-            except Exception as async_error:
+            except Exception:
                 # Fallback to sequential execution if async fails
                 for tool_call in response.tool_calls:
                     tool_name = tool_call["name"]
@@ -2244,7 +2460,7 @@ def create_enhanced_prompt_for_groq(user_input: str) -> str:
     )
 
     if is_customer_query:
-        return f"""You are a customer service assistant with access to customer data.
+        return """You are a customer service assistant with access to customer data.
 
 The user is asking: {user_input}
 
@@ -2263,7 +2479,7 @@ Acknowledge these specifically and explain what information you would typically 
 Keep your response professional and helpful."""
 
     else:
-        return f"""You are a helpful customer service assistant.
+        return """You are a helpful customer service assistant.
 
 The user is asking: {user_input}
 

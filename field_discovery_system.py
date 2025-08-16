@@ -3,10 +3,8 @@ Comprehensive Field Discovery System for Tilores Integration
 Provides access to 310+ fields through GraphQL schema introspection
 """
 
-import asyncio
-import json
 import os
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List
 
 import aiohttp
 from langchain.tools import tool
