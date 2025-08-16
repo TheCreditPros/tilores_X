@@ -99,3 +99,4 @@ site/
 
 # But allow requirements files
 !requirements*.txt
+set_railway_vars.sh

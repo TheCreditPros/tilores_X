@@ -126,7 +126,7 @@ python test_simplified_runner.py
 | Provider | Models | Status |
 |----------|--------|--------|
 | OpenAI | gpt-4o-mini, gpt-3.5-turbo | ✅ Working |
-| Groq | llama-3.3-70b-versatile, deepseek-r1-distill-llama-70b | ✅ Working |
+| Groq | llama-3.3-70b-versatile, llama-3.3-70b-specdec (1,665 tok/s), deepseek-r1-distill-llama-70b, mixtral-8x7b-32768, llama-3.2-90b-text-preview | ✅ Working |
 | Anthropic | claude-3-haiku, claude-3-sonnet | ✅ Working |
 | Google | gemini-pro, gemini-flash | ✅ Working |
 
