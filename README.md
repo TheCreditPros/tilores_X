@@ -4,13 +4,15 @@
 
 ## 🌐 Production Access
 
-**🔗 Production API**: https://tilores-unified-api-production.up.railway.app
+**🔗 Production API**: https://tiloresx-production.up.railway.app
 **💬 UI Interface**: AnythingLLM (anythingllm.thecreditpros.com)
 
 **📊 Key Endpoints**:
 - **Health Check**: `/health`
-- **LangServe API**: `/chat/invoke` (AnythingLLM compatible)
-- **Service Info**: `/`
+- **OpenAI API**: `/v1/chat/completions` (OpenAI compatible)
+- **Models List**: `/v1/models`
+- **Metrics**: `/metrics`
+- **Detailed Health**: `/health/detailed`
 
 ---
 
@@ -64,7 +66,7 @@ python main_enhanced.py
 
 ### Health Check
 ```bash
-curl https://tilores-unified-api-production.up.railway.app/health
+curl https://tiloresx-production.up.railway.app/health
 ```
 
 ### Customer Search via AnythingLLM
@@ -75,13 +77,12 @@ Simply ask in AnythingLLM:
 
 ### Direct API Call
 ```bash
-curl -X POST https://tilores-unified-api-production.up.railway.app/chat/invoke \
+curl -X POST https://tiloresx-production.up.railway.app/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "input": {
-      "input": "Find customer with client ID 1648647",
-      "model": "gpt-4o-mini"
-    }
+    "model": "llama-3.3-70b-versatile",
+    "messages": [{"role": "user", "content": "Find customer with client ID 1648647"}],
+    "max_tokens": 500
   }'
 ```
 
@@ -121,16 +122,80 @@ python test_simplified_runner.py
                        └─────────────────┘
 ```
 
-## 📊 Supported Models
+## 📊 Supported Models & Performance
 
-| Provider | Models | Status |
-|----------|--------|--------|
-| OpenAI | gpt-4o-mini, gpt-3.5-turbo | ✅ Working |
-| Groq | llama-3.3-70b-versatile, llama-3.3-70b-specdec (1,665 tok/s), deepseek-r1-distill-llama-70b, mixtral-8x7b-32768, llama-3.2-90b-text-preview | ✅ Working |
-| Anthropic | claude-3-haiku, claude-3-sonnet | ✅ Working |
-| Google | gemini-pro, gemini-flash | ✅ Working |
+### 🏎️ **Ultra-Fast Models (Recommended for Production)**
 
-*For detailed model specifications and use cases, see [Architecture Documentation](memory-bank/tilores_X_memory_bank_architecture_README.md#supported-models--providers)*
+| Model ID (OpenAI Endpoint) | Provider | Speed | Use Case | Status |
+|----------------------------|----------|-------|----------|--------|
+| `llama-3.3-70b-specdec` | Groq | **1,665 tok/s** | Real-time chat, phone apps | ✅ Working |
+| `llama-3.3-70b-versatile` | Groq | **276 tok/s** | General purpose, fast responses | ✅ Working |
+| `mixtral-8x7b-32768` | Groq | **500+ tok/s** | Large context, fast processing | ✅ Working |
+| `deepseek-r1-distill-llama-70b` | Groq | **0.825s avg** | Cost-effective reasoning | ✅ Working |
+| `llama-3.2-90b-text-preview` | Groq | **330 tok/s** | Large parameter model | ✅ Working |
+
+### 🧠 **High-Quality Models**
+
+| Model ID (OpenAI Endpoint) | Provider | Speed | Use Case | Status |
+|----------------------------|----------|-------|----------|--------|
+| `gpt-5-mini` | OpenAI | **Latest** | Advanced reasoning, latest features | ✅ Working |
+| `gpt-4o` | OpenAI | **2.789s avg** | Complex analysis, high accuracy | ✅ Working |
+| `gpt-4o-mini` | OpenAI | **1.915s avg** | Balanced speed/quality | ✅ Working |
+| `gpt-4.1-mini` | OpenAI | **Fallback** | Reliable baseline | ✅ Working |
+| `gpt-3.5-turbo` | OpenAI | **1.016s avg** | Fast, cost-effective | ✅ Working |
+
+### 🎭 **Specialized Models**
+
+| Model ID (OpenAI Endpoint) | Provider | Speed | Use Case | Status |
+|----------------------------|----------|-------|----------|--------|
+| `claude-3-sonnet` | Anthropic | **Advanced** | Complex reasoning, analysis | ✅ Working |
+| `claude-3-haiku` | Anthropic | **Fast** | Quick responses, simple tasks | ✅ Working |
+| `gemini-1.5-flash-002` | Google | **2.2s avg** | Multimodal, fast processing | ✅ Working |
+
+### 🌐 **OpenRouter/Cerebras Models**
+
+| Model ID (OpenAI Endpoint) | Provider | Speed | Use Case | Status |
+|----------------------------|----------|-------|----------|--------|
+| `llama-3.3-70b-versatile-openrouter` | OpenRouter/Cerebras | **2-4x faster** | Ultra-fast inference | ✅ Working |
+| `qwen-3-32b-openrouter` | OpenRouter/Cerebras | **Ultra-fast** | Efficient reasoning | ✅ Working |
+
+### 🎯 **Model Selection Guide**
+
+**For Phone Applications (< 2s response):**
+- Primary: `llama-3.3-70b-specdec` (1,665 tok/s)
+- Backup: `llama-3.3-70b-versatile` (276 tok/s)
+
+**For General Chat:**
+- Primary: `llama-3.3-70b-versatile` (276 tok/s)
+- Backup: `gpt-4o-mini` (1.915s avg)
+
+**For Complex Analysis:**
+- Primary: `claude-3-sonnet` (advanced reasoning)
+- Backup: `gpt-4o` (2.789s avg)
+
+**For Cost Optimization:**
+- Primary: `deepseek-r1-distill-llama-70b` (0.825s avg)
+- Backup: `gpt-3.5-turbo` (1.016s avg)
+
+### 📡 **OpenAI API Compatibility**
+
+All models are accessible via standard OpenAI API format:
+
+```bash
+curl -X POST https://tiloresx-production.up.railway.app/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama-3.3-70b-specdec",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 100
+  }'
+```
+
+**Available Endpoints:**
+- `/v1/models` - List all available models
+- `/v1/chat/completions` - OpenAI-compatible chat completions
+- `/health` - Service health check
+- `/metrics` - Performance monitoring
 
 ---
 
