@@ -1,0 +1,44 @@
+# Exclude large files and directories from Docker build
+.env
+.env.*
+__pycache__/
+*.py[cod]
+*$py.class
+.coverage
+htmlcov/
+.pytest_cache/
+venv/
+.venv/
+ENV/
+env/
+.DS_Store
+.git/
+.github/
+.claude/
+.githooks/
+*.log
+logs/
+tmp/
+temp/
+.tmp/
+
+# Railway specific
+railway.tar.gz
+railway.toml
+railway_setup.sh
+railway_setup_env.sh
+
+# Testing artifacts
+tests/
+memory-bank/
+deprecation-report.md
+CLAUDE.md
+tilores_X.code-workspace
+
+# Keep only production files
+!requirements.txt
+!nixpacks.toml
+!railway.json
+!Procfile
+!*.py
+!utils/
