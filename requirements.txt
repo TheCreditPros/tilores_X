@@ -29,3 +29,6 @@ fastapi-sse>=1.1.0  # Server-Sent Events for streaming
 # Redis Caching for Performance (Phase VI)
 redis>=5.0.0
 hiredis>=2.0.0  # High-performance Redis parser
+
+# Rate Limiting (Phase VIII)
+slowapi>=0.1.9
