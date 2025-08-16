@@ -128,11 +128,16 @@ python test_simplified_runner.py
 
 | Model ID (OpenAI Endpoint) | Provider | Speed | Use Case | Status |
 |----------------------------|----------|-------|----------|--------|
-| `llama-3.3-70b-specdec` | Groq | **1,665 tok/s** | Real-time chat, phone apps | ✅ Working |
-| `llama-3.3-70b-versatile` | Groq | **276 tok/s** | General purpose, fast responses | ✅ Working |
-| `mixtral-8x7b-32768` | Groq | **500+ tok/s** | Large context, fast processing | ✅ Working |
-| `deepseek-r1-distill-llama-70b` | Groq | **0.825s avg** | Cost-effective reasoning | ✅ Working |
-| `llama-3.2-90b-text-preview` | Groq | **330 tok/s** | Large parameter model | ✅ Working |
+| `llama-3.3-70b-versatile` | Groq | **~600ms avg** | General purpose, fast responses | ✅ Working |
+| `deepseek-r1-distill-llama-70b` | Groq | **~3.5s avg** | Cost-effective reasoning | ✅ Working |
+
+### ⚠️ **Recently Deprecated Models**
+
+| Model ID (OpenAI Endpoint) | Provider | Previous Speed | Status | Replacement |
+|----------------------------|----------|----------------|--------|-------------|
+| `llama-3.3-70b-specdec` | Groq | 1,665 tok/s | ❌ **DEPRECATED** | Use `llama-3.3-70b-versatile` |
+| `mixtral-8x7b-32768` | Groq | 500+ tok/s | ❌ **DEPRECATED** | Use `llama-3.3-70b-versatile` |
+| `llama-3.2-90b-text-preview` | Groq | 330 tok/s | ❌ **DEPRECATED** | Use `deepseek-r1-distill-llama-70b` |
 
 ### 🧠 **High-Quality Models**
 
@@ -162,19 +167,19 @@ python test_simplified_runner.py
 ### 🎯 **Model Selection Guide**
 
 **For Phone Applications (< 2s response):**
-- Primary: `llama-3.3-70b-specdec` (1,665 tok/s)
-- Backup: `llama-3.3-70b-versatile` (276 tok/s)
+- Primary: `llama-3.3-70b-versatile` (~600ms avg)
+- Backup: `gpt-4o-mini` (1.915s avg)
 
 **For General Chat:**
-- Primary: `llama-3.3-70b-versatile` (276 tok/s)
-- Backup: `gpt-4o-mini` (1.915s avg)
+- Primary: `llama-3.3-70b-versatile` (~600ms avg)
+- Backup: `gpt-3.5-turbo` (1.016s avg)
 
 **For Complex Analysis:**
 - Primary: `claude-3-sonnet` (advanced reasoning)
 - Backup: `gpt-4o` (2.789s avg)
 
 **For Cost Optimization:**
-- Primary: `deepseek-r1-distill-llama-70b` (0.825s avg)
+- Primary: `deepseek-r1-distill-llama-70b` (~3.5s avg)
 - Backup: `gpt-3.5-turbo` (1.016s avg)
 
 ### 📡 **OpenAI API Compatibility**
@@ -185,7 +190,7 @@ All models are accessible via standard OpenAI API format:
 curl -X POST https://tiloresx-production.up.railway.app/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "llama-3.3-70b-specdec",
+    "model": "llama-3.3-70b-versatile",
     "messages": [{"role": "user", "content": "Hello"}],
     "max_tokens": 100
   }'
