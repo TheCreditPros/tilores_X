@@ -34,11 +34,3 @@ memory-bank/
 deprecation-report.md
 CLAUDE.md
 tilores_X.code-workspace
-
-# Keep only production files
-!requirements.txt
-!nixpacks.toml
-!railway.json
-!Procfile
-!*.py
-!utils/
