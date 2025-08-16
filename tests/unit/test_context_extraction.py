@@ -6,11 +6,7 @@ Tests advanced customer context extraction utilities
 from unittest.mock import patch
 
 # Import the module under test
-from utils.context_extraction import (
-    IDPatterns,
-    extract_customer_context_from_messages,
-    parse_customer_query
-)
+from utils.context_extraction import IDPatterns, extract_customer_context_from_messages, parse_customer_query
 
 
 class TestIDPatterns:
@@ -131,7 +127,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting context when no identifiers present."""
         messages = [
             {"role": "user", "content": "Hello, how are you?"},
-            {"role": "assistant", "content": "I'm fine, thank you!"}
+            {"role": "assistant", "content": "I'm fine, thank you!"},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result == {}
@@ -140,7 +136,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting client ID from user messages."""
         messages = [
             {"role": "user", "content": "Help me with client 1881899"},
-            {"role": "assistant", "content": "I'll help you with that client."}
+            {"role": "assistant", "content": "I'll help you with that client."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["client_id"] == "1881899"
@@ -149,7 +145,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting client ID from assistant responses."""
         messages = [
             {"role": "user", "content": "Find my customer"},
-            {"role": "assistant", "content": "Found customer_id: 1881899 in system"}
+            {"role": "assistant", "content": "Found customer_id: 1881899 in system"},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["client_id"] == "1881899"
@@ -158,7 +154,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting email from messages."""
         messages = [
             {"role": "user", "content": "Look up john.doe@example.com"},
-            {"role": "assistant", "content": "I'll search for that email."}
+            {"role": "assistant", "content": "I'll search for that email."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["email"] == "john.doe@example.com"
@@ -167,7 +163,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting Salesforce Contact ID."""
         messages = [
             {"role": "user", "content": "Find contact 003Ux00004c99SQ"},
-            {"role": "assistant", "content": "Searching for that contact."}
+            {"role": "assistant", "content": "Searching for that contact."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["customer_id"] == "003Ux00004c99SQ"
@@ -176,7 +172,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting phone number."""
         messages = [
             {"role": "user", "content": "Customer with phone (555) 123-4567"},
-            {"role": "assistant", "content": "I'll find that customer."}
+            {"role": "assistant", "content": "I'll find that customer."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["phone"] == "15551234567"
@@ -185,7 +181,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting customer names."""
         messages = [
             {"role": "user", "content": "Find customer John Smith"},
-            {"role": "assistant", "content": "Searching for John Smith."}
+            {"role": "assistant", "content": "Searching for John Smith."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["first_name"] == "John"
@@ -215,7 +211,7 @@ class TestExtractCustomerContextFromMessages:
         """Test extracting multiple types of identifiers."""
         messages = [
             {"role": "user", "content": "Find client 1881899 with email john@example.com"},
-            {"role": "assistant", "content": "I found the customer."}
+            {"role": "assistant", "content": "I found the customer."},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["client_id"] == "1881899"
@@ -225,7 +221,7 @@ class TestExtractCustomerContextFromMessages:
         """Test that extraction respects priority order (most recent first)."""
         messages = [
             {"role": "user", "content": "Old client 1111111"},
-            {"role": "user", "content": "Current client 1881899"}
+            {"role": "user", "content": "Current client 1881899"},
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["client_id"] == "1881899"  # Most recent
@@ -234,7 +230,7 @@ class TestExtractCustomerContextFromMessages:
         """Test processing in reverse order (most recent first)."""
         messages = [
             {"role": "user", "content": "client 1881899 with email john@example.com"},
-            {"role": "user", "content": "Another client 9999999"}  # More recent, processed first
+            {"role": "user", "content": "Another client 9999999"},  # More recent, processed first
         ]
         result = extract_customer_context_from_messages(messages)
         # Since processing in reverse order, the more recent client ID is found first
@@ -246,7 +242,7 @@ class TestExtractCustomerContextFromMessages:
         messages = [
             {"role": "user"},  # Missing content
             {"content": "No role here"},  # Missing role
-            {"role": "user", "content": "client 1881899"}  # Valid message
+            {"role": "user", "content": "client 1881899"},  # Valid message
         ]
         result = extract_customer_context_from_messages(messages)
         assert result["client_id"] == "1881899"
@@ -254,12 +250,9 @@ class TestExtractCustomerContextFromMessages:
     def test_extract_context_exception_handling(self):
         """Test exception handling in context extraction."""
         # Test with invalid message structure that might cause exceptions
-        invalid_messages = [
-            None,
-            {"role": "user", "content": "client 1881899"}
-        ]
+        invalid_messages = [None, {"role": "user", "content": "client 1881899"}]
 
-        with patch('builtins.print'):
+        with patch("builtins.print"):
             result = extract_customer_context_from_messages(invalid_messages)
             # Should handle gracefully and still extract from valid message
             assert result["client_id"] == "1881899"
@@ -412,7 +405,7 @@ class TestIntegration:
             {"role": "assistant", "content": "I can help. Can you provide customer details?"},
             {"role": "user", "content": "The customer is John Smith with email john.smith@company.com"},
             {"role": "assistant", "content": "Found customer_id: 1881899 for john.smith@company.com"},
-            {"role": "user", "content": "Great, what's their phone number?"}
+            {"role": "user", "content": "Great, what's their phone number?"},
         ]
 
         context = extract_customer_context_from_messages(messages)
@@ -431,7 +424,7 @@ class TestIntegration:
             "Search for 003Ux00004c99SQ",
             "Customer with phone 555-123-4567",
             "John Smith",  # Simple name without keywords
-            "Complex query with client 1881899 and email john@example.com"
+            "Complex query with client 1881899 and email john@example.com",
         ]
 
         results = [parse_customer_query(q) for q in queries]

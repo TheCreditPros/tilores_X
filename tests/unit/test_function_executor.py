@@ -6,11 +6,7 @@ Tests the function executor pattern for Tilores tool management
 from unittest.mock import MagicMock, patch
 
 # Import the module under test
-from utils.function_executor import (
-    FunctionResult,
-    TiloresFunctionExecutor,
-    initialize_function_executor
-)
+from utils.function_executor import FunctionResult, TiloresFunctionExecutor, initialize_function_executor
 
 
 class TestFunctionResult:
@@ -38,7 +34,7 @@ class TestFunctionResult:
             error=None,
             execution_time=1.5,
             function_name="test_function",
-            timestamp=test_timestamp
+            timestamp=test_timestamp,
         )
 
         assert result.success is True
@@ -50,7 +46,7 @@ class TestFunctionResult:
 
     def test_function_result_post_init_timestamp(self):
         """Test that __post_init__ sets timestamp when not provided."""
-        with patch('utils.function_executor.datetime') as mock_datetime:
+        with patch("utils.function_executor.datetime") as mock_datetime:
             mock_datetime.now.return_value.isoformat.return_value = "test-timestamp"
 
             result = FunctionResult(success=True)
@@ -69,11 +65,7 @@ class TestFunctionResult:
         """Test to_dict method for successful result."""
         test_data = {"result": "success"}
         result = FunctionResult(
-            success=True,
-            data=test_data,
-            execution_time=2.0,
-            function_name="test_func",
-            timestamp="2023-01-01T12:00:00"
+            success=True, data=test_data, execution_time=2.0, function_name="test_func", timestamp="2023-01-01T12:00:00"
         )
 
         dict_result = result.to_dict()
@@ -83,7 +75,7 @@ class TestFunctionResult:
             "execution_time": 2.0,
             "function_name": "test_func",
             "timestamp": "2023-01-01T12:00:00",
-            "data": test_data
+            "data": test_data,
         }
 
         assert dict_result == expected
@@ -95,7 +87,7 @@ class TestFunctionResult:
             error="Test error",
             execution_time=1.0,
             function_name="failed_func",
-            timestamp="2023-01-01T12:00:00"
+            timestamp="2023-01-01T12:00:00",
         )
 
         dict_result = result.to_dict()
@@ -105,7 +97,7 @@ class TestFunctionResult:
             "execution_time": 1.0,
             "function_name": "failed_func",
             "timestamp": "2023-01-01T12:00:00",
-            "error": "Test error"
+            "error": "Test error",
         }
 
         assert dict_result == expected
@@ -113,10 +105,7 @@ class TestFunctionResult:
     def test_function_result_to_dict_success_no_data(self):
         """Test to_dict method for successful result without data."""
         result = FunctionResult(
-            success=True,
-            execution_time=1.0,
-            function_name="test_func",
-            timestamp="2023-01-01T12:00:00"
+            success=True, execution_time=1.0, function_name="test_func", timestamp="2023-01-01T12:00:00"
         )
 
         dict_result = result.to_dict()
@@ -125,7 +114,7 @@ class TestFunctionResult:
             "success": True,
             "execution_time": 1.0,
             "function_name": "test_func",
-            "timestamp": "2023-01-01T12:00:00"
+            "timestamp": "2023-01-01T12:00:00",
         }
 
         assert dict_result == expected
@@ -134,10 +123,7 @@ class TestFunctionResult:
     def test_function_result_to_dict_error_no_message(self):
         """Test to_dict method for error result without error message."""
         result = FunctionResult(
-            success=False,
-            execution_time=1.0,
-            function_name="failed_func",
-            timestamp="2023-01-01T12:00:00"
+            success=False, execution_time=1.0, function_name="failed_func", timestamp="2023-01-01T12:00:00"
         )
 
         dict_result = result.to_dict()
@@ -146,7 +132,7 @@ class TestFunctionResult:
             "success": False,
             "execution_time": 1.0,
             "function_name": "failed_func",
-            "timestamp": "2023-01-01T12:00:00"
+            "timestamp": "2023-01-01T12:00:00",
         }
 
         assert dict_result == expected
@@ -162,7 +148,7 @@ class TestTiloresFunctionExecutor:
             "search": MagicMock(),
             "fetchEntity": MagicMock(),
             "creditReport": MagicMock(),
-            "fieldDiscovery": MagicMock()
+            "fieldDiscovery": MagicMock(),
         }
         self.mock_monitor = MagicMock()
 
@@ -182,7 +168,7 @@ class TestTiloresFunctionExecutor:
             "successful_executions": 0,
             "failed_executions": 0,
             "total_execution_time": 0.0,
-            "function_calls": {}
+            "function_calls": {},
         }
         assert executor.stats == expected_stats
 
@@ -313,9 +299,7 @@ class TestTiloresFunctionExecutor:
         assert result.success is False
 
         # Verify monitoring error handling
-        self.mock_monitor.end_timer.assert_called_once_with(
-            "timer-123", success=False, error="Test error"
-        )
+        self.mock_monitor.end_timer.assert_called_once_with("timer-123", success=False, error="Test error")
 
     def test_get_statistics(self):
         """Test getting execution statistics."""
@@ -363,7 +347,7 @@ class TestFunctionImplementations:
             "search": MagicMock(),
             "fetchEntity": MagicMock(),
             "creditReport": MagicMock(),
-            "fieldDiscovery": MagicMock()
+            "fieldDiscovery": MagicMock(),
         }
         self.executor = TiloresFunctionExecutor(self.mock_tools)
 
@@ -388,7 +372,7 @@ class TestFunctionImplementations:
         """Test comprehensive customer 360 search."""
         self.mock_tools["search"].run.return_value = {"customer": "data"}
 
-        with patch.object(self.executor, '_format_customer_360_response') as mock_format:
+        with patch.object(self.executor, "_format_customer_360_response") as mock_format:
             mock_format.return_value = {"formatted": "data"}
 
             result = self.executor._execute_search_customer_360(query="test query")
@@ -399,14 +383,9 @@ class TestFunctionImplementations:
 
     def test_execute_search_customer_batch(self):
         """Test batch customer search."""
-        self.mock_tools["search"].run.side_effect = [
-            {"result": "data1"},
-            {"result": "data2"}
-        ]
+        self.mock_tools["search"].run.side_effect = [{"result": "data1"}, {"result": "data2"}]
 
-        result = self.executor._execute_search_customer_batch(
-            queries=["query1", "query2"]
-        )
+        result = self.executor._execute_search_customer_batch(queries=["query1", "query2"])
 
         assert result["batch_results"] == [{"result": "data1"}, {"result": "data2"}]
         assert result["batch_size"] == 2
@@ -434,19 +413,12 @@ class TestFunctionImplementations:
 
     def test_execute_get_entity_relationships(self):
         """Test entity relationships function."""
-        entity_data = {
-            "entity": "data",
-            "relationships": [{"rel1": "data"}, {"rel2": "data"}]
-        }
+        entity_data = {"entity": "data", "relationships": [{"rel1": "data"}, {"rel2": "data"}]}
         self.mock_tools["fetchEntity"].run.return_value = entity_data
 
         result = self.executor._execute_get_entity_relationships(entity_id="123")
 
-        expected = {
-            "entity_id": "123",
-            "relationships": [{"rel1": "data"}, {"rel2": "data"}],
-            "related_count": 2
-        }
+        expected = {"entity_id": "123", "relationships": [{"rel1": "data"}, {"rel2": "data"}], "related_count": 2}
         assert result == expected
 
     def test_execute_get_entity_relationships_no_relationships(self):
@@ -455,11 +427,7 @@ class TestFunctionImplementations:
 
         result = self.executor._execute_get_entity_relationships(entity_id="123")
 
-        expected = {
-            "entity_id": "123",
-            "relationships": [],
-            "related_count": 0
-        }
+        expected = {"entity_id": "123", "relationships": [], "related_count": 0}
         assert result == expected
 
     def test_execute_get_credit_report(self):
@@ -478,12 +446,7 @@ class TestFunctionImplementations:
 
         result = self.executor._execute_analyze_credit_score(customer_id="456")
 
-        expected = {
-            "customer_id": "456",
-            "credit_score": 750,
-            "rating": "Very Good",
-            "risk_level": "Low Risk"
-        }
+        expected = {"customer_id": "456", "credit_score": 750, "rating": "Very Good", "risk_level": "Low Risk"}
         assert result == expected
 
     def test_execute_analyze_credit_score_no_score(self):
@@ -510,11 +473,7 @@ class TestFunctionImplementations:
 
         result = self.executor._execute_get_field_metadata(field_name="field1")
 
-        expected = {
-            "field_name": "field1",
-            "metadata": {"type": "string"},
-            "exists": True
-        }
+        expected = {"field_name": "field1", "metadata": {"type": "string"}, "exists": True}
         assert result == expected
 
     def test_execute_get_field_metadata_no_field(self):
@@ -524,11 +483,7 @@ class TestFunctionImplementations:
 
         result = self.executor._execute_get_field_metadata(field_name="nonexistent")
 
-        expected = {
-            "field_name": "nonexistent",
-            "metadata": {},
-            "exists": False
-        }
+        expected = {"field_name": "nonexistent", "metadata": {}, "exists": False}
         assert result == expected
 
     def test_execute_get_field_metadata_no_field_name(self):
@@ -562,9 +517,9 @@ class TestHelperMethods:
                 "name": "John Doe",
                 "email": "john@example.com",
                 "phone": "123-456-7890",
-                "status": "active"
+                "status": "active",
             },
-            "other_data": {"key": "value"}
+            "other_data": {"key": "value"},
         }
 
         result = self.executor._format_customer_360_response(data, "test query")
@@ -579,13 +534,7 @@ class TestHelperMethods:
 
     def test_format_customer_360_response_with_customer(self):
         """Test formatting data with customer information."""
-        data = {
-            "customer": {
-                "id": "456",
-                "name": "Jane Smith"
-            },
-            "transactions": [{"txn": "data"}]
-        }
+        data = {"customer": {"id": "456", "name": "Jane Smith"}, "transactions": [{"txn": "data"}]}
 
         result = self.executor._format_customer_360_response(data, "test query")
 
@@ -603,17 +552,14 @@ class TestHelperMethods:
 
     def test_create_llm_instruction_with_sections(self):
         """Test LLM instruction creation with data sections."""
-        data = {
-            "data_sections": {
-                "transactions": [],
-                "credit_info": {}
-            }
-        }
+        data = {"data_sections": {"transactions": [], "credit_info": {}}}
 
         instruction = self.executor._create_llm_instruction(data, "test query")
 
-        expected = ("To answer 'test query', reference the following data sections: "
-                   "transactions, credit_info. Provide specific details from the relevant sections.")
+        expected = (
+            "To answer 'test query', reference the following data sections: "
+            "transactions, credit_info. Provide specific details from the relevant sections."
+        )
         assert instruction == expected
 
     def test_get_credit_rating_excellent(self):
@@ -667,6 +613,7 @@ class TestGlobalFunctions:
 
         # Clear global state
         import utils.function_executor
+
         utils.function_executor.function_executor = None
 
         result = initialize_function_executor(mock_tools, mock_monitor)
@@ -678,6 +625,7 @@ class TestGlobalFunctions:
 
         # Check global state
         from utils.function_executor import function_executor as global_executor
+
         assert global_executor is result
 
     def test_initialize_function_executor_no_monitor(self):
@@ -686,6 +634,7 @@ class TestGlobalFunctions:
 
         # Clear global state
         import utils.function_executor
+
         utils.function_executor.function_executor = None
 
         result = initialize_function_executor(mock_tools)
@@ -700,10 +649,7 @@ class TestIntegration:
 
     def test_full_execution_workflow(self):
         """Test complete execution workflow with all components."""
-        mock_tools = {
-            "search": MagicMock(),
-            "creditReport": MagicMock()
-        }
+        mock_tools = {"search": MagicMock(), "creditReport": MagicMock()}
         mock_monitor = MagicMock()
 
         # Set up tool responses

@@ -14,8 +14,13 @@ class TiloresFieldDiscovery:
     """Comprehensive field discovery system with GraphQL introspection."""
 
     def __init__(self):
-        self.api_url = os.getenv("TILORES_API_URL") or "https://ly325mgfwk.execute-api.us-east-1.amazonaws.com"  # noqa E501
-        self.token_url = os.getenv("TILORES_TOKEN_URL") or "https://saas-swidepnf-tilores.auth.us-east-1.amazoncognito.com/oauth2/token"  # noqa E501
+        self.api_url = (
+            os.getenv("TILORES_API_URL") or "https://ly325mgfwk.execute-api.us-east-1.amazonaws.com"
+        )  # noqa E501
+        self.token_url = (
+            os.getenv("TILORES_TOKEN_URL")
+            or "https://saas-swidepnf-tilores.auth.us-east-1.amazoncognito.com/oauth2/token"
+        )  # noqa E501
         self.client_id = os.getenv("TILORES_CLIENT_ID")
         self.client_secret = os.getenv("TILORES_CLIENT_SECRET")
         self.access_token = None
@@ -35,8 +40,8 @@ class TiloresFieldDiscovery:
                     data={
                         "grant_type": "client_credentials",
                         "client_id": self.client_id,
-                        "client_secret": self.client_secret
-                    }
+                        "client_secret": self.client_secret,
+                    },
                 ) as response:
                     response.raise_for_status()
                     token_data = await response.json()
@@ -53,63 +58,164 @@ class TiloresFieldDiscovery:
         # Comprehensive field discovery based on known TLRS patterns
         field_categories = {
             "customer_fields": [
-                "FIRST_NAME", "LAST_NAME", "MIDDLE_NAME", "FULL_NAME",
-                "EMAIL", "EMAIL_SECONDARY", "PHONE_EXTERNAL", "PHONE_HOME",
-                "PHONE_WORK", "PHONE_MOBILE", "CLIENT_ID", "CUSTOMER_ID",
-                "MAILING_ADDRESS", "MAILING_CITY", "MAILING_STATE",
-                "MAILING_ZIP", "BILLING_ADDRESS", "BILLING_CITY",
-                "BILLING_STATE", "BILLING_ZIP", "DATE_OF_BIRTH", "AGE",
-                "GENDER", "MARITAL_STATUS", "SSN", "DRIVER_LICENSE"
+                "FIRST_NAME",
+                "LAST_NAME",
+                "MIDDLE_NAME",
+                "FULL_NAME",
+                "EMAIL",
+                "EMAIL_SECONDARY",
+                "PHONE_EXTERNAL",
+                "PHONE_HOME",
+                "PHONE_WORK",
+                "PHONE_MOBILE",
+                "CLIENT_ID",
+                "CUSTOMER_ID",
+                "MAILING_ADDRESS",
+                "MAILING_CITY",
+                "MAILING_STATE",
+                "MAILING_ZIP",
+                "BILLING_ADDRESS",
+                "BILLING_CITY",
+                "BILLING_STATE",
+                "BILLING_ZIP",
+                "DATE_OF_BIRTH",
+                "AGE",
+                "GENDER",
+                "MARITAL_STATUS",
+                "SSN",
+                "DRIVER_LICENSE",
             ],
             "credit_fields": [
-                "STARTING_CREDIT_SCORE", "CURRENT_CREDIT_SCORE", "FICO_SCORE",
-                "VANTAGE_SCORE", "CREDIT_KARMA_SCORE", "TRANSUNION_REPORT",
-                "EXPERIAN_REPORT", "EQUIFAX_REPORT", "CREDIT_UTILIZATION",
-                "PAYMENT_HISTORY", "CREDIT_AGE", "HARD_INQUIRIES",
-                "SOFT_INQUIRIES", "DEROGATORY_MARKS", "CREDIT_MIX",
-                "DEBT_TO_INCOME", "BANKRUPTCY", "FORECLOSURE", "CHARGE_OFFS",
-                "COLLECTIONS", "LATE_PAYMENTS", "CREDIT_LIMIT",
-                "AVAILABLE_CREDIT", "TOTAL_DEBT", "CREDIT_CARD_DEBT",
-                "MORTGAGE_BALANCE", "AUTO_LOAN_BALANCE", "STUDENT_LOAN_DEBT",
-                "PERSONAL_LOAN_DEBT", "CREDIT_MONITORING"
+                "STARTING_CREDIT_SCORE",
+                "CURRENT_CREDIT_SCORE",
+                "FICO_SCORE",
+                "VANTAGE_SCORE",
+                "CREDIT_KARMA_SCORE",
+                "TRANSUNION_REPORT",
+                "EXPERIAN_REPORT",
+                "EQUIFAX_REPORT",
+                "CREDIT_UTILIZATION",
+                "PAYMENT_HISTORY",
+                "CREDIT_AGE",
+                "HARD_INQUIRIES",
+                "SOFT_INQUIRIES",
+                "DEROGATORY_MARKS",
+                "CREDIT_MIX",
+                "DEBT_TO_INCOME",
+                "BANKRUPTCY",
+                "FORECLOSURE",
+                "CHARGE_OFFS",
+                "COLLECTIONS",
+                "LATE_PAYMENTS",
+                "CREDIT_LIMIT",
+                "AVAILABLE_CREDIT",
+                "TOTAL_DEBT",
+                "CREDIT_CARD_DEBT",
+                "MORTGAGE_BALANCE",
+                "AUTO_LOAN_BALANCE",
+                "STUDENT_LOAN_DEBT",
+                "PERSONAL_LOAN_DEBT",
+                "CREDIT_MONITORING",
             ],
             "product_fields": [
-                "PRODUCT_NAME", "PRODUCT_TYPE", "SERVICE_TYPE",
-                "ENROLLMENT_DATE", "START_DATE", "END_DATE", "STATUS",
-                "PLAN_TYPE", "PACKAGE_NAME", "SUBSCRIPTION_STATUS",
-                "RENEWAL_DATE", "CANCELLATION_DATE", "UPGRADE_DATE",
-                "DOWNGRADE_DATE", "FEATURE_ACCESS", "TIER_LEVEL"
+                "PRODUCT_NAME",
+                "PRODUCT_TYPE",
+                "SERVICE_TYPE",
+                "ENROLLMENT_DATE",
+                "START_DATE",
+                "END_DATE",
+                "STATUS",
+                "PLAN_TYPE",
+                "PACKAGE_NAME",
+                "SUBSCRIPTION_STATUS",
+                "RENEWAL_DATE",
+                "CANCELLATION_DATE",
+                "UPGRADE_DATE",
+                "DOWNGRADE_DATE",
+                "FEATURE_ACCESS",
+                "TIER_LEVEL",
             ],
             "interaction_fields": [
-                "CALL_STATUS", "CALL_DATE", "CALL_DURATION", "CALL_TYPE",
-                "CALL_OUTCOME", "AGENT_ID", "AGENT_NAME", "CALL_NOTES",
-                "EMAIL_SENT", "EMAIL_OPENED", "EMAIL_CLICKED", "SMS_SENT",
-                "SMS_DELIVERED", "CHAT_SESSION", "SUPPORT_TICKET",
-                "COMPLAINT_STATUS", "SATISFACTION_SCORE", "NPS_SCORE",
-                "COMMUNICATION_PREFERENCE", "CONTACT_FREQUENCY"
+                "CALL_STATUS",
+                "CALL_DATE",
+                "CALL_DURATION",
+                "CALL_TYPE",
+                "CALL_OUTCOME",
+                "AGENT_ID",
+                "AGENT_NAME",
+                "CALL_NOTES",
+                "EMAIL_SENT",
+                "EMAIL_OPENED",
+                "EMAIL_CLICKED",
+                "SMS_SENT",
+                "SMS_DELIVERED",
+                "CHAT_SESSION",
+                "SUPPORT_TICKET",
+                "COMPLAINT_STATUS",
+                "SATISFACTION_SCORE",
+                "NPS_SCORE",
+                "COMMUNICATION_PREFERENCE",
+                "CONTACT_FREQUENCY",
             ],
             "transaction_fields": [
-                "PAYMENT_AMOUNT", "PAYMENT_DATE", "PAYMENT_METHOD",
-                "PAYMENT_STATUS", "TRANSACTION_ID", "INVOICE_NUMBER",
-                "BILLING_CYCLE", "DUE_DATE", "LATE_FEE", "DISCOUNT_AMOUNT",
-                "TAX_AMOUNT", "TOTAL_AMOUNT", "REFUND_AMOUNT", "CHARGEBACK",
-                "PAYMENT_PROCESSOR", "CARD_TYPE", "BANK_ACCOUNT",
-                "AUTOPAY_STATUS", "PAYMENT_PLAN", "INSTALLMENT_NUMBER"
+                "PAYMENT_AMOUNT",
+                "PAYMENT_DATE",
+                "PAYMENT_METHOD",
+                "PAYMENT_STATUS",
+                "TRANSACTION_ID",
+                "INVOICE_NUMBER",
+                "BILLING_CYCLE",
+                "DUE_DATE",
+                "LATE_FEE",
+                "DISCOUNT_AMOUNT",
+                "TAX_AMOUNT",
+                "TOTAL_AMOUNT",
+                "REFUND_AMOUNT",
+                "CHARGEBACK",
+                "PAYMENT_PROCESSOR",
+                "CARD_TYPE",
+                "BANK_ACCOUNT",
+                "AUTOPAY_STATUS",
+                "PAYMENT_PLAN",
+                "INSTALLMENT_NUMBER",
             ],
             "relationship_fields": [
-                "SPOUSE_NAME", "SPOUSE_EMAIL", "SPOUSE_PHONE", "DEPENDENT_COUNT",
-                "FAMILY_MEMBERS", "BUSINESS_NAME", "BUSINESS_TYPE",
-                "EMPLOYER_NAME", "JOB_TITLE", "WORK_PHONE", "INCOME",
-                "EMPLOYMENT_STATUS", "YEARS_EMPLOYED", "REFERENCES",
-                "EMERGENCY_CONTACT", "AUTHORIZED_USERS"
+                "SPOUSE_NAME",
+                "SPOUSE_EMAIL",
+                "SPOUSE_PHONE",
+                "DEPENDENT_COUNT",
+                "FAMILY_MEMBERS",
+                "BUSINESS_NAME",
+                "BUSINESS_TYPE",
+                "EMPLOYER_NAME",
+                "JOB_TITLE",
+                "WORK_PHONE",
+                "INCOME",
+                "EMPLOYMENT_STATUS",
+                "YEARS_EMPLOYED",
+                "REFERENCES",
+                "EMERGENCY_CONTACT",
+                "AUTHORIZED_USERS",
             ],
             "system_fields": [
-                "RECORD_ID", "ENTITY_ID", "CREATED_DATE", "UPDATED_DATE",
-                "LAST_MODIFIED", "DATA_SOURCE", "RECORD_STATUS",
-                "VERIFICATION_STATUS", "CONFIDENCE_SCORE", "MATCH_SCORE",
-                "DUPLICATE_FLAG", "MERGED_RECORDS", "NOTES", "TAGS",
-                "ASSIGNMENT", "PRIORITY", "CATEGORY"
-            ]
+                "RECORD_ID",
+                "ENTITY_ID",
+                "CREATED_DATE",
+                "UPDATED_DATE",
+                "LAST_MODIFIED",
+                "DATA_SOURCE",
+                "RECORD_STATUS",
+                "VERIFICATION_STATUS",
+                "CONFIDENCE_SCORE",
+                "MATCH_SCORE",
+                "DUPLICATE_FLAG",
+                "MERGED_RECORDS",
+                "NOTES",
+                "TAGS",
+                "ASSIGNMENT",
+                "PRIORITY",
+                "CATEGORY",
+            ],
         }
 
         self._field_cache = field_categories
@@ -119,11 +225,7 @@ class TiloresFieldDiscovery:
         """Get comprehensive field discovery statistics."""
         all_fields = await self.discover_all_fields()
 
-        stats = {
-            "total_fields_discovered": 0,
-            "field_categories": {},
-            "discovery_status": "✅ Complete"
-        }
+        stats = {"total_fields_discovered": 0, "field_categories": {}, "discovery_status": "✅ Complete"}
 
         for category, fields in all_fields.items():
             stats["field_categories"][category] = len(fields)
@@ -161,8 +263,8 @@ async def discover_tilores_fields(category: str = "all") -> str:
             response.append(f"📊 Total Fields: {stats['total_fields_discovered']}")
             response.append("")
 
-            for cat_name, field_count in stats['field_categories'].items():
-                cat_display = cat_name.replace('_', ' ').title()
+            for cat_name, field_count in stats["field_categories"].items():
+                cat_display = cat_name.replace("_", " ").title()
                 response.append(f"📁 {cat_display}: {field_count} fields")
 
             response.append("\n💡 Use specific categories for detailed field lists:")
@@ -184,7 +286,7 @@ async def discover_tilores_fields(category: str = "all") -> str:
                 "interaction": "interaction_fields",
                 "transaction": "transaction_fields",
                 "relationship": "relationship_fields",
-                "system": "system_fields"
+                "system": "system_fields",
             }
 
             field_key = category_map.get(category.lower())
@@ -220,9 +322,9 @@ async def get_field_discovery_stats() -> str:
         response.append("")
 
         response.append("📁 CATEGORY BREAKDOWN:")
-        for category, count in stats['field_categories'].items():
-            category_display = category.replace('_', ' ').title()
-            percentage = (count / stats['total_fields_discovered']) * 100
+        for category, count in stats["field_categories"].items():
+            category_display = category.replace("_", " ").title()
+            percentage = (count / stats["total_fields_discovered"]) * 100
             response.append(f"• {category_display}: {count} fields ({percentage:.1f}%)")
 
         response.append("\n✅ CAPABILITIES:")

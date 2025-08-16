@@ -17,6 +17,7 @@ from fastapi.testclient import TestClient
 
 # Import the FastAPI app
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from main_openai_compatible import app
@@ -35,12 +36,7 @@ class TestLiveLLMProviders:
         cls.performance_metrics = {}
 
         # Validate required environment variables
-        required_env_vars = [
-            "OPENAI_API_KEY",
-            "ANTHROPIC_API_KEY",
-            "GROQ_API_KEY",
-            "TILORES_TOKEN"
-        ]
+        required_env_vars = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GROQ_API_KEY", "TILORES_TOKEN"]
 
         cls.missing_env_vars = []
         for var in required_env_vars:
@@ -54,12 +50,15 @@ class TestLiveLLMProviders:
         """Make a chat completion request and measure performance."""
         start_time = time.time()
 
-        response = self.client.post("/v1/chat/completions", json={
-            "model": model,
-            "messages": [{"role": "user", "content": message}],
-            "temperature": 0.1,  # Low temperature for consistent responses
-            "max_tokens": 1000
-        })
+        response = self.client.post(
+            "/v1/chat/completions",
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": message}],
+                "temperature": 0.1,  # Low temperature for consistent responses
+                "max_tokens": 1000,
+            },
+        )
 
         response_time = (time.time() - start_time) * 1000  # Convert to milliseconds
 
@@ -79,20 +78,16 @@ class TestLiveLLMProviders:
             "content": content,
             "response_time_ms": response_time,
             "model": model,
-            "tokens_used": data.get("usage", {}).get("total_tokens", 0)
+            "tokens_used": data.get("usage", {}).get("total_tokens", 0),
         }
 
-    @pytest.mark.parametrize("model", [
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-3.5-turbo"
-    ])
+    @pytest.mark.parametrize("model", ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"])
     def test_openai_models_general_query(self, model):
         """Test OpenAI models with general queries."""
         result = self.make_chat_request(
             model=model,
             message="What is the capital of France? Please provide a brief explanation.",
-            expected_min_length=30
+            expected_min_length=30,
         )
 
         # Validate response contains expected information
@@ -106,22 +101,18 @@ class TestLiveLLMProviders:
         self.performance_metrics[f"openai_{model}"] = result["response_time_ms"]
         self.test_results[f"openai_{model}_general"] = True
 
-    @pytest.mark.parametrize("model", [
-        "claude-3-5-sonnet-20241022",
-        "claude-3-haiku-20240307"
-    ])
+    @pytest.mark.parametrize("model", ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"])
     def test_anthropic_models_general_query(self, model):
         """Test Anthropic models with general queries."""
         result = self.make_chat_request(
-            model=model,
-            message="Explain the concept of machine learning in simple terms.",
-            expected_min_length=50
+            model=model, message="Explain the concept of machine learning in simple terms.", expected_min_length=50
         )
 
         # Validate response quality
         content = result["content"].lower()
-        assert any(term in content for term in ["machine learning", "algorithm", "data", "pattern"]), \
-            f"Response lacks ML concepts: {result['content']}"
+        assert any(
+            term in content for term in ["machine learning", "algorithm", "data", "pattern"]
+        ), f"Response lacks ML concepts: {result['content']}"
 
         # Performance validation - Anthropic should respond within 4 seconds
         assert result["response_time_ms"] < 4000, f"Anthropic {model} too slow: {result['response_time_ms']}ms"
@@ -130,22 +121,18 @@ class TestLiveLLMProviders:
         self.performance_metrics[f"anthropic_{model.split('-')[2]}"] = result["response_time_ms"]
         self.test_results[f"anthropic_{model}_general"] = True
 
-    @pytest.mark.parametrize("model", [
-        "llama-3.1-70b-versatile",
-        "llama-3.1-8b-instant"
-    ])
+    @pytest.mark.parametrize("model", ["llama-3.1-70b-versatile", "llama-3.1-8b-instant"])
     def test_groq_models_general_query(self, model):
         """Test Groq models with general queries."""
         result = self.make_chat_request(
-            model=model,
-            message="What are the benefits of renewable energy?",
-            expected_min_length=40
+            model=model, message="What are the benefits of renewable energy?", expected_min_length=40
         )
 
         # Validate response quality
         content = result["content"].lower()
-        assert any(term in content for term in ["renewable", "energy", "environment", "solar", "wind"]), \
-            f"Response lacks renewable energy concepts: {result['content']}"
+        assert any(
+            term in content for term in ["renewable", "energy", "environment", "solar", "wind"]
+        ), f"Response lacks renewable energy concepts: {result['content']}"
 
         # Performance validation - Groq should be very fast (under 2 seconds)
         assert result["response_time_ms"] < 2000, f"Groq {model} too slow: {result['response_time_ms']}ms"
@@ -162,7 +149,7 @@ class TestLiveLLMProviders:
         result = self.make_chat_request(
             model="gpt-4o-mini",  # Fast model for customer queries
             message=customer_query,
-            expected_min_length=80  # Expect detailed customer info
+            expected_min_length=80,  # Expect detailed customer info
         )
 
         content = result["content"].lower()
@@ -171,12 +158,12 @@ class TestLiveLLMProviders:
         expected_elements = ["dawn", "bruton", "1648647"]
         missing_elements = [elem for elem in expected_elements if elem not in content]
 
-        assert len(missing_elements) == 0, \
-            f"Missing customer elements {missing_elements} in response: {result['content']}"
+        assert (
+            len(missing_elements) == 0
+        ), f"Missing customer elements {missing_elements} in response: {result['content']}"
 
         # Performance validation for customer queries (should be under 6 seconds total)
-        assert result["response_time_ms"] < 6000, \
-            f"Customer query too slow: {result['response_time_ms']}ms"
+        assert result["response_time_ms"] < 6000, f"Customer query too slow: {result['response_time_ms']}ms"
 
         # Store customer query metrics
         self.performance_metrics["customer_query_response_time"] = result["response_time_ms"]
@@ -184,12 +171,15 @@ class TestLiveLLMProviders:
 
     def test_streaming_response_functionality(self):
         """Test streaming responses work correctly."""
-        response = self.client.post("/v1/chat/completions", json={
-            "model": "gpt-4o-mini",
-            "messages": [{"role": "user", "content": "Count from 1 to 5 with explanations"}],
-            "stream": True,
-            "max_tokens": 200
-        })
+        response = self.client.post(
+            "/v1/chat/completions",
+            json={
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": "Count from 1 to 5 with explanations"}],
+                "stream": True,
+                "max_tokens": 200,
+            },
+        )
 
         assert response.status_code == 200
 
@@ -232,31 +222,31 @@ class TestLiveLLMProviders:
         test_message = "This is a test message for token counting validation."
 
         for model in ["gpt-4o-mini", "claude-3-haiku-20240307"]:
-            result = self.make_chat_request(
-                model=model,
-                message=test_message,
-                expected_min_length=10
-            )
+            result = self.make_chat_request(model=model, message=test_message, expected_min_length=10)
 
             usage = result["response"]["usage"]
             assert usage["prompt_tokens"] > 0, f"No prompt tokens counted for {model}"
             assert usage["completion_tokens"] > 0, f"No completion tokens counted for {model}"
             assert usage["total_tokens"] > 0, f"No total tokens counted for {model}"
-            assert usage["total_tokens"] == usage["prompt_tokens"] + usage["completion_tokens"], \
-                f"Token math incorrect for {model}"
+            assert (
+                usage["total_tokens"] == usage["prompt_tokens"] + usage["completion_tokens"]
+            ), f"Token math incorrect for {model}"
 
         self.test_results["token_counting"] = True
 
     def test_error_handling_for_invalid_models(self):
         """Test error handling for invalid model requests."""
-        response = self.client.post("/v1/chat/completions", json={
-            "model": "invalid-model-name",
-            "messages": [{"role": "user", "content": "Test message"}]
-        })
+        response = self.client.post(
+            "/v1/chat/completions",
+            json={"model": "invalid-model-name", "messages": [{"role": "user", "content": "Test message"}]},
+        )
 
         # Should return an error but not crash
-        assert response.status_code in [400, 404, 422], \
-            f"Expected error status for invalid model, got {response.status_code}"
+        assert response.status_code in [
+            400,
+            404,
+            422,
+        ], f"Expected error status for invalid model, got {response.status_code}"
 
         self.test_results["error_handling"] = True
 
@@ -266,11 +256,7 @@ class TestLiveLLMProviders:
         import concurrent.futures
 
         def make_concurrent_request():
-            return self.make_chat_request(
-                model="gpt-4o-mini",
-                message="What is 2+2?",
-                expected_min_length=5
-            )
+            return self.make_chat_request(model="gpt-4o-mini", message="What is 2+2?", expected_min_length=5)
 
         start_time = time.time()
 

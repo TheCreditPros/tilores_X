@@ -10,8 +10,12 @@ import pytest
 from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 from main_enhanced import (
-    app, count_tokens, count_messages_tokens, generate_unique_id,
-    get_system_fingerprint, determine_finish_reason
+    app,
+    count_tokens,
+    count_messages_tokens,
+    generate_unique_id,
+    get_system_fingerprint,
+    determine_finish_reason,
 )
 
 
@@ -52,7 +56,7 @@ class TestTokenCountingUtilities:
     @pytest.mark.unit
     def test_count_tokens_with_exception(self):
         """Test token counting fallback when tiktoken throws exception."""
-        with patch('main_enhanced.tiktoken.get_encoding') as mock_get_encoding:
+        with patch("main_enhanced.tiktoken.get_encoding") as mock_get_encoding:
             mock_get_encoding.side_effect = Exception("Encoding error")
 
             token_count = count_tokens("test text", "gpt-4")
@@ -66,7 +70,7 @@ class TestTokenCountingUtilities:
         messages = [
             MagicMock(role="system", content="You are a helpful assistant."),
             MagicMock(role="user", content="Hello!"),
-            MagicMock(role="assistant", content="Hi there!")
+            MagicMock(role="assistant", content="Hi there!"),
         ]
 
         token_count = count_messages_tokens(messages, "gpt-4")
@@ -119,7 +123,7 @@ class TestTokenCountingUtilities:
         """Test finish reason determination for length limit."""
         content = "This is a very long response that exceeds the token limit."
 
-        with patch('main_enhanced.count_tokens') as mock_count:
+        with patch("main_enhanced.count_tokens") as mock_count:
             mock_count.return_value = 1500  # Exceeds limit
 
             reason = determine_finish_reason(content, max_tokens=1000)
@@ -142,7 +146,7 @@ class TestChatCompletionsEndpoint:
     @pytest.mark.unit
     def test_chat_completions_successful_response(self, test_client, sample_chat_request_dict):
         """Test successful chat completion request."""
-        with patch('main_enhanced.run_chain') as mock_run_chain:
+        with patch("main_enhanced.run_chain") as mock_run_chain:
             mock_run_chain.return_value = "Test response from LLM"
 
             response = test_client.post("/v1/chat/completions", json=sample_chat_request_dict)
@@ -160,13 +164,9 @@ class TestChatCompletionsEndpoint:
     @pytest.mark.unit
     def test_chat_completions_streaming_response(self, test_client):
         """Test streaming chat completion request."""
-        request_data = {
-            "model": "gpt-4o-mini",
-            "messages": [{"role": "user", "content": "Hello"}],
-            "stream": True
-        }
+        request_data = {"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Hello"}], "stream": True}
 
-        with patch('main_enhanced.run_chain') as mock_run_chain:
+        with patch("main_enhanced.run_chain") as mock_run_chain:
             mock_run_chain.return_value = "Streaming test response"
 
             response = test_client.post("/v1/chat/completions", json=request_data)
@@ -179,10 +179,7 @@ class TestChatCompletionsEndpoint:
     @pytest.mark.unit
     def test_chat_completions_complex_response_extraction(self, test_client):
         """Test extraction of content from complex LangChain response objects."""
-        request_data = {
-            "model": "gpt-4o-mini",
-            "messages": [{"role": "user", "content": "Test"}]
-        }
+        request_data = {"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Test"}]}
 
         # Test different response types
         test_cases = [
@@ -197,11 +194,11 @@ class TestChatCompletionsEndpoint:
             # Dict with nested message content
             {"message": {"content": "Nested dict content"}},
             # Complex object that should use fallback
-            MagicMock(spec=[])
+            MagicMock(spec=[]),
         ]
 
         for i, mock_response in enumerate(test_cases):
-            with patch('main_enhanced.run_chain') as mock_run_chain:
+            with patch("main_enhanced.run_chain") as mock_run_chain:
                 mock_run_chain.return_value = mock_response
 
                 response = test_client.post("/v1/chat/completions", json=request_data)
@@ -216,7 +213,7 @@ class TestChatCompletionsEndpoint:
     @pytest.mark.unit
     def test_chat_completions_error_handling(self, test_client, sample_chat_request_dict):
         """Test error handling in chat completions endpoint."""
-        with patch('main_enhanced.run_chain') as mock_run_chain:
+        with patch("main_enhanced.run_chain") as mock_run_chain:
             mock_run_chain.side_effect = Exception("LLM processing error")
 
             response = test_client.post("/v1/chat/completions", json=sample_chat_request_dict)
@@ -234,7 +231,7 @@ class TestChatCompletionsEndpoint:
         invalid_request = {
             "model": "gpt-4o-mini",
             # Missing required 'messages' field
-            "temperature": 0.7
+            "temperature": 0.7,
         }
 
         response = test_client.post("/v1/chat/completions", json=invalid_request)
@@ -244,8 +241,7 @@ class TestChatCompletionsEndpoint:
     @pytest.mark.unit
     def test_chat_completions_langsmith_integration(self, test_client, sample_chat_request_dict):
         """Test LangSmith observability integration."""
-        with patch('main_enhanced.run_chain') as mock_run_chain, \
-             patch('main_enhanced.engine') as mock_engine:
+        with patch("main_enhanced.run_chain") as mock_run_chain, patch("main_enhanced.engine") as mock_engine:
 
             # Mock LangSmith availability
             mock_engine.langsmith_client = MagicMock()
@@ -265,11 +261,11 @@ class TestChatCompletionsEndpoint:
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "Hello"},
                 {"role": "assistant", "content": "Hi there!"},
-                {"role": "user", "content": "How are you?"}
-            ]
+                {"role": "user", "content": "How are you?"},
+            ],
         }
 
-        with patch('main_enhanced.run_chain') as mock_run_chain:
+        with patch("main_enhanced.run_chain") as mock_run_chain:
             mock_run_chain.return_value = "I'm doing well, thank you!"
 
             response = test_client.post("/v1/chat/completions", json=request_data)
@@ -290,10 +286,10 @@ class TestModelsEndpoint:
         mock_models = [
             {"id": "gpt-4o-mini", "provider": "openai"},
             {"id": "claude-3-haiku", "provider": "anthropic"},
-            {"id": "llama-3.3-70b-versatile", "provider": "groq"}
+            {"id": "llama-3.3-70b-versatile", "provider": "groq"},
         ]
 
-        with patch('main_enhanced.get_available_models') as mock_get_models:
+        with patch("main_enhanced.get_available_models") as mock_get_models:
             mock_get_models.return_value = mock_models
 
             response = test_client.get("/v1/models")
@@ -314,7 +310,7 @@ class TestModelsEndpoint:
     @pytest.mark.unit
     def test_models_list_error_handling(self, test_client):
         """Test error handling in models endpoint."""
-        with patch('main_enhanced.get_available_models') as mock_get_models:
+        with patch("main_enhanced.get_available_models") as mock_get_models:
             mock_get_models.side_effect = Exception("Model discovery failed")
 
             response = test_client.get("/v1/models")
@@ -328,7 +324,7 @@ class TestModelsEndpoint:
     @pytest.mark.unit
     def test_models_list_empty_response(self, test_client):
         """Test models endpoint with empty model list."""
-        with patch('main_enhanced.get_available_models') as mock_get_models:
+        with patch("main_enhanced.get_available_models") as mock_get_models:
             mock_get_models.return_value = []
 
             response = test_client.get("/v1/models")
@@ -344,10 +340,10 @@ class TestModelsEndpoint:
         mock_models = [
             {"id": "model-z", "provider": "provider1"},
             {"id": "model-a", "provider": "provider2"},
-            {"id": "model-m", "provider": "provider3"}
+            {"id": "model-m", "provider": "provider3"},
         ]
 
-        with patch('main_enhanced.get_available_models') as mock_get_models:
+        with patch("main_enhanced.get_available_models") as mock_get_models:
             mock_get_models.return_value = mock_models
 
             response = test_client.get("/v1/models")
@@ -377,12 +373,9 @@ class TestHealthAndInfoEndpoints:
     @pytest.mark.unit
     def test_root_endpoint(self, test_client):
         """Test root information endpoint."""
-        mock_models = [
-            {"id": "gpt-4o-mini", "provider": "openai"},
-            {"id": "claude-3-haiku", "provider": "anthropic"}
-        ]
+        mock_models = [{"id": "gpt-4o-mini", "provider": "openai"}, {"id": "claude-3-haiku", "provider": "anthropic"}]
 
-        with patch('main_enhanced.get_available_models') as mock_get_models:
+        with patch("main_enhanced.get_available_models") as mock_get_models:
             mock_get_models.return_value = mock_models
 
             response = test_client.get("/")
@@ -496,6 +489,7 @@ class TestApplicationInitialization:
         # Engine initialization happens at module import time,
         # so we test that the initialize_engine function exists and is callable
         from main_enhanced import initialize_engine
+
         assert callable(initialize_engine)
 
         # Test that we can call it without errors

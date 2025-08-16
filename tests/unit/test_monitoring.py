@@ -46,7 +46,7 @@ class TestTimerFunctionality:
         """Test starting a timer with basic parameters."""
         monitor_instance = TiloresMonitor()
 
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
         assert timer_id == "test_operation_1000000"
@@ -60,7 +60,7 @@ class TestTimerFunctionality:
         monitor_instance = TiloresMonitor()
         metadata = {"user_id": "123", "query": "test query"}
 
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation", metadata)
 
         assert monitor_instance.active_timers[timer_id]["metadata"] == metadata
@@ -70,11 +70,11 @@ class TestTimerFunctionality:
         monitor_instance = TiloresMonitor()
 
         # Start timer
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
         # End timer
-        with patch('time.time', return_value=1001.5):
+        with patch("time.time", return_value=1001.5):
             duration = monitor_instance.end_timer(timer_id, success=True)
 
         assert duration == 1.5
@@ -93,11 +93,11 @@ class TestTimerFunctionality:
         monitor_instance = TiloresMonitor()
 
         # Start timer
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
         # End timer with error
-        with patch('time.time', return_value=1001.0):
+        with patch("time.time", return_value=1001.0):
             duration = monitor_instance.end_timer(timer_id, success=False, error="Test error")
 
         assert duration == 1.0
@@ -111,14 +111,14 @@ class TestTimerFunctionality:
         """Test ending a timer that doesn't exist."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance.logger, 'warning') as mock_warning:
+        with patch.object(monitor_instance.logger, "warning") as mock_warning:
             duration = monitor_instance.end_timer("nonexistent_timer")
 
         assert duration == 0.0
         mock_warning.assert_called_once_with("Timer nonexistent_timer not found")
 
-    @patch('monitoring.cache_manager')
-    @patch('monitoring.CACHE_AVAILABLE', True)
+    @patch("monitoring.cache_manager")
+    @patch("monitoring.CACHE_AVAILABLE", True)
     def test_end_timer_with_redis_storage(self, mock_cache_manager):
         """Test ending a timer with Redis storage enabled."""
         monitor_instance = TiloresMonitor()
@@ -126,11 +126,11 @@ class TestTimerFunctionality:
         mock_cache_manager.redis_client = mock_redis
 
         # Start and end timer
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
-        with patch('time.time', return_value=1001.0):
-            with patch('monitoring.datetime') as mock_datetime:
+        with patch("time.time", return_value=1001.0):
+            with patch("monitoring.datetime") as mock_datetime:
                 mock_datetime.now.return_value.strftime.return_value = "20240101"
                 monitor_instance.end_timer(timer_id, success=True)
 
@@ -140,8 +140,8 @@ class TestTimerFunctionality:
         mock_redis.hincrbyfloat.assert_called_once_with(expected_key, "total_time", 1.0)
         mock_redis.expire.assert_called_once_with(expected_key, 86400 * 7)
 
-    @patch('monitoring.cache_manager')
-    @patch('monitoring.CACHE_AVAILABLE', True)
+    @patch("monitoring.cache_manager")
+    @patch("monitoring.CACHE_AVAILABLE", True)
     def test_end_timer_redis_error_handling(self, mock_cache_manager):
         """Test Redis error handling during timer end."""
         monitor_instance = TiloresMonitor()
@@ -149,11 +149,11 @@ class TestTimerFunctionality:
         mock_redis.hincrby.side_effect = Exception("Redis error")
         mock_cache_manager.redis_client = mock_redis
 
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
-        with patch('time.time', return_value=1001.0):
-            with patch.object(monitor_instance.logger, 'debug') as mock_debug:
+        with patch("time.time", return_value=1001.0):
+            with patch.object(monitor_instance.logger, "debug") as mock_debug:
                 monitor_instance.end_timer(timer_id)
 
         mock_debug.assert_called_once_with("Could not store metrics in Redis: Redis error")
@@ -166,13 +166,7 @@ class TestAPICallTracking:
         """Test tracking a successful API call."""
         monitor_instance = TiloresMonitor()
 
-        monitor_instance.track_api_call(
-            "search_customer",
-            1.23,
-            True,
-            provider="openai",
-            user_id="123"
-        )
+        monitor_instance.track_api_call("search_customer", 1.23, True, provider="openai", user_id="123")
 
         assert monitor_instance.request_counts["search_customer"] == 1
         assert monitor_instance.provider_usage["openai"] == 1
@@ -190,12 +184,7 @@ class TestAPICallTracking:
         """Test tracking a failed API call."""
         monitor_instance = TiloresMonitor()
 
-        monitor_instance.track_api_call(
-            "search_customer",
-            2.45,
-            False,
-            error="Connection timeout"
-        )
+        monitor_instance.track_api_call("search_customer", 2.45, False, error="Connection timeout")
 
         assert monitor_instance.request_counts["search_customer"] == 1
         assert len(monitor_instance.api_calls) == 1
@@ -241,12 +230,8 @@ class TestErrorRecording:
         monitor_instance = TiloresMonitor()
         context = {"user_id": "123", "query": "test query", "attempt": 2}
 
-        with patch.object(monitor_instance.logger, 'error') as mock_error:
-            monitor_instance.record_error(
-                "search_customer",
-                "API rate limit exceeded",
-                context
-            )
+        with patch.object(monitor_instance.logger, "error") as mock_error:
+            monitor_instance.record_error("search_customer", "API rate limit exceeded", context)
 
         assert len(monitor_instance.error_log) == 1
         error_entry = monitor_instance.error_log[0]
@@ -255,7 +240,7 @@ class TestErrorRecording:
         # Check logging calls
         expected_calls = [
             call("❌ search_customer error: API rate limit exceeded"),
-            call(f"Context: {json.dumps(context, indent=2)}")
+            call(f"Context: {json.dumps(context, indent=2)}"),
         ]
         mock_error.assert_has_calls(expected_calls)
 
@@ -267,11 +252,7 @@ class TestFieldCoverageTracking:
         """Test basic field coverage tracking."""
         monitor_instance = TiloresMonitor()
 
-        result_data = {
-            "name": "John Doe",
-            "email": "john@example.com",
-            "phone": "555-1234"
-        }
+        result_data = {"name": "John Doe", "email": "john@example.com", "phone": "555-1234"}
 
         monitor_instance.track_field_coverage(result_data)
 
@@ -324,7 +305,7 @@ class TestTiloresConnectivity:
         monitor_instance = TiloresMonitor()
 
         # Mock the import and engine within the function
-        with patch('builtins.__import__') as mock_import:
+        with patch("builtins.__import__") as mock_import:
             mock_core_app = MagicMock()
             mock_engine = MagicMock()
             mock_tilores = MagicMock()
@@ -345,7 +326,7 @@ class TestTiloresConnectivity:
         """Test Tilores connectivity when engine is None."""
         monitor_instance = TiloresMonitor()
 
-        with patch('builtins.__import__') as mock_import:
+        with patch("builtins.__import__") as mock_import:
             mock_core_app = MagicMock()
             mock_core_app.engine = None
             mock_import.return_value = mock_core_app
@@ -359,7 +340,7 @@ class TestTiloresConnectivity:
         """Test Tilores connectivity when tilores is None."""
         monitor_instance = TiloresMonitor()
 
-        with patch('builtins.__import__') as mock_import:
+        with patch("builtins.__import__") as mock_import:
             mock_core_app = MagicMock()
             mock_engine = MagicMock()
             mock_engine.tilores = None
@@ -374,7 +355,7 @@ class TestTiloresConnectivity:
         """Test Tilores connectivity when import fails."""
         monitor_instance = TiloresMonitor()
 
-        with patch('builtins.__import__', side_effect=ImportError("Module not found")):
+        with patch("builtins.__import__", side_effect=ImportError("Module not found")):
             result = monitor_instance.track_tilores_connectivity()
 
         assert result["status"] == "error"
@@ -384,7 +365,7 @@ class TestTiloresConnectivity:
         """Test Tilores connectivity with unknown API URL."""
         monitor_instance = TiloresMonitor()
 
-        with patch('builtins.__import__') as mock_import:
+        with patch("builtins.__import__") as mock_import:
             mock_core_app = MagicMock()
             mock_engine = MagicMock()
             mock_tilores = MagicMock()
@@ -409,16 +390,12 @@ class TestMetricsGeneration:
         monitor_instance = TiloresMonitor()
 
         # Add some test data
-        monitor_instance.api_calls.append({
-            "operation": "test_op",
-            "success": True,
-            "duration": 1.0
-        })
+        monitor_instance.api_calls.append({"operation": "test_op", "success": True, "duration": 1.0})
         monitor_instance.performance_metrics["test_op"] = [1.0, 1.5, 0.8]
         monitor_instance.request_counts["search"] = 5
         monitor_instance.provider_usage["openai"] = 3
 
-        with patch.object(monitor_instance, 'track_tilores_connectivity') as mock_connectivity:
+        with patch.object(monitor_instance, "track_tilores_connectivity") as mock_connectivity:
             mock_connectivity.return_value = {"status": "connected"}
             metrics = monitor_instance.get_metrics()
 
@@ -440,7 +417,7 @@ class TestMetricsGeneration:
         """Test getting metrics with no data."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance, 'track_tilores_connectivity') as mock_connectivity:
+        with patch.object(monitor_instance, "track_tilores_connectivity") as mock_connectivity:
             mock_connectivity.return_value = {"status": "disconnected"}
             metrics = monitor_instance.get_metrics()
 
@@ -458,7 +435,7 @@ class TestMetricsGeneration:
         monitor_instance.field_coverage_stats["total_calls"] = 5
         monitor_instance.field_coverage_stats["total_fields"] = 15
 
-        with patch.object(monitor_instance, 'track_tilores_connectivity'):
+        with patch.object(monitor_instance, "track_tilores_connectivity"):
             metrics = monitor_instance.get_metrics()
 
         assert metrics["field_coverage"]["avg_fields_per_call"] == 3.0
@@ -471,7 +448,7 @@ class TestMetricsGeneration:
         for success in [True, True, False, True, False]:
             monitor_instance.api_calls.append({"success": success})
 
-        with patch.object(monitor_instance, 'track_tilores_connectivity'):
+        with patch.object(monitor_instance, "track_tilores_connectivity"):
             metrics = monitor_instance.get_metrics()
 
         assert metrics["success_rate"] == "60.00%"  # 3 out of 5 successful
@@ -485,14 +462,14 @@ class TestHealthStatus:
         monitor_instance = TiloresMonitor()
 
         # Mock healthy metrics
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "98.50%",
                 "tilores_connectivity": {"status": "connected"},
                 "recent_errors": [{"error": "minor issue"}],
                 "total_requests": 100,
                 "uptime_formatted": "2:30:45",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -508,14 +485,14 @@ class TestHealthStatus:
         """Test health status with degraded success rate."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "85.00%",
                 "tilores_connectivity": {"status": "connected"},
                 "recent_errors": [],
                 "total_requests": 100,
                 "uptime_formatted": "1:00:00",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -527,14 +504,14 @@ class TestHealthStatus:
         """Test health status with very low success rate."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "75.00%",
                 "tilores_connectivity": {"status": "connected"},
                 "recent_errors": [],
                 "total_requests": 100,
                 "uptime_formatted": "1:00:00",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -546,14 +523,14 @@ class TestHealthStatus:
         """Test health status when Tilores is disconnected."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "98.00%",
                 "tilores_connectivity": {"status": "disconnected"},
                 "recent_errors": [],
                 "total_requests": 100,
                 "uptime_formatted": "1:00:00",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -567,14 +544,14 @@ class TestHealthStatus:
 
         recent_errors = [{"error": f"Error {i}"} for i in range(8)]
 
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "98.00%",
                 "tilores_connectivity": {"status": "connected"},
                 "recent_errors": recent_errors,
                 "total_requests": 100,
                 "uptime_formatted": "1:00:00",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -586,14 +563,14 @@ class TestHealthStatus:
         """Test health status with multiple issues."""
         monitor_instance = TiloresMonitor()
 
-        with patch.object(monitor_instance, 'get_metrics') as mock_metrics:
+        with patch.object(monitor_instance, "get_metrics") as mock_metrics:
             mock_metrics.return_value = {
                 "success_rate": "70.00%",
                 "tilores_connectivity": {"status": "error"},
                 "recent_errors": [{"error": f"Error {i}"} for i in range(6)],
                 "total_requests": 100,
                 "uptime_formatted": "1:00:00",
-                "timestamp": "2024-01-01T12:00:00"
+                "timestamp": "2024-01-01T12:00:00",
             }
 
             health = monitor_instance.get_health_status()
@@ -615,15 +592,15 @@ class TestGlobalMonitorInstance:
 class TestCacheIntegration:
     """Test cache availability scenarios."""
 
-    @patch('monitoring.CACHE_AVAILABLE', False)
+    @patch("monitoring.CACHE_AVAILABLE", False)
     def test_end_timer_no_cache_available(self):
         """Test timer end when cache is not available."""
         monitor_instance = TiloresMonitor()
 
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             timer_id = monitor_instance.start_timer("test_operation")
 
-        with patch('time.time', return_value=1001.0):
+        with patch("time.time", return_value=1001.0):
             # Should not raise any errors when cache not available
             duration = monitor_instance.end_timer(timer_id)
 

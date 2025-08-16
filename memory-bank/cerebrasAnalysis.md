@@ -125,7 +125,7 @@ class CerebrasProvider:
     def __init__(self):
         self.api_url = "https://api.cerebras.ai/v1/chat/completions"
         self.headers = {"Authorization": f"Bearer {CEREBRAS_API_KEY}"}
-    
+
     async def generate(self, prompt, model="llama-4-scout"):
         # Custom implementation needed
         pass

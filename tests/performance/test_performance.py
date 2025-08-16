@@ -27,7 +27,7 @@ class TestResponseTimes:
             "openai": {
                 "choices": [{"message": {"content": "Test response", "role": "assistant"}}],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-                "model": "gpt-3.5-turbo"
+                "model": "gpt-3.5-turbo",
             }
         }
 
@@ -55,7 +55,7 @@ class TestResponseTimes:
         assert response.status_code == 200
         assert response_time < 200, f"Models endpoint took {response_time:.2f}ms, expected < 200ms"
 
-    @patch('core_app.run_chain')
+    @patch("core_app.run_chain")
     def test_chat_completion_response_time(self, mock_run_chain):
         """Test chat completion response time is under 2000ms."""
         mock_run_chain.return_value = "Test response from LLM"
@@ -63,7 +63,7 @@ class TestResponseTimes:
         request_data = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "Hello, how are you?"}],
-            "max_tokens": 100
+            "max_tokens": 100,
         }
 
         start_time = time.time()
@@ -86,7 +86,7 @@ class TestLoadTesting:
         self.mock_response = {
             "choices": [{"message": {"content": "Load test response", "role": "assistant"}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
         }
 
     def test_concurrent_requests_performance(self):
@@ -117,7 +117,7 @@ class TestLoadTesting:
         # Total time should be efficient (less than sequential execution)
         assert total_time < 2000, f"Total time {total_time:.2f}ms too high for concurrent requests"
 
-    @patch('core_app.run_chain')
+    @patch("core_app.run_chain")
     def test_sustained_load_performance(self, mock_run_chain):
         """Test system maintains performance under sustained load."""
         mock_run_chain.return_value = "Load test response"
@@ -125,7 +125,7 @@ class TestLoadTesting:
         request_data = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "Load test message"}],
-            "max_tokens": 50
+            "max_tokens": 50,
         }
 
         response_times = []
@@ -161,12 +161,12 @@ class TestCachePerformance:
         self.mock_response = {
             "choices": [{"message": {"content": "Cached response", "role": "assistant"}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
         }
 
-    @patch('core_app.run_chain')
-    @patch('redis_cache.RedisCacheManager.get_llm_response')
-    @patch('redis_cache.RedisCacheManager.set_llm_response')
+    @patch("core_app.run_chain")
+    @patch("redis_cache.RedisCacheManager.get_llm_response")
+    @patch("redis_cache.RedisCacheManager.set_llm_response")
     def test_cache_hit_performance_improvement(self, mock_cache_set, mock_cache_get, mock_run_chain):
         """Test cache hits provide significant performance improvement."""
         mock_run_chain.return_value = "Cached response"
@@ -174,7 +174,7 @@ class TestCachePerformance:
         request_data = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "Performance test message"}],
-            "max_tokens": 50
+            "max_tokens": 50,
         }
 
         # First request (cache miss)
@@ -197,7 +197,7 @@ class TestCachePerformance:
 
         # Cache hit should be significantly faster (at least 50% improvement)
         if response1.status_code == 200 and response2.status_code == 200:
-            improvement_ratio = cache_miss_time / cache_hit_time if cache_hit_time > 0 else float('inf')
+            improvement_ratio = cache_miss_time / cache_hit_time if cache_hit_time > 0 else float("inf")
             assert improvement_ratio > 1.5, f"Cache only improved performance by {improvement_ratio:.2f}x"
 
 
@@ -212,7 +212,7 @@ class TestResourceUtilization:
         self.mock_response = {
             "choices": [{"message": {"content": "Resource test", "role": "assistant"}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
         }
 
     def test_memory_usage_efficiency(self):
@@ -233,7 +233,7 @@ class TestResourceUtilization:
         # Memory increase should be reasonable (less than 50MB for 50 requests)
         assert memory_increase < 50, f"Memory increased by {memory_increase:.2f}MB, expected < 50MB"
 
-    @patch('core_app.run_chain')
+    @patch("core_app.run_chain")
     def test_cpu_usage_efficiency(self, mock_run_chain):
         """Test CPU usage remains reasonable under load."""
         mock_run_chain.return_value = "CPU test response"
@@ -241,7 +241,7 @@ class TestResourceUtilization:
         request_data = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "CPU test message"}],
-            "max_tokens": 50
+            "max_tokens": 50,
         }
 
         # Monitor CPU usage during requests
@@ -272,16 +272,16 @@ class TestProviderFailoverPerformance:
         self.mock_response = {
             "choices": [{"message": {"content": "Failover response", "role": "assistant"}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
         }
 
-    @patch('core_app.run_chain')
+    @patch("core_app.run_chain")
     def test_failover_response_time(self, mock_run_chain):
         """Test failover doesn't significantly impact response time."""
         request_data = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "Failover test"}],
-            "max_tokens": 50
+            "max_tokens": 50,
         }
 
         # Mock response for failover test
@@ -309,7 +309,7 @@ class TestRateLimitingPerformance:
         self.mock_response = {
             "choices": [{"message": {"content": "Rate limit test", "role": "assistant"}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
         }
 
     def test_rate_limit_response_time(self):
@@ -331,8 +331,9 @@ class TestRateLimitingPerformance:
                 assert response_time < 100, f"Rate limit response took {response_time:.2f}ms"
 
         # At least some requests should hit rate limit
-        rate_limited_responses = [t for i, t in enumerate(response_times)
-                                 if self.client.get("/health").status_code == 429]
+        rate_limited_responses = [
+            t for i, t in enumerate(response_times) if self.client.get("/health").status_code == 429
+        ]
 
         # Rate limit responses should be consistently fast
         if rate_limited_responses:

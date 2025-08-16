@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 
 # Import application modules for testing
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from main_enhanced import app
@@ -25,6 +26,7 @@ from field_discovery_system import TiloresFieldDiscovery
 # ============================================================================
 # ENVIRONMENT AND CONFIGURATION FIXTURES
 # ============================================================================
+
 
 @pytest.fixture(scope="session")
 def test_env_vars():
@@ -76,6 +78,7 @@ def mock_env_missing_vars():
 # API CLIENT FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def test_client(test_env_vars):
     """FastAPI test client for API endpoint testing."""
@@ -98,6 +101,7 @@ def async_test_client(test_env_vars):
 # ============================================================================
 # MOCK FIXTURES FOR EXTERNAL DEPENDENCIES
 # ============================================================================
+
 
 @pytest.fixture
 def mock_redis_client():
@@ -127,17 +131,21 @@ def mock_tilores_api():
     mock_api.gql.return_value = {
         "data": {
             "search": {
-                "entities": [{
-                    "id": "test_entity_id",
-                    "records": [{
-                        "id": "test_record_id",
-                        "EMAIL": "test@example.com",
-                        "FIRST_NAME": "Test",
-                        "LAST_NAME": "User",
-                        "CLIENT_ID": "123456",
-                        "PHONE_EXTERNAL": "555-0123"
-                    }]
-                }]
+                "entities": [
+                    {
+                        "id": "test_entity_id",
+                        "records": [
+                            {
+                                "id": "test_record_id",
+                                "EMAIL": "test@example.com",
+                                "FIRST_NAME": "Test",
+                                "LAST_NAME": "User",
+                                "CLIENT_ID": "123456",
+                                "PHONE_EXTERNAL": "555-0123",
+                            }
+                        ],
+                    }
+                ]
             }
         }
     }
@@ -199,10 +207,11 @@ def mock_llm_providers():
 # APPLICATION COMPONENT FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def mock_cache_manager(mock_redis_client):
     """Mock cache manager with Redis functionality."""
-    with patch('redis_cache.redis') as mock_redis_module:
+    with patch("redis_cache.redis") as mock_redis_module:
         mock_redis_module.from_url.return_value = mock_redis_client
         mock_redis_module.Redis.return_value = mock_redis_client
 
@@ -216,7 +225,7 @@ def mock_cache_manager(mock_redis_client):
 @pytest.fixture
 def mock_cache_manager_unavailable(mock_redis_unavailable):
     """Mock cache manager with unavailable Redis."""
-    with patch('redis_cache.redis') as mock_redis_module:
+    with patch("redis_cache.redis") as mock_redis_module:
         mock_redis_module.from_url.side_effect = Exception("Redis unavailable")
         mock_redis_module.Redis.side_effect = Exception("Redis unavailable")
 
@@ -241,7 +250,7 @@ def mock_field_discovery():
     discovery._field_cache = {
         "customer_fields": ["EMAIL", "FIRST_NAME", "LAST_NAME", "CLIENT_ID"],
         "credit_fields": ["CREDIT_SCORE", "CREDIT_REPORT", "PAYMENT_HISTORY"],
-        "system_fields": ["RECORD_ID", "CREATED_DATE", "UPDATED_DATE"]
+        "system_fields": ["RECORD_ID", "CREATED_DATE", "UPDATED_DATE"],
     }
     return discovery
 
@@ -249,8 +258,7 @@ def mock_field_discovery():
 @pytest.fixture
 def mock_llm_engine(mock_tilores_api, mock_tilores_tools, mock_llm_providers):
     """Mock LLM engine with all components."""
-    with patch('core_app.TiloresAPI') as mock_tilores_class, \
-         patch('core_app.TiloresTools') as mock_tools_class:
+    with patch("core_app.TiloresAPI") as mock_tilores_class, patch("core_app.TiloresTools") as mock_tools_class:
 
         mock_tilores_class.from_environ.return_value = mock_tilores_api
         mock_tools_class.return_value = mock_tilores_tools
@@ -316,11 +324,13 @@ def mock_llm_engine(mock_tilores_api, mock_tilores_tools, mock_llm_providers):
         }
 
         # Mock list_models method
-        engine.list_models = MagicMock(return_value=[
-            {"id": "gpt-4o", "provider": "openai"},
-            {"id": "gpt-4o-mini", "provider": "openai"},
-            {"id": "llama-3.3-70b-versatile", "provider": "groq"}
-        ])
+        engine.list_models = MagicMock(
+            return_value=[
+                {"id": "gpt-4o", "provider": "openai"},
+                {"id": "gpt-4o-mini", "provider": "openai"},
+                {"id": "llama-3.3-70b-versatile", "provider": "groq"},
+            ]
+        )
 
         yield engine
 
@@ -328,6 +338,7 @@ def mock_llm_engine(mock_tilores_api, mock_tilores_tools, mock_llm_providers):
 # ============================================================================
 # TEST DATA FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def sample_customer_data():
@@ -342,7 +353,7 @@ def sample_customer_data():
         "CUSTOMER_AGE": "35",
         "DATE_OF_BIRTH": "1988-01-15",
         "STATUS": "ACTIVE",
-        "PRODUCT_NAME": "Credit Monitoring"
+        "PRODUCT_NAME": "Credit Monitoring",
     }
 
 
@@ -350,14 +361,13 @@ def sample_customer_data():
 def sample_chat_request():
     """Sample chat completion request for API testing."""
     from main_enhanced import ChatCompletionRequest, ChatMessage
+
     return ChatCompletionRequest(
         model="gpt-4o-mini",
-        messages=[
-            ChatMessage(role="user", content="Find customer test.customer@example.com")
-        ],
+        messages=[ChatMessage(role="user", content="Find customer test.customer@example.com")],
         temperature=0.7,
         max_tokens=1000,
-        stream=False
+        stream=False,
     )
 
 
@@ -366,12 +376,10 @@ def sample_chat_request_dict():
     """Sample chat completion request as dict for JSON API testing."""
     return {
         "model": "gpt-4o-mini",
-        "messages": [
-            {"role": "user", "content": "Find customer test.customer@example.com"}
-        ],
+        "messages": [{"role": "user", "content": "Find customer test.customer@example.com"}],
         "temperature": 0.7,
         "max_tokens": 1000,
-        "stream": False
+        "stream": False,
     }
 
 
@@ -385,7 +393,7 @@ def sample_credit_data():
         "PAYMENT_HISTORY": "Good",
         "CREDIT_AGE": "8 years",
         "HARD_INQUIRIES": "2",
-        "DEROGATORY_MARKS": "0"
+        "DEROGATORY_MARKS": "0",
     }
 
 
@@ -393,13 +401,14 @@ def sample_credit_data():
 # PERFORMANCE AND LOAD TESTING FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def performance_test_config():
     """Configuration for performance testing."""
     return {
         "concurrent_users": 10,
         "test_duration": 30,  # seconds
-        "ramp_up_time": 5,    # seconds
+        "ramp_up_time": 5,  # seconds
         "target_response_time": 2.0,  # seconds
         "error_threshold": 0.05,  # 5% error rate threshold
     }
@@ -412,28 +421,17 @@ def load_test_scenarios():
         "chat_completions": {
             "endpoint": "/v1/chat/completions",
             "method": "POST",
-            "payload": {
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": "Hello"}],
-                "stream": False
-            }
+            "payload": {"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Hello"}], "stream": False},
         },
-        "models_list": {
-            "endpoint": "/v1/models",
-            "method": "GET",
-            "payload": None
-        },
-        "health_check": {
-            "endpoint": "/health",
-            "method": "GET",
-            "payload": None
-        }
+        "models_list": {"endpoint": "/v1/models", "method": "GET", "payload": None},
+        "health_check": {"endpoint": "/health", "method": "GET", "payload": None},
     }
 
 
 # ============================================================================
 # UTILITY FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def event_loop():
@@ -450,7 +448,8 @@ def reset_singletons():
     yield
     # Cleanup after test
     import importlib
-    modules_to_reload = ['core_app', 'redis_cache', 'field_discovery_system']
+
+    modules_to_reload = ["core_app", "redis_cache", "field_discovery_system"]
     for module_name in modules_to_reload:
         if module_name in sys.modules:
             importlib.reload(sys.modules[module_name])
@@ -459,7 +458,7 @@ def reset_singletons():
 @pytest.fixture
 def mock_time():
     """Mock time module for testing time-dependent functionality."""
-    with patch('time.time') as mock_time_func:
+    with patch("time.time") as mock_time_func:
         mock_time_func.return_value = 1640995200.0  # Fixed timestamp: 2022-01-01 00:00:00
         yield mock_time_func
 
@@ -474,6 +473,7 @@ def mock_rate_limiter():
     def mock_limit_decorator(*args, **kwargs):
         def decorator(func):
             return func  # Return the original function without rate limiting
+
         return decorator
 
     mock_limiter.limit = mock_limit_decorator
@@ -484,8 +484,8 @@ def mock_rate_limiter():
     mock_limiter._check_request_limit = MagicMock(return_value=None)
 
     # Patch multiple places where the limiter might be used
-    with patch('slowapi.Limiter', return_value=mock_limiter), \
-         patch('main_enhanced.limiter', mock_limiter), \
-         patch('slowapi.util.get_remote_address', return_value='127.0.0.1'):
+    with patch("slowapi.Limiter", return_value=mock_limiter), patch("main_enhanced.limiter", mock_limiter), patch(
+        "slowapi.util.get_remote_address", return_value="127.0.0.1"
+    ):
 
         yield mock_limiter

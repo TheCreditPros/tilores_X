@@ -19,8 +19,8 @@ class TestQueryRouter:
 
         router = QueryRouter()
 
-        assert hasattr(router, 'general_patterns')
-        assert hasattr(router, 'general_regex')
+        assert hasattr(router, "general_patterns")
+        assert hasattr(router, "general_regex")
         assert len(router.general_patterns) > 0
         assert len(router.general_regex) == len(router.general_patterns)
 
@@ -111,8 +111,7 @@ class TestGetAllTiloresFields:
         cached_fields = '{"EMAIL": true, "FIRST_NAME": true, "LAST_NAME": true}'
         mock_cache_manager.get_tilores_fields.return_value = cached_fields
 
-        with patch('core_app.CACHE_AVAILABLE', True), \
-             patch('core_app.cache_manager', mock_cache_manager):
+        with patch("core_app.CACHE_AVAILABLE", True), patch("core_app.cache_manager", mock_cache_manager):
 
             result = get_all_tilores_fields(mock_tilores_api)
 
@@ -141,15 +140,15 @@ class TestGetAllTiloresFields:
                                 {"name": "LAST_NAME"},
                                 {"name": "CREDIT_RESPONSE"},  # Should be excluded
                                 {"name": "TRANSUNION_SUMMARY_LINK"},  # Should be excluded
-                            ]
+                            ],
                         },
                         {
                             "name": "CreditResponseCreditLiability",
                             "fields": [
                                 {"name": "ACCOUNT_TYPE"},
                                 {"name": "BALANCE"},
-                            ]
-                        }
+                            ],
+                        },
                     ]
                 }
             }
@@ -161,8 +160,7 @@ class TestGetAllTiloresFields:
         mock_cache_manager = Mock()
         mock_cache_manager.get_tilores_fields.return_value = None
 
-        with patch('core_app.CACHE_AVAILABLE', True), \
-             patch('core_app.cache_manager', mock_cache_manager):
+        with patch("core_app.CACHE_AVAILABLE", True), patch("core_app.cache_manager", mock_cache_manager):
 
             result = get_all_tilores_fields(mock_tilores_api)
 
@@ -187,7 +185,7 @@ class TestGetAllTiloresFields:
         mock_tilores_api = Mock()
         mock_tilores_api.gql.side_effect = Exception("API Error")
 
-        with patch('core_app.CACHE_AVAILABLE', False):
+        with patch("core_app.CACHE_AVAILABLE", False):
             result = get_all_tilores_fields(mock_tilores_api)
 
             # Should return empty dict on error
@@ -208,7 +206,7 @@ class TestGetAllTiloresFields:
                             "fields": [
                                 {"name": "EMAIL"},
                                 {"name": "CLIENT_ID"},
-                            ]
+                            ],
                         }
                     ]
                 }
@@ -216,7 +214,7 @@ class TestGetAllTiloresFields:
         }
         mock_tilores_api.gql.return_value = mock_schema_response
 
-        with patch('core_app.CACHE_AVAILABLE', False):
+        with patch("core_app.CACHE_AVAILABLE", False):
             result = get_all_tilores_fields(mock_tilores_api)
 
             assert "EMAIL" in result
@@ -232,12 +230,13 @@ class TestMultiProviderLLMEngine:
         """Test basic engine initialization without external dependencies"""
         from core_app import MultiProviderLLMEngine
 
-        with patch('core_app.ANTHROPIC_AVAILABLE', False), \
-             patch('core_app.GEMINI_AVAILABLE', False), \
-             patch('core_app.GROQ_AVAILABLE', False), \
-             patch('core_app.OPENROUTER_AVAILABLE', False), \
-             patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch("core_app.ANTHROPIC_AVAILABLE", False), patch("core_app.GEMINI_AVAILABLE", False), patch(
+            "core_app.GROQ_AVAILABLE", False
+        ), patch("core_app.OPENROUTER_AVAILABLE", False), patch.object(
+            MultiProviderLLMEngine, "_init_langsmith"
+        ), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -254,16 +253,19 @@ class TestMultiProviderLLMEngine:
         """Test engine initialization with all providers available"""
         from core_app import MultiProviderLLMEngine
 
-        with patch('core_app.ANTHROPIC_AVAILABLE', True), \
-             patch('core_app.GEMINI_AVAILABLE', True), \
-             patch('core_app.GROQ_AVAILABLE', True), \
-             patch('core_app.OPENROUTER_AVAILABLE', True), \
-             patch('core_app.ChatAnthropic', Mock()), \
-             patch('core_app.ChatGoogleGenerativeAI', Mock()), \
-             patch('core_app.ChatGroq', Mock()), \
-             patch('core_app.OpenRouterChatOpenAI', Mock()), \
-             patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch("core_app.ANTHROPIC_AVAILABLE", True), patch("core_app.GEMINI_AVAILABLE", True), patch(
+            "core_app.GROQ_AVAILABLE", True
+        ), patch("core_app.OPENROUTER_AVAILABLE", True), patch("core_app.ChatAnthropic", Mock()), patch(
+            "core_app.ChatGoogleGenerativeAI", Mock()
+        ), patch(
+            "core_app.ChatGroq", Mock()
+        ), patch(
+            "core_app.OpenRouterChatOpenAI", Mock()
+        ), patch.object(
+            MultiProviderLLMEngine, "_init_langsmith"
+        ), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -273,11 +275,9 @@ class TestMultiProviderLLMEngine:
             assert "gemini-1.5-flash-002" in engine.model_mappings
             assert "llama-3.3-70b-versatile" in engine.model_mappings
 
-    @patch.dict(os.environ, {
-        "LANGSMITH_TRACING": "true",
-        "LANGSMITH_API_KEY": "test-key",
-        "LANGSMITH_PROJECT": "test-project"
-    })
+    @patch.dict(
+        os.environ, {"LANGSMITH_TRACING": "true", "LANGSMITH_API_KEY": "test-key", "LANGSMITH_PROJECT": "test-project"}
+    )
     def test_init_langsmith_enabled(self):
         """Test LangSmith initialization when enabled"""
         from core_app import MultiProviderLLMEngine
@@ -285,10 +285,11 @@ class TestMultiProviderLLMEngine:
         mock_client = Mock()
         mock_tracer = Mock()
 
-        with patch('core_app.LANGSMITH_AVAILABLE', True), \
-             patch('core_app.LangSmithClient', return_value=mock_client), \
-             patch('core_app.LangChainTracer', return_value=mock_tracer), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch("core_app.LANGSMITH_AVAILABLE", True), patch(
+            "core_app.LangSmithClient", return_value=mock_client
+        ), patch("core_app.LangChainTracer", return_value=mock_tracer), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -299,8 +300,7 @@ class TestMultiProviderLLMEngine:
         """Test LangSmith initialization when disabled"""
         from core_app import MultiProviderLLMEngine
 
-        with patch('core_app.LANGSMITH_AVAILABLE', False), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch("core_app.LANGSMITH_AVAILABLE", False), patch.object(MultiProviderLLMEngine, "_init_tilores"):
 
             engine = MultiProviderLLMEngine()
 
@@ -328,19 +328,27 @@ class TestMultiProviderLLMEngine:
         mock_credit_tool.name = "tilores_credit_report"
         mock_credit_tool.__len__ = Mock(return_value=1)
 
-        with patch.dict(os.environ, {
-            "TILORES_API_URL": "https://test.tilores.com",
-            "TILORES_CLIENT_ID": "test-client",
-            "TILORES_CLIENT_SECRET": "test-secret",
-            "TILORES_TOKEN_URL": "https://test.token.url",
-        }), \
-        patch('core_app.TiloresAPI') as mock_tilores_class, \
-        patch('core_app.TiloresTools', return_value=mock_tilores_tools), \
-        patch('core_app.get_all_tilores_fields', return_value={"EMAIL": True}), \
-        patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-        patch.object(MultiProviderLLMEngine, '_create_unified_search_tool', return_value=mock_search_tool), \
-        patch.object(MultiProviderLLMEngine, '_create_record_lookup_tool', return_value=mock_record_tool), \
-        patch.object(MultiProviderLLMEngine, '_create_credit_report_tool', return_value=mock_credit_tool):
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://test.tilores.com",
+                "TILORES_CLIENT_ID": "test-client",
+                "TILORES_CLIENT_SECRET": "test-secret",
+                "TILORES_TOKEN_URL": "https://test.token.url",
+            },
+        ), patch("core_app.TiloresAPI") as mock_tilores_class, patch(
+            "core_app.TiloresTools", return_value=mock_tilores_tools
+        ), patch(
+            "core_app.get_all_tilores_fields", return_value={"EMAIL": True}
+        ), patch.object(
+            MultiProviderLLMEngine, "_init_langsmith"
+        ), patch.object(
+            MultiProviderLLMEngine, "_create_unified_search_tool", return_value=mock_search_tool
+        ), patch.object(
+            MultiProviderLLMEngine, "_create_record_lookup_tool", return_value=mock_record_tool
+        ), patch.object(
+            MultiProviderLLMEngine, "_create_credit_report_tool", return_value=mock_credit_tool
+        ):
 
             mock_tilores_class.from_environ.return_value = mock_tilores_api
 
@@ -356,13 +364,11 @@ class TestMultiProviderLLMEngine:
         from core_app import MultiProviderLLMEngine
 
         # Mock environment to be completely empty for Tilores variables
-        clean_env = {k: v for k, v in os.environ.items()
-                    if not k.startswith('TILORES_')}
+        clean_env = {k: v for k, v in os.environ.items() if not k.startswith("TILORES_")}
 
-        with patch.dict(os.environ, clean_env, clear=True), \
-             patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch('dotenv.load_dotenv'), \
-             patch('core_app.TiloresAPI') as mock_tilores_class:
+        with patch.dict(os.environ, clean_env, clear=True), patch.object(
+            MultiProviderLLMEngine, "_init_langsmith"
+        ), patch("dotenv.load_dotenv"), patch("core_app.TiloresAPI") as mock_tilores_class:
 
             # Make TiloresAPI.from_environ return None to simulate missing vars
             mock_tilores_class.from_environ.return_value = None
@@ -376,9 +382,9 @@ class TestMultiProviderLLMEngine:
         """Test getting OpenAI model"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.ChatOpenAI') as mock_openai:
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.ChatOpenAI") as mock_openai:
 
             engine = MultiProviderLLMEngine()
             mock_model = Mock()
@@ -393,9 +399,9 @@ class TestMultiProviderLLMEngine:
         """Test getting nonexistent model falls back to default"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.ChatGroq") as mock_groq:
 
             engine = MultiProviderLLMEngine()
             mock_model = Mock()
@@ -410,8 +416,9 @@ class TestMultiProviderLLMEngine:
         """Test getting provider for a model"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -422,8 +429,9 @@ class TestMultiProviderLLMEngine:
         """Test listing available models"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             models = engine.list_models()
@@ -440,8 +448,9 @@ class TestMultiProviderLLMEngine:
         """Test parsing query string for email"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -452,8 +461,9 @@ class TestMultiProviderLLMEngine:
         """Test parsing query string for client ID"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -464,8 +474,9 @@ class TestMultiProviderLLMEngine:
         """Test parsing query string for name"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -476,8 +487,9 @@ class TestMultiProviderLLMEngine:
         """Test parsing query string for Salesforce ID"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -488,8 +500,9 @@ class TestMultiProviderLLMEngine:
         """Test parsing query string fallback"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -506,8 +519,9 @@ class TestEngineToolCreation:
         """Test creation of unified search tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.all_fields = {"EMAIL": True, "FIRST_NAME": True}
@@ -518,38 +532,40 @@ class TestEngineToolCreation:
 
             tool = engine._create_unified_search_tool(mock_tilores_tools)
 
-            assert hasattr(tool, 'name')
-            assert hasattr(tool, 'invoke')
+            assert hasattr(tool, "name")
+            assert hasattr(tool, "invoke")
 
     def test_create_record_lookup_tool(self):
         """Test creation of record lookup tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.tilores = Mock()
 
             tool = engine._create_record_lookup_tool()
 
-            assert hasattr(tool, 'name')
-            assert hasattr(tool, 'invoke')
+            assert hasattr(tool, "name")
+            assert hasattr(tool, "invoke")
 
     def test_create_credit_report_tool(self):
         """Test creation of credit report tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.tilores = Mock()
 
             tool = engine._create_credit_report_tool()
 
-            assert hasattr(tool, 'name')
-            assert hasattr(tool, 'invoke')
+            assert hasattr(tool, "name")
+            assert hasattr(tool, "invoke")
 
 
 @pytest.mark.unit
@@ -560,8 +576,9 @@ class TestEnvironmentLoading:
         """Test successful environment loading"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             # Just test that method can be called without error
@@ -571,9 +588,9 @@ class TestEnvironmentLoading:
         """Test environment loading when dotenv is not available"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('dotenv.load_dotenv', side_effect=ImportError("dotenv not available")):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("dotenv.load_dotenv", side_effect=ImportError("dotenv not available")):
 
             engine = MultiProviderLLMEngine()
             # Should not raise exception
@@ -583,9 +600,9 @@ class TestEnvironmentLoading:
         """Test environment loading with generic error handling"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('pathlib.Path', side_effect=Exception("Path error")):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("pathlib.Path", side_effect=Exception("Path error")):
 
             engine = MultiProviderLLMEngine()
             # Should not raise exception even with Path errors
@@ -600,8 +617,9 @@ class TestCreditAnalysisExtraction:
         """Test successful credit extraction from dict result"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -609,21 +627,27 @@ class TestCreditAnalysisExtraction:
             result_dict = {
                 "data": {
                     "search": {
-                        "entities": [{
-                            "records": [{
-                                "FIRST_NAME": "John",
-                                "LAST_NAME": "Doe",
-                                "EMAIL": "john.doe@example.com",
-                                "CLIENT_ID": "123456",
-                                "STARTING_CREDIT_SCORE": "720",
-                                "CREDIT_LIABILITY": "5000"
-                            }]
-                        }]
+                        "entities": [
+                            {
+                                "records": [
+                                    {
+                                        "FIRST_NAME": "John",
+                                        "LAST_NAME": "Doe",
+                                        "EMAIL": "john.doe@example.com",
+                                        "CLIENT_ID": "123456",
+                                        "STARTING_CREDIT_SCORE": "720",
+                                        "CREDIT_LIABILITY": "5000",
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 }
             }
 
-            with patch.object(engine, '_format_comprehensive_credit_report', return_value="Credit Report") as mock_format:
+            with patch.object(
+                engine, "_format_comprehensive_credit_report", return_value="Credit Report"
+            ) as mock_format:
                 result = engine._extract_credit_from_dict(result_dict, {"EMAIL": "john.doe@example.com"})
 
                 assert "Credit Report" in result
@@ -633,8 +657,9 @@ class TestCreditAnalysisExtraction:
         """Test credit extraction when no entities found"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -648,8 +673,9 @@ class TestCreditAnalysisExtraction:
         """Test successful credit information extraction from string"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -661,7 +687,9 @@ class TestCreditAnalysisExtraction:
             CREDIT_RESPONSE: Available
             """
 
-            with patch.object(engine, '_generate_credit_advisor_response', return_value="Credit Analysis") as mock_generate:
+            with patch.object(
+                engine, "_generate_credit_advisor_response", return_value="Credit Analysis"
+            ) as mock_generate:
                 result = engine._extract_credit_information(result_str, {"EMAIL": "john.doe@example.com"})
 
                 assert "Credit Analysis" in result
@@ -671,8 +699,9 @@ class TestCreditAnalysisExtraction:
         """Test credit advisor response for excellent credit score"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -682,7 +711,7 @@ class TestCreditAnalysisExtraction:
                 has_credit_response=True,
                 has_transunion_data=True,
                 credit_indicators=["CREDIT_LIABILITY", "PAYMENT_HISTORY"],
-                raw_data="Sample credit data"
+                raw_data="Sample credit data",
             )
 
             assert "Excellent (750+)" in result
@@ -693,8 +722,9 @@ class TestCreditAnalysisExtraction:
         """Test credit advisor response for poor credit score"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -704,7 +734,7 @@ class TestCreditAnalysisExtraction:
                 has_credit_response=False,
                 has_transunion_data=False,
                 credit_indicators=[],
-                raw_data="Limited credit data"
+                raw_data="Limited credit data",
             )
 
             assert "Very Poor (Below 600)" in result
@@ -715,8 +745,9 @@ class TestCreditAnalysisExtraction:
         """Test credit advisor response when no credit score available"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
@@ -727,7 +758,7 @@ class TestCreditAnalysisExtraction:
                 has_credit_response=False,
                 has_transunion_data=False,
                 credit_indicators=[],
-                raw_data=""
+                raw_data="",
             )
 
             # Check that the function handles zero score properly
@@ -738,18 +769,18 @@ class TestCreditAnalysisExtraction:
         """Test formatting report when no credit data available"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
 
-            customer_info = {
-                "first_name": "John",
-                "email": "john@example.com"
-            }
+            customer_info = {"first_name": "John", "email": "john@example.com"}
             full_result = {"data": "sample"}
 
-            with patch.object(engine, '_generate_credit_advisor_response', return_value="No Credit Report") as mock_generate:
+            with patch.object(
+                engine, "_generate_credit_advisor_response", return_value="No Credit Report"
+            ) as mock_generate:
                 result = engine._format_no_credit_data_report(customer_info, full_result)
 
                 assert "No Credit Report" in result
@@ -764,8 +795,9 @@ class TestToolExecution:
         """Test execution of unified search tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.all_fields = {"EMAIL": True}
@@ -776,7 +808,7 @@ class TestToolExecution:
             mock_tilores_tools.search_tool.return_value = mock_search_tool
 
             # Mock cache miss
-            with patch('core_app.CACHE_AVAILABLE', False):
+            with patch("core_app.CACHE_AVAILABLE", False):
                 tool = engine._create_unified_search_tool(mock_tilores_tools)
                 result = tool.invoke("john.doe@example.com")
 
@@ -786,8 +818,9 @@ class TestToolExecution:
         """Test unified search tool with cache hit"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.all_fields = {"EMAIL": True}
@@ -796,8 +829,7 @@ class TestToolExecution:
             mock_cache_manager = Mock()
             mock_cache_manager.get_customer_search.return_value = "Cached customer data"
 
-            with patch('core_app.CACHE_AVAILABLE', True), \
-                 patch('core_app.cache_manager', mock_cache_manager):
+            with patch("core_app.CACHE_AVAILABLE", True), patch("core_app.cache_manager", mock_cache_manager):
 
                 tool = engine._create_unified_search_tool(mock_tilores_tools)
                 result = tool.invoke("john.doe@example.com")
@@ -808,8 +840,9 @@ class TestToolExecution:
         """Test execution of record lookup tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             mock_tilores = Mock()
@@ -819,12 +852,14 @@ class TestToolExecution:
                 "data": {
                     "entityByRecord": {
                         "entity": {
-                            "records": [{
-                                "id": "003Ux00000WCmXtIAL",
-                                "EMAIL": "john.doe@example.com",
-                                "FIRST_NAME": "John",
-                                "LAST_NAME": "Doe"
-                            }]
+                            "records": [
+                                {
+                                    "id": "003Ux00000WCmXtIAL",
+                                    "EMAIL": "john.doe@example.com",
+                                    "FIRST_NAME": "John",
+                                    "LAST_NAME": "Doe",
+                                }
+                            ]
                         }
                     }
                 }
@@ -842,8 +877,9 @@ class TestToolExecution:
         """Test execution of credit report tool"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.tilores = Mock()
@@ -851,8 +887,9 @@ class TestToolExecution:
             mock_unified_search = Mock()
             mock_unified_search.invoke.return_value = "Customer credit data"
 
-            with patch.object(engine, '_create_unified_search_tool', return_value=mock_unified_search), \
-                 patch.object(engine, '_extract_credit_information', return_value="Credit Report"):
+            with patch.object(engine, "_create_unified_search_tool", return_value=mock_unified_search), patch.object(
+                engine, "_extract_credit_information", return_value="Credit Report"
+            ):
 
                 tool = engine._create_credit_report_tool()
                 # Call tool with correct parameter structure
@@ -882,7 +919,7 @@ class TestUtilityFunctions:
             "llama-3.3-70b-versatile": {"provider": "groq"},
         }
 
-        with patch('core_app.engine', mock_engine):
+        with patch("core_app.engine", mock_engine):
             result = _get_fastest_available_model()
             assert result == "llama-3.3-70b-versatile"
 
@@ -890,8 +927,7 @@ class TestUtilityFunctions:
         """Test engine initialization"""
         from core_app import initialize_engine
 
-        with patch('core_app.engine', None), \
-             patch('core_app.MultiProviderLLMEngine') as mock_engine_class:
+        with patch("core_app.engine", None), patch("core_app.MultiProviderLLMEngine") as mock_engine_class:
 
             mock_engine = Mock()
             mock_engine_class.return_value = mock_engine
@@ -908,7 +944,7 @@ class TestUtilityFunctions:
         mock_models = [{"id": "gpt-4o", "provider": "openai"}]
         mock_engine.list_models.return_value = mock_models
 
-        with patch('core_app.engine', mock_engine):
+        with patch("core_app.engine", mock_engine):
             result = get_available_models()
             assert result == mock_models
 
@@ -919,7 +955,7 @@ class TestUtilityFunctions:
         mock_engine = Mock()
         mock_engine.get_provider.return_value = "openai"
 
-        with patch('core_app.engine', mock_engine):
+        with patch("core_app.engine", mock_engine):
             result = get_model_provider("gpt-4o")
             assert result == "openai"
 
@@ -932,10 +968,9 @@ class TestAdvancedModelHandling:
         """Test getting Anthropic model"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.ANTHROPIC_AVAILABLE', True), \
-             patch('core_app.ChatAnthropic') as mock_anthropic:
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.ANTHROPIC_AVAILABLE", True), patch("core_app.ChatAnthropic") as mock_anthropic:
 
             engine = MultiProviderLLMEngine()
             mock_model = Mock()
@@ -950,10 +985,9 @@ class TestAdvancedModelHandling:
         """Test getting Groq model"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.GROQ_AVAILABLE', True), \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.GROQ_AVAILABLE", True), patch("core_app.ChatGroq") as mock_groq:
 
             engine = MultiProviderLLMEngine()
             mock_model = Mock()
@@ -968,11 +1002,13 @@ class TestAdvancedModelHandling:
         """Test getting OpenRouter model"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.OPENROUTER_AVAILABLE', True), \
-             patch('core_app.OpenRouterChatOpenAI') as mock_openrouter, \
-             patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.OPENROUTER_AVAILABLE", True), patch(
+            "core_app.OpenRouterChatOpenAI"
+        ) as mock_openrouter, patch.dict(
+            os.environ, {"OPENROUTER_API_KEY": "test-key"}
+        ):
 
             engine = MultiProviderLLMEngine()
             mock_model = Mock()
@@ -987,10 +1023,9 @@ class TestAdvancedModelHandling:
         """Test model creation with error and fallback"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'), \
-             patch('core_app.ChatOpenAI', side_effect=Exception("Model error")), \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ), patch("core_app.ChatOpenAI", side_effect=Exception("Model error")), patch("core_app.ChatGroq") as mock_groq:
 
             engine = MultiProviderLLMEngine()
             mock_fallback = Mock()
@@ -1004,8 +1039,9 @@ class TestAdvancedModelHandling:
         """Test get_llm_with_tools with debug logging"""
         from core_app import MultiProviderLLMEngine
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.tools = [Mock(), Mock()]
@@ -1014,8 +1050,9 @@ class TestAdvancedModelHandling:
             mock_llm_with_tools = Mock()
             mock_llm.bind_tools.return_value = mock_llm_with_tools
 
-            with patch.object(engine, 'get_model', return_value=mock_llm), \
-                 patch.object(engine, 'get_provider', return_value="openai"):
+            with patch.object(engine, "get_model", return_value=mock_llm), patch.object(
+                engine, "get_provider", return_value="openai"
+            ):
 
                 result = engine.get_llm_with_tools("gpt-4o")
 
@@ -1032,29 +1069,35 @@ class TestTimeoutAndErrorHandling:
         from core_app import MultiProviderLLMEngine
         import concurrent.futures
 
-        with patch.dict(os.environ, {
-            "TILORES_API_URL": "https://test.tilores.com",
-            "TILORES_CLIENT_ID": "test-client",
-            "TILORES_CLIENT_SECRET": "test-secret",
-            "TILORES_TOKEN_URL": "https://test.token.url",
-        }), \
-        patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-        patch('core_app.TiloresAPI') as mock_tilores_class, \
-        patch('core_app.TiloresTools'), \
-        patch('core_app.get_all_tilores_fields', return_value={}), \
-        patch('time.sleep'):  # Speed up test
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://test.tilores.com",
+                "TILORES_CLIENT_ID": "test-client",
+                "TILORES_CLIENT_SECRET": "test-secret",
+                "TILORES_TOKEN_URL": "https://test.token.url",
+            },
+        ), patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch(
+            "core_app.TiloresAPI"
+        ) as mock_tilores_class, patch(
+            "core_app.TiloresTools"
+        ), patch(
+            "core_app.get_all_tilores_fields", return_value={}
+        ), patch(
+            "time.sleep"
+        ):  # Speed up test
 
             # First call times out, second succeeds
             mock_tilores_class.from_environ.side_effect = [
                 concurrent.futures.TimeoutError("Timeout"),
-                Mock()  # Success on retry
+                Mock(),  # Success on retry
             ]
 
-            with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
+            with patch("concurrent.futures.ThreadPoolExecutor") as mock_executor:
                 mock_future = Mock()
                 mock_future.result.side_effect = [
                     concurrent.futures.TimeoutError("Timeout"),
-                    Mock()  # Success on retry
+                    Mock(),  # Success on retry
                 ]
                 mock_executor.return_value.__enter__.return_value.submit.return_value = mock_future
 
@@ -1068,16 +1111,19 @@ class TestTimeoutAndErrorHandling:
         from core_app import MultiProviderLLMEngine
         import concurrent.futures
 
-        with patch.dict(os.environ, {
-            "TILORES_API_URL": "https://test.tilores.com",
-            "TILORES_CLIENT_ID": "test-client",
-            "TILORES_CLIENT_SECRET": "test-secret",
-            "TILORES_TOKEN_URL": "https://test.token.url",
-        }), \
-        patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-        patch('time.sleep'):  # Speed up test
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://test.tilores.com",
+                "TILORES_CLIENT_ID": "test-client",
+                "TILORES_CLIENT_SECRET": "test-secret",
+                "TILORES_TOKEN_URL": "https://test.token.url",
+            },
+        ), patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch(
+            "time.sleep"
+        ):  # Speed up test
 
-            with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
+            with patch("concurrent.futures.ThreadPoolExecutor") as mock_executor:
                 mock_future = Mock()
                 mock_future.result.side_effect = concurrent.futures.TimeoutError("Persistent timeout")
                 mock_executor.return_value.__enter__.return_value.submit.return_value = mock_future
@@ -1093,19 +1139,23 @@ class TestTimeoutAndErrorHandling:
         from core_app import MultiProviderLLMEngine
         import concurrent.futures
 
-        with patch.dict(os.environ, {
-            "TILORES_API_URL": "https://test.tilores.com",
-            "TILORES_CLIENT_ID": "test-client",
-            "TILORES_CLIENT_SECRET": "test-secret",
-            "TILORES_TOKEN_URL": "https://test.token.url",
-        }), \
-        patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-        patch('core_app.TiloresAPI') as mock_tilores_class, \
-        patch('core_app.TiloresTools'):
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://test.tilores.com",
+                "TILORES_CLIENT_ID": "test-client",
+                "TILORES_CLIENT_SECRET": "test-secret",
+                "TILORES_TOKEN_URL": "https://test.token.url",
+            },
+        ), patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch(
+            "core_app.TiloresAPI"
+        ) as mock_tilores_class, patch(
+            "core_app.TiloresTools"
+        ):
 
             mock_tilores_class.from_environ.return_value = Mock()
 
-            with patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
+            with patch("concurrent.futures.ThreadPoolExecutor") as mock_executor:
                 # Main init succeeds, field discovery times out
                 mock_future_init = Mock()
                 mock_future_init.result.return_value = Mock()
@@ -1115,7 +1165,7 @@ class TestTimeoutAndErrorHandling:
 
                 mock_executor.return_value.__enter__.return_value.submit.side_effect = [
                     mock_future_init,  # TiloresAPI init
-                    mock_future_fields  # Field discovery
+                    mock_future_fields,  # Field discovery
                 ]
 
                 engine = MultiProviderLLMEngine()
@@ -1130,8 +1180,9 @@ class TestTimeoutAndErrorHandling:
         from core_app import MultiProviderLLMEngine
         import concurrent.futures
 
-        with patch.object(MultiProviderLLMEngine, '_init_langsmith'), \
-             patch.object(MultiProviderLLMEngine, '_init_tilores'):
+        with patch.object(MultiProviderLLMEngine, "_init_langsmith"), patch.object(
+            MultiProviderLLMEngine, "_init_tilores"
+        ):
 
             engine = MultiProviderLLMEngine()
             engine.all_fields = {"EMAIL": True, "FIRST_NAME": True}
@@ -1148,8 +1199,9 @@ class TestTimeoutAndErrorHandling:
             mock_search_tool.invoke.side_effect = search_side_effect
             mock_tilores_tools.search_tool.return_value = mock_search_tool
 
-            with patch('core_app.CACHE_AVAILABLE', False), \
-                 patch('concurrent.futures.ThreadPoolExecutor') as mock_executor:
+            with patch("core_app.CACHE_AVAILABLE", False), patch(
+                "concurrent.futures.ThreadPoolExecutor"
+            ) as mock_executor:
 
                 mock_future = Mock()
                 mock_future.result.side_effect = concurrent.futures.TimeoutError("Timeout")
@@ -1186,10 +1238,9 @@ class TestRunChain:
         mock_tools_list.__iter__ = Mock(return_value=iter([]))
         mock_engine.tools = mock_tools_list
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router, \
-             patch('core_app.CACHE_AVAILABLE', False):
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router, patch("core_app.CACHE_AVAILABLE", False):
 
             mock_router.should_use_tilores_tools.return_value = False
 
@@ -1229,9 +1280,9 @@ class TestRunChain:
         mock_engine.get_provider.return_value = "openai"
         mock_llm_with_tools.invoke.return_value = mock_response
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router:
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router:
 
             mock_router.should_use_tilores_tools.return_value = True
 
@@ -1248,9 +1299,9 @@ class TestRunChain:
         mock_engine = Mock()
         mock_engine.tools = []  # No tools available
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router:
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router:
 
             mock_router.should_use_tilores_tools.return_value = True
 
@@ -1281,10 +1332,9 @@ class TestRunChain:
         mock_tools_list.__iter__ = Mock(return_value=iter([]))
         mock_engine.tools = mock_tools_list
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router, \
-             patch('core_app.CACHE_AVAILABLE', False):
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router, patch("core_app.CACHE_AVAILABLE", False):
 
             mock_router.should_use_tilores_tools.return_value = False
 
@@ -1319,13 +1369,12 @@ class TestRunChain:
         conversation = [
             {"role": "user", "content": "Hello"},
             {"role": "assistant", "content": "Hi there!"},
-            {"role": "user", "content": "What's 2+2?"}
+            {"role": "user", "content": "What's 2+2?"},
         ]
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router, \
-             patch('core_app.CACHE_AVAILABLE', False):
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router, patch("core_app.CACHE_AVAILABLE", False):
 
             mock_router.should_use_tilores_tools.return_value = False
 
@@ -1353,9 +1402,9 @@ class TestRunChain:
         mock_tools_list.__iter__ = Mock(return_value=iter([]))
         mock_engine.tools = mock_tools_list
 
-        with patch('core_app.initialize_engine'), \
-             patch('core_app.engine', mock_engine), \
-             patch('core_app.query_router') as mock_router:
+        with patch("core_app.initialize_engine"), patch("core_app.engine", mock_engine), patch(
+            "core_app.query_router"
+        ) as mock_router:
 
             mock_router.should_use_tilores_tools.return_value = False
 

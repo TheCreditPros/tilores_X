@@ -20,6 +20,7 @@ class TestDebugMode:
         # Reload module to pick up new env var
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is True
@@ -30,6 +31,7 @@ class TestDebugMode:
         """Test debug mode enabled with 'TRUE'."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is True
@@ -39,6 +41,7 @@ class TestDebugMode:
         """Test debug mode enabled with '1'."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is True
@@ -48,6 +51,7 @@ class TestDebugMode:
         """Test debug mode enabled with 'yes'."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is True
@@ -57,6 +61,7 @@ class TestDebugMode:
         """Test debug mode disabled with 'false'."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is False
@@ -67,6 +72,7 @@ class TestDebugMode:
         """Test debug mode defaults to False when env var not set."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.DEBUG_MODE is False
@@ -111,6 +117,7 @@ class TestSetupLogging:
         """Test that debug mode uses detailed formatter."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         logger = utils.debug_config.setup_logging("test_debug_logger")
@@ -119,7 +126,7 @@ class TestSetupLogging:
 
         # Debug mode should include timestamp and name
         assert formatter is not None
-        assert hasattr(formatter, '_fmt')
+        assert hasattr(formatter, "_fmt")
         fmt_str = formatter._fmt or ""
         assert "%(asctime)s" in fmt_str
         assert "%(name)s" in fmt_str
@@ -129,6 +136,7 @@ class TestSetupLogging:
         """Test that production mode uses simple formatter."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         logger = utils.debug_config.setup_logging("test_prod_logger")
@@ -137,7 +145,7 @@ class TestSetupLogging:
 
         # Production mode should be simple
         assert formatter is not None
-        assert hasattr(formatter, '_fmt')
+        assert hasattr(formatter, "_fmt")
         fmt_str = formatter._fmt or ""
         assert "%(asctime)s" not in fmt_str
         assert "%(name)s" not in fmt_str
@@ -148,11 +156,12 @@ class TestDebugPrint:
     """Test the debug_print function."""
 
     @patch.dict(os.environ, {"TILORES_DEBUG": "true"})
-    @patch('builtins.print')
+    @patch("builtins.print")
     def test_debug_print_enabled(self, mock_print):
         """Test debug_print when debug mode is enabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         utils.debug_config.debug_print("Test message")
@@ -160,11 +169,12 @@ class TestDebugPrint:
         mock_print.assert_called_once_with("🔍 [DEBUG] Test message")
 
     @patch.dict(os.environ, {"TILORES_DEBUG": "true"})
-    @patch('builtins.print')
+    @patch("builtins.print")
     def test_debug_print_custom_emoji(self, mock_print):
         """Test debug_print with custom emoji."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         utils.debug_config.debug_print("Test message", "🚀")
@@ -172,11 +182,12 @@ class TestDebugPrint:
         mock_print.assert_called_once_with("🚀 [DEBUG] Test message")
 
     @patch.dict(os.environ, {"TILORES_DEBUG": "false"})
-    @patch('builtins.print')
+    @patch("builtins.print")
     def test_debug_print_disabled(self, mock_print):
         """Test debug_print when debug mode is disabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         utils.debug_config.debug_print("Test message")
@@ -192,6 +203,7 @@ class TestIsDebugEnabled:
         """Test is_debug_enabled returns True when debug enabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.is_debug_enabled() is True
@@ -201,6 +213,7 @@ class TestIsDebugEnabled:
         """Test is_debug_enabled returns False when debug disabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         assert utils.debug_config.is_debug_enabled() is False
@@ -216,7 +229,7 @@ class TestModuleLevelLogging:
         import utils.debug_config
 
         # Capture logs
-        with patch.object(utils.debug_config, 'logger') as mock_logger:
+        with patch.object(utils.debug_config, "logger") as mock_logger:
             importlib.reload(utils.debug_config)
 
             # The module should log debug status when DEBUG_MODE is True
@@ -229,6 +242,7 @@ class TestModuleLevelLogging:
         """Test that module doesn't log debug message when debug disabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         # When debug is False, no debug message should be logged
@@ -251,6 +265,7 @@ class TestLoggerConfiguration:
         """Test that logger uses DEBUG level when debug enabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         logger = utils.debug_config.setup_logging("test_debug_level")
@@ -261,6 +276,7 @@ class TestLoggerConfiguration:
         """Test that logger uses INFO level when debug disabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         logger = utils.debug_config.setup_logging("test_info_level")
@@ -275,6 +291,7 @@ class TestIntegration:
         """Test complete debug workflow when enabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         # Check debug mode detection
@@ -287,7 +304,7 @@ class TestIntegration:
         assert logger.level == logging.DEBUG
 
         # Test debug print (with mock to avoid actual output)
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             utils.debug_config.debug_print("Integration test")
             mock_print.assert_called_once()
 
@@ -296,6 +313,7 @@ class TestIntegration:
         """Test complete workflow when debug disabled."""
         import importlib
         import utils.debug_config
+
         importlib.reload(utils.debug_config)
 
         # Check debug mode detection
@@ -308,6 +326,6 @@ class TestIntegration:
         assert logger.level == logging.INFO
 
         # Test debug print (should not print)
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             utils.debug_config.debug_print("Production test")
             mock_print.assert_not_called()

@@ -93,9 +93,9 @@ async def generate_streaming_response(request, content):
         "gpt-4o-mini": 0.05,             # 50ms delay
         "default": 0.02                   # 20ms delay
     }
-    
+
     chunk_delay = model_speeds.get(request.model, 0.02)
-    
+
     # Use variable chunk sizes based on content
     if len(content) < 500:
         chunk_size = 50  # Smaller chunks for short responses
@@ -110,11 +110,11 @@ async def generate_streaming_response(request, content):
 async def process_records_parallel(records):
     """Process records in parallel instead of sequential"""
     import asyncio
-    
+
     async def process_single_record(record):
         # Process individual record
         return processed_record
-    
+
     # Process all records concurrently
     tasks = [process_single_record(record) for record in records]
     results = await asyncio.gather(*tasks)
@@ -139,13 +139,13 @@ class OptimizedCache:
     def __init__(self):
         self.memory_cache = {}  # L1 cache (memory)
         self.redis_cache = redis_client  # L2 cache (Redis)
-    
+
     @lru_cache(maxsize=100)
     def get_cached_response(self, key):
         # Check L1 cache first
         if key in self.memory_cache:
             return self.memory_cache[key]
-        
+
         # Check L2 cache
         if self.redis_cache:
             value = self.redis_cache.get(key)
@@ -153,9 +153,9 @@ class OptimizedCache:
                 # Promote to L1
                 self.memory_cache[key] = value
                 return value
-        
+
         return None
-    
+
     def set_cached_response(self, key, value, ttl=3600):
         # Set in both caches
         self.memory_cache[key] = value

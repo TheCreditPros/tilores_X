@@ -32,12 +32,8 @@ class TestCacheHitMiss:
         # First request should be cache miss
         response1 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": "What is 2+2?"}],
-                "max_tokens": 50
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "What is 2+2?"}], "max_tokens": 50},
+            headers={"Authorization": "Bearer test-key"},
         )
 
         assert response1.status_code == 200
@@ -47,12 +43,8 @@ class TestCacheHitMiss:
         start_time = time.time()
         response2 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": "What is 2+2?"}],
-                "max_tokens": 50
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "What is 2+2?"}], "max_tokens": 50},
+            headers={"Authorization": "Bearer test-key"},
         )
         cache_hit_time = time.time() - start_time
 
@@ -74,23 +66,15 @@ class TestCacheHitMiss:
         # Request with gpt-4o-mini
         response1 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": query}],
-                "max_tokens": 50
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": query}], "max_tokens": 50},
+            headers={"Authorization": "Bearer test-key"},
         )
 
         # Request with gpt-4o (different model, should be cache miss)
         response2 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o",
-                "messages": [{"role": "user", "content": query}],
-                "max_tokens": 50
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o", "messages": [{"role": "user", "content": query}], "max_tokens": 50},
+            headers={"Authorization": "Bearer test-key"},
         )
 
         assert response1.status_code == 200
@@ -107,12 +91,8 @@ class TestCacheHitMiss:
         # Single message
         response1 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": "Hello"}],
-                "max_tokens": 50
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 50},
+            headers={"Authorization": "Bearer test-key"},
         )
 
         # Different conversation context
@@ -123,11 +103,11 @@ class TestCacheHitMiss:
                 "messages": [
                     {"role": "user", "content": "Hi there"},
                     {"role": "assistant", "content": "Hello!"},
-                    {"role": "user", "content": "Hello"}
+                    {"role": "user", "content": "Hello"},
                 ],
-                "max_tokens": 50
+                "max_tokens": 50,
             },
-            headers={"Authorization": "Bearer test-key"}
+            headers={"Authorization": "Bearer test-key"},
         )
 
         assert response1.status_code == 200
@@ -157,15 +137,13 @@ class TestCachePerformance:
         query_data = {
             "model": "gpt-4o-mini",
             "messages": [{"role": "user", "content": "Explain quantum computing"}],
-            "max_tokens": 100
+            "max_tokens": 100,
         }
 
         # First request (cache miss)
         start_time = time.time()
         response1 = self.client.post(
-            "/v1/chat/completions",
-            json=query_data,
-            headers={"Authorization": "Bearer test-key"}
+            "/v1/chat/completions", json=query_data, headers={"Authorization": "Bearer test-key"}
         )
         first_request_time = time.time() - start_time
 
@@ -174,9 +152,7 @@ class TestCachePerformance:
         # Second request (cache hit)
         start_time = time.time()
         response2 = self.client.post(
-            "/v1/chat/completions",
-            json=query_data,
-            headers={"Authorization": "Bearer test-key"}
+            "/v1/chat/completions", json=query_data, headers={"Authorization": "Bearer test-key"}
         )
         second_request_time = time.time() - start_time
 
@@ -199,9 +175,9 @@ class TestCachePerformance:
                 json={
                     "model": "gpt-4o-mini",
                     "messages": [{"role": "user", "content": f"Request number {i % 3}"}],  # Only 3 unique queries
-                    "max_tokens": 50
+                    "max_tokens": 50,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
 
         # Make 9 concurrent requests (3 unique queries × 3 each)
@@ -230,9 +206,9 @@ class TestCachePerformance:
                 json={
                     "model": "gpt-4o-mini",
                     "messages": [{"role": "user", "content": f"Unique query {i}"}],
-                    "max_tokens": 20
+                    "max_tokens": 20,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
             # Handle rate limiting gracefully
             if response.status_code == 200:
@@ -263,16 +239,12 @@ class TestCacheExpiration:
         query = "Test cache expiration"
 
         # Mock cache manager to use very short TTL
-        with patch.object(cache_manager, 'set_llm_response') as mock_set:
+        with patch.object(cache_manager, "set_llm_response") as mock_set:
             # First request
             response1 = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o-mini",
-                    "messages": [{"role": "user", "content": query}],
-                    "max_tokens": 20
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": query}], "max_tokens": 20},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             # Handle potential rate limiting
@@ -293,12 +265,8 @@ class TestCacheExpiration:
         # First request to populate cache
         response1 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": query}],
-                "max_tokens": 20
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": query}], "max_tokens": 20},
+            headers={"Authorization": "Bearer test-key"},
         )
 
         # Handle potential rate limiting
@@ -314,12 +282,8 @@ class TestCacheExpiration:
         start_time = time.time()
         response2 = self.client.post(
             "/v1/chat/completions",
-            json={
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": query}],
-                "max_tokens": 20
-            },
-            headers={"Authorization": "Bearer test-key"}
+            json={"model": "gpt-4o-mini", "messages": [{"role": "user", "content": query}], "max_tokens": 20},
+            headers={"Authorization": "Bearer test-key"},
         )
         elapsed_time = time.time() - start_time
 
@@ -340,18 +304,18 @@ class TestCacheFallback:
     def test_cache_unavailable_fallback(self):
         """Test system works when cache is unavailable."""
         # Mock cache manager to simulate unavailability
-        with patch.object(cache_manager, 'cache_available', False), \
-             patch.object(cache_manager, 'get_llm_response', return_value=None), \
-             patch.object(cache_manager, 'set_llm_response', return_value=None):
+        with patch.object(cache_manager, "cache_available", False), patch.object(
+            cache_manager, "get_llm_response", return_value=None
+        ), patch.object(cache_manager, "set_llm_response", return_value=None):
 
             response = self.client.post(
                 "/v1/chat/completions",
                 json={
                     "model": "gpt-4o-mini",
                     "messages": [{"role": "user", "content": "Test without cache"}],
-                    "max_tokens": 50
+                    "max_tokens": 50,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
 
             # System should work without cache, but may hit rate limits
@@ -364,17 +328,18 @@ class TestCacheFallback:
     def test_cache_error_handling(self):
         """Test cache error handling doesn't break system."""
         # Mock cache operations to raise exceptions
-        with patch.object(cache_manager, 'get_llm_response', side_effect=Exception("Cache error")), \
-             patch.object(cache_manager, 'set_llm_response', side_effect=Exception("Cache error")):
+        with patch.object(cache_manager, "get_llm_response", side_effect=Exception("Cache error")), patch.object(
+            cache_manager, "set_llm_response", side_effect=Exception("Cache error")
+        ):
 
             response = self.client.post(
                 "/v1/chat/completions",
                 json={
                     "model": "gpt-4o-mini",
                     "messages": [{"role": "user", "content": "Test with cache errors"}],
-                    "max_tokens": 50
+                    "max_tokens": 50,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
 
             # System should gracefully handle cache errors, but may hit rate limits
@@ -423,7 +388,7 @@ class TestCacheKeyGeneration:
         messages2 = [
             {"role": "user", "content": "Hi"},
             {"role": "assistant", "content": "Hello!"},
-            {"role": "user", "content": "Hello"}
+            {"role": "user", "content": "Hello"},
         ]
 
         # Convert messages to string for hashing

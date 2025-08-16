@@ -17,7 +17,7 @@ class TestRedisCacheManagerInitialization:
     @pytest.mark.unit
     def test_redis_available_successful_connection(self, mock_redis_client):
         """Test successful Redis connection when Redis is available."""
-        with patch('redis_cache.redis') as mock_redis_module:
+        with patch("redis_cache.redis") as mock_redis_module:
             mock_redis_module.from_url.return_value = mock_redis_client
             mock_redis_module.Redis.return_value = mock_redis_client
 
@@ -30,7 +30,7 @@ class TestRedisCacheManagerInitialization:
     @pytest.mark.unit
     def test_redis_unavailable_graceful_fallback(self):
         """Test graceful fallback when Redis is unavailable."""
-        with patch('redis_cache.redis') as mock_redis_module:
+        with patch("redis_cache.redis") as mock_redis_module:
             mock_redis_module.from_url.side_effect = Exception("Redis unavailable")
             mock_redis_module.Redis.side_effect = Exception("Redis unavailable")
 
@@ -44,7 +44,7 @@ class TestRedisCacheManagerInitialization:
         """Test connection failure during ping operation."""
         mock_redis_client.ping.side_effect = Exception("Connection timeout")
 
-        with patch('redis_cache.redis') as mock_redis_module:
+        with patch("redis_cache.redis") as mock_redis_module:
             mock_redis_module.from_url.return_value = mock_redis_client
 
             cache_manager = RedisCacheManager()
@@ -55,8 +55,7 @@ class TestRedisCacheManagerInitialization:
     @pytest.mark.unit
     def test_redis_url_configuration(self, mock_redis_client):
         """Test Redis connection with REDIS_URL environment variable."""
-        with patch('redis_cache.redis') as mock_redis_module, \
-             patch('redis_cache.os.getenv') as mock_getenv:
+        with patch("redis_cache.redis") as mock_redis_module, patch("redis_cache.os.getenv") as mock_getenv:
 
             mock_getenv.return_value = "redis://test:6379/0"
             mock_redis_module.from_url.return_value = mock_redis_client
@@ -64,24 +63,20 @@ class TestRedisCacheManagerInitialization:
             cache_manager = RedisCacheManager()
 
             mock_redis_module.from_url.assert_called_once_with(
-                "redis://test:6379/0",
-                decode_responses=True,
-                socket_connect_timeout=5,
-                socket_timeout=5
+                "redis://test:6379/0", decode_responses=True, socket_connect_timeout=5, socket_timeout=5
             )
 
     @pytest.mark.unit
     def test_local_redis_configuration(self, mock_redis_client):
         """Test local Redis connection configuration."""
-        with patch('redis_cache.redis') as mock_redis_module, \
-             patch('redis_cache.os.getenv') as mock_getenv:
+        with patch("redis_cache.redis") as mock_redis_module, patch("redis_cache.os.getenv") as mock_getenv:
 
             def getenv_side_effect(key, default=None):
                 env_vars = {
-                    'REDIS_URL': None,
-                    'REDIS_HOST': 'test-host',
-                    'REDIS_PORT': '6380',
-                    'REDIS_PASSWORD': 'test-password'
+                    "REDIS_URL": None,
+                    "REDIS_HOST": "test-host",
+                    "REDIS_PORT": "6380",
+                    "REDIS_PASSWORD": "test-password",
                 }
                 return env_vars.get(key, default)
 
@@ -91,12 +86,12 @@ class TestRedisCacheManagerInitialization:
             cache_manager = RedisCacheManager()
 
             mock_redis_module.Redis.assert_called_once_with(
-                host='test-host',
+                host="test-host",
                 port=6380,
-                password='test-password',
+                password="test-password",
                 decode_responses=True,
                 socket_connect_timeout=5,
-                socket_timeout=5
+                socket_timeout=5,
             )
 
 
@@ -146,9 +141,7 @@ class TestTiloresFieldsCaching:
         result = mock_cache_manager.get_tilores_fields("test_api_id")
 
         assert result == test_fields
-        mock_cache_manager.redis_client.get.assert_called_once_with(
-            "tilores:fields:test_api_id"
-        )
+        mock_cache_manager.redis_client.get.assert_called_once_with("tilores:fields:test_api_id")
 
     @pytest.mark.unit
     def test_get_tilores_fields_cache_miss(self, mock_cache_manager):
@@ -173,9 +166,7 @@ class TestTiloresFieldsCaching:
 
         mock_cache_manager.set_tilores_fields("test_api_id", test_fields)
 
-        mock_cache_manager.redis_client.setex.assert_called_once_with(
-            "tilores:fields:test_api_id", 3600, test_fields
-        )
+        mock_cache_manager.redis_client.setex.assert_called_once_with("tilores:fields:test_api_id", 3600, test_fields)
 
     @pytest.mark.unit
     def test_set_tilores_fields_redis_unavailable(self, mock_cache_manager_unavailable):
@@ -206,9 +197,7 @@ class TestLLMResponseCaching:
         result = mock_cache_manager.get_llm_response("test_hash_123")
 
         assert result == test_response
-        mock_cache_manager.redis_client.get.assert_called_once_with(
-            "tilores:llm:test_hash_123"
-        )
+        mock_cache_manager.redis_client.get.assert_called_once_with("tilores:llm:test_hash_123")
 
     @pytest.mark.unit
     def test_set_llm_response_successful(self, mock_cache_manager):
@@ -217,9 +206,7 @@ class TestLLMResponseCaching:
 
         mock_cache_manager.set_llm_response("test_hash_123", test_response)
 
-        mock_cache_manager.redis_client.setex.assert_called_once_with(
-            "tilores:llm:test_hash_123", 86400, test_response
-        )
+        mock_cache_manager.redis_client.setex.assert_called_once_with("tilores:llm:test_hash_123", 86400, test_response)
 
     @pytest.mark.unit
     def test_llm_response_24_hour_ttl(self, mock_cache_manager):
@@ -243,9 +230,7 @@ class TestCustomerSearchCaching:
         result = mock_cache_manager.get_customer_search("search_hash_123")
 
         assert result == test_data
-        mock_cache_manager.redis_client.get.assert_called_once_with(
-            "tilores:search:search_hash_123"
-        )
+        mock_cache_manager.redis_client.get.assert_called_once_with("tilores:search:search_hash_123")
 
     @pytest.mark.unit
     def test_set_customer_search_successful(self, mock_cache_manager):
@@ -291,9 +276,7 @@ class TestCreditReportCaching:
         result = mock_cache_manager.get_credit_report("customer_123")
 
         assert result == test_report
-        mock_cache_manager.redis_client.get.assert_called_once_with(
-            "tilores:credit:customer_123"
-        )
+        mock_cache_manager.redis_client.get.assert_called_once_with("tilores:credit:customer_123")
 
     @pytest.mark.unit
     def test_set_credit_report_successful(self, mock_cache_manager):
@@ -302,9 +285,7 @@ class TestCreditReportCaching:
 
         mock_cache_manager.set_credit_report("customer_123", test_report)
 
-        mock_cache_manager.redis_client.setex.assert_called_once_with(
-            "tilores:credit:customer_123", 3600, test_report
-        )
+        mock_cache_manager.redis_client.setex.assert_called_once_with("tilores:credit:customer_123", 3600, test_report)
 
 
 class TestCacheUtilities:
@@ -397,7 +378,9 @@ class TestCacheClear:
     def test_clear_cache_all_entries(self, mock_cache_manager):
         """Test clearing all cache entries."""
         mock_cache_manager.redis_client.keys.return_value = [
-            "tilores:fields:api1", "tilores:llm:hash1", "tilores:search:search1"
+            "tilores:fields:api1",
+            "tilores:llm:hash1",
+            "tilores:search:search1",
         ]
 
         count = mock_cache_manager.clear_cache()
@@ -409,9 +392,7 @@ class TestCacheClear:
     @pytest.mark.unit
     def test_clear_cache_specific_pattern(self, mock_cache_manager):
         """Test clearing cache entries with specific pattern."""
-        mock_cache_manager.redis_client.keys.return_value = [
-            "tilores:fields:api1", "tilores:fields:api2"
-        ]
+        mock_cache_manager.redis_client.keys.return_value = ["tilores:fields:api1", "tilores:fields:api2"]
 
         count = mock_cache_manager.clear_cache("fields")
 

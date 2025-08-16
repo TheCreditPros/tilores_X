@@ -22,6 +22,7 @@ class TestProviderFailover:
         # Clear cache before each test to ensure fresh LLM calls
         try:
             from redis_cache import cache_manager
+
             cache_manager.clear_cache()
         except Exception:
             pass  # Cache might not be available in test environment
@@ -30,8 +31,7 @@ class TestProviderFailover:
     def test_openai_to_groq_failover(self):
         """Test failover from OpenAI to Groq when OpenAI fails."""
         # Mock OpenAI failure and successful Groq fallback
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI throws exception
             mock_openai.side_effect = Exception("OpenAI API unavailable")
@@ -44,12 +44,8 @@ class TestProviderFailover:
             # Test chat completion with GPT model that should fail over to Groq
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200
@@ -68,9 +64,9 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_multiple_provider_failures(self):
         """Test behavior when multiple providers fail sequentially."""
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatAnthropic') as mock_anthropic, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatAnthropic") as mock_anthropic, patch(
+            "core_app.ChatGroq"
+        ) as mock_groq:
 
             # All providers fail initially
             mock_openai.side_effect = Exception("OpenAI down")
@@ -79,12 +75,8 @@ class TestProviderFailover:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             # The system has fallback mechanisms, so it might still return 200
@@ -98,12 +90,12 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_provider_timeout_failover(self):
         """Test failover when provider times out."""
+
         def slow_provider(*args, **kwargs):
             time.sleep(2)  # Simulate slow response
             return Mock(content="Slow response")
 
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI is slow
             mock_openai_instance = Mock()
@@ -119,12 +111,8 @@ class TestProviderFailover:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             elapsed_time = time.time() - start_time
@@ -136,8 +124,7 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_api_key_failure_failover(self):
         """Test failover when API key is invalid."""
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI throws authentication error
             auth_error = Mock()
@@ -152,12 +139,8 @@ class TestProviderFailover:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200
@@ -167,8 +150,7 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_rate_limit_failover(self):
         """Test failover when provider hits rate limits."""
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI throws rate limit error
             mock_openai.side_effect = Exception("Rate limit exceeded")
@@ -180,12 +162,8 @@ class TestProviderFailover:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200
@@ -195,8 +173,7 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_model_unavailable_failover(self):
         """Test failover when specific model is unavailable."""
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # Specific model unavailable
             mock_openai.side_effect = Exception("Model gpt-4o not available")
@@ -208,12 +185,8 @@ class TestProviderFailover:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200
@@ -223,19 +196,16 @@ class TestProviderFailover:
     @pytest.mark.integration
     def test_streaming_failover(self):
         """Test failover behavior with streaming responses."""
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI streaming fails
             mock_openai.side_effect = Exception("Streaming unavailable")
 
             # Groq streaming works
             mock_groq_instance = Mock()
-            mock_groq_instance.stream.return_value = iter([
-                Mock(content="Hello"),
-                Mock(content=" from"),
-                Mock(content=" Groq!")
-            ])
+            mock_groq_instance.stream.return_value = iter(
+                [Mock(content="Hello"), Mock(content=" from"), Mock(content=" Groq!")]
+            )
             mock_groq.return_value = mock_groq_instance
 
             response = self.client.post(
@@ -244,9 +214,9 @@ class TestProviderFailover:
                     "model": "gpt-4o",
                     "messages": [{"role": "user", "content": "Hello"}],
                     "stream": True,
-                    "max_tokens": 100
+                    "max_tokens": 100,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200
@@ -264,6 +234,7 @@ class TestProviderRetryMechanisms:
         # Clear cache before each test to ensure fresh LLM calls
         try:
             from redis_cache import cache_manager
+
             cache_manager.clear_cache()
         except Exception:
             pass  # Cache might not be available in test environment
@@ -280,7 +251,7 @@ class TestProviderRetryMechanisms:
                 raise Exception(f"Temporary failure {retry_count}")
             return Mock(content="Success after retries")
 
-        with patch('core_app.ChatOpenAI') as mock_openai:
+        with patch("core_app.ChatOpenAI") as mock_openai:
             mock_openai_instance = Mock()
             mock_openai_instance.invoke.side_effect = failing_provider
             mock_openai.return_value = mock_openai_instance
@@ -289,12 +260,8 @@ class TestProviderRetryMechanisms:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             elapsed_time = time.time() - start_time
@@ -316,8 +283,7 @@ class TestProviderRetryMechanisms:
             retry_count += 1
             raise Exception(f"Persistent failure {retry_count}")
 
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI always fails
             mock_openai_instance = Mock()
@@ -333,12 +299,8 @@ class TestProviderRetryMechanisms:
 
             response = self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             elapsed_time = time.time() - start_time
@@ -360,7 +322,7 @@ class TestProviderRetryMechanisms:
                 raise Exception("Service temporarily unavailable")
             return Mock(content="Service recovered")
 
-        with patch('core_app.ChatOpenAI') as mock_openai:
+        with patch("core_app.ChatOpenAI") as mock_openai:
             mock_openai_instance = Mock()
             mock_openai_instance.invoke.side_effect = intermittent_failure
             mock_openai.return_value = mock_openai_instance
@@ -373,9 +335,9 @@ class TestProviderRetryMechanisms:
                     json={
                         "model": "gpt-4o",
                         "messages": [{"role": "user", "content": f"Request {i}"}],
-                        "max_tokens": 100
+                        "max_tokens": 100,
                     },
-                    headers={"Authorization": "Bearer test-key"}
+                    headers={"Authorization": "Bearer test-key"},
                 )
                 responses.append(response)
                 time.sleep(0.1)  # Small delay between requests
@@ -395,6 +357,7 @@ class TestProviderHealthMonitoring:
         # Clear cache before each test to ensure fresh LLM calls
         try:
             from redis_cache import cache_manager
+
             cache_manager.clear_cache()
         except Exception:
             pass  # Cache might not be available in test environment
@@ -440,19 +403,15 @@ class TestProviderHealthMonitoring:
     @pytest.mark.integration
     def test_provider_status_during_failure(self):
         """Test provider status reporting during failures."""
-        with patch('core_app.ChatOpenAI') as mock_openai:
+        with patch("core_app.ChatOpenAI") as mock_openai:
             # OpenAI fails
             mock_openai.side_effect = Exception("OpenAI unavailable")
 
             # Try to use OpenAI model
             self.client.post(
                 "/v1/chat/completions",
-                json={
-                    "model": "gpt-4o",
-                    "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
-                },
-                headers={"Authorization": "Bearer test-key"}
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                headers={"Authorization": "Bearer test-key"},
             )
 
             # Check health status after failure
@@ -474,6 +433,7 @@ class TestConcurrentFailover:
         # Clear cache before each test to ensure fresh LLM calls
         try:
             from redis_cache import cache_manager
+
             cache_manager.clear_cache()
         except Exception:
             pass  # Cache might not be available in test environment
@@ -483,8 +443,7 @@ class TestConcurrentFailover:
         """Test multiple concurrent requests during provider failover."""
         request_count = 10
 
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI fails
             mock_openai.side_effect = Exception("OpenAI down")
@@ -503,9 +462,9 @@ class TestConcurrentFailover:
                     json={
                         "model": "gpt-4o",
                         "messages": [{"role": "user", "content": f"Request {i}"}],
-                        "max_tokens": 100
+                        "max_tokens": 100,
                     },
-                    headers={"Authorization": "Bearer test-key"}
+                    headers={"Authorization": "Bearer test-key"},
                 )
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
@@ -523,8 +482,7 @@ class TestConcurrentFailover:
     def test_sync_failover_performance(self):
         """Test failover performance with multiple requests."""
 
-        with patch('core_app.ChatOpenAI') as mock_openai, \
-             patch('core_app.ChatGroq') as mock_groq:
+        with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
             # OpenAI has delays
             def slow_openai(*args, **kwargs):
@@ -548,9 +506,9 @@ class TestConcurrentFailover:
                     json={
                         "model": "gpt-4o",
                         "messages": [{"role": "user", "content": f"Request {i}"}],
-                        "max_tokens": 50
+                        "max_tokens": 50,
                     },
-                    headers={"Authorization": "Bearer test-key"}
+                    headers={"Authorization": "Bearer test-key"},
                 )
                 responses.append(response)
 
@@ -574,6 +532,7 @@ class TestFailoverConfiguration:
         # Clear cache before each test to ensure fresh LLM calls
         try:
             from redis_cache import cache_manager
+
             cache_manager.clear_cache()
         except Exception:
             pass  # Cache might not be available in test environment
@@ -581,14 +540,13 @@ class TestFailoverConfiguration:
     @pytest.mark.integration
     def test_custom_retry_configuration(self):
         """Test custom retry configuration takes effect."""
-        with patch.dict('os.environ', {'TILORES_TIMEOUT': '1000'}):  # 1 second timeout
+        with patch.dict("os.environ", {"TILORES_TIMEOUT": "1000"}):  # 1 second timeout
 
             def slow_provider(*args, **kwargs):
                 time.sleep(2)  # Longer than timeout
                 return Mock(content="Should not reach here")
 
-            with patch('core_app.ChatOpenAI') as mock_openai, \
-                 patch('core_app.ChatGroq') as mock_groq:
+            with patch("core_app.ChatOpenAI") as mock_openai, patch("core_app.ChatGroq") as mock_groq:
 
                 mock_openai_instance = Mock()
                 mock_openai_instance.invoke.side_effect = slow_provider
@@ -603,12 +561,8 @@ class TestFailoverConfiguration:
 
                 response = self.client.post(
                     "/v1/chat/completions",
-                    json={
-                        "model": "gpt-4o",
-                        "messages": [{"role": "user", "content": "Hello"}],
-                        "max_tokens": 100
-                    },
-                    headers={"Authorization": "Bearer test-key"}
+                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},
+                    headers={"Authorization": "Bearer test-key"},
                 )
 
                 elapsed_time = time.time() - start_time
@@ -634,18 +588,18 @@ class TestFailoverConfiguration:
             call_order.append("groq")
             return Mock(content="Groq success")
 
-        with patch('core_app.ChatOpenAI', side_effect=track_openai), \
-             patch('core_app.ChatAnthropic', side_effect=track_anthropic), \
-             patch('core_app.ChatGroq', side_effect=track_groq):
+        with patch("core_app.ChatOpenAI", side_effect=track_openai), patch(
+            "core_app.ChatAnthropic", side_effect=track_anthropic
+        ), patch("core_app.ChatGroq", side_effect=track_groq):
 
             response = self.client.post(
                 "/v1/chat/completions",
                 json={
                     "model": "gpt-4o",  # Should try OpenAI first
                     "messages": [{"role": "user", "content": "Hello"}],
-                    "max_tokens": 100
+                    "max_tokens": 100,
                 },
-                headers={"Authorization": "Bearer test-key"}
+                headers={"Authorization": "Bearer test-key"},
             )
 
             assert response.status_code == 200

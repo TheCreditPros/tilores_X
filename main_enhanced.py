@@ -27,6 +27,7 @@ from monitoring import monitor
 try:
     from langsmith import Client as LangSmithClient
     from core_app import engine
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LangSmithClient = None
@@ -40,7 +41,7 @@ initialize_engine()
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per minute", "3000 per hour"],
-    storage_uri=os.getenv("REDIS_URL", "memory://")  # Use Redis if available, else memory
+    storage_uri=os.getenv("REDIS_URL", "memory://"),  # Use Redis if available, else memory
 )
 
 # FastAPI app - ultra-minimal for AnythingLLM integration
@@ -151,17 +152,12 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
 
     # Send opening chunk
     opening_chunk = {
-        'id': response_id,
-        'object': 'chat.completion.chunk',
-        'created': created,
-        'model': request.model,
-        'system_fingerprint': system_fp,
-        'choices': [{
-            'index': 0,
-            'delta': {'role': 'assistant'},
-            'logprobs': None,
-            'finish_reason': None
-        }]
+        "id": response_id,
+        "object": "chat.completion.chunk",
+        "created": created,
+        "model": request.model,
+        "system_fingerprint": system_fp,
+        "choices": [{"index": 0, "delta": {"role": "assistant"}, "logprobs": None, "finish_reason": None}],
     }
     yield f"data: {json.dumps(opening_chunk)}\n\n"
 
@@ -219,14 +215,13 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
     request_id = generate_unique_id()
 
     # Start monitoring timer
-    timer_id = monitor.start_timer("chat_completion", {
-        "model": chat_request.model,
-        "stream": chat_request.stream,
-        "message_count": len(chat_request.messages)
-    })
+    timer_id = monitor.start_timer(
+        "chat_completion",
+        {"model": chat_request.model, "stream": chat_request.stream, "message_count": len(chat_request.messages)},
+    )
 
     # LangSmith: Initialize API request tracing
-    if LANGSMITH_AVAILABLE and engine and hasattr(engine, 'langsmith_client'):
+    if LANGSMITH_AVAILABLE and engine and hasattr(engine, "langsmith_client"):
         try:
             if engine.langsmith_client:
                 print(f"📊 LangSmith: Tracing API request {request_id}")
@@ -235,9 +230,7 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
 
     try:
         # Pass full conversation history to core_app for context preservation
-        messages = [
-            {"role": msg.role, "content": msg.content} for msg in chat_request.messages
-        ]
+        messages = [{"role": msg.role, "content": msg.content} for msg in chat_request.messages]
 
         # Calculate prompt tokens
         prompt_tokens = count_messages_tokens(chat_request.messages, chat_request.model)
@@ -251,29 +244,19 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
         if isinstance(response, str):
             content = response
         elif hasattr(response, "content"):
-            content = (
-                str(response.content) if response.content else "I'm ready to help."
-            )
+            content = str(response.content) if response.content else "I'm ready to help."
         elif hasattr(response, "message") and hasattr(response.message, "content"):
             content = str(response.message.content)
         elif isinstance(response, dict):
             if "content" in response:
                 content = str(response["content"])
-            elif (
-                "message" in response
-                and isinstance(response["message"], dict)
-                and "content" in response["message"]
-            ):
+            elif "message" in response and isinstance(response["message"], dict) and "content" in response["message"]:
                 content = str(response["message"]["content"])
             else:
                 content = "I'm ready to help."
         else:
             content_str = str(response)
-            if (
-                len(content_str) > 500
-                or "LLMResult" in content_str
-                or "token_usage" in content_str
-            ):
+            if len(content_str) > 500 or "LLMResult" in content_str or "token_usage" in content_str:
                 content = "I'm ready to help."
             else:
                 content = content_str
@@ -339,8 +322,9 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
                     "index": 0,
                     "message": {
                         "role": "assistant",
-                        "content": ("I apologize, but I encountered an error "
-                                    "processing your request. Please try again."),
+                        "content": (
+                            "I apologize, but I encountered an error " "processing your request. Please try again."
+                        ),
                     },
                     "finish_reason": "stop",
                 }
