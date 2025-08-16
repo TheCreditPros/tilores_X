@@ -467,12 +467,25 @@ def mock_time():
 @pytest.fixture(autouse=True)
 def mock_rate_limiter():
     """Mock rate limiter to prevent 429 errors during testing."""
-    with patch('slowapi.Limiter') as mock_limiter_class:
-        # Create a mock limiter instance that always allows requests
-        mock_limiter = MagicMock()
-        mock_limiter.limit.return_value = lambda func: func  # Return function unchanged
-        mock_limiter_class.return_value = mock_limiter
+    # Create a mock limiter that always allows requests
+    mock_limiter = MagicMock()
 
-        # Also patch the limiter instance in main_enhanced if it exists
-        with patch('main_enhanced.limiter', mock_limiter, create=True):
-            yield mock_limiter
+    # Mock the limit decorator to return the function unchanged
+    def mock_limit_decorator(*args, **kwargs):
+        def decorator(func):
+            return func  # Return the original function without rate limiting
+        return decorator
+
+    mock_limiter.limit = mock_limit_decorator
+
+    # Also mock the limiter properties and methods
+    mock_limiter.enabled = False
+    mock_limiter.check = MagicMock(return_value=None)
+    mock_limiter._check_request_limit = MagicMock(return_value=None)
+
+    # Patch multiple places where the limiter might be used
+    with patch('slowapi.Limiter', return_value=mock_limiter), \
+         patch('main_enhanced.limiter', mock_limiter), \
+         patch('slowapi.util.get_remote_address', return_value='127.0.0.1'):
+
+        yield mock_limiter
