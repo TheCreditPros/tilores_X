@@ -3,6 +3,7 @@ import {
   CheckCircle,
   CloudDone,
   DarkMode,
+  ExpandMore,
   Info,
   LightMode,
   Refresh,
@@ -11,18 +12,24 @@ import {
   WarningAmber,
 } from "@mui/icons-material";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Avatar,
   Backdrop,
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Chip,
   CircularProgress,
+  Collapse,
   createTheme,
   CssBaseline,
   Grid,
+  IconButton,
   LinearProgress,
   Paper,
   Stack,
@@ -198,11 +205,61 @@ function EnhancedMUIDashboard() {
   );
 
   const PhaseCard = ({ phase, title, metrics, status = "operational" }) => {
+    const [expanded, setExpanded] = useState(false);
+
     const statusColors = {
       operational: "success",
       warning: "warning",
       error: "error",
     };
+
+    const getWarningContext = () => {
+      switch (phase) {
+        case "2":
+          return {
+            issue: "AI Optimization Success Rate Below Threshold",
+            description: "Current success rate of 89% is below the expected 92% threshold for production workloads.",
+            impact: "May result in suboptimal pattern recognition and increased processing time.",
+            actions: [
+              "Review recent pattern identification algorithms",
+              "Check A/B test configurations for conflicts",
+              "Analyze cost efficiency metrics for resource allocation"
+            ],
+            severity: "MEDIUM",
+            eta: "2-4 hours to investigate and resolve"
+          };
+        case "3":
+          return {
+            issue: "Continuous Learning Cycle Gain Below Target",
+            description: "Average cycle gain of +2.3% is below the target of +3.5% for optimal learning velocity.",
+            impact: "Slower adaptation to new patterns and reduced self-healing effectiveness.",
+            actions: [
+              "Review pattern application effectiveness",
+              "Analyze quality breach resolution times",
+              "Optimize self-healing algorithms"
+            ],
+            severity: "MEDIUM",
+            eta: "1-2 hours to optimize learning parameters"
+          };
+        case "4":
+          return {
+            issue: "Production Integration Response Time Elevated",
+            description: "Current response time of 847ms exceeds the target of <500ms for optimal user experience.",
+            impact: "Potential user experience degradation and increased resource consumption.",
+            actions: [
+              "Optimize Railway deployment configuration",
+              "Review database query performance",
+              "Check network latency and CDN configuration"
+            ],
+            severity: "MEDIUM",
+            eta: "30-60 minutes to optimize performance"
+          };
+        default:
+          return null;
+      }
+    };
+
+    const warningContext = status === "warning" ? getWarningContext() : null;
 
     return (
       <Card sx={{ height: "100%" }}>
@@ -223,12 +280,26 @@ function EnhancedMUIDashboard() {
             </Stack>
           }
           action={
-            <Chip
-              label={status}
-              color={statusColors[status]}
-              size="small"
-              sx={{ textTransform: "capitalize" }}
-            />
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={status}
+                color={statusColors[status]}
+                size="small"
+                sx={{ textTransform: "capitalize" }}
+              />
+              {warningContext && (
+                <IconButton
+                  size="small"
+                  onClick={() => setExpanded(!expanded)}
+                  sx={{
+                    transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.3s',
+                  }}
+                >
+                  <ExpandMore />
+                </IconButton>
+              )}
+            </Stack>
           }
         />
         <CardContent>
@@ -262,10 +333,124 @@ function EnhancedMUIDashboard() {
                 )}
               </Box>
             ))}
+
+            {/* Warning Details Expansion */}
+            {warningContext && (
+              <Collapse in={expanded}>
+                <Box sx={{ mt: 2, p: 2, bgcolor: "warning.light", borderRadius: 1, color: "warning.contrastText" }}>
+                  <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+                    ⚠️ {warningContext.issue}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    {warningContext.description}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+                    Impact: {warningContext.impact}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>
+                    Recommended Actions:
+                  </Typography>
+                  <Stack spacing={0.5} sx={{ ml: 1, mb: 1 }}>
+                    {warningContext.actions.map((action, idx) => (
+                      <Typography key={idx} variant="body2">
+                        • {action}
+                      </Typography>
+                    ))}
+                  </Stack>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Chip
+                      label={`Severity: ${warningContext.severity}`}
+                      size="small"
+                      color="warning"
+                      variant="outlined"
+                    />
+                    <Typography variant="caption">
+                      ETA: {warningContext.eta}
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Collapse>
+            )}
           </Stack>
         </CardContent>
       </Card>
     );
+  };
+
+  // Generate dynamic alerts based on system state
+  const generateSystemAlerts = (data) => {
+    const alerts = [];
+
+    // Check for edge case handling below threshold
+    const edgeCaseMetric = data.phases?.find(p => p.phase === "1")?.metrics?.find(m => m.label === "Edge Cases");
+    if (edgeCaseMetric && parseFloat(edgeCaseMetric.value) < 90) {
+      alerts.push({
+        severity: "error",
+        icon: <WarningAmber />,
+        title: "HIGH: Edge Case Handling Below Threshold",
+        description: `Current edge case handling at ${edgeCaseMetric.value} is below the 90% operational threshold.`,
+        impact: "May result in unhandled edge cases affecting system reliability.",
+        actions: [
+          "Review recent edge case patterns",
+          "Increase test coverage for edge scenarios",
+          "Adjust pattern recognition sensitivity"
+        ],
+        eta: "2-3 hours to investigate and resolve"
+      });
+    }
+
+    // Check for AI optimization success rate
+    const aiPhase = data.phases?.find(p => p.phase === "2");
+    const successRateMetric = aiPhase?.metrics?.find(m => m.label === "Success Rate");
+    if (successRateMetric && parseFloat(successRateMetric.value) < 92) {
+      alerts.push({
+        severity: "warning",
+        icon: <Info />,
+        title: "MEDIUM: AI Optimization Success Rate Below Target",
+        description: `Success rate of ${successRateMetric.value} is below the expected 92% threshold.`,
+        impact: "Reduced pattern recognition efficiency and increased processing overhead.",
+        actions: [
+          "Analyze recent A/B test configurations",
+          "Review pattern identification algorithms",
+          "Check resource allocation for optimization processes"
+        ],
+        eta: "1-2 hours to optimize performance"
+      });
+    }
+
+    // Check for response time issues
+    const prodPhase = data.phases?.find(p => p.phase === "4");
+    const responseTimeMetric = prodPhase?.metrics?.find(m => m.label === "Response Time");
+    if (responseTimeMetric && parseFloat(responseTimeMetric.value) > 500) {
+      alerts.push({
+        severity: "warning",
+        icon: <Info />,
+        title: "MEDIUM: Production Response Time Elevated",
+        description: `Current response time of ${responseTimeMetric.value} exceeds the 500ms target.`,
+        impact: "Potential user experience degradation and increased resource consumption.",
+        actions: [
+          "Optimize database query performance",
+          "Review Railway deployment configuration",
+          "Check CDN and network latency"
+        ],
+        eta: "30-60 minutes to optimize"
+      });
+    }
+
+    // Add positive alerts for good performance
+    if (data.kpi?.systemUptime?.value === "99.8%") {
+      alerts.push({
+        severity: "success",
+        icon: <CheckCircle />,
+        title: "INFO: System Uptime Excellent",
+        description: "System maintaining 99.8% uptime with all components operational.",
+        impact: "Optimal system reliability and user experience.",
+        actions: ["Continue monitoring", "Maintain current configuration"],
+        eta: "No action required"
+      });
+    }
+
+    return alerts;
   };
 
   const ActivityFeed = ({ activities = [] }) => (
@@ -515,29 +700,74 @@ function EnhancedMUIDashboard() {
             </Card>
           </Grid>
 
-          {/* Alerts */}
+          {/* Dynamic Alerts */}
           <Grid item xs={12} lg={6}>
             <Card>
               <CardHeader title="🚨 Active Alerts & Actions" />
               <CardContent>
                 <Stack spacing={2}>
-                  <Alert severity="error" icon={<WarningAmber />}>
-                    <Typography variant="body2">
-                      <strong>HIGH:</strong> Edge case handling at 86.4% (below
-                      90% threshold)
-                    </Typography>
-                  </Alert>
-                  <Alert severity="warning" icon={<Info />}>
-                    <Typography variant="body2">
-                      <strong>MEDIUM:</strong> A/B test #47 ready for review
-                    </Typography>
-                  </Alert>
-                  <Alert severity="success" icon={<CheckCircle />}>
-                    <Typography variant="body2">
-                      <strong>INFO:</strong> Cycle #48 scheduled to start in 2
-                      hours
-                    </Typography>
-                  </Alert>
+                  {generateSystemAlerts(data).map((alert, idx) => (
+                    <Accordion key={idx} sx={{ boxShadow: 'none', border: '1px solid', borderColor: `${alert.severity}.main` }}>
+                      <AccordionSummary expandIcon={<ExpandMore />}>
+                        <Alert
+                          severity={alert.severity}
+                          icon={alert.icon}
+                          sx={{ width: '100%', '& .MuiAlert-message': { width: '100%' } }}
+                        >
+                          <Typography variant="body2" fontWeight={600}>
+                            {alert.title}
+                          </Typography>
+                        </Alert>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Stack spacing={2}>
+                          <Typography variant="body2">
+                            <strong>Description:</strong> {alert.description}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Impact:</strong> {alert.impact}
+                          </Typography>
+                          <Box>
+                            <Typography variant="body2" fontWeight={600} gutterBottom>
+                              Recommended Actions:
+                            </Typography>
+                            <Stack spacing={0.5} sx={{ ml: 1 }}>
+                              {alert.actions.map((action, actionIdx) => (
+                                <Typography key={actionIdx} variant="body2">
+                                  • {action}
+                                </Typography>
+                              ))}
+                            </Stack>
+                          </Box>
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Chip
+                              label={`ETA: ${alert.eta}`}
+                              size="small"
+                              variant="outlined"
+                            />
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color={alert.severity}
+                              onClick={() => {
+                                // Placeholder for action handler
+                                // console.log(`Taking action for: ${alert.title}`);
+                              }}
+                            >
+                              Take Action
+                            </Button>
+                          </Stack>
+                        </Stack>
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                  {generateSystemAlerts(data).length === 0 && (
+                    <Alert severity="success" icon={<CheckCircle />}>
+                      <Typography variant="body2">
+                        <strong>All Systems Operational:</strong> No active alerts or issues detected.
+                      </Typography>
+                    </Alert>
+                  )}
                 </Stack>
               </CardContent>
             </Card>

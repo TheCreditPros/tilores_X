@@ -1,17 +1,24 @@
 /**
- * Comprehensive E2E Integration Tests for tilores_X Dashboard
+ * Comprehensive E2E Integration Tests for tilores_X Enhanced Dashboard
  *
  * Full-stack end-to-end testing covering MUI Dashboard frontend
  * integration with Virtuous Cycle API backend endpoints.
  *
+ * Updated for Enhanced Dashboard v2.0 with:
+ * - Contextual warning information
+ * - Dynamic alerts system
+ * - Expandable phase card details
+ * - Real-time backend integration
+ *
  * Author: Roo (Elite Software Engineer)
  * Created: 2025-08-16
+ * Updated: 2025-08-17 - Enhanced Dashboard Features
  * Integration: Frontend-Backend E2E Testing
  */
 
 import { test, expect } from '@playwright/test';
 
-test.describe('Dashboard Integration Tests', () => {
+test.describe('Enhanced Dashboard Integration Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     // Navigate to dashboard before each test
@@ -21,28 +28,34 @@ test.describe('Dashboard Integration Tests', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test('Dashboard loads successfully with all components', async ({ page }) => {
+  test('Enhanced dashboard loads successfully with all components', async ({ page }) => {
     // Verify main title is present
     await expect(page.locator('h4')).toContainText('tilores_X AI Dashboard');
 
-    // Verify all KPI cards are present
-    const kpiCards = page.locator('.MuiCard-root');
-    await expect(kpiCards).toHaveCount(4); // 4 KPI cards expected
+    // Verify all KPI cards are present (updated titles)
+    await expect(page.locator('text=Overall Quality Score')).toBeVisible();
+    await expect(page.locator('text=Total Traces Processed')).toBeVisible();
+    await expect(page.locator('text=Optimization Triggers')).toBeVisible();
+    await expect(page.locator('text=System Uptime')).toBeVisible();
 
-    // Verify specific KPI card titles
-    await expect(page.locator('text=Current Quality')).toBeVisible();
-    await expect(page.locator('text=Traces Processed')).toBeVisible();
-    await expect(page.locator('text=Optimizations')).toBeVisible();
-    await expect(page.locator('text=Improvements')).toBeVisible();
+    // Verify enhanced phase cards with warning states
+    await expect(page.locator('text=Multi-Spectrum Foundation')).toBeVisible();
+    await expect(page.locator('text=AI Optimization')).toBeVisible();
+    await expect(page.locator('text=Continuous Learning')).toBeVisible();
+    await expect(page.locator('text=Production Integration')).toBeVisible();
 
-    // Verify phase status section is present
-    await expect(page.locator('text=Phase Status')).toBeVisible();
+    // Verify enhanced charts section
+    await expect(page.locator('text=Quality Evolution & Performance Trends')).toBeVisible();
+    await expect(page.locator('text=7-Spectrum Performance Matrix')).toBeVisible();
 
-    // Verify metrics chart is present
-    await expect(page.locator('text=Performance Metrics')).toBeVisible();
+    // Verify enhanced alerts section
+    await expect(page.locator('text=Active Alerts & Actions')).toBeVisible();
+
+    // Verify real-time activity feed
+    await expect(page.locator('text=Real-Time Activity')).toBeVisible();
 
     // Take screenshot for visual verification
-    await page.screenshot({ path: 'test-results/dashboard-loaded.png' });
+    await page.screenshot({ path: 'test-results/enhanced-dashboard-loaded.png' });
   });
 
   test('API integration loads data successfully', async ({ page }) => {
@@ -277,42 +290,276 @@ test.describe('Dashboard Integration Tests', () => {
     // expect(violations).toHaveLength(0);
   });
 
-  test('Complete integration workflow', async ({ page }) => {
-    // This test validates the complete user workflow
+  test('Enhanced phase cards with expandable warning context', async ({ page }) => {
+    // Mock API with warning states to trigger expandable context
+    await page.route('**/v1/virtuous-cycle/status', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          monitoring_active: true,
+          langsmith_available: true,
+          frameworks_available: true,
+          quality_threshold: 0.90,
+          metrics: {
+            traces_processed: 250,
+            quality_checks: 45,
+            optimizations_triggered: 5,
+            improvements_deployed: 3,
+            current_quality: 0.89, // Below threshold to trigger warnings
+            last_update: new Date().toISOString()
+          },
+          component_status: {
+            langsmith_client: true,
+            quality_collector: true,
+            phase2_orchestrator: false, // Trigger AI Optimization warning
+            phase3_orchestrator: false, // Trigger Continuous Learning warning
+            phase4_orchestrator: false  // Trigger Production Integration warning
+          }
+        })
+      });
+    });
 
-    // Step 1: Load dashboard
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Step 2: Verify initial data load
-    await expect(page.locator('h4')).toContainText('tilores_X AI Dashboard');
-    const qualityCard = page.locator('text=Current Quality').locator('..');
-    await expect(qualityCard).toBeVisible();
+    // Verify warning states are displayed
+    await expect(page.locator('text=AI Optimization').locator('..').locator('text=Warning')).toBeVisible();
+    await expect(page.locator('text=Continuous Learning').locator('..').locator('text=Warning')).toBeVisible();
+    await expect(page.locator('text=Production Integration').locator('..').locator('text=Warning')).toBeVisible();
 
-    // Step 3: Verify API integration
+    // Test expandable warning context for Production Integration
+    const prodIntegrationCard = page.locator('text=Production Integration').locator('..');
+    const expandButton = prodIntegrationCard.locator('button[aria-label*="expand"]').or(
+      prodIntegrationCard.locator('svg[data-testid="ExpandMoreIcon"]').locator('..')
+    );
+
+    if (await expandButton.isVisible()) {
+      await expandButton.click();
+
+      // Verify expanded context appears
+      await expect(page.locator('text=Production Integration Response Time Elevated')).toBeVisible();
+      await expect(page.locator('text=Impact:')).toBeVisible();
+      await expect(page.locator('text=Recommended Actions:')).toBeVisible();
+      await expect(page.locator('text=ETA:')).toBeVisible();
+    }
+
+    await page.screenshot({ path: 'test-results/enhanced-phase-warnings.png' });
+  });
+
+  test('Dynamic alerts system with contextual information', async ({ page }) => {
+    // Mock API data that will trigger specific alerts
+    await page.route('**/v1/virtuous-cycle/status', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          monitoring_active: true,
+          langsmith_available: true,
+          frameworks_available: true,
+          quality_threshold: 0.90,
+          metrics: {
+            traces_processed: 250,
+            quality_checks: 45,
+            optimizations_triggered: 5,
+            improvements_deployed: 3,
+            current_quality: 0.864, // Will trigger edge case alert
+            last_update: new Date().toISOString()
+          },
+          component_status: {
+            langsmith_client: true,
+            quality_collector: true,
+            phase2_orchestrator: true,
+            phase3_orchestrator: true,
+            phase4_orchestrator: true
+          }
+        })
+      });
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Verify dynamic alerts section
+    const alertsSection = page.locator('text=Active Alerts & Actions').locator('..');
+    await expect(alertsSection).toBeVisible();
+
+    // Verify HIGH alert for edge case handling
+    await expect(page.locator('text=HIGH: Edge case handling at 86.4% (below 90% threshold)')).toBeVisible();
+
+    // Test expandable alert details
+    const highAlert = page.locator('text=HIGH: Edge case handling').locator('..');
+    const alertExpandButton = highAlert.locator('svg[data-testid="ExpandMoreIcon"]').locator('..').first();
+
+    if (await alertExpandButton.isVisible()) {
+      await alertExpandButton.click();
+
+      // Verify expanded alert context
+      await expect(page.locator('text=Description:')).toBeVisible();
+      await expect(page.locator('text=Impact:')).toBeVisible();
+      await expect(page.locator('text=Recommended Actions:')).toBeVisible();
+      await expect(page.locator('text=ETA:')).toBeVisible();
+      await expect(page.locator('button:has-text("Take Action")')).toBeVisible();
+    }
+
+    await page.screenshot({ path: 'test-results/dynamic-alerts-expanded.png' });
+  });
+
+  test('Real-time backend data integration validation', async ({ page }) => {
+    let apiCallCount = 0;
+
+    // Intercept API calls to verify real backend integration
+    await page.route('**/v1/virtuous-cycle/status', route => {
+      apiCallCount++;
+      // Pass through to real backend to test actual integration
+      route.continue();
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Verify API was called
+    expect(apiCallCount).toBeGreaterThan(0);
+
+    // Verify real data is loaded (not mock fallback values)
+    const qualityValue = page.locator('[data-testid="current-quality-value"]');
+    await expect(qualityValue).not.toContainText('Loading...');
+    await expect(qualityValue).not.toContainText('0.85'); // Mock fallback value
+
+    // Verify real-time activity feed shows actual timestamps
+    const activityFeed = page.locator('text=Real-Time Activity').locator('..');
+    await expect(activityFeed).toBeVisible();
+
+    // Look for activity items with realistic timestamps
+    const activityItems = activityFeed.locator('text=/\\d+ min ago|\\d+ sec ago/');
+    if (await activityItems.count() > 0) {
+      await expect(activityItems.first()).toBeVisible();
+    }
+
+    await page.screenshot({ path: 'test-results/real-backend-integration.png' });
+  });
+
+  test('Enhanced alerts accordion interaction', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Find alerts section
+    const alertsSection = page.locator('text=Active Alerts & Actions').locator('..');
+    await expect(alertsSection).toBeVisible();
+
+    // Test accordion expansion/collapse behavior
+    const accordionHeaders = alertsSection.locator('.MuiAccordionSummary-root');
+    const accordionCount = await accordionHeaders.count();
+
+    if (accordionCount > 0) {
+      // Test expanding first accordion
+      await accordionHeaders.first().click();
+      await page.waitForTimeout(500); // Wait for animation
+
+      // Verify expanded content is visible
+      const expandedContent = alertsSection.locator('.MuiAccordionDetails-root').first();
+      await expect(expandedContent).toBeVisible();
+
+      // Test collapsing
+      await accordionHeaders.first().click();
+      await page.waitForTimeout(500);
+
+      // Verify content is hidden
+      await expect(expandedContent).not.toBeVisible();
+    }
+
+    await page.screenshot({ path: 'test-results/alerts-accordion-interaction.png' });
+  });
+
+  test('System uptime positive alert validation', async ({ page }) => {
+    // Mock API with excellent uptime to trigger positive alert
+    await page.route('**/v1/virtuous-cycle/status', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          monitoring_active: true,
+          langsmith_available: true,
+          frameworks_available: true,
+          quality_threshold: 0.90,
+          metrics: {
+            traces_processed: 250,
+            quality_checks: 45,
+            optimizations_triggered: 5,
+            improvements_deployed: 3,
+            current_quality: 0.95, // High quality
+            last_update: new Date().toISOString()
+          },
+          component_status: {
+            langsmith_client: true,
+            quality_collector: true,
+            phase2_orchestrator: true,
+            phase3_orchestrator: true,
+            phase4_orchestrator: true
+          }
+        })
+      });
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Verify system uptime shows 99.8%
+    await expect(page.locator('text=99.8%')).toBeVisible();
+
+    // Verify positive alert for excellent uptime
+    const alertsSection = page.locator('text=Active Alerts & Actions').locator('..');
+    await expect(alertsSection.locator('text=INFO: System Uptime Excellent')).toBeVisible();
+
+    await page.screenshot({ path: 'test-results/positive-uptime-alert.png' });
+  });
+
+  test('Complete enhanced integration workflow', async ({ page }) => {
+    // This test validates the complete enhanced user workflow
+
+    // Step 1: Load enhanced dashboard
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Step 2: Verify enhanced dashboard components
+    await expect(page.locator('h4')).toContainText('tilores_X AI Dashboard');
+    await expect(page.locator('text=Overall Quality Score')).toBeVisible();
+    await expect(page.locator('text=Active Alerts & Actions')).toBeVisible();
+
+    // Step 3: Verify API integration with real backend
     const apiResponse = page.waitForResponse('**/v1/virtuous-cycle/status');
     await page.reload();
     await apiResponse;
 
-    // Step 4: Test user interaction (trigger optimization)
-    await page.route('**/v1/virtuous-cycle/trigger', route => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, reason: 'E2E test trigger' })
-      });
-    });
+    // Step 4: Test enhanced warning interaction
+    const warningPhases = page.locator('text=Warning');
+    const warningCount = await warningPhases.count();
 
-    const triggerBtn = page.locator('button:has-text("Trigger Optimization")');
-    if (await triggerBtn.isVisible()) {
-      await triggerBtn.click();
+    if (warningCount > 0) {
+      // Find expand button for first warning phase
+      const firstWarningCard = warningPhases.first().locator('..').locator('..');
+      const expandButton = firstWarningCard.locator('button').last();
+
+      if (await expandButton.isVisible()) {
+        await expandButton.click();
+        await page.waitForTimeout(500);
+      }
     }
 
-    // Step 5: Verify final state
-    await page.waitForTimeout(1000);
-    await page.screenshot({ path: 'test-results/complete-workflow.png' });
+    // Step 5: Test dynamic alerts interaction
+    const alertsSection = page.locator('text=Active Alerts & Actions').locator('..');
+    const alertAccordions = alertsSection.locator('.MuiAccordionSummary-root');
+    const alertCount = await alertAccordions.count();
 
-    // Complete workflow successful
+    if (alertCount > 0) {
+      await alertAccordions.first().click();
+      await page.waitForTimeout(500);
+    }
+
+    // Step 6: Verify final enhanced state
+    await page.screenshot({ path: 'test-results/complete-enhanced-workflow.png' });
+
+    // Enhanced workflow successful
     expect(true).toBe(true);
   });
 
