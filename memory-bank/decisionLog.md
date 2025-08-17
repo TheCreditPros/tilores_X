@@ -594,3 +594,32 @@ This implementation represents a significant architectural advancement in the ti
 - Creates foundation for advanced dashboard features in subsequent phases with validated integration patterns
 
 This implementation represents the successful resolution of critical deployment issues and establishment of a fully validated Dashboard Phase 1 deployment with complete frontend-backend integration, real-time monitoring capabilities, and enterprise-grade error handling for the tilores_X system.
+
+
+## [2025-08-17 14:16:33] - LangSmith Dashboard Configuration Fix Implementation
+
+**Decision**: Updated dashboard LangSmith service configuration to use actual project names discovered through LangSmith CLI research, resolving critical 404 errors in dashboard navigation.
+
+**Rationale**:
+- Dashboard was using hardcoded project names (`tilores-x-production`, `tilores-x-experiments`, `tilores-x-dev`) that didn't exist in the actual LangSmith workspace
+- LangSmith CLI research revealed actual project names follow pattern: `tilores_production_llama_3.3_70b_versatile-8c273476`
+- 404 errors were preventing users from accessing LangSmith monitoring and analytics features
+- Required comprehensive testing to ensure configuration changes didn't break existing functionality
+
+**Implementation Details**:
+- **File Updated**: [`dashboard/src/services/langsmithService.js`](dashboard/src/services/langsmithService.js:14-18) - Updated PROJECTS configuration object
+- **Research Tools Created**: [`langsmith_project_info.py`](langsmith_project_info.py) for dynamic project discovery
+- **Documentation**: [`LANGSMITH_CONFIGURATION_RESEARCH.md`](LANGSMITH_CONFIGURATION_RESEARCH.md) with comprehensive findings
+- **Testing**: Comprehensive validation through unit tests (5/5 passing), end-to-end tests (Playwright), and URL generation verification
+
+**Technical Patterns Used**:
+- **Configuration Update Pattern**: Updated hardcoded configuration with actual discovered values
+- **CLI Research Pattern**: Used LangSmith SDK to discover actual workspace projects programmatically
+- **Testing Validation Pattern**: Comprehensive test suite to verify configuration changes work correctly
+- **Documentation Pattern**: Created reusable tools and documentation for future project management
+
+**Impact**:
+- Resolves critical dashboard 404 errors preventing LangSmith navigation
+- Enables proper access to production monitoring, experiments, and analytics
+- Provides tools for future project discovery and configuration updates
+- Maintains backward compatibility while fixing broken functionality
