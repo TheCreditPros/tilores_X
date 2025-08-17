@@ -15,7 +15,7 @@ import tiktoken
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -51,6 +51,15 @@ app = FastAPI(
     title="Tilores API for AnythingLLM",
     description="Fully OpenAI-compatible API with Tilores integration",
     version="6.4.0",  # Updated: Phone-optimized with 2-tier cache + batch processing
+)
+
+# Add CORS middleware for dashboard integration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add rate limit error handler
@@ -460,11 +469,7 @@ async def trigger_virtuous_cycle(request: Request):
         return result
 
     except Exception as e:
-        return {
-            "success": False,
-            "reason": f"Trigger failed: {str(e)}",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"success": False, "reason": f"Trigger failed: {str(e)}", "timestamp": datetime.utcnow().isoformat()}
 
 
 @app.get("/v1")
@@ -478,14 +483,8 @@ async def v1_root(request: Request):
         "version": "v1",
         "service": "Tilores API for AnythingLLM",
         "openai_compatible": True,
-        "endpoints": {
-            "chat_completions": "/v1/chat/completions",
-            "models": "/v1/models"
-        },
-        "models": {
-            "total": len(available_models),
-            "available": [model["id"] for model in available_models]
-        }
+        "endpoints": {"chat_completions": "/v1/chat/completions", "models": "/v1/models"},
+        "models": {"total": len(available_models), "available": [model["id"] for model in available_models]},
     }
 
 
@@ -520,7 +519,9 @@ async def create_completion(request: Request, completion_request: CompletionRequ
 
     try:
         response = run_chain(messages, model=completion_request.model)
-        content = str(response) if isinstance(response, str) else str(getattr(response, 'content', 'Response generated'))
+        content = (
+            str(response) if isinstance(response, str) else str(getattr(response, "content", "Response generated"))
+        )
 
         return {
             "id": generate_unique_id("cmpl"),
@@ -598,9 +599,7 @@ async def startup_background_tasks():
     """Start background tasks for Virtuous Cycle monitoring."""
     try:
         # Start Virtuous Cycle monitoring
-        monitoring_task = asyncio.create_task(
-            virtuous_cycle_manager.start_monitoring()
-        )
+        monitoring_task = asyncio.create_task(virtuous_cycle_manager.start_monitoring())
         background_tasks.append(monitoring_task)
 
         print("🚀 Virtuous Cycle monitoring started")

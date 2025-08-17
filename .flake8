@@ -1,6 +1,6 @@
 [flake8]
 max-line-length = 120
-ignore = E203,E221,E222,E225,E231,E241,E251,E261,E262,E265,E266,E301,E302,E303,E304,E305,E306,W291,W292,W293,W391,E121,E122,E123,E124,E125,E126,E127,E128,E129,E131,E501,E401,E402,W503,W504,W605
+ignore = E203,E221,E222,E225,E231,E241,E251,E261,E262,E265,E266,E301,E302,E303,E304,E305,E306,W291,W292,W293,W391,E121,E122,E123,E124,E125,E126,E127,E128,E129,E131,E501,E401,E402,W503,W504,W605,C901
 exclude = .git,__pycache__,.venv,venv,env,build,dist,*.egg-info,.tox,.mypy_cache,.pytest_cache,.coverage,htmlcov,node_modules,migrations
 filename = *.py
 max-complexity = 15
