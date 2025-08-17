@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "gcc"]
+nixPkgs = ["python311", "python311Packages.pip", "gcc", "nodejs", "npm"]
 
 [phases.install]
-cmds = ["pip install --break-system-packages -r requirements.txt"]
+cmds = [
+  "pip install --break-system-packages -r requirements.txt",
+  "cd dashboard && npm install && npm run build && cd .."
+]
 
 [start]
 cmd = "python main_enhanced.py"
