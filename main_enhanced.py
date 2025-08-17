@@ -67,12 +67,27 @@ app.add_middleware(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Mount static files for dashboard (if dist directory exists)
+# Mount static files for dashboard (check multiple possible paths)
 import os
 
-if os.path.exists("dashboard/dist"):
-    app.mount("/dashboard", StaticFiles(directory="dashboard/dist", html=True), name="dashboard")
-    print("📊 Dashboard static files mounted at /dashboard")
+dashboard_paths = ["dashboard/dist", "./dashboard/dist", "/app/dashboard/dist"]
+dashboard_mounted = False
+
+for path in dashboard_paths:
+    if os.path.exists(path):
+        try:
+            app.mount("/dashboard", StaticFiles(directory=path, html=True), name="dashboard")
+            print(f"📊 Dashboard static files mounted at /dashboard from {path}")
+            dashboard_mounted = True
+            break
+        except Exception as e:
+            print(f"⚠️ Failed to mount dashboard from {path}: {e}")
+
+if not dashboard_mounted:
+    print("⚠️ Dashboard static files not found - dashboard will not be available")
+    print(f"📁 Current working directory: {os.getcwd()}")
+    if os.path.exists("."):
+        print(f"📁 Directory contents: {os.listdir('.')}")
 
 
 # OpenAI-compatible request/response models
