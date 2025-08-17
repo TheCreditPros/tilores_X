@@ -190,14 +190,18 @@ python -m pytest tests/functional/test_live_llm_responses.py -v
 python -m pytest tests/functional/test_tilores_data_validation.py -v
 python -m pytest tests/functional/test_speed_and_quality_validation.py -v
 
-# Check code quality
+# Check code quality (individual files)
 flake8 core_app.py main_enhanced.py monitoring.py
+
+# Run comprehensive linting for all files (backend + frontend)
+./lint_all.sh
 ```
 
 ### Linting Configuration
-- `.flake8` configured to ignore style-only issues
-- Focus on logic errors and code quality
+- `.flake8` configured to ignore style-only issues and complexity warnings (C901)
+- Focus on logic errors and code quality that affect functionality
 - Max line length: 120 characters
+- Comprehensive linting script: `./lint_all.sh` for both backend (Python) and frontend (JavaScript/JSX)
 
 ## Common Development Tasks
 
@@ -702,7 +706,7 @@ The `field_discovery_system.py` provides comprehensive field access:
 - **OpenAI**: gpt-5-mini, gpt-4o, gpt-4o-mini (128K context), gpt-4.1-mini
 - **Groq**: llama-3.3-70b-versatile (32K context), deepseek-r1-distill-llama-70b (32K context)
 - **Anthropic**: claude-3-sonnet, claude-3-haiku (200K context)
-- **Google**: 
+- **Google**:
   - gemini-1.5-flash-002 (1M context, 2.3s avg) - Fastest overall
   - gemini-2.5-flash (1M context, 7.2s avg) - Enhanced reasoning
   - gemini-2.5-flash-lite (1M context, 3.5s avg) - Best balance
