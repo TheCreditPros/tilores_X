@@ -2150,6 +2150,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                     return f"Tool {tool_name} not found"
 
                 # Execute tool in thread pool for true async behavior
+                from concurrent.futures import ThreadPoolExecutor
                 loop = asyncio.get_event_loop()
                 with ThreadPoolExecutor() as executor:
                     tool_result = await loop.run_in_executor(executor, execute_tool)
