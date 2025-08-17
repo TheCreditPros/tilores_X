@@ -5,7 +5,9 @@ nixPkgs = ["python311", "python311Packages.pip", "gcc", "nodejs", "nodePackages.
 cmds = [
   "pip install --break-system-packages -r requirements.txt",
   "cd dashboard && npm install --include=dev",
-  "cd dashboard && npx vite build"
+  "cd dashboard && npm run build",
+  "ls -la dashboard/dist || echo 'Dashboard dist directory not found'",
+  "ls -la dashboard/dist/assets || echo 'Dashboard assets not found'"
 ]
 
 [start]
