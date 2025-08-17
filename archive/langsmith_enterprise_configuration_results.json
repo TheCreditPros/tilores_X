@@ -1,0 +1,264 @@
+{
+  "configuration_status": "partial_success",
+  "successful_tasks": 3,
+  "total_tasks": 4,
+  "project_settings": {
+    "status": "success",
+    "projects_configured": 0,
+    "total_projects": 4,
+    "settings_results": [
+      {
+        "project_name": "tilores_autonomous_production",
+        "status": "failed",
+        "error": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "project_name": "tilores_autonomous_experiments",
+        "status": "failed",
+        "error": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "project_name": "tilores_quality_analytics",
+        "status": "failed",
+        "error": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "project_name": "tilores_pattern_learning",
+        "status": "failed",
+        "error": "HTTP 404: {\"detail\":\"Not Found\"}"
+      }
+    ]
+  },
+  "automation_configuration": {
+    "status": "failed",
+    "error": "'list' object has no attribute 'get'"
+  },
+  "endpoints_testing": {
+    "status": "success",
+    "total_endpoints_tested": 14,
+    "successful_endpoints": 11,
+    "success_rate": 78.57142857142857,
+    "target_endpoints": 241,
+    "coverage": 5.809128630705394,
+    "test_results": {
+      "workspace_management": {
+        "endpoints_tested": 3,
+        "successful": 3,
+        "results": [
+          {
+            "endpoint": "/api/v1/workspaces/current/stats",
+            "status": "success",
+            "tested_at": "2025-08-17T15:53:57.880806"
+          },
+          {
+            "endpoint": "/api/v1/workspaces/current",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:57.978335"
+          },
+          {
+            "endpoint": "/api/v1/workspaces/current/members",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:57.978343"
+          }
+        ]
+      },
+      "session_management": {
+        "endpoints_tested": 3,
+        "successful": 0,
+        "results": [
+          {
+            "endpoint": "/api/v1/sessions",
+            "status": "failed",
+            "error": "'list' object has no attribute 'get'"
+          },
+          {
+            "endpoint": "/api/v1/sessions/{session_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/sessions/{session_id}/stats",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "runs_and_traces": {
+        "endpoints_tested": 5,
+        "successful": 4,
+        "results": [
+          {
+            "endpoint": "/api/v1/runs",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.129074"
+          },
+          {
+            "endpoint": "/api/v1/runs/query",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.129093"
+          },
+          {
+            "endpoint": "/api/v1/runs/stats",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.129096"
+          },
+          {
+            "endpoint": "/api/v1/runs/group/stats",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.129098"
+          },
+          {
+            "endpoint": "/api/v1/runs/{run_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "datasets": {
+        "endpoints_tested": 4,
+        "successful": 0,
+        "results": [
+          {
+            "endpoint": "/api/v1/datasets",
+            "status": "failed",
+            "error": "'list' object has no attribute 'get'"
+          },
+          {
+            "endpoint": "/api/v1/datasets/{dataset_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/datasets/{dataset_id}/examples",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/datasets/{dataset_id}/search",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "feedback_system": {
+        "endpoints_tested": 3,
+        "successful": 2,
+        "results": [
+          {
+            "endpoint": "/api/v1/feedback",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.981159"
+          },
+          {
+            "endpoint": "/api/v1/feedback/stats",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.981168"
+          },
+          {
+            "endpoint": "/api/v1/feedback/{feedback_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "bulk_operations": {
+        "endpoints_tested": 3,
+        "successful": 1,
+        "results": [
+          {
+            "endpoint": "/api/v1/bulk-exports",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:53:59.981204"
+          },
+          {
+            "endpoint": "/api/v1/bulk-exports/{export_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/bulk-exports/{export_id}/download",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "annotation_queues": {
+        "endpoints_tested": 3,
+        "successful": 0,
+        "results": [
+          {
+            "endpoint": "/api/v1/annotation-queues",
+            "status": "failed",
+            "error": "'list' object has no attribute 'get'"
+          },
+          {
+            "endpoint": "/api/v1/annotation-queues/{queue_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/annotation-queues/{queue_id}/items",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      },
+      "evaluations": {
+        "endpoints_tested": 3,
+        "successful": 1,
+        "results": [
+          {
+            "endpoint": "/api/v1/evaluations",
+            "status": "accessible",
+            "tested_at": "2025-08-17T15:54:00.551134"
+          },
+          {
+            "endpoint": "/api/v1/evaluations/{evaluation_id}",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          },
+          {
+            "endpoint": "/api/v1/evaluations/{evaluation_id}/results",
+            "status": "skipped",
+            "reason": "parameterized_endpoint"
+          }
+        ]
+      }
+    },
+    "tested_at": "2025-08-17T15:54:00.559452"
+  },
+  "capabilities_validation": {
+    "status": "success",
+    "capability_score": 25.0,
+    "successful_validations": 1,
+    "total_validations": 4,
+    "validation_results": {
+      "workspace_stats": {
+        "status": "success",
+        "projects": 25,
+        "datasets": 59,
+        "annotation_queues": 3
+      },
+      "bulk_operations": {
+        "status": "limited",
+        "error": "HTTP 422: {\"detail\":[\"body.bulk_export_destination_id: Field required\",\"body.session_id: Field required\",\"body.format: Input should be 'Parquet'\"]}",
+        "capability": "api_accessible_but_limited"
+      },
+      "analytics_capabilities": {
+        "status": "limited",
+        "error": "HTTP 405: {\"detail\":\"Method Not Allowed\"}",
+        "capability": "basic_analytics_only"
+      },
+      "quality_monitoring": {
+        "status": "limited",
+        "error": "Invalid variable type: value should be str, int or float, got True of type <class 'bool'>",
+        "capability": "quality_monitoring_limited"
+      }
+    },
+    "validated_at": "2025-08-17T15:55:37.604739"
+  },
+  "configuration_duration_seconds": 229.090853,
+  "configuration_start_time": "2025-08-17T15:51:48.513951",
+  "configuration_end_time": "2025-08-17T15:55:37.604804",
+  "day2_completion_status": "completed_with_issues"
+}

@@ -1,0 +1,179 @@
+{
+  "setup_status": "success",
+  "projects_created": 4,
+  "total_projects_planned": 4,
+  "projects_results": [
+    {
+      "project_id": "521f6ed4-a79e-4720-9c8e-0e00b9a36ed4",
+      "project_name": "tilores_autonomous_production",
+      "description": "Production autonomous AI monitoring and quality management",
+      "metadata": {
+        "purpose": "production_monitoring",
+        "capabilities": [
+          "real_time_quality_tracking",
+          "autonomous_optimization",
+          "predictive_quality_management",
+          "performance_regression_detection"
+        ],
+        "retention_days": 90,
+        "quality_threshold": 90,
+        "alert_enabled": true,
+        "auto_optimization": true
+      },
+      "datasets_created": [
+        {
+          "dataset_id": "6b787d78-e49b-4611-a190-9937395296f8",
+          "dataset_name": "tilores_autonomous_production_high_quality_patterns",
+          "description": "High-quality interaction patterns for optimization guidance",
+          "created_at": "2025-08-17T19:50:13.375587+00:00"
+        },
+        {
+          "dataset_id": "25488334-e5e1-47f4-ace0-24e099d63b61",
+          "dataset_name": "tilores_autonomous_production_edge_cases",
+          "description": "Edge cases and error scenarios for improvement",
+          "created_at": "2025-08-17T19:50:13.695652+00:00"
+        }
+      ],
+      "created_at": "2025-08-17T15:50:13.755793",
+      "status": "success"
+    },
+    {
+      "project_id": "dd24fb69-be69-4f59-a8a2-453405792ed6",
+      "project_name": "tilores_autonomous_experiments",
+      "description": "Autonomous AI experimentation and A/B testing framework",
+      "metadata": {
+        "purpose": "experimentation",
+        "capabilities": [
+          "ab_testing_framework",
+          "experiment_management",
+          "statistical_validation",
+          "optimization_strategy_testing"
+        ],
+        "retention_days": 30,
+        "quality_threshold": 85,
+        "alert_enabled": true,
+        "auto_optimization": false
+      },
+      "datasets_created": [
+        {
+          "dataset_id": "eb91e5b5-b1d1-401b-819b-51c4ad7bf078",
+          "dataset_name": "tilores_autonomous_experiments_ab_test_results",
+          "description": "A/B testing results and statistical validation data",
+          "created_at": "2025-08-17T19:50:14.670524+00:00"
+        },
+        {
+          "dataset_id": "d16ebb5c-4b4d-4517-9950-31a4a9bb4adf",
+          "dataset_name": "tilores_autonomous_experiments_optimization_strategies",
+          "description": "Tested optimization strategies and their effectiveness",
+          "created_at": "2025-08-17T19:50:14.987583+00:00"
+        }
+      ],
+      "created_at": "2025-08-17T15:50:14.973870",
+      "status": "success"
+    },
+    {
+      "project_id": "253c2811-5070-49ff-9e91-091c76eb6d69",
+      "project_name": "tilores_quality_analytics",
+      "description": "Quality analytics and predictive management system",
+      "metadata": {
+        "purpose": "quality_analytics",
+        "capabilities": [
+          "bulk_analytics",
+          "quality_trend_analysis",
+          "predictive_forecasting",
+          "performance_insights"
+        ],
+        "retention_days": 180,
+        "quality_threshold": 95,
+        "alert_enabled": true,
+        "auto_optimization": false
+      },
+      "datasets_created": [
+        {
+          "dataset_id": "ffcaab75-b4b1-4f52-8d13-0330478cad92",
+          "dataset_name": "tilores_quality_analytics_quality_trends",
+          "description": "Quality trend analysis and predictive data",
+          "created_at": "2025-08-17T19:50:15.580835+00:00"
+        },
+        {
+          "dataset_id": "a33a6956-2a7e-4e56-8bd6-0a43dd770d7b",
+          "dataset_name": "tilores_quality_analytics_performance_metrics",
+          "description": "Performance metrics and analytics insights",
+          "created_at": "2025-08-17T19:50:15.895994+00:00"
+        }
+      ],
+      "created_at": "2025-08-17T15:50:15.906381",
+      "status": "success"
+    },
+    {
+      "project_id": "69dd5264-4111-4004-a414-365005aab337",
+      "project_name": "tilores_pattern_learning",
+      "description": "Pattern indexing and meta-learning engine",
+      "metadata": {
+        "purpose": "pattern_learning",
+        "capabilities": [
+          "pattern_indexing",
+          "meta_learning_engine",
+          "similarity_search",
+          "strategy_effectiveness_tracking"
+        ],
+        "retention_days": 365,
+        "quality_threshold": 92,
+        "alert_enabled": true,
+        "auto_optimization": true
+      },
+      "datasets_created": [
+        {
+          "dataset_id": "e87606a6-45be-4d27-9a92-035be124b54b",
+          "dataset_name": "tilores_pattern_learning_successful_patterns",
+          "description": "Indexed successful interaction patterns",
+          "created_at": "2025-08-17T19:50:16.574960+00:00"
+        },
+        {
+          "dataset_id": "dd5fc301-75af-4085-aa0d-d866a3def440",
+          "dataset_name": "tilores_pattern_learning_meta_learning_data",
+          "description": "Meta-learning strategy effectiveness data",
+          "created_at": "2025-08-17T19:50:16.870999+00:00"
+        }
+      ],
+      "created_at": "2025-08-17T15:50:16.930429",
+      "status": "success"
+    }
+  ],
+  "annotation_queues": {
+    "status": "success",
+    "queues_created": [
+      {
+        "queue_id": "a19a84a3-ca22-4aab-8a36-463f45864637",
+        "queue_name": "autonomous_quality_review",
+        "description": "Quality review queue for autonomous AI interactions",
+        "queue_type": "quality_review",
+        "status": "success"
+      },
+      {
+        "queue_id": "3a13cb2c-9052-43b5-9c26-990b28e7c713",
+        "queue_name": "edge_case_analysis",
+        "description": "Edge case analysis and pattern identification",
+        "queue_type": "pattern_analysis",
+        "status": "success"
+      },
+      {
+        "queue_id": "3259d0ab-4285-4787-8993-c135221ae7ec",
+        "queue_name": "optimization_validation",
+        "description": "Validation queue for optimization strategies",
+        "queue_type": "optimization_review",
+        "status": "success"
+      }
+    ],
+    "total_queues": 3
+  },
+  "setup_duration_seconds": 6.59694,
+  "setup_start_time": "2025-08-17T15:50:11.767420",
+  "setup_end_time": "2025-08-17T15:50:18.364360",
+  "next_steps": [
+    "Configure workspace permissions for enterprise API access",
+    "Set up project settings and retention policies",
+    "Configure automated dataset creation and alert thresholds",
+    "Test LangSmith integration with all 241 endpoints"
+  ]
+}

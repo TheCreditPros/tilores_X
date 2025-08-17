@@ -5,12 +5,10 @@ import {
   DarkMode,
   ExpandMore,
   HelpOutline,
-  Info,
   LightMode,
   Refresh,
   Speed,
   TrendingUp,
-  WarningAmber,
 } from "@mui/icons-material";
 import {
   Accordion,
@@ -210,46 +208,6 @@ function EnhancedMUIDashboard() {
   };
 
   // --- Enhanced Components ---
-  const KpiCard = ({ title, value, trend, icon: Icon, color = "primary", helpText = null }) => (
-    <Card sx={{ height: "100%" }}>
-      <CardContent>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={1}
-        >
-          <Avatar sx={{ bgcolor: `${color}.main`, width: 40, height: 40 }}>
-            <Icon />
-          </Avatar>
-          {trend && (
-            <Chip
-              label={trend}
-              size="small"
-              color={trend.startsWith("+") ? "success" : "error"}
-              sx={{ fontWeight: 600 }}
-            />
-          )}
-        </Stack>
-        <Typography variant="h4" fontWeight={700} color={`${color}.main`} data-testid="current-quality-value">
-          {value}
-        </Typography>
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Typography variant="body2" color="text.secondary">
-            {title}
-          </Typography>
-          {helpText && (
-            <RechartsTooltip title={helpText} arrow>
-              <IconButton size="small" sx={{ color: 'text.secondary' }}>
-                <HelpOutline sx={{ fontSize: 14 }} />
-              </IconButton>
-            </RechartsTooltip>
-          )}
-        </Stack>
-      </CardContent>
-    </Card>
-  );
-
   const PhaseCard = ({ phase, title, metrics, status = "operational" }) => {
     const [expanded, setExpanded] = useState(false);
 
@@ -522,82 +480,6 @@ function EnhancedMUIDashboard() {
         </CardContent>
       </Card>
     );
-  };
-
-  // Generate dynamic alerts based on system state
-  const generateSystemAlerts = (data) => {
-    const alerts = [];
-
-    // Check for edge case handling below threshold
-    const edgeCaseMetric = data.phases?.find(p => p.phase === "1")?.metrics?.find(m => m.label === "Edge Cases");
-    if (edgeCaseMetric && parseFloat(edgeCaseMetric.value) < 90) {
-      alerts.push({
-        severity: "error",
-        icon: <WarningAmber />,
-        title: "HIGH: Edge Case Handling Below Threshold",
-        description: `Current edge case handling at ${edgeCaseMetric.value} is below the 90% operational threshold.`,
-        impact: "May result in unhandled edge cases affecting system reliability.",
-        actions: [
-          "Review recent edge case patterns",
-          "Increase test coverage for edge scenarios",
-          "Adjust pattern recognition sensitivity"
-        ],
-        eta: "2-3 hours to investigate and resolve"
-      });
-    }
-
-    // Check for AI optimization success rate
-    const aiPhase = data.phases?.find(p => p.phase === "2");
-    const successRateMetric = aiPhase?.metrics?.find(m => m.label === "Success Rate");
-    if (successRateMetric && parseFloat(successRateMetric.value) < 92) {
-      alerts.push({
-        severity: "warning",
-        icon: <Info />,
-        title: "MEDIUM: AI Optimization Success Rate Below Target",
-        description: `Success rate of ${successRateMetric.value} is below the expected 92% threshold.`,
-        impact: "Reduced pattern recognition efficiency and increased processing overhead.",
-        actions: [
-          "Analyze recent A/B test configurations",
-          "Review pattern identification algorithms",
-          "Check resource allocation for optimization processes"
-        ],
-        eta: "1-2 hours to optimize performance"
-      });
-    }
-
-    // Check for response time issues
-    const prodPhase = data.phases?.find(p => p.phase === "4");
-    const responseTimeMetric = prodPhase?.metrics?.find(m => m.label === "Response Time");
-    if (responseTimeMetric && parseFloat(responseTimeMetric.value) > 500) {
-      alerts.push({
-        severity: "warning",
-        icon: <Info />,
-        title: "MEDIUM: Production Response Time Elevated",
-        description: `Current response time of ${responseTimeMetric.value} exceeds the 500ms target.`,
-        impact: "Potential user experience degradation and increased resource consumption.",
-        actions: [
-          "Optimize database query performance",
-          "Review Railway deployment configuration",
-          "Check CDN and network latency"
-        ],
-        eta: "30-60 minutes to optimize"
-      });
-    }
-
-    // Add positive alerts for good performance
-    if (data.kpi?.systemUptime?.value === "99.8%") {
-      alerts.push({
-        severity: "success",
-        icon: <CheckCircle />,
-        title: "INFO: System Uptime Excellent",
-        description: "System maintaining 99.8% uptime with all components operational.",
-        impact: "Optimal system reliability and user experience.",
-        actions: ["Continue monitoring", "Maintain current configuration"],
-        eta: "No action required"
-      });
-    }
-
-    return alerts;
   };
 
   const ActivityFeed = ({ activities = [] }) => (

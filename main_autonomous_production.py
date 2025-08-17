@@ -24,7 +24,6 @@ quality_monitor: Optional[AutonomousQualityMonitor] = None
 
 async def initialize_autonomous_platform():
     """Initialize the autonomous AI platform with production configuration"""
-    global autonomous_platform, enhanced_cycle_manager, quality_monitor
 
     print("🤖 Initializing Autonomous AI Platform for Production...")
 
@@ -34,7 +33,7 @@ async def initialize_autonomous_platform():
             "LANGSMITH_API_KEY",
             "LANGSMITH_ORGANIZATION_ID",
             "AUTONOMOUS_AI_ENABLED",
-            "AUTONOMOUS_AI_MODE"
+            "AUTONOMOUS_AI_MODE",
         ]
 
         missing_vars = [var for var in required_vars if not os.getenv(var)]
@@ -48,8 +47,10 @@ async def initialize_autonomous_platform():
         # Validate LangSmith connectivity
         print("🔍 Validating LangSmith Enterprise connectivity...")
         workspace_stats = await enterprise_client.get_workspace_stats()
-        print(f"✅ LangSmith connected - Projects: {workspace_stats.tracer_session_count}, "
-              f"Datasets: {workspace_stats.dataset_count}")
+        print(
+            f"✅ LangSmith connected - Projects: {workspace_stats.tracer_session_count}, "
+            f"Datasets: {workspace_stats.dataset_count}"
+        )
 
         # Initialize Autonomous AI Platform
         print("🧠 Initializing Autonomous AI Platform core...")
@@ -61,25 +62,31 @@ async def initialize_autonomous_platform():
 
         # Initialize Autonomous Quality Monitor
         print("📈 Initializing Autonomous Quality Monitor...")
-        quality_monitor = AutonomousQualityMonitor(enhanced_cycle_manager)
+        # quality_monitor = AutonomousQualityMonitor(enhanced_cycle_manager)  # Reserved for future use
 
         # Run initial autonomous improvement cycle
         print("🔄 Running initial autonomous improvement cycle...")
         initial_cycle_result = await autonomous_platform.autonomous_improvement_cycle()
-        print(f"📊 Initial cycle completed - Components: {len(initial_cycle_result['components_executed'])}, "
-              f"Improvements: {len(initial_cycle_result['improvements_identified'])}")
+        print(
+            f"📊 Initial cycle completed - Components: {len(initial_cycle_result['components_executed'])}, "
+            f"Improvements: {len(initial_cycle_result['improvements_identified'])}"
+        )
 
         # Get initial platform status
         print("🎯 Getting initial platform status...")
         initial_status = await autonomous_platform.get_platform_status()
-        print(f"📈 Platform operational - Quality: {initial_status['current_quality']:.1%}, "
-              f"Trend: {initial_status['quality_trend']}")
+        print(
+            f"📈 Platform operational - Quality: {initial_status['current_quality']:.1%}, "
+            f"Trend: {initial_status['quality_trend']}"
+        )
 
         # Get initial enhanced status
         print("🔍 Getting enhanced integration status...")
         enhanced_status = await enhanced_cycle_manager.get_enhanced_status()
-        print(f"✅ Enhanced features: {enhanced_status['enhanced_features']}, "
-              f"Legacy compatibility: {enhanced_status['legacy_compatibility']}")
+        print(
+            f"✅ Enhanced features: {enhanced_status['enhanced_features']}, "
+            f"Legacy compatibility: {enhanced_status['legacy_compatibility']}"
+        )
 
         print("✅ Autonomous AI Platform successfully initialized!")
         print(f"🕒 Platform started at: {datetime.utcnow().isoformat()}")
@@ -94,7 +101,6 @@ async def initialize_autonomous_platform():
 
 async def shutdown_autonomous_platform():
     """Gracefully shutdown the autonomous AI platform"""
-    global autonomous_platform, enhanced_cycle_manager, quality_monitor
 
     print("🛑 Shutting down Autonomous AI Platform...")
 
@@ -159,13 +165,12 @@ async def enhanced_shutdown_event():
 @app.get("/health/autonomous")
 async def autonomous_health_check():
     """Health check specifically for autonomous AI platform"""
-    global autonomous_platform, enhanced_cycle_manager, quality_monitor
 
     if not os.getenv("AUTONOMOUS_AI_ENABLED", "false").lower() == "true":
         return {
             "status": "disabled",
             "message": "Autonomous AI Platform is disabled",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     health_status = {
@@ -173,7 +178,7 @@ async def autonomous_health_check():
         "autonomous_platform": "active" if autonomous_platform else "inactive",
         "enhanced_cycle_manager": "active" if enhanced_cycle_manager else "inactive",
         "quality_monitor": "active" if quality_monitor else "inactive",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
 
     # Get platform metrics if available
@@ -190,13 +195,9 @@ async def autonomous_health_check():
 @app.get("/metrics/autonomous")
 async def autonomous_metrics():
     """Get comprehensive autonomous AI platform metrics"""
-    global autonomous_platform, quality_monitor
 
     if not autonomous_platform:
-        return {
-            "error": "Autonomous AI Platform not initialized",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"error": "Autonomous AI Platform not initialized", "timestamp": datetime.utcnow().isoformat()}
 
     try:
         # Get platform status
@@ -211,42 +212,28 @@ async def autonomous_metrics():
             "status": "success",
             "platform_status": platform_status,
             "enhanced_status": enhanced_status,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        return {
-            "error": f"Failed to retrieve autonomous metrics: {e}",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"error": f"Failed to retrieve autonomous metrics: {e}", "timestamp": datetime.utcnow().isoformat()}
 
 
 @app.post("/autonomous/optimize")
 async def trigger_autonomous_optimization():
     """Manually trigger autonomous optimization cycle"""
-    global autonomous_platform
 
     if not autonomous_platform:
-        return {
-            "error": "Autonomous AI Platform not initialized",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"error": "Autonomous AI Platform not initialized", "timestamp": datetime.utcnow().isoformat()}
 
     try:
         # Trigger optimization cycle
         result = await autonomous_platform.autonomous_improvement_cycle()
 
-        return {
-            "status": "success",
-            "optimization_result": result,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"status": "success", "optimization_result": result, "timestamp": datetime.utcnow().isoformat()}
 
     except Exception as e:
-        return {
-            "error": f"Optimization cycle failed: {e}",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"error": f"Optimization cycle failed: {e}", "timestamp": datetime.utcnow().isoformat()}
 
 
 if __name__ == "__main__":

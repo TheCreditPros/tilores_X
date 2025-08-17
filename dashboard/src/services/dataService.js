@@ -6,6 +6,7 @@
  */
 
 import axios from "axios";
+import { enhanceDataWithLangSmith } from "./langsmithRealDataService";
 
 // Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL ||
@@ -35,7 +36,9 @@ api.interceptors.response.use(
 export const fetchVirtuousCycleStatus = async () => {
   try {
     const response = await api.get("/v1/virtuous-cycle/status");
-    return response.data;
+    // Enhance with real LangSmith data
+    const enhancedData = await enhanceDataWithLangSmith(response.data);
+    return enhancedData;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Failed to fetch virtuous cycle status:", error);
@@ -82,6 +85,48 @@ export const fetchHealthMetrics = async () => {
 };
 
 /**
+ * Fetch autonomous AI metrics for DAY 3 monitoring
+ */
+export const fetchAutonomousAIMetrics = async () => {
+  try {
+    const response = await api.get("/v1/autonomous-ai/metrics");
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to fetch autonomous AI metrics:", error);
+    throw new Error(`Autonomous AI metrics unavailable: ${error.message}`);
+  }
+};
+
+/**
+ * Fetch monitoring alerts
+ */
+export const fetchMonitoringAlerts = async () => {
+  try {
+    const response = await api.get("/v1/monitoring/alerts");
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to fetch monitoring alerts:", error);
+    return { active_alerts: [], alert_history: [] };
+  }
+};
+
+/**
+ * Fetch LangSmith projects health
+ */
+export const fetchLangSmithProjectsHealth = async () => {
+  try {
+    const response = await api.get("/v1/langsmith/projects/health");
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to fetch LangSmith projects health:", error);
+    return { projects: {} };
+  }
+};
+
+/**
  * Fetch available models
  */
 export const fetchAvailableModels = async () => {
@@ -96,16 +141,16 @@ export const fetchAvailableModels = async () => {
 };
 
 /**
- * Transform API data to dashboard format
+ * Transform API data to dashboard format with autonomous AI metrics
  */
-export const transformToDashboardData = (apiData) => {
+export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
   if (!apiData || !apiData.metrics) {
     throw new Error("No API data available - dashboard requires real data");
   }
 
   const { metrics, component_status, monitoring_active } = apiData;
 
-  // Transform KPI data
+  // Transform KPI data with autonomous AI metrics
   const kpiData = {
     qualityScore: {
       value: `${(metrics.current_quality * 100).toFixed(1)}%`,
@@ -126,6 +171,19 @@ export const transformToDashboardData = (apiData) => {
       value: monitoring_active ? "99.8%" : "0%",
       trend: "30d avg",
       status: monitoring_active ? "success" : "error",
+    },
+    // Add autonomous AI metrics
+    autonomousCapabilities: {
+      value: autonomousMetrics?.autonomous_capability_status ?
+        `${Object.values(autonomousMetrics.autonomous_capability_status).filter(s => s === 'monitoring').length}/8` : "0/8",
+      trend: "Capabilities Active",
+      status: autonomousMetrics?.autonomous_capability_status ? "success" : "warning",
+    },
+    predictiveAccuracy: {
+      value: autonomousMetrics?.predictive_accuracy ?
+        `${autonomousMetrics.predictive_accuracy.toFixed(1)}%` : "0%",
+      trend: "7-day forecast",
+      status: autonomousMetrics?.predictive_accuracy > 85 ? "success" : "warning",
     },
   };
 
@@ -197,6 +255,17 @@ export const transformToDashboardData = (apiData) => {
       last_update: metrics.last_update,
       component_health: Object.values(component_status).filter(Boolean).length,
     },
+    // Add autonomous AI dashboard data
+    autonomousAI: autonomousMetrics ? {
+      qualityAchievementRate: autonomousMetrics.quality_achievement_rate,
+      predictiveAccuracy: autonomousMetrics.predictive_accuracy,
+      autonomousCapabilityStatus: autonomousMetrics.autonomous_capability_status,
+      optimizationCycleEffectiveness: autonomousMetrics.optimization_cycle_effectiveness,
+      metaLearningProgress: autonomousMetrics.meta_learning_progress,
+      langsmithProjectsHealth: autonomousMetrics.langsmith_projects_health,
+      endpointMonitoringStatus: autonomousMetrics.endpoint_monitoring_status,
+      alertSummary: autonomousMetrics.alert_summary,
+    } : null,
   };
 };
 
@@ -288,5 +357,8 @@ export default {
   triggerOptimization,
   fetchHealthMetrics,
   fetchAvailableModels,
+  fetchAutonomousAIMetrics,
+  fetchMonitoringAlerts,
+  fetchLangSmithProjectsHealth,
   transformToDashboardData,
 };
