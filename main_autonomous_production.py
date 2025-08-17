@@ -42,6 +42,22 @@ async def initialize_autonomous_platform():
         if missing_vars:
             raise ValueError(f"Missing required environment variables: {missing_vars}")
 
+        # Convert boolean environment variables to strings for LangSmith compatibility
+        bool_vars = [
+            "AUTONOMOUS_AI_ENABLED",
+            "LANGSMITH_ENTERPRISE_MODE",
+            "LANGSMITH_ENTERPRISE_FEATURES",
+            "LANGCHAIN_TRACING_V2",
+            "LANGSMITH_TRACING"
+        ]
+
+        for var in bool_vars:
+            value = os.getenv(var)
+            if isinstance(value, bool):
+                os.environ[var] = str(value).lower()
+            elif value and value.lower() in ['true', 'false']:
+                os.environ[var] = value.lower()
+
         # Initialize Enterprise LangSmith Client
         print("📊 Initializing Enterprise LangSmith Client...")
         enterprise_client = create_enterprise_client()
