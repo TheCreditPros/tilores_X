@@ -388,7 +388,7 @@ class TestSpeedAndQualityValidation:
             customer_status = "✅" if customer_speed <= customer_target else "⚠️"
             print(f"   {customer_status} Customer Query: {customer_speed:.0f}ms (target: <{customer_target}ms)")
 
-        print(f"\n🎯 Overall Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        print(f"\n🎯 Overall Success Rate: {(passed_tests / total_tests) * 100:.1f}%")
 
         if passed_tests == total_tests:
             print("🎉 ALL SPEED AND QUALITY TESTS PASSED!")

@@ -256,8 +256,6 @@ class TestProviderRetryMechanisms:
             mock_openai_instance.invoke.side_effect = failing_provider
             mock_openai.return_value = mock_openai_instance
 
-            start_time = time.time()
-
             response = self.client.post(
                 "/v1/chat/completions",
                 json={"model": "gpt-4o", "messages": [{"role": "user", "content": "Hello"}], "max_tokens": 100},

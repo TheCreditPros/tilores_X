@@ -329,7 +329,7 @@ class TestTiloresDataValidation:
                 avg_accuracy = total_accuracy / len(cls.data_accuracy_scores)
                 print(f"   📈 Average Accuracy: {avg_accuracy:.1f}%")
 
-        print(f"\n🎯 Overall Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        print(f"\n🎯 Overall Success Rate: {(passed_tests / total_tests) * 100:.1f}%")
 
         if passed_tests == total_tests:
             print("🎉 ALL TILORES DATA VALIDATION TESTS PASSED!")
