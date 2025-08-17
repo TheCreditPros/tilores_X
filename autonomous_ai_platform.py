@@ -30,17 +30,16 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 # Import enterprise LangSmith client
-from langsmith_enterprise_client import (
-    EnterpriseLangSmithClient,
-    QualityMetrics
-)
+from langsmith_enterprise_client import EnterpriseLangSmithClient, QualityMetrics
 
 # External dependencies with graceful fallback
 try:
     import numpy as np
+
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
+    np = None
 
 
 class OptimizationStrategy(Enum):
@@ -131,10 +130,7 @@ class DeltaRegressionAnalyzer:
         self.regression_threshold = 0.05  # 5% degradation
         self.confidence_threshold = 0.8
 
-    async def check_performance_regression(
-        self,
-        session_names: Optional[List[str]] = None
-    ) -> DeltaAnalysis:
+    async def check_performance_regression(self, session_names: Optional[List[str]] = None) -> DeltaAnalysis:
         """Check for performance regression across models and spectrums."""
         analysis_start = time.time()
         analysis_id = f"delta_analysis_{int(analysis_start)}"
@@ -146,10 +142,7 @@ class DeltaRegressionAnalyzer:
         baseline_start = baseline_end - timedelta(days=self.baseline_window_days)
 
         baseline_metrics = await self.langsmith_client.get_quality_metrics(
-            session_names=session_names,
-            start_time=baseline_start,
-            end_time=baseline_end,
-            limit=1000
+            session_names=session_names, start_time=baseline_start, end_time=baseline_end, limit=1000
         )
 
         # Get current performance (last 24 hours)
@@ -157,16 +150,11 @@ class DeltaRegressionAnalyzer:
         current_start = current_end - timedelta(days=self.comparison_window_days)
 
         current_metrics = await self.langsmith_client.get_quality_metrics(
-            session_names=session_names,
-            start_time=current_start,
-            end_time=current_end,
-            limit=1000
+            session_names=session_names, start_time=current_start, end_time=current_end, limit=1000
         )
 
         # Calculate delta analysis
-        delta_result = self._calculate_delta_analysis(
-            baseline_metrics, current_metrics, analysis_id
-        )
+        delta_result = self._calculate_delta_analysis(baseline_metrics, current_metrics, analysis_id)
 
         analysis_time = time.time() - analysis_start
         delta_result.metadata["analysis_time"] = analysis_time
@@ -179,10 +167,7 @@ class DeltaRegressionAnalyzer:
         return delta_result
 
     def _calculate_delta_analysis(
-        self,
-        baseline_metrics: List[QualityMetrics],
-        current_metrics: List[QualityMetrics],
-        analysis_id: str
+        self, baseline_metrics: List[QualityMetrics], current_metrics: List[QualityMetrics], analysis_id: str
     ) -> DeltaAnalysis:
         """Calculate delta analysis between baseline and current."""
         # Calculate baseline quality
@@ -193,17 +178,11 @@ class DeltaRegressionAnalyzer:
         regression_detected = quality_delta < -self.regression_threshold
 
         # Analyze affected models and spectrums
-        affected_models = self._identify_affected_models(
-            baseline_metrics, current_metrics
-        )
-        affected_spectrums = self._identify_affected_spectrums(
-            baseline_metrics, current_metrics
-        )
+        affected_models = self._identify_affected_models(baseline_metrics, current_metrics)
+        affected_spectrums = self._identify_affected_spectrums(baseline_metrics, current_metrics)
 
         # Determine root cause
-        root_cause = self._identify_root_cause(
-            baseline_metrics, current_metrics, affected_models, affected_spectrums
-        )
+        root_cause = self._identify_root_cause(baseline_metrics, current_metrics, affected_models, affected_spectrums)
 
         # Calculate confidence
         confidence = self._calculate_confidence(baseline_metrics, current_metrics)
@@ -222,8 +201,8 @@ class DeltaRegressionAnalyzer:
             metadata={
                 "baseline_sample_size": len(baseline_metrics),
                 "current_sample_size": len(current_metrics),
-                "regression_threshold": self.regression_threshold
-            }
+                "regression_threshold": self.regression_threshold,
+            },
         )
 
     def _calculate_average_quality(self, metrics: List[QualityMetrics]) -> float:
@@ -234,9 +213,7 @@ class DeltaRegressionAnalyzer:
         return sum(m.quality_score for m in metrics) / len(metrics)
 
     def _identify_affected_models(
-        self,
-        baseline_metrics: List[QualityMetrics],
-        current_metrics: List[QualityMetrics]
+        self, baseline_metrics: List[QualityMetrics], current_metrics: List[QualityMetrics]
     ) -> List[str]:
         """Identify models with significant quality changes."""
         # Group by model
@@ -246,12 +223,8 @@ class DeltaRegressionAnalyzer:
         affected_models = []
 
         for model in set(baseline_by_model.keys()) | set(current_by_model.keys()):
-            baseline_quality = self._calculate_average_quality(
-                baseline_by_model.get(model, [])
-            )
-            current_quality = self._calculate_average_quality(
-                current_by_model.get(model, [])
-            )
+            baseline_quality = self._calculate_average_quality(baseline_by_model.get(model, []))
+            current_quality = self._calculate_average_quality(current_by_model.get(model, []))
 
             quality_change = current_quality - baseline_quality
 
@@ -261,9 +234,7 @@ class DeltaRegressionAnalyzer:
         return affected_models
 
     def _identify_affected_spectrums(
-        self,
-        baseline_metrics: List[QualityMetrics],
-        current_metrics: List[QualityMetrics]
+        self, baseline_metrics: List[QualityMetrics], current_metrics: List[QualityMetrics]
     ) -> List[str]:
         """Identify spectrums with significant quality changes."""
         # Group by spectrum (extracted from session names)
@@ -273,12 +244,8 @@ class DeltaRegressionAnalyzer:
         affected_spectrums = []
 
         for spectrum in set(baseline_by_spectrum.keys()) | set(current_by_spectrum.keys()):
-            baseline_quality = self._calculate_average_quality(
-                baseline_by_spectrum.get(spectrum, [])
-            )
-            current_quality = self._calculate_average_quality(
-                current_by_spectrum.get(spectrum, [])
-            )
+            baseline_quality = self._calculate_average_quality(baseline_by_spectrum.get(spectrum, []))
+            current_quality = self._calculate_average_quality(current_by_spectrum.get(spectrum, []))
 
             quality_change = current_quality - baseline_quality
 
@@ -287,9 +254,7 @@ class DeltaRegressionAnalyzer:
 
         return affected_spectrums
 
-    def _group_metrics_by_model(
-        self, metrics: List[QualityMetrics]
-    ) -> Dict[str, List[QualityMetrics]]:
+    def _group_metrics_by_model(self, metrics: List[QualityMetrics]) -> Dict[str, List[QualityMetrics]]:
         """Group metrics by model."""
         grouped = {}
         for metric in metrics:
@@ -299,9 +264,7 @@ class DeltaRegressionAnalyzer:
             grouped[model].append(metric)
         return grouped
 
-    def _group_metrics_by_spectrum(
-        self, metrics: List[QualityMetrics]
-    ) -> Dict[str, List[QualityMetrics]]:
+    def _group_metrics_by_spectrum(self, metrics: List[QualityMetrics]) -> Dict[str, List[QualityMetrics]]:
         """Group metrics by spectrum (inferred from session name)."""
         grouped = {}
         for metric in metrics:
@@ -334,7 +297,7 @@ class DeltaRegressionAnalyzer:
         baseline_metrics: List[QualityMetrics],
         current_metrics: List[QualityMetrics],
         affected_models: List[str],
-        affected_spectrums: List[str]
+        affected_spectrums: List[str],
     ) -> Optional[str]:
         """Identify potential root cause of regression."""
         if not affected_models and not affected_spectrums:
@@ -349,9 +312,7 @@ class DeltaRegressionAnalyzer:
             return "System-wide performance degradation"
 
     def _calculate_confidence(
-        self,
-        baseline_metrics: List[QualityMetrics],
-        current_metrics: List[QualityMetrics]
+        self, baseline_metrics: List[QualityMetrics], current_metrics: List[QualityMetrics]
     ) -> float:
         """Calculate confidence in delta analysis."""
         baseline_size = len(baseline_metrics)
@@ -391,7 +352,7 @@ class AdvancedABTesting:
         variant_b_prompt: str,
         target_models: List[str],
         target_spectrums: List[str],
-        traffic_split: float = 0.5
+        traffic_split: float = 0.5,
     ) -> str:
         """Create new A/B testing experiment."""
         experiment_id = f"ab_test_{int(time.time())}"
@@ -401,8 +362,7 @@ class AdvancedABTesting:
         # Create dataset for experiment tracking
         dataset_name = f"ab_test_{experiment_name}_{experiment_id}"
         dataset = await self.langsmith_client.create_dataset(
-            name=dataset_name,
-            description=f"A/B test comparing prompt variants for {experiment_name}"
+            name=dataset_name, description=f"A/B test comparing prompt variants for {experiment_name}"
         )
 
         # Store experiment configuration
@@ -417,21 +377,16 @@ class AdvancedABTesting:
             "traffic_split": traffic_split,
             "start_time": datetime.now().isoformat(),
             "status": "active",
-            "min_sample_size": self.min_sample_size
+            "min_sample_size": self.min_sample_size,
         }
 
         # Add experiment config as example to dataset
-        await self.langsmith_client.add_examples_to_dataset(
-            dataset.id,
-            [{"experiment_config": experiment_config}]
-        )
+        await self.langsmith_client.add_examples_to_dataset(dataset.id, [{"experiment_config": experiment_config}])
 
         self.logger.info(f"✅ A/B experiment created: {experiment_id}")
         return experiment_id
 
-    async def evaluate_ab_experiment(
-        self, experiment_id: str
-    ) -> ABTestResult:
+    async def evaluate_ab_experiment(self, experiment_id: str) -> ABTestResult:
         """Evaluate A/B experiment results."""
         self.logger.info(f"📊 Evaluating A/B experiment: {experiment_id}")
 
@@ -442,17 +397,11 @@ class AdvancedABTesting:
             raise ValueError(f"Experiment {experiment_id} not found")
 
         # Collect results for both variants
-        variant_a_results = await self._collect_variant_results(
-            experiment_id, "variant_a"
-        )
-        variant_b_results = await self._collect_variant_results(
-            experiment_id, "variant_b"
-        )
+        variant_a_results = await self._collect_variant_results(experiment_id, "variant_a")
+        variant_b_results = await self._collect_variant_results(experiment_id, "variant_b")
 
         # Calculate statistical significance
-        significance_result = self._calculate_statistical_significance(
-            variant_a_results, variant_b_results
-        )
+        significance_result = self._calculate_statistical_significance(variant_a_results, variant_b_results)
 
         # Determine winner and deployment readiness
         variant_a_quality = self._calculate_average_quality_from_results(variant_a_results)
@@ -462,10 +411,10 @@ class AdvancedABTesting:
         winner = "variant_b" if improvement > 0 else "variant_a"
 
         deployment_ready = (
-            significance_result["significant"] and
-            abs(improvement) >= self.minimum_improvement and
-            len(variant_a_results) >= self.min_sample_size and
-            len(variant_b_results) >= self.min_sample_size
+            significance_result["significant"]
+            and abs(improvement) >= self.minimum_improvement
+            and len(variant_a_results) >= self.min_sample_size
+            and len(variant_b_results) >= self.min_sample_size
         )
 
         return ABTestResult(
@@ -482,53 +431,41 @@ class AdvancedABTesting:
             metadata={
                 "significance_result": significance_result,
                 "variant_a_sample_size": len(variant_a_results),
-                "variant_b_sample_size": len(variant_b_results)
-            }
+                "variant_b_sample_size": len(variant_b_results),
+            },
         )
 
     async def _get_experiment_data(self, experiment_id: str) -> Optional[Dict[str, Any]]:
         """Get experiment configuration data."""
         # Search for experiment in datasets
-        datasets = await self.langsmith_client.list_datasets(
-            name_contains=f"ab_test_{experiment_id}"
-        )
+        datasets = await self.langsmith_client.list_datasets(name_contains=f"ab_test_{experiment_id}")
 
         if not datasets:
             return None
 
         # Get experiment config from dataset
-        examples = await self.langsmith_client.search_dataset_examples(
-            datasets[0].id, "experiment_config", limit=1
-        )
+        examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "experiment_config", limit=1)
 
         if examples:
             return examples[0].get("experiment_config")
 
         return None
 
-    async def _collect_variant_results(
-        self, experiment_id: str, variant: str
-    ) -> List[Dict[str, Any]]:
+    async def _collect_variant_results(self, experiment_id: str, variant: str) -> List[Dict[str, Any]]:
         """Collect results for a specific variant."""
         # Get runs tagged with experiment and variant
-        runs = await self.langsmith_client.list_runs(
-            limit=1000,
-            include_feedback=True
-        )
+        runs = await self.langsmith_client.list_runs(limit=1000, include_feedback=True)
 
         # Filter runs for this experiment and variant
         variant_runs = []
         for run in runs:
             run_metadata = run.get("extra", {}).get("metadata", {})
-            if (run_metadata.get("experiment_id") == experiment_id and
-                run_metadata.get("variant") == variant):
+            if run_metadata.get("experiment_id") == experiment_id and run_metadata.get("variant") == variant:
                 variant_runs.append(run)
 
         return variant_runs
 
-    def _calculate_average_quality_from_results(
-        self, results: List[Dict[str, Any]]
-    ) -> float:
+    def _calculate_average_quality_from_results(self, results: List[Dict[str, Any]]) -> float:
         """Calculate average quality from run results."""
         if not results:
             return 0.0
@@ -549,9 +486,7 @@ class AdvancedABTesting:
         return total_quality / len(results)
 
     def _calculate_statistical_significance(
-        self,
-        variant_a_results: List[Dict[str, Any]],
-        variant_b_results: List[Dict[str, Any]]
+        self, variant_a_results: List[Dict[str, Any]], variant_b_results: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """Calculate statistical significance of A/B test."""
         if len(variant_a_results) < 5 or len(variant_b_results) < 5:
@@ -559,19 +494,15 @@ class AdvancedABTesting:
                 "significant": False,
                 "p_value": 1.0,
                 "confidence_interval": (0.0, 0.0),
-                "reason": "insufficient_sample_size"
+                "reason": "insufficient_sample_size",
             }
 
         # Extract quality scores
-        a_scores = [
-            self._extract_quality_score(result) for result in variant_a_results
-        ]
-        b_scores = [
-            self._extract_quality_score(result) for result in variant_b_results
-        ]
+        a_scores = [self._extract_quality_score(result) for result in variant_a_results]
+        b_scores = [self._extract_quality_score(result) for result in variant_b_results]
 
         # Simple statistical test (t-test approximation)
-        if NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE and np is not None:
             # Use numpy for more accurate calculations
             a_mean = np.mean(a_scores)
             b_mean = np.mean(b_scores)
@@ -599,10 +530,10 @@ class AdvancedABTesting:
             b_mean = sum(b_scores) / len(b_scores)
 
             # Simple variance calculation
-            a_var = sum((x - a_mean)**2 for x in a_scores) / (len(a_scores) - 1)
-            b_var = sum((x - b_mean)**2 for x in b_scores) / (len(b_scores) - 1)
+            a_var = sum((x - a_mean) ** 2 for x in a_scores) / (len(a_scores) - 1)
+            b_var = sum((x - b_mean) ** 2 for x in b_scores) / (len(b_scores) - 1)
 
-            pooled_se = ((a_var / len(a_scores)) + (b_var / len(b_scores)))**0.5
+            pooled_se = ((a_var / len(a_scores)) + (b_var / len(b_scores))) ** 0.5
             t_stat = (b_mean - a_mean) / pooled_se if pooled_se > 0 else 0
 
             # Simplified p-value
@@ -622,7 +553,7 @@ class AdvancedABTesting:
             "t_statistic": t_stat,
             "effect_size": b_mean - a_mean,
             "variant_a_mean": a_mean,
-            "variant_b_mean": b_mean
+            "variant_b_mean": b_mean,
         }
 
     def _extract_quality_score(self, result: Dict[str, Any]) -> float:
@@ -661,7 +592,7 @@ class ReinforcementLearningCollector:
         feedback_type: str,
         score: float,
         correction: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Collect user feedback for reinforcement learning."""
         self.logger.info(f"📝 Collecting feedback for run: {run_id}")
@@ -672,13 +603,11 @@ class ReinforcementLearningCollector:
             key=feedback_type,
             score=score,
             comment=correction,
-            correction={"corrected_output": correction} if correction else None
+            correction={"corrected_output": correction} if correction else None,
         )
 
         # Store in reinforcement learning dataset
-        await self._store_feedback_pattern(
-            run_id, feedback_type, score, correction, metadata
-        )
+        await self._store_feedback_pattern(run_id, feedback_type, score, correction, metadata)
 
         return feedback_result
 
@@ -688,18 +617,15 @@ class ReinforcementLearningCollector:
         feedback_type: str,
         score: float,
         correction: Optional[str],
-        metadata: Optional[Dict[str, Any]]
+        metadata: Optional[Dict[str, Any]],
     ):
         """Store feedback pattern for learning."""
         # Get or create feedback dataset
-        datasets = await self.langsmith_client.list_datasets(
-            name_contains=self.feedback_dataset_name
-        )
+        datasets = await self.langsmith_client.list_datasets(name_contains=self.feedback_dataset_name)
 
         if not datasets:
             dataset = await self.langsmith_client.create_dataset(
-                name=self.feedback_dataset_name,
-                description="Reinforcement learning feedback patterns"
+                name=self.feedback_dataset_name, description="Reinforcement learning feedback patterns"
             )
             dataset_id = dataset.id
         else:
@@ -712,29 +638,21 @@ class ReinforcementLearningCollector:
             "score": score,
             "correction": correction,
             "timestamp": datetime.now().isoformat(),
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
 
-        await self.langsmith_client.add_examples_to_dataset(
-            dataset_id, [feedback_example]
-        )
+        await self.langsmith_client.add_examples_to_dataset(dataset_id, [feedback_example])
 
-    async def get_recent_corrections(
-        self, days_back: int = 7
-    ) -> List[FeedbackPattern]:
+    async def get_recent_corrections(self, days_back: int = 7) -> List[FeedbackPattern]:
         """Get recent user corrections for learning."""
         # Get feedback dataset
-        datasets = await self.langsmith_client.list_datasets(
-            name_contains=self.feedback_dataset_name
-        )
+        datasets = await self.langsmith_client.list_datasets(name_contains=self.feedback_dataset_name)
 
         if not datasets:
             return []
 
         # Search for recent corrections
-        recent_examples = await self.langsmith_client.search_dataset_examples(
-            datasets[0].id, "correction", limit=100
-        )
+        recent_examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "correction", limit=100)
 
         # Convert to feedback patterns
         patterns = []
@@ -758,7 +676,7 @@ class ReinforcementLearningCollector:
             application_count=1,
             success_rate=1.0 if example.get("score", 0) > 0.8 else 0.0,
             last_applied=example.get("timestamp", datetime.now().isoformat()),
-            metadata=example.get("metadata", {})
+            metadata=example.get("metadata", {}),
         )
 
     def _extract_success_indicators(self, example: Dict[str, Any]) -> List[str]:
@@ -814,9 +732,7 @@ class PatternIndexer:
 
         # Get high-quality runs from last 30 days
         high_quality_runs = await self.langsmith_client.get_high_quality_runs(
-            quality_threshold=0.95,
-            days_back=30,
-            limit=100
+            quality_threshold=0.95, days_back=30, limit=100
         )
 
         # Create or get success patterns dataset
@@ -827,9 +743,7 @@ class PatternIndexer:
         for run_data in high_quality_runs:
             pattern = self._extract_pattern_from_run(run_data)
             if pattern:
-                await self.langsmith_client.add_examples_to_dataset(
-                    dataset_id, [pattern]
-                )
+                await self.langsmith_client.add_examples_to_dataset(dataset_id, [pattern])
                 indexed_count += 1
 
         self.logger.info(f"✅ Indexed {indexed_count} successful patterns")
@@ -837,12 +751,10 @@ class PatternIndexer:
         return {
             "patterns_indexed": indexed_count,
             "dataset_id": dataset_id,
-            "indexing_timestamp": datetime.now().isoformat()
+            "indexing_timestamp": datetime.now().isoformat(),
         }
 
-    async def find_similar_successful_patterns(
-        self, query_context: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    async def find_similar_successful_patterns(self, query_context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Find similar successful patterns for optimization."""
         dataset_id = await self._ensure_success_patterns_dataset()
 
@@ -856,17 +768,14 @@ class PatternIndexer:
     async def _ensure_success_patterns_dataset(self) -> str:
         """Ensure success patterns dataset exists."""
         # Check if dataset exists
-        datasets = await self.langsmith_client.list_datasets(
-            name_contains=self.success_pattern_dataset
-        )
+        datasets = await self.langsmith_client.list_datasets(name_contains=self.success_pattern_dataset)
 
         if datasets:
             return datasets[0].id
 
         # Create new dataset
         dataset = await self.langsmith_client.create_dataset(
-            name=self.success_pattern_dataset,
-            description="Indexed successful patterns for similarity search"
+            name=self.success_pattern_dataset, description="Indexed successful patterns for similarity search"
         )
 
         return dataset.id
@@ -885,7 +794,7 @@ class PatternIndexer:
             "session_name": run_data.get("session_name", ""),
             "pattern_type": "high_quality_interaction",
             "extracted_at": datetime.now().isoformat(),
-            "metadata": run_data.get("metadata", {})
+            "metadata": run_data.get("metadata", {}),
         }
 
 
@@ -907,9 +816,7 @@ class MetaLearningEngine:
         self.min_strategy_samples = 5
         self.strategy_confidence_threshold = 0.8
 
-    async def identify_best_strategies(
-        self, context: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    async def identify_best_strategies(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Identify best optimization strategies for given context."""
         self.logger.info("🧠 Identifying optimal strategies...")
 
@@ -917,25 +824,17 @@ class MetaLearningEngine:
         strategy_data = await self._get_strategy_performance_data()
 
         # Analyze strategy effectiveness for context
-        context_strategies = self._analyze_strategies_for_context(
-            strategy_data, context
-        )
+        context_strategies = self._analyze_strategies_for_context(strategy_data, context)
 
         # Rank strategies by effectiveness
-        ranked_strategies = sorted(
-            context_strategies,
-            key=lambda x: x["effectiveness_score"],
-            reverse=True
-        )
+        ranked_strategies = sorted(context_strategies, key=lambda x: x["effectiveness_score"], reverse=True)
 
         return ranked_strategies[:3]  # Top 3 strategies
 
     async def _get_strategy_performance_data(self) -> List[Dict[str, Any]]:
         """Get historical strategy performance data."""
         # Get or create strategy dataset
-        datasets = await self.langsmith_client.list_datasets(
-            name_contains=self.strategy_dataset
-        )
+        datasets = await self.langsmith_client.list_datasets(name_contains=self.strategy_dataset)
 
         if not datasets:
             return []
@@ -948,9 +847,7 @@ class MetaLearningEngine:
         return examples
 
     def _analyze_strategies_for_context(
-        self,
-        strategy_data: List[Dict[str, Any]],
-        context: Dict[str, Any]
+        self, strategy_data: List[Dict[str, Any]], context: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """Analyze strategy effectiveness for specific context."""
         context_strategies = []
@@ -964,19 +861,19 @@ class MetaLearningEngine:
             if similarity > 0.5:  # Relevant context
                 effectiveness = strategy_example.get("effectiveness_score", 0.0)
 
-                context_strategies.append({
-                    "strategy": strategy_example.get("strategy", ""),
-                    "effectiveness_score": effectiveness * similarity,
-                    "context_similarity": similarity,
-                    "sample_size": strategy_example.get("sample_size", 0),
-                    "confidence": strategy_example.get("confidence", 0.0)
-                })
+                context_strategies.append(
+                    {
+                        "strategy": strategy_example.get("strategy", ""),
+                        "effectiveness_score": effectiveness * similarity,
+                        "context_similarity": similarity,
+                        "sample_size": strategy_example.get("sample_size", 0),
+                        "confidence": strategy_example.get("confidence", 0.0),
+                    }
+                )
 
         return context_strategies
 
-    def _calculate_context_similarity(
-        self, context1: Dict[str, Any], context2: Dict[str, Any]
-    ) -> float:
+    def _calculate_context_similarity(self, context1: Dict[str, Any], context2: Dict[str, Any]) -> float:
         """Calculate similarity between contexts."""
         similarity_score = 0.0
         total_factors = 0
@@ -1039,7 +936,7 @@ class AutonomousAIPlatform:
             "components_executed": [],
             "improvements_identified": [],
             "optimizations_deployed": [],
-            "learning_applied": False
+            "learning_applied": False,
         }
 
         # 1. Delta/Regression Analysis
@@ -1047,42 +944,42 @@ class AutonomousAIPlatform:
         cycle_results["components_executed"].append("delta_analysis")
 
         if delta_analysis.regression_detected:
-            cycle_results["improvements_identified"].append({
-                "type": "regression_detected",
-                "severity": "high" if delta_analysis.quality_delta < -0.1 else "medium",
-                "affected_models": delta_analysis.affected_models,
-                "affected_spectrums": delta_analysis.affected_spectrums
-            })
+            cycle_results["improvements_identified"].append(
+                {
+                    "type": "regression_detected",
+                    "severity": "high" if delta_analysis.quality_delta < -0.1 else "medium",
+                    "affected_models": delta_analysis.affected_models,
+                    "affected_spectrums": delta_analysis.affected_spectrums,
+                }
+            )
 
         # 2. Pattern-based Optimization
         optimization_context = {
             "current_quality": delta_analysis.current_quality,
             "regression_detected": delta_analysis.regression_detected,
-            "affected_models": delta_analysis.affected_models
+            "affected_models": delta_analysis.affected_models,
         }
 
-        similar_patterns = await self.pattern_indexer.find_similar_successful_patterns(
-            optimization_context
-        )
+        similar_patterns = await self.pattern_indexer.find_similar_successful_patterns(optimization_context)
 
         if similar_patterns:
             cycle_results["components_executed"].append("pattern_matching")
             cycle_results["learning_applied"] = True
 
         # 3. Meta-learning Strategy Selection
-        optimal_strategies = await self.meta_learner.identify_best_strategies(
-            optimization_context
-        )
+        optimal_strategies = await self.meta_learner.identify_best_strategies(optimization_context)
         cycle_results["components_executed"].append("meta_learning")
 
         # Apply optimal strategies if available
         if optimal_strategies:
-            cycle_results["improvements_identified"].append({
-                "type": "optimal_strategies_identified",
-                "severity": "low",
-                "strategies": [s["strategy"] for s in optimal_strategies[:2]],
-                "effectiveness_scores": [s["effectiveness_score"] for s in optimal_strategies[:2]]
-            })
+            cycle_results["improvements_identified"].append(
+                {
+                    "type": "optimal_strategies_identified",
+                    "severity": "low",
+                    "strategies": [s["strategy"] for s in optimal_strategies[:2]],
+                    "effectiveness_scores": [s["effectiveness_score"] for s in optimal_strategies[:2]],
+                }
+            )
 
         # 4. Feedback Integration
         recent_feedback = await self.feedback_collector.get_recent_corrections()
@@ -1095,12 +992,14 @@ class AutonomousAIPlatform:
         cycle_results["components_executed"].append("quality_prediction")
 
         if quality_prediction["needs_intervention"]:
-            cycle_results["improvements_identified"].append({
-                "type": "predicted_degradation",
-                "severity": "medium",
-                "predicted_quality": quality_prediction["predicted_quality_7d"],
-                "confidence": quality_prediction["confidence"]
-            })
+            cycle_results["improvements_identified"].append(
+                {
+                    "type": "predicted_degradation",
+                    "severity": "medium",
+                    "predicted_quality": quality_prediction["predicted_quality_7d"],
+                    "confidence": quality_prediction["confidence"],
+                }
+            )
 
         cycle_duration = time.time() - cycle_start
         cycle_results["cycle_duration"] = cycle_duration
@@ -1118,8 +1017,7 @@ class AutonomousAIPlatform:
 
         # Get performance trends
         trends = await self.langsmith_client.get_performance_trends(
-            days=self.prediction_horizon_days,
-            include_predictions=True
+            days=self.prediction_horizon_days, include_predictions=True
         )
 
         quality_trend = trends["quality_trend"]
@@ -1138,7 +1036,7 @@ class AutonomousAIPlatform:
             "risk_factors": risk_analysis.get("risk_factors", []),
             "recommendations": risk_analysis.get("recommendations", []),
             "current_trend": quality_trend.get("trend", "stable"),
-            "prediction_timestamp": datetime.now().isoformat()
+            "prediction_timestamp": datetime.now().isoformat(),
         }
 
     async def get_platform_status(self) -> Dict[str, Any]:
@@ -1157,7 +1055,7 @@ class AutonomousAIPlatform:
             "workspace_stats": {
                 "projects": workspace_stats.tracer_session_count,
                 "datasets": workspace_stats.dataset_count,
-                "repos": workspace_stats.repo_count
+                "repos": workspace_stats.repo_count,
             },
             "current_quality": performance_trends["quality_trend"]["current_quality"],
             "quality_trend": performance_trends["quality_trend"]["trend"],
@@ -1168,15 +1066,16 @@ class AutonomousAIPlatform:
                 "ab_testing": True,
                 "pattern_indexing": True,
                 "meta_learning": True,
-                "predictive_quality": True
+                "predictive_quality": True,
             },
-            "status_timestamp": datetime.now().isoformat()
+            "status_timestamp": datetime.now().isoformat(),
         }
 
 
 # ========================================================================
 # FACTORY FUNCTIONS & UTILITIES
 # ========================================================================
+
 
 def create_autonomous_platform() -> AutonomousAIPlatform:
     """Create autonomous AI platform from environment."""
@@ -1190,12 +1089,10 @@ def create_autonomous_platform() -> AutonomousAIPlatform:
 # MAIN EXECUTION FOR TESTING
 # ========================================================================
 
+
 async def main():
     """Main function for testing autonomous AI platform."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
         print("🚀 Testing Autonomous AI Platform...")
@@ -1236,4 +1133,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

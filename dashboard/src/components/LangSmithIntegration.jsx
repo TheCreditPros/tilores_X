@@ -5,7 +5,7 @@
  * to LangSmith for AI operations investigation.
  */
 
-import React, { useState } from 'react';
+// React hooks not needed in this component currently
 import {
   Button,
   IconButton,
@@ -15,7 +15,6 @@ import {
   Box,
   Alert,
   Card,
-  CardHeader,
   CardContent,
   Avatar,
   Accordion,
@@ -25,10 +24,7 @@ import {
 } from '@mui/material';
 import {
   Launch,
-  Analytics,
   ExpandMore,
-  Science,
-  TrendingUp,
   CheckCircle,
   WarningAmber,
   Info,
@@ -36,7 +32,6 @@ import {
 } from '@mui/icons-material';
 
 import {
-  LangSmithService,
   generateLangSmithContext,
   LANGSMITH_QUICK_LINKS,
   trackLangSmithNavigation
@@ -282,8 +277,8 @@ export const LangSmithAlert = ({ alert }) => {
               color={alert.severity}
               onClick={() => {
                 // Enhanced action handler with LangSmith context
-                console.log(`Taking action for: ${alert.title}`);
-                console.log(`LangSmith context available: ${langsmithContext.primaryAction.url}`);
+                // Taking action for: alert.title
+                // LangSmith context available: langsmithContext.primaryAction.url
               }}
             >
               Take Action

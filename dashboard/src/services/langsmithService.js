@@ -25,7 +25,7 @@ export const LangSmithService = {
   // Base URLs
   getOrgUrl: () => `${LANGSMITH_CONFIG.BASE_URL}/o/${LANGSMITH_CONFIG.ORG_ID}`,
 
-  getProjectUrl: (projectName = LANGSMITH_CONFIG.PROJECTS.PRODUCTION) =>
+  getProjectUrl: () =>
     `${LANGSMITH_CONFIG.BASE_URL}/o/${LANGSMITH_CONFIG.ORG_ID}`,
 
   // Quality Investigation Links
@@ -99,7 +99,7 @@ export const LangSmithService = {
 /**
  * Generate contextual LangSmith links based on alert type
  */
-export const generateLangSmithContext = (alertType, data = {}) => {
+export const generateLangSmithContext = (alertType) => {
   switch (alertType) {
     case 'edge_case_handling':
       return {
@@ -226,8 +226,10 @@ export const LANGSMITH_QUICK_LINKS = [
  * Track LangSmith navigation for analytics
  */
 export const trackLangSmithNavigation = (linkLabel, sourceComponent) => {
-  // Analytics tracking
-  console.log(`LangSmith Navigation: ${linkLabel} from ${sourceComponent}`);
+  // Analytics tracking placeholder
+  // Will track: ${linkLabel} from ${sourceComponent}
+  void linkLabel; // Mark as intentionally unused
+  void sourceComponent; // Mark as intentionally unused
 
   // Optional: Send to analytics service
   // analytics.track('langsmith_navigation', {

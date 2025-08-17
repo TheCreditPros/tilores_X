@@ -1,1 +1,1 @@
-web: python main_enhanced.py
+web: python main_autonomous_production.py
