@@ -72,10 +72,13 @@ import os
 
 # Extended list of possible dashboard paths for different deployment scenarios
 dashboard_paths = [
+    "dashboard-static",
+    "./dashboard-static",
     "dashboard/dist",
     "./dashboard/dist",
     "/app/dashboard/dist",
     "/tmp/dashboard-backup",
+    "/tmp/dashboard-static-backup",
     "dist",
     "./dist",
 ]
