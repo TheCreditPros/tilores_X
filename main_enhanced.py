@@ -99,7 +99,13 @@ for path in dashboard_paths:
             has_assets = "assets" in contents or any("index-" in f and f.endswith(".js") for f in contents)
 
             if has_index or has_assets:
+                # Mount dashboard with proper asset handling
                 app.mount("/dashboard", StaticFiles(directory=path, html=True), name="dashboard")
+                # Also mount assets directly for proper asset serving
+                assets_path = os.path.join(path, "assets")
+                if os.path.exists(assets_path):
+                    app.mount("/assets", StaticFiles(directory=assets_path), name="dashboard_assets")
+                    print(f"📦 Dashboard assets also mounted at /assets from {assets_path}")
                 print(f"📊 Dashboard static files mounted at /dashboard from {path}")
                 print(f"  📄 Has index.html: {has_index}")
                 print(f"  📦 Has assets: {has_assets}")
