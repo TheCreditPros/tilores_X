@@ -7,10 +7,7 @@ Tests all new features: tiered caching, batch processing, phone optimization
 import os
 import sys
 import time
-import asyncio
-import json
 from datetime import datetime
-from typing import Dict, List, Any
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,11 +21,9 @@ load_dotenv()
 from test_data import (
     TEST_CUSTOMERS,
     PHONE_SCENARIOS,
-    BATCH_SCENARIOS,
     COMPLEX_SCENARIOS,
     EDGE_CASES,
     PERFORMANCE_TARGETS,
-    get_test_customer,
     get_customers_for_prewarm,
     get_batch_test_data,
 )
@@ -112,7 +107,7 @@ class ComprehensiveTestSuite:
 
             # Test 4: Cache statistics
             stats = cache.get_stats()
-            print(f"\n📊 Cache Statistics:")
+            print("\n📊 Cache Statistics:")
             print(f"   • Hit rate: {stats['hit_rate']:.1f}%")
             print(f"   • L1 size: {stats['l1_size']}/{stats['l1_max_size']}")
             print(f"   • Avg L1 latency: {stats['avg_l1_latency_ms']:.2f}ms")
@@ -158,12 +153,12 @@ class ComprehensiveTestSuite:
             start = time.time()
             # With 4 workers, 4 queries should take ~100ms (same as 1 query)
             time.sleep(0.11)  # Simulate parallel execution with slight overhead
-            parallel_results = sequential_results.copy()
+            # parallel_results = sequential_results.copy()  # Currently using sequential
             par_time = time.time() - start
 
             speedup = seq_time / par_time
 
-            print(f"\n📊 Batch Processing Results:")
+            print("\n📊 Batch Processing Results:")
             print(f"   • Sequential: {seq_time:.2f}s")
             print(f"   • Parallel: {par_time:.2f}s")
             print(f"   • Speedup: {speedup:.1f}x")
@@ -204,11 +199,10 @@ class ComprehensiveTestSuite:
             if scenario["requires_cache"]:
                 # Simulate cache hit
                 time.sleep(0.001)  # 1ms for cache
-                latency = 1
             else:
                 # Simulate API call
                 time.sleep(0.2)  # 200ms for API
-                latency = 200
+                # latency = 200  # Not used in current implementation
 
             latency_ms = (time.time() - start) * 1000
 
@@ -276,9 +270,9 @@ class ComprehensiveTestSuite:
         self.results.append(("Edge Cases", passed))
 
         if passed:
-            print(f"\n✅ Edge cases: All handled correctly")
+            print("\n✅ Edge cases: All handled correctly")
         else:
-            print(f"\n⚠️  Edge cases: Some failures")
+            print("\n⚠️  Edge cases: Some failures")
 
     def test_pre_warming(self):
         """Test cache pre-warming functionality"""
@@ -301,13 +295,13 @@ class ComprehensiveTestSuite:
             warm_time = time.time() - start
             avg_time = (warm_time / len(customers)) * 1000
 
-            print(f"\n📊 Pre-warming Results:")
+            print("\n📊 Pre-warming Results:")
             print(f"   • Total time: {warm_time:.2f}s")
             print(f"   • Average per customer: {avg_time:.0f}ms")
-            print(f"   • Ready for instant access")
+            print("   • Ready for instant access")
 
             self.results.append(("Pre-warming", True))
-            print(f"\n✅ Pre-warming successful")
+            print("\n✅ Pre-warming successful")
 
         except Exception as e:
             print(f"❌ Pre-warming test failed: {e}")
@@ -341,9 +335,9 @@ class ComprehensiveTestSuite:
         self.results.append(("Performance Benchmarks", passed))
 
         if passed:
-            print(f"\n✅ All performance targets met")
+            print("\n✅ All performance targets met")
         else:
-            print(f"\n⚠️  Some performance targets missed")
+            print("\n⚠️  Some performance targets missed")
 
     def print_summary(self):
         """Print test suite summary"""

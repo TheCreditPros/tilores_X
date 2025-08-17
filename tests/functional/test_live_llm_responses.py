@@ -338,7 +338,7 @@ class TestLiveLLMProviders:
             avg_groq = sum(groq_metrics.values()) / len(groq_metrics)
             print(f"   📈 Groq Average: {avg_groq:.0f}ms")
 
-        print(f"\n🎯 Overall Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        print(f"\n🎯 Overall Success Rate: {(passed_tests / total_tests) * 100:.1f}%")
 
         if passed_tests == total_tests:
             print("🎉 ALL FUNCTIONAL TESTS PASSED! System validated for production.")
