@@ -10,11 +10,11 @@ const LANGSMITH_CONFIG = {
   BASE_URL: 'https://smith.langchain.com',
   ORG_ID: 'b36f2280-93a9-4523-bf03-707ac1032a33',
 
-  // Project mapping (adjust based on actual LangSmith projects)
+  // Project mapping (updated with actual LangSmith projects)
   PROJECTS: {
-    PRODUCTION: 'tilores-x-production',
-    EXPERIMENTS: 'tilores-x-experiments',
-    DEVELOPMENT: 'tilores-x-dev'
+    PRODUCTION: 'tilores_production_llama_3.3_70b_versatile-8c273476',
+    EXPERIMENTS: 'tilores_llama_3.3_70b_versatile-25078bc4',
+    DEVELOPMENT: 'tilores_production_gpt_4o_mini-68758e59'
   }
 };
 
