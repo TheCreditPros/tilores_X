@@ -103,7 +103,7 @@ set_railway_vars.sh
 
 # Dashboard/Frontend
 dashboard/node_modules/
-dashboard/dist/
+# dashboard/dist/ - Allow dist for production deployment
 dashboard/.parcel-cache/
 dashboard/coverage/
 dashboard/.vite/
