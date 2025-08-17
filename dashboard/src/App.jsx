@@ -61,6 +61,15 @@ import {
   transformToDashboardData,
 } from "./services/dataService";
 
+// Import LangSmith integration
+import {
+  LangSmithQuickAccess,
+  LangSmithKpiCard,
+  generateLangSmithEnhancedAlerts,
+  LangSmithAlert
+} from "./components/LangSmithIntegration";
+import { LangSmithService } from "./services/langsmithService";
+
 function EnhancedMUIDashboard() {
   // --- Theme ---
   const [mode, setMode] = useState("dark");
@@ -674,49 +683,56 @@ function EnhancedMUIDashboard() {
         {/* Quick Reference Guide */}
         <QuickReference />
 
+        {/* LangSmith Quick Access */}
+        <LangSmithQuickAccess />
+
         {/* Smart Insights */}
         <SmartInsights data={data} />
 
         {/* KPIs */}
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} md={3}>
-            <KpiCard
+            <LangSmithKpiCard
               title="Overall Quality Score"
               value={data.kpi?.qualityScore?.value || "Loading..."}
               trend={data.kpi?.qualityScore?.trend || null}
               icon={TrendingUp}
               color="success"
               helpText="Measures how accurately our AI responds to customer queries. 90%+ is excellent. When below 90%, automatic optimization triggers."
+              langsmithLink={LangSmithService.getQualityAnalytics()}
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <KpiCard
+            <LangSmithKpiCard
               title="Total Traces Processed"
               value={data.kpi?.tracesProcessed?.value || "Loading..."}
               trend={data.kpi?.tracesProcessed?.trend || null}
               icon={Analytics}
               color="info"
               helpText="Number of customer interactions analyzed by our AI system. Higher numbers indicate active usage and learning opportunities."
+              langsmithLink={LangSmithService.getQualityTraces('1h')}
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <KpiCard
+            <LangSmithKpiCard
               title="Optimization Triggers"
               value={data.kpi?.optimizationsTriggers?.value || "Loading..."}
               trend={data.kpi?.optimizationsTriggers?.trend || null}
               icon={Speed}
               color="primary"
               helpText="How many times our AI has automatically improved itself. Each trigger represents a successful self-optimization cycle."
+              langsmithLink={LangSmithService.getOptimizationExperiments()}
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <KpiCard
+            <LangSmithKpiCard
               title="System Uptime"
               value={data.kpi?.systemUptime?.value || "Loading..."}
               trend={data.kpi?.systemUptime?.trend || null}
               icon={CloudDone}
               color="success"
               helpText="System availability over the last 30 days. 99.8% means only 1.4 hours of downtime per month - excellent reliability."
+              langsmithLink={LangSmithService.getModelComparison()}
             />
           </Grid>
         </Grid>
@@ -829,7 +845,7 @@ function EnhancedMUIDashboard() {
               <CardHeader title="🚨 Active Alerts & Actions" />
               <CardContent>
                 <Stack spacing={2}>
-                  {generateSystemAlerts(data).map((alert, idx) => (
+                  {generateLangSmithEnhancedAlerts(data).map((alert, idx) => (
                     <Accordion key={idx} sx={{ boxShadow: 'none', border: '1px solid', borderColor: `${alert.severity}.main` }}>
                       <AccordionSummary expandIcon={<ExpandMore />}>
                         <Alert
@@ -884,7 +900,7 @@ function EnhancedMUIDashboard() {
                       </AccordionDetails>
                     </Accordion>
                   ))}
-                  {generateSystemAlerts(data).length === 0 && (
+                  {generateLangSmithEnhancedAlerts(data).length === 0 && (
                     <Alert severity="success" icon={<CheckCircle />}>
                       <Typography variant="body2">
                         <strong>All Systems Operational:</strong> No active alerts or issues detected.
