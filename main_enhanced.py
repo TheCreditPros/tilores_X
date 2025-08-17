@@ -70,24 +70,66 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Mount static files for dashboard (check multiple possible paths)
 import os
 
-dashboard_paths = ["dashboard/dist", "./dashboard/dist", "/app/dashboard/dist"]
+# Extended list of possible dashboard paths for different deployment scenarios
+dashboard_paths = [
+    "dashboard/dist",
+    "./dashboard/dist",
+    "/app/dashboard/dist",
+    "/tmp/dashboard-backup",
+    "dist",
+    "./dist",
+]
 dashboard_mounted = False
 
+print("🔍 Searching for dashboard static files...")
 for path in dashboard_paths:
+    print(f"  Checking path: {path}")
     if os.path.exists(path):
+        print(f"  ✅ Found directory: {path}")
         try:
-            app.mount("/dashboard", StaticFiles(directory=path, html=True), name="dashboard")
-            print(f"📊 Dashboard static files mounted at /dashboard from {path}")
-            dashboard_mounted = True
-            break
+            # List contents to verify it has the expected files
+            contents = os.listdir(path)
+            print(f"  📁 Contents: {contents}")
+
+            # Check for index.html and assets
+            has_index = "index.html" in contents
+            has_assets = "assets" in contents or any("index-" in f and f.endswith(".js") for f in contents)
+
+            if has_index or has_assets:
+                app.mount("/dashboard", StaticFiles(directory=path, html=True), name="dashboard")
+                print(f"📊 Dashboard static files mounted at /dashboard from {path}")
+                print(f"  📄 Has index.html: {has_index}")
+                print(f"  📦 Has assets: {has_assets}")
+                dashboard_mounted = True
+                break
+            else:
+                print("  ⚠️ Directory exists but missing expected files (index.html or assets)")
         except Exception as e:
-            print(f"⚠️ Failed to mount dashboard from {path}: {e}")
+            print(f"  ❌ Failed to mount dashboard from {path}: {e}")
+    else:
+        print(f"  ❌ Path does not exist: {path}")
 
 if not dashboard_mounted:
     print("⚠️ Dashboard static files not found - dashboard will not be available")
     print(f"📁 Current working directory: {os.getcwd()}")
-    if os.path.exists("."):
-        print(f"📁 Directory contents: {os.listdir('.')}")
+    print("📁 Root directory contents:")
+    try:
+        root_contents = os.listdir(".")
+        for item in sorted(root_contents):
+            item_path = os.path.join(".", item)
+            if os.path.isdir(item_path):
+                print(f"  📂 {item}/")
+                if item == "dashboard":
+                    try:
+                        dashboard_contents = os.listdir(item_path)
+                        for subitem in sorted(dashboard_contents):
+                            print(f"    📄 {subitem}")
+                    except Exception as e:
+                        print(f"    ❌ Error reading dashboard contents: {e}")
+            else:
+                print(f"  📄 {item}")
+    except Exception as e:
+        print(f"❌ Error listing directory contents: {e}")
 
 
 # OpenAI-compatible request/response models
