@@ -26,7 +26,7 @@ export const LangSmithService = {
   getOrgUrl: () => `${LANGSMITH_CONFIG.BASE_URL}/o/${LANGSMITH_CONFIG.ORG_ID}`,
 
   getProjectUrl: (projectName = LANGSMITH_CONFIG.PROJECTS.PRODUCTION) =>
-    `${LANGSMITH_CONFIG.BASE_URL}/o/${LANGSMITH_CONFIG.ORG_ID}/projects/p/${projectName}`,
+    `${LANGSMITH_CONFIG.BASE_URL}/o/${LANGSMITH_CONFIG.ORG_ID}`,
 
   // Quality Investigation Links
   getQualityTraces: (timeRange = '24h', minScore = 90) =>

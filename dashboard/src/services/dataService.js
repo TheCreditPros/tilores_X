@@ -39,8 +39,8 @@ export const fetchVirtuousCycleStatus = async () => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Failed to fetch virtuous cycle status:", error);
-    // Return mock data on error for development
-    return getMockVirtuousCycleData();
+    // No mock data - throw error to handle properly
+    throw new Error(`API unavailable: ${error.message}`);
   }
 };
 
@@ -76,7 +76,8 @@ export const fetchHealthMetrics = async () => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Failed to fetch health metrics:", error);
-    return getMockHealthData();
+    // No mock data - throw error to handle properly
+    throw new Error(`Health API unavailable: ${error.message}`);
   }
 };
 
@@ -99,7 +100,7 @@ export const fetchAvailableModels = async () => {
  */
 export const transformToDashboardData = (apiData) => {
   if (!apiData || !apiData.metrics) {
-    return getMockDashboardData();
+    throw new Error("No API data available - dashboard requires real data");
   }
 
   const { metrics, component_status, monitoring_active } = apiData;
@@ -279,78 +280,7 @@ const generateSpectrumData = () => [
   { name: "Communication", current: 94.5, baseline: 92.8 },
 ];
 
-/**
- * Mock data for development and error states
- */
-const getMockVirtuousCycleData = () => ({
-  monitoring_active: true,
-  langsmith_available: true,
-  frameworks_available: true,
-  quality_threshold: 0.9,
-  last_optimization: null,
-  metrics: {
-    traces_processed: 24900,
-    quality_checks: 156,
-    optimizations_triggered: 3,
-    improvements_deployed: 2,
-    current_quality: 0.947,
-    last_update: new Date().toISOString(),
-  },
-  component_status: {
-    langsmith_client: true,
-    quality_collector: true,
-    phase2_orchestrator: true,
-    phase3_orchestrator: true,
-    phase4_orchestrator: true,
-  },
-});
-
-const getMockHealthData = () => ({
-  status: "healthy",
-  uptime: "99.8%",
-  response_time: "847ms",
-  memory_usage: "45%",
-  cpu_usage: "32%",
-});
-
-const getMockDashboardData = () => ({
-  kpi: {
-    qualityScore: { value: "94.7%", trend: "+2.3%", status: "success" },
-    tracesProcessed: { value: "24.9K", trend: "+4.8K/wk", status: "info" },
-    optimizationsTriggers: { value: "3", trend: "Active", status: "primary" },
-    systemUptime: { value: "99.8%", trend: "30d avg", status: "success" },
-  },
-  phases: [
-    {
-      phase: "1",
-      title: "Multi-Spectrum Foundation",
-      metrics: [
-        { label: "Customer Identity", value: "96.1%", progress: 96.1 },
-        { label: "Financial Analysis", value: "92.3%", progress: 92.3 },
-        { label: "Edge Cases", value: "86.4%", progress: 86.4 },
-        { label: "Active Experiments", value: "23 running" },
-      ],
-      status: "operational",
-    },
-  ],
-  activity: [
-    {
-      time: "2 min ago",
-      action: "System initialized",
-      detail: "Mock data loaded",
-      type: "info",
-    },
-  ],
-  charts: {
-    qualityTrends: generateQualityTrends(0.947),
-    spectrumData: generateSpectrumData(),
-  },
-  systemStatus: {
-    monitoring_active: true,
-    last_update: new Date().toISOString(),
-    component_health: 5,
-  },
-});
+// All mock data functions removed - dashboard must use real data only
 
 // Export all functions
 export default {

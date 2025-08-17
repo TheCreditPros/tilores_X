@@ -74,7 +74,7 @@ def get_sessions_via_rest_api(api_key, endpoint):
                 start_time = session.get('start_time', '')
                 tenant_id = session.get('tenant_id', '')
 
-                print(f"  📁 {i+1}. {name}")
+                print(f"  📁 {i + 1}. {name}")
                 print(f"     ID: {session_id}")
                 print(f"     Runs: {run_count}")
                 print(f"     Started: {start_time}")
