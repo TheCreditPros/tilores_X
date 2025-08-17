@@ -9,7 +9,6 @@ import {
   LightMode,
   Refresh,
   Speed,
-  TrendingDown,
   TrendingUp,
   WarningAmber,
 } from "@mui/icons-material";
@@ -37,7 +36,6 @@ import {
   Stack,
   Switch,
   ThemeProvider,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
@@ -66,7 +64,6 @@ import {
   LangSmithQuickAccess,
   LangSmithKpiCard,
   generateLangSmithEnhancedAlerts,
-  LangSmithAlert
 } from "./components/LangSmithIntegration";
 import { LangSmithService } from "./services/langsmithService";
 
@@ -97,9 +94,8 @@ function EnhancedMUIDashboard() {
       // eslint-disable-next-line no-console
       console.error("Dashboard data fetch failed:", err);
       setError(err.message);
-      // Data service handles fallback to mock data on error
-      const fallbackData = transformToDashboardData(null);
-      setDashboardData(fallbackData);
+      // No fallback data - dashboard requires real API connection
+      setDashboardData(null);
     } finally {
       setLoading(false);
     }
@@ -175,7 +171,36 @@ function EnhancedMUIDashboard() {
     );
   }
 
-  // Error state fallback (data service provides fallback data)
+  // Error state - show error message if no data available
+  if (error && !dashboardData) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box sx={{ p: 3, minHeight: "100vh", bgcolor: "background.default" }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Dashboard Unavailable
+            </Typography>
+            <Typography variant="body2">
+              Cannot connect to tilores_X API: {error}
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Please ensure the API server is running and accessible.
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={handleRefresh}
+              sx={{ mt: 2 }}
+              startIcon={<Refresh />}
+            >
+              Retry Connection
+            </Button>
+          </Alert>
+        </Box>
+      </ThemeProvider>
+    );
+  }
+
   const data = dashboardData || {
     kpi: {},
     phases: [],
@@ -664,7 +689,7 @@ function EnhancedMUIDashboard() {
             </Typography>
             {error && (
               <Typography variant="caption" color="error.main">
-                API Connection: Mock Mode ({error})
+                API Connection Failed: {error}
               </Typography>
             )}
             {lastUpdate && (
