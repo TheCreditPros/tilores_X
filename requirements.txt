@@ -32,3 +32,11 @@ hiredis>=2.0.0  # High-performance Redis parser
 
 # Rate Limiting (Phase VIII)
 slowapi>=0.1.9
+
+# Autonomous AI Platform Dependencies
+aiohttp>=3.8.0
+numpy>=1.24.0
+
+# Autonomous AI Platform Dependencies
+aiohttp>=3.8.0
+numpy>=1.24.0
