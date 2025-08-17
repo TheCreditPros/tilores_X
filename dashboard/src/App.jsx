@@ -912,6 +912,15 @@ function EnhancedMUIDashboard() {
             </Card>
           </Grid>
         </Grid>
+
+        {/* Version Footer */}
+        <Box sx={{ mt: 4, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="caption" color="text.secondary" textAlign="center" display="block">
+            tilores_X Dashboard v1.0.0 • Build: {new Date().toISOString().slice(0,16).replace('T', ' ')} •
+            LangSmith Integration: {data.systemStatus?.monitoring_active ? 'Active' : 'Inactive'} •
+            Commit: b071436
+          </Typography>
+        </Box>
       </Box>
     </ThemeProvider>
   );
