@@ -7,9 +7,11 @@ Integrates the complete autonomous AI platform with existing infrastructure
 import os
 from datetime import datetime
 from typing import Optional
+from contextlib import asynccontextmanager
 
 # Core application imports
 from main_enhanced import app, startup_background_tasks, shutdown_background_tasks
+from fastapi import FastAPI
 
 # Autonomous AI Platform imports
 from autonomous_ai_platform import AutonomousAIPlatform
@@ -128,10 +130,11 @@ async def shutdown_autonomous_platform():
         print(f"⚠️ Error during autonomous platform shutdown: {e}")
 
 
-# Enhanced FastAPI event handlers
-@app.on_event("startup")
-async def enhanced_startup_event():
-    """Enhanced startup event with autonomous AI platform initialization"""
+# Enhanced FastAPI lifespan handler (modern approach)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Enhanced lifespan handler with autonomous AI platform management"""
+    # Startup
     print("🚀 Starting Tilores API with Autonomous AI Platform")
 
     # Start original background tasks
@@ -148,10 +151,9 @@ async def enhanced_startup_event():
     else:
         print("ℹ️ Autonomous AI Platform disabled - running in standard mode")
 
+    yield
 
-@app.on_event("shutdown")
-async def enhanced_shutdown_event():
-    """Enhanced shutdown event with autonomous AI platform cleanup"""
+    # Shutdown
     print("🛑 Shutting down Tilores API")
 
     # Shutdown autonomous AI platform
@@ -159,6 +161,9 @@ async def enhanced_shutdown_event():
 
     # Shutdown original background tasks
     await shutdown_background_tasks()
+
+# Apply the lifespan handler to the app
+app.router.lifespan_context = lifespan
 
 
 # Health check endpoints for autonomous AI platform
