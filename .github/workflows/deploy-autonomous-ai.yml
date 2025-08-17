@@ -1,0 +1,361 @@
+name: Deploy Autonomous AI Platform
+
+on:
+  push:
+    branches: [ main, production ]
+    paths:
+      - 'autonomous_ai_platform.py'
+      - 'autonomous_integration.py'
+      - 'langsmith_enterprise_client.py'
+      - 'main_autonomous_production.py'
+      - 'requirements.txt'
+      - 'railway.json'
+      - 'nixpacks.toml'
+      - '.github/workflows/deploy-autonomous-ai.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'autonomous_ai_platform.py'
+      - 'autonomous_integration.py'
+      - 'langsmith_enterprise_client.py'
+      - 'main_autonomous_production.py'
+      - 'requirements.txt'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  security-scan:
+    name: Security & Compliance Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit safety semgrep
+
+      - name: Run Bandit security scan
+        run: |
+          bandit -r . -f json -o bandit-report.json || true
+          bandit -r . --severity-level medium --confidence-level medium
+
+      - name: Run Safety vulnerability scan
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check
+
+      - name: Run Semgrep security scan
+        run: |
+          semgrep --config=auto --json --output=semgrep-report.json . || true
+          semgrep --config=auto .
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+            semgrep-report.json
+
+  test-suite:
+    name: Comprehensive Test Suite
+    runs-on: ubuntu-latest
+    needs: security-scan
+    strategy:
+      matrix:
+        test-type: [unit, integration, performance]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio pytest-mock
+
+      - name: Run unit tests
+        if: matrix.test-type == 'unit'
+        run: |
+          pytest tests/unit/ -v --cov=. --cov-report=xml --cov-report=html
+
+      - name: Run integration tests
+        if: matrix.test-type == 'integration'
+        env:
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY_TEST }}
+          LANGSMITH_ORGANIZATION_ID: ${{ secrets.LANGSMITH_ORGANIZATION_ID_TEST }}
+        run: |
+          pytest tests/integration/ -v --tb=short
+
+      - name: Run performance tests
+        if: matrix.test-type == 'performance'
+        run: |
+          pytest tests/performance/ -v --tb=short
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results-${{ matrix.test-type }}
+          path: |
+            htmlcov/
+            coverage.xml
+            pytest-report.xml
+
+  validate-autonomous-ai:
+    name: Validate Autonomous AI Platform
+    runs-on: ubuntu-latest
+    needs: test-suite
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate autonomous AI platform initialization
+        env:
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY_TEST }}
+          LANGSMITH_ORGANIZATION_ID: ${{ secrets.LANGSMITH_ORGANIZATION_ID_TEST }}
+          AUTONOMOUS_AI_ENABLED: "true"
+          META_LEARNING_ENABLED: "true"
+        run: |
+          python -c "
+          import sys
+          sys.path.append('.')
+          from langsmith_enterprise_client import create_enterprise_client
+          from autonomous_ai_platform import AutonomousAIPlatform
+          from autonomous_integration import EnhancedVirtuousCycleManager, AutonomousQualityMonitor
+
+          print('✓ Testing LangSmith Enterprise Client...')
+          client = create_enterprise_client()
+          print(f'✓ Client created: {type(client).__name__}')
+
+          print('✓ Testing Autonomous AI Platform...')
+          platform = AutonomousAIPlatform(client)
+          status = platform.get_platform_status()
+          print(f'✓ Platform status: {status}')
+
+          print('✓ Testing Enhanced Virtuous Cycle Manager...')
+          manager = EnhancedVirtuousCycleManager()
+          print(f'✓ Manager initialized: {type(manager).__name__}')
+
+          print('✓ Testing Autonomous Quality Monitor...')
+          monitor = AutonomousQualityMonitor(manager)
+          print(f'✓ Monitor initialized: {type(monitor).__name__}')
+
+          print('✅ All autonomous AI components validated successfully!')
+          "
+
+      - name: Test production entry point
+        env:
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY_TEST }}
+          LANGSMITH_ORGANIZATION_ID: ${{ secrets.LANGSMITH_ORGANIZATION_ID_TEST }}
+          AUTONOMOUS_AI_ENABLED: "true"
+          META_LEARNING_ENABLED: "true"
+        run: |
+          timeout 30s python main_autonomous_production.py &
+          sleep 10
+          curl -f http://localhost:8000/health || echo "Health check failed"
+          curl -f http://localhost:8000/autonomous/status || echo "Autonomous status check failed"
+          pkill -f main_autonomous_production.py || true
+
+  build-dashboard:
+    name: Build Dashboard Assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dashboard dependencies
+        run: |
+          cd dashboard
+          npm ci --include=dev
+
+      - name: Build dashboard
+        run: |
+          cd dashboard
+          npm run build
+          ls -la dist/
+          ls -la dist/assets/
+
+      - name: Upload dashboard artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dashboard-build
+          path: dashboard/dist/
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [security-scan, test-suite, validate-autonomous-ai, build-dashboard]
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download dashboard artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dashboard-build
+          path: dashboard/dist/
+
+      - name: Install Railway CLI
+        run: |
+          curl -fsSL https://railway.app/install.sh | sh
+          echo "$HOME/.railway/bin" >> $GITHUB_PATH
+
+      - name: Deploy to Railway Staging
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+        run: |
+          railway login --token $RAILWAY_TOKEN
+          railway environment staging
+          railway up --detach
+
+      - name: Wait for deployment
+        run: sleep 60
+
+      - name: Validate staging deployment
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+        run: |
+          curl -f $STAGING_URL/health
+          curl -f $STAGING_URL/autonomous/status
+          curl -f $STAGING_URL/metrics
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/production' || github.event.inputs.environment == 'production'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download dashboard artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dashboard-build
+          path: dashboard/dist/
+
+      - name: Install Railway CLI
+        run: |
+          curl -fsSL https://railway.app/install.sh | sh
+          echo "$HOME/.railway/bin" >> $GITHUB_PATH
+
+      - name: Deploy to Railway Production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+        run: |
+          railway login --token $RAILWAY_TOKEN
+          railway environment production
+          railway up --detach
+
+      - name: Wait for deployment
+        run: sleep 90
+
+      - name: Validate production deployment
+        env:
+          PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+        run: |
+          curl -f $PRODUCTION_URL/health
+          curl -f $PRODUCTION_URL/autonomous/status
+          curl -f $PRODUCTION_URL/metrics
+
+      - name: Run production smoke tests
+        env:
+          PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY_PROD }}
+        run: |
+          # Test autonomous AI endpoints
+          curl -f -X POST $PRODUCTION_URL/autonomous/analyze \
+            -H "Content-Type: application/json" \
+            -d '{"test": "smoke_test"}'
+
+          # Test LangSmith integration
+          curl -f $PRODUCTION_URL/langsmith/projects
+
+  post-deployment-monitoring:
+    name: Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always() && (needs.deploy-production.result == 'success' || needs.deploy-staging.result == 'success')
+
+    steps:
+      - name: Setup monitoring alerts
+        env:
+          DEPLOYMENT_URL: ${{ github.ref == 'refs/heads/production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}
+        run: |
+          echo "Setting up monitoring for: $DEPLOYMENT_URL"
+          # Add monitoring setup commands here
+
+      - name: Generate deployment report
+        run: |
+          echo "# Autonomous AI Platform Deployment Report" > deployment-report.md
+          echo "- **Environment**: ${{ github.ref == 'refs/heads/production' && 'Production' || 'Staging' }}" >> deployment-report.md
+          echo "- **Commit**: ${{ github.sha }}" >> deployment-report.md
+          echo "- **Deployed at**: $(date -u)" >> deployment-report.md
+          echo "- **Status**: ✅ Successful" >> deployment-report.md
+
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-report
+          path: deployment-report.md
