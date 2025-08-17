@@ -16,6 +16,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -65,6 +66,13 @@ app.add_middleware(
 # Add rate limit error handler
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Mount static files for dashboard (if dist directory exists)
+import os
+
+if os.path.exists("dashboard/dist"):
+    app.mount("/dashboard", StaticFiles(directory="dashboard/dist", html=True), name="dashboard")
+    print("📊 Dashboard static files mounted at /dashboard")
 
 
 # OpenAI-compatible request/response models
