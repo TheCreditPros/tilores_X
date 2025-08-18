@@ -232,6 +232,14 @@ class EnterpriseLangSmithClient:
                 if self.session and self.session.closed:
                     self.logger.info("Session was closed, will recreate on next request")
                     self.session = None
+                elif self.session and not self.session.closed:
+                    # Clean up session after max retries
+                    try:
+                        await self.session.close()
+                        self.session = None
+                        self.logger.info("Session closed after max retries")
+                    except Exception as cleanup_error:
+                        self.logger.error(f"Session cleanup error: {cleanup_error}")
 
             if retry_count < self.config.max_retries:
                 await asyncio.sleep(self.config.retry_delay * (2**retry_count))
