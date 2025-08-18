@@ -68,16 +68,72 @@ class RedisCacheManager:
             # Railway Redis URL (production)
             redis_url = os.getenv("REDIS_URL")
             if redis_url:
-                # Use redis.from_url for better Railway compatibility
+                # Enhanced Railway Redis URL parsing for better authentication
                 debug_print("Connecting to Railway Redis via URL", "🔗")
-                self.redis_client = redis.from_url(
-                    redis_url,
-                    decode_responses=True,
-                    socket_connect_timeout=10,
-                    socket_timeout=10,
-                    retry_on_timeout=True,
-                    health_check_interval=30,
+
+                # Parse URL to extract password if needed
+                parsed_url = self._parse_redis_url(redis_url)
+                debug_print(
+                    f"Redis URL parsed - host: {parsed_url.get('host', 'unknown')}, auth: {'yes' if parsed_url.get('password') else 'no'}",
+                    "🔍",
                 )
+
+                try:
+                    # Railway Redis requires SSL/TLS connections
+                    if "railway.app" in redis_url:
+                        # Railway-specific connection - use rediss:// for SSL
+                        debug_print("Detected Railway Redis - using SSL connection", "🔒")
+                        ssl_redis_url = redis_url.replace("redis://", "rediss://")
+                        debug_print(f"SSL URL: {ssl_redis_url[:50]}...", "🔒")
+
+                        self.redis_client = redis.from_url(
+                            ssl_redis_url,
+                            decode_responses=True,
+                            socket_connect_timeout=30,  # Longer timeout for cloud
+                            socket_timeout=30,
+                            retry_on_timeout=True,
+                            health_check_interval=30,
+                        )
+                    else:
+                        # Standard Redis connection for other providers
+                        self.redis_client = redis.from_url(
+                            redis_url,
+                            decode_responses=True,
+                            socket_connect_timeout=10,
+                            socket_timeout=10,
+                            retry_on_timeout=True,
+                            health_check_interval=30,
+                        )
+                except Exception as url_error:
+                    # Fallback to manual connection if URL parsing fails
+                    debug_print(f"URL connection failed, trying manual connection: {url_error}", "⚠️")
+                    if parsed_url.get("password"):
+                        is_railway = "railway.app" in parsed_url.get("host", "")
+                        debug_print(f"Manual connection - Railway: {is_railway}", "🔧")
+
+                        connection_params = {
+                            "host": parsed_url.get("host", "localhost"),
+                            "port": parsed_url.get("port", 6379),
+                            "password": parsed_url.get("password"),
+                            "decode_responses": True,
+                            "socket_connect_timeout": 30,
+                            "socket_timeout": 30,
+                        }
+
+                        # Add SSL parameters for Railway
+                        if is_railway:
+                            connection_params.update(
+                                {
+                                    "ssl": True,
+                                    "ssl_cert_reqs": None,
+                                    "ssl_check_hostname": False,
+                                    "ssl_ca_certs": None,
+                                }
+                            )
+
+                        self.redis_client = redis.Redis(**connection_params)
+                    else:
+                        raise url_error
             else:
                 # Local Redis (development) - gracefully handle missing password
                 redis_password = os.getenv("REDIS_PASSWORD")
@@ -103,18 +159,27 @@ class RedisCacheManager:
                         debug_print("Redis connection established", "✅")
                         break
                     except redis.AuthenticationError as auth_error:
-                        logger.warning(f"Redis authentication failed: {auth_error}")
-                        debug_print("Redis auth failed - falling back to no-cache mode", "⚠️")
-                        # Don't raise auth errors in production - graceful fallback
-                        self.redis_client = None
-                        self.cache_available = False
-                        break
+                        if attempt < max_retries - 1:
+                            logger.warning(f"Redis authentication failed (attempt {attempt + 1}): {auth_error}")
+                            debug_print(f"Redis auth failed attempt {attempt + 1}, retrying...", "⚠️")
+                            import time
+
+                            time.sleep(2**attempt)  # Exponential backoff
+                            continue  # Continue to next retry attempt
+                        else:
+                            logger.warning(f"Redis authentication failed after {max_retries} attempts: {auth_error}")
+                            debug_print("Redis auth failed - falling back to no-cache mode", "⚠️")
+                            # Don't raise auth errors in production - graceful fallback
+                            self.redis_client = None
+                            self.cache_available = False
+                            break
                     except Exception as retry_error:
                         if attempt < max_retries - 1:
                             debug_print(f"Redis connection attempt {attempt + 1} failed, retrying...", "⚠️")
                             import time
 
                             time.sleep(2**attempt)  # Exponential backoff
+                            continue  # Continue to next retry attempt
                         else:
                             logger.warning(f"Redis connection failed after {max_retries} attempts: {retry_error}")
                             debug_print("Redis connection failed - falling back to no-cache mode", "⚠️")
@@ -125,6 +190,24 @@ class RedisCacheManager:
             debug_print(f"Redis connection failed - falling back to no-cache mode: {e}", "⚠️")
             self.redis_client = None
             self.cache_available = False
+
+    def _parse_redis_url(self, redis_url: str) -> Dict[str, Any]:
+        """Parse Redis URL to extract connection parameters."""
+        try:
+            from urllib.parse import urlparse
+
+            parsed = urlparse(redis_url)
+
+            return {
+                "host": parsed.hostname or "localhost",
+                "port": parsed.port or 6379,
+                "password": parsed.password,
+                "username": parsed.username,
+                "db": int(parsed.path.lstrip("/")) if parsed.path and parsed.path != "/" else 0,
+            }
+        except Exception as e:
+            logger.warning(f"Failed to parse Redis URL: {e}")
+            return {"host": "localhost", "port": 6379, "password": None}
 
     def _generate_cache_key(self, prefix: str, identifier: str) -> str:
         """Generate consistent cache key with namespace."""
