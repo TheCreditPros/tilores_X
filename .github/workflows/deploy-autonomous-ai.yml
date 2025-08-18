@@ -73,7 +73,7 @@ jobs:
           semgrep --config=auto .
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
@@ -100,7 +100,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Cache pip dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -132,7 +132,7 @@ jobs:
           pytest tests/performance/ -v --tb=short
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results-${{ matrix.test-type }}
@@ -236,7 +236,7 @@ jobs:
           ls -la dist/assets/
 
       - name: Upload dashboard artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dashboard-build
           path: dashboard/dist/
@@ -253,7 +253,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download dashboard artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dashboard-build
           path: dashboard/dist/
@@ -294,7 +294,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download dashboard artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dashboard-build
           path: dashboard/dist/
@@ -359,7 +359,7 @@ jobs:
           echo "- **Status**: ✅ Successful" >> deployment-report.md
 
       - name: Upload deployment report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: deployment-report
           path: deployment-report.md
