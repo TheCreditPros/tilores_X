@@ -164,7 +164,7 @@ class DeploymentValidator:
                 try:
                     # Test API call with SSL
                     stats = await client.get_workspace_stats()
-                    print(f"✅ OPTIMAL: LangSmith API working with SSL")
+                    print("✅ OPTIMAL: LangSmith API working with SSL")
                     print(f"   Tenant ID: {stats.tenant_id}")
                     return True
 
@@ -275,13 +275,13 @@ class DeploymentValidator:
         """Generate final deployment validation report."""
         total_time = time.time() - self.start_time
 
-        print(f"\n🎯 FINAL DEPLOYMENT VALIDATION REPORT")
+        print("\n🎯 FINAL DEPLOYMENT VALIDATION REPORT")
         print("=" * 70)
         print(f"Validation Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
         print(f"Total Validation Time: {total_time:.2f}s")
         print(f"Validation Score: {self.validation_score:.1f}%")
 
-        print(f"\nDetailed Results:")
+        print("\nDetailed Results:")
         for test_name, result in self.test_results.items():
             status = "✅ PASSED" if result else "❌ FAILED"
             print(f"  {test_name}: {status}")
@@ -300,19 +300,19 @@ class DeploymentValidator:
         print(f"Risk Level: {risk_level}")
 
         if self.validation_score >= 75.0:
-            print(f"\n📋 DEPLOYMENT CHECKLIST:")
+            print("\n📋 DEPLOYMENT CHECKLIST:")
             print("  ✅ Redis timeout optimizations applied")
             print("  ✅ 4-Phase Framework environment loading fixed")
             print("  ✅ LangSmith SSL container compatibility enabled")
             print("  ✅ System startup sequence validated")
             print("  ✅ All fixes tested in Railway-like environment")
 
-            print(f"\n🚀 READY FOR RAILWAY DEPLOYMENT")
+            print("\n🚀 READY FOR RAILWAY DEPLOYMENT")
             print("   All critical issues resolved")
             print("   Container environment compatibility confirmed")
             print("   Fast failure and graceful degradation working")
         else:
-            print(f"\n🛑 DEPLOYMENT BLOCKED")
+            print("\n🛑 DEPLOYMENT BLOCKED")
             print("   Critical validation failures detected")
             print("   Fix issues before attempting deployment")
 
@@ -330,10 +330,10 @@ async def main():
 
         # Exit with appropriate code
         if deployment_ready:
-            print(f"\n✅ VALIDATION COMPLETE: DEPLOYMENT APPROVED")
+            print("\n✅ VALIDATION COMPLETE: DEPLOYMENT APPROVED")
             sys.exit(0)
         else:
-            print(f"\n❌ VALIDATION FAILED: DEPLOYMENT BLOCKED")
+            print("\n❌ VALIDATION FAILED: DEPLOYMENT BLOCKED")
             sys.exit(1)
 
     except Exception as e:

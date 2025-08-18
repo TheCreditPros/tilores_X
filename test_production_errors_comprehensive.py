@@ -14,7 +14,6 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
@@ -153,7 +152,7 @@ async def test_data_structure_handling():
     ]
 
     for i, test_data in enumerate(test_cases):
-        logger.info(f"🧪 Testing case {i+1}: {type(test_data)}")
+        logger.info(f"🧪 Testing case {i + 1}: {type(test_data)}")
 
         try:
             # Test the data handling that's failing in production
@@ -180,7 +179,7 @@ async def test_data_structure_handling():
                 logger.warning(f"⚠️ Unexpected data type: {type(test_data)}")
 
         except Exception as e:
-            logger.error(f"❌ Data structure test {i+1} failed: {e}")
+            logger.error(f"❌ Data structure test {i + 1} failed: {e})")
 
 
 async def main():

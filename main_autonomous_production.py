@@ -13,13 +13,12 @@ from contextlib import asynccontextmanager
 from main_enhanced import app, startup_background_tasks, shutdown_background_tasks
 from fastapi import FastAPI
 
-# Autonomous AI Platform imports
-from autonomous_ai_platform import AutonomousAIPlatform
-from langsmith_enterprise_client import create_enterprise_client
+# Autonomous AI Platform imports - Production Safe Version
+from autonomous_ai_platform_production_safe import ProductionSafeAutonomousAI, create_production_safe_autonomous_ai
 from autonomous_integration import EnhancedVirtuousCycleManager, AutonomousQualityMonitor
 
-# Global autonomous AI platform instance
-autonomous_platform: Optional[AutonomousAIPlatform] = None
+# Global autonomous AI platform instance - Production Safe
+autonomous_platform: Optional[ProductionSafeAutonomousAI] = None
 enhanced_cycle_manager: Optional[EnhancedVirtuousCycleManager] = None
 quality_monitor: Optional[AutonomousQualityMonitor] = None
 
@@ -30,17 +29,16 @@ async def initialize_autonomous_platform():
     print("🤖 Initializing Autonomous AI Platform for Production...")
 
     try:
-        # Validate environment configuration
+        # Validate environment configuration for production-safe mode
         required_vars = [
-            "LANGSMITH_API_KEY",
-            "LANGSMITH_ORGANIZATION_ID",
             "AUTONOMOUS_AI_ENABLED",
             "AUTONOMOUS_AI_MODE",
         ]
 
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         if missing_vars:
-            raise ValueError(f"Missing required environment variables: {missing_vars}")
+            print(f"⚠️ Missing optional environment variables: {missing_vars}")
+            print("🔄 Continuing with production-safe defaults...")
 
         # Convert boolean environment variables to strings for LangSmith compatibility
         bool_vars = [
@@ -58,28 +56,10 @@ async def initialize_autonomous_platform():
             elif value and value.lower() in ["true", "false"]:
                 os.environ[var] = value.lower()
 
-        # Initialize Enterprise LangSmith Client
-        print("📊 Initializing Enterprise LangSmith Client...")
-        enterprise_client = create_enterprise_client()
-
-        if enterprise_client:
-            # Validate LangSmith connectivity
-            print("🔍 Validating LangSmith Enterprise connectivity...")
-            try:
-                workspace_stats = await enterprise_client.get_workspace_stats()
-                print(
-                    f"✅ LangSmith connected - Projects: {workspace_stats.tracer_session_count}, "
-                    f"Datasets: {workspace_stats.dataset_count}"
-                )
-            except Exception as e:
-                print(f"⚠️ LangSmith connectivity validation failed: {e}")
-                print("🔄 Continuing with mock mode...")
-        else:
-            print("⚠️ Enterprise LangSmith client not available - using mock mode")
-
-        # Initialize Autonomous AI Platform
-        print("🧠 Initializing Autonomous AI Platform core...")
-        autonomous_platform = AutonomousAIPlatform(enterprise_client)
+        # Initialize Production-Safe Autonomous AI Platform
+        print("🧠 Initializing Production-Safe Autonomous AI Platform...")
+        autonomous_platform = create_production_safe_autonomous_ai()
+        print("✅ Production-safe autonomous AI platform created successfully")
 
         # Initialize Enhanced Virtuous Cycle Manager
         print("♻️ Initializing Enhanced Virtuous Cycle Manager...")

@@ -27,7 +27,7 @@ import time
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 # Import enterprise LangSmith client
 from langsmith_enterprise_client import EnterpriseLangSmithClient, QualityMetrics
@@ -657,23 +657,37 @@ class ReinforcementLearningCollector:
 
     async def get_recent_corrections(self, days_back: int = 7) -> List[FeedbackPattern]:
         """Get recent user corrections for learning."""
-        # Get feedback dataset
-        datasets = await self.langsmith_client.list_datasets(name_contains=self.feedback_dataset_name)
-
-        if not datasets:
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, returning empty corrections")
             return []
 
-        # Search for recent corrections
-        recent_examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "correction", limit=100)
+        try:
+            # Get feedback dataset
+            datasets = await self.langsmith_client.list_datasets(name_contains=self.feedback_dataset_name)
 
-        # Convert to feedback patterns
-        patterns = []
-        for example in recent_examples:
-            if example.get("correction"):
-                pattern = self._create_feedback_pattern(example)
-                patterns.append(pattern)
+            if not datasets:
+                return []
 
-        return patterns
+            # Search for recent corrections
+            recent_examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "correction", limit=100)
+
+            # Ensure we have a list of dicts
+            if not isinstance(recent_examples, list):
+                self.logger.warning(f"Expected list of examples, got {type(recent_examples)}")
+                return []
+
+            # Convert to feedback patterns
+            patterns = []
+            for example in recent_examples:
+                if isinstance(example, dict) and example.get("correction"):
+                    pattern = self._create_feedback_pattern(example)
+                    patterns.append(pattern)
+
+            return patterns
+
+        except Exception as e:
+            self.logger.error(f"Failed to get recent corrections: {e}")
+            return []
 
     def _create_feedback_pattern(self, example: Dict[str, Any]) -> FeedbackPattern:
         """Create feedback pattern from example."""
@@ -772,14 +786,28 @@ class PatternIndexer:
 
     async def find_similar_successful_patterns(self, query_context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Find similar successful patterns for optimization."""
-        dataset_id = await self._ensure_success_patterns_dataset()
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, returning empty patterns")
+            return []
 
-        # Find similar patterns
-        similar_patterns = await self.langsmith_client.find_similar_patterns(
-            dataset_id, query_context, self.similarity_threshold
-        )
+        try:
+            dataset_id = await self._ensure_success_patterns_dataset()
 
-        return similar_patterns
+            # Find similar patterns
+            similar_patterns = await self.langsmith_client.find_similar_patterns(
+                dataset_id, query_context, self.similarity_threshold
+            )
+
+            # Ensure we return a list of dicts
+            if isinstance(similar_patterns, list):
+                return similar_patterns
+            else:
+                self.logger.warning(f"Expected list of patterns, got {type(similar_patterns)}")
+                return []
+
+        except Exception as e:
+            self.logger.error(f"Failed to find similar patterns: {e}")
+            return []
 
     async def _ensure_success_patterns_dataset(self) -> str:
         """Ensure success patterns dataset exists."""
@@ -834,18 +862,32 @@ class MetaLearningEngine:
 
     async def identify_best_strategies(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Identify best optimization strategies for given context."""
-        self.logger.info("🧠 Identifying optimal strategies...")
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, returning empty strategies")
+            return []
 
-        # Get strategy performance data
-        strategy_data = await self._get_strategy_performance_data()
+        try:
+            self.logger.info("🧠 Identifying optimal strategies...")
 
-        # Analyze strategy effectiveness for context
-        context_strategies = self._analyze_strategies_for_context(strategy_data, context)
+            # Get strategy performance data
+            strategy_data = await self._get_strategy_performance_data()
 
-        # Rank strategies by effectiveness
-        ranked_strategies = sorted(context_strategies, key=lambda x: x["effectiveness_score"], reverse=True)
+            # Ensure strategy_data is a list
+            if not isinstance(strategy_data, list):
+                self.logger.warning(f"Expected list of strategy data, got {type(strategy_data)}")
+                return []
 
-        return ranked_strategies[:3]  # Top 3 strategies
+            # Analyze strategy effectiveness for context
+            context_strategies = self._analyze_strategies_for_context(strategy_data, context)
+
+            # Rank strategies by effectiveness
+            ranked_strategies = sorted(context_strategies, key=lambda x: x["effectiveness_score"], reverse=True)
+
+            return ranked_strategies[:3]  # Top 3 strategies
+
+        except Exception as e:
+            self.logger.error(f"Failed to identify best strategies: {e}")
+            return []
 
     async def _get_strategy_performance_data(self) -> List[Dict[str, Any]]:
         """Get historical strategy performance data."""
