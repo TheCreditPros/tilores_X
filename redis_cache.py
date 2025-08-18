@@ -68,41 +68,31 @@ class RedisCacheManager:
             # Railway Redis URL (production)
             redis_url = os.getenv("REDIS_URL")
             if redis_url:
-                # Parse Redis URL to extract password for Railway internal Redis
-                import urllib.parse
-
-                parsed_url = urllib.parse.urlparse(redis_url)
-
-                # Extract connection parameters
-                host = parsed_url.hostname or "localhost"
-                port = parsed_url.port or 6379
-                password = parsed_url.password or os.getenv("REDIS_PASSWORD")
-
-                # Connect with explicit parameters for better Railway compatibility
-                self.redis_client = redis.Redis(
-                    host=host,
-                    port=port,
-                    password=password,
+                # Use redis.from_url for better Railway compatibility
+                debug_print("Connecting to Railway Redis via URL", "🔗")
+                self.redis_client = redis.from_url(
+                    redis_url,
                     decode_responses=True,
                     socket_connect_timeout=10,
                     socket_timeout=10,
                     retry_on_timeout=True,
                     health_check_interval=30,
                 )
-
-                debug_print(f"Connecting to Redis at {host}:{port} with auth", "🔗")
             else:
-                # Local Redis (development)
+                # Local Redis (development) - gracefully handle missing password
+                redis_password = os.getenv("REDIS_PASSWORD")
+                debug_print(f"Connecting to local Redis (auth: {'yes' if redis_password else 'no'})", "🔗")
+
                 self.redis_client = redis.Redis(
                     host=os.getenv("REDIS_HOST", "localhost"),
                     port=int(os.getenv("REDIS_PORT", 6379)),
-                    password=os.getenv("REDIS_PASSWORD"),
+                    password=redis_password,
                     decode_responses=True,
                     socket_connect_timeout=5,
                     socket_timeout=5,
                 )
 
-            # Test connection with retry logic
+            # Test connection with retry logic and graceful fallback
             if self.redis_client:
                 max_retries = 3
                 for attempt in range(max_retries):
@@ -113,9 +103,12 @@ class RedisCacheManager:
                         debug_print("Redis connection established", "✅")
                         break
                     except redis.AuthenticationError as auth_error:
-                        logger.error(f"Redis authentication failed: {auth_error}")
-                        debug_print(f"Redis auth failed: {auth_error}", "❌")
-                        raise auth_error
+                        logger.warning(f"Redis authentication failed: {auth_error}")
+                        debug_print("Redis auth failed - falling back to no-cache mode", "⚠️")
+                        # Don't raise auth errors in production - graceful fallback
+                        self.redis_client = None
+                        self.cache_available = False
+                        break
                     except Exception as retry_error:
                         if attempt < max_retries - 1:
                             debug_print(f"Redis connection attempt {attempt + 1} failed, retrying...", "⚠️")
@@ -123,10 +116,13 @@ class RedisCacheManager:
 
                             time.sleep(2**attempt)  # Exponential backoff
                         else:
-                            raise retry_error
+                            logger.warning(f"Redis connection failed after {max_retries} attempts: {retry_error}")
+                            debug_print("Redis connection failed - falling back to no-cache mode", "⚠️")
+                            self.redis_client = None
+                            self.cache_available = False
         except Exception as e:
             logger.warning(f"Redis connection failed: {e}")
-            debug_print(f"Redis connection failed: {e}", "⚠️")
+            debug_print(f"Redis connection failed - falling back to no-cache mode: {e}", "⚠️")
             self.redis_client = None
             self.cache_available = False
 
