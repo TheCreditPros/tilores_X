@@ -61,8 +61,8 @@ import {
 import {
   LangSmithQuickAccess,
   LangSmithKpiCard,
-  generateLangSmithEnhancedAlerts,
 } from "./components/LangSmithIntegration";
+import { generateLangSmithEnhancedAlerts } from "./utils/langsmithAlerts";
 import { LangSmithService } from "./services/langsmithService";
 
 function EnhancedMUIDashboard() {
