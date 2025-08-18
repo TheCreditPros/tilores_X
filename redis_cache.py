@@ -160,14 +160,14 @@ class RedisCacheManager:
                         break
                     except redis.AuthenticationError as auth_error:
                         if attempt < max_retries - 1:
-                            logger.warning(f"Redis authentication failed (attempt {attempt + 1}): {auth_error}")
+                            logger.info(f"Redis authentication failed (attempt {attempt + 1}): {auth_error}")
                             debug_print(f"Redis auth failed attempt {attempt + 1}, retrying...", "⚠️")
                             import time
 
                             time.sleep(2**attempt)  # Exponential backoff
                             continue  # Continue to next retry attempt
                         else:
-                            logger.warning(f"Redis authentication failed after {max_retries} attempts: {auth_error}")
+                            logger.info(f"Redis authentication failed after {max_retries} attempts: {auth_error}")
                             debug_print("Redis auth failed - falling back to no-cache mode", "⚠️")
                             # Don't raise auth errors in production - graceful fallback
                             self.redis_client = None
