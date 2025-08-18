@@ -68,9 +68,29 @@ class RedisCacheManager:
             # Railway Redis URL (production)
             redis_url = os.getenv("REDIS_URL")
             if redis_url:
-                self.redis_client = redis.from_url(
-                    redis_url, decode_responses=True, socket_connect_timeout=5, socket_timeout=5
+                # Parse Redis URL to extract password for Railway internal Redis
+                import urllib.parse
+
+                parsed_url = urllib.parse.urlparse(redis_url)
+
+                # Extract connection parameters
+                host = parsed_url.hostname or "localhost"
+                port = parsed_url.port or 6379
+                password = parsed_url.password or os.getenv("REDIS_PASSWORD")
+
+                # Connect with explicit parameters for better Railway compatibility
+                self.redis_client = redis.Redis(
+                    host=host,
+                    port=port,
+                    password=password,
+                    decode_responses=True,
+                    socket_connect_timeout=10,
+                    socket_timeout=10,
+                    retry_on_timeout=True,
+                    health_check_interval=30,
                 )
+
+                debug_print(f"Connecting to Redis at {host}:{port} with auth", "🔗")
             else:
                 # Local Redis (development)
                 self.redis_client = redis.Redis(
@@ -82,12 +102,28 @@ class RedisCacheManager:
                     socket_timeout=5,
                 )
 
-            # Test connection
+            # Test connection with retry logic
             if self.redis_client:
-                self.redis_client.ping()
-                self.cache_available = True
-                logger.info("Redis cache connected and ready")
-                debug_print("Redis connection established", "✅")
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        self.redis_client.ping()
+                        self.cache_available = True
+                        logger.info("Redis cache connected and ready")
+                        debug_print("Redis connection established", "✅")
+                        break
+                    except redis.AuthenticationError as auth_error:
+                        logger.error(f"Redis authentication failed: {auth_error}")
+                        debug_print(f"Redis auth failed: {auth_error}", "❌")
+                        raise auth_error
+                    except Exception as retry_error:
+                        if attempt < max_retries - 1:
+                            debug_print(f"Redis connection attempt {attempt + 1} failed, retrying...", "⚠️")
+                            import time
+
+                            time.sleep(2**attempt)  # Exponential backoff
+                        else:
+                            raise retry_error
         except Exception as e:
             logger.warning(f"Redis connection failed: {e}")
             debug_print(f"Redis connection failed: {e}", "⚠️")
