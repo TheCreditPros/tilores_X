@@ -114,11 +114,13 @@ def validate_autonomous_ai_components() -> Dict[str, Any]:
         validation_results["components_validated"].append("EnterpriseLangSmithClient")
 
         # Test Autonomous AI Platform - just validate import works
-        import autonomous_ai_platform
+        import autonomous_ai_platform  # noqa: F401
+
         validation_results["components_validated"].append("AutonomousAIPlatform")
 
         # Test Enhanced Virtuous Cycle Manager - just validate import works
-        import autonomous_integration
+        import autonomous_integration  # noqa: F401
+
         validation_results["components_validated"].append("EnhancedVirtuousCycleManager")
 
         print("✅ All autonomous AI components validated successfully")
