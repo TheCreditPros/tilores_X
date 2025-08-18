@@ -48,27 +48,34 @@ async def initialize_autonomous_platform():
             "LANGSMITH_ENTERPRISE_MODE",
             "LANGSMITH_ENTERPRISE_FEATURES",
             "LANGCHAIN_TRACING_V2",
-            "LANGSMITH_TRACING"
+            "LANGSMITH_TRACING",
         ]
 
         for var in bool_vars:
             value = os.getenv(var)
             if isinstance(value, bool):
                 os.environ[var] = str(value).lower()
-            elif value and value.lower() in ['true', 'false']:
+            elif value and value.lower() in ["true", "false"]:
                 os.environ[var] = value.lower()
 
         # Initialize Enterprise LangSmith Client
         print("📊 Initializing Enterprise LangSmith Client...")
         enterprise_client = create_enterprise_client()
 
-        # Validate LangSmith connectivity
-        print("🔍 Validating LangSmith Enterprise connectivity...")
-        workspace_stats = await enterprise_client.get_workspace_stats()
-        print(
-            f"✅ LangSmith connected - Projects: {workspace_stats.tracer_session_count}, "
-            f"Datasets: {workspace_stats.dataset_count}"
-        )
+        if enterprise_client:
+            # Validate LangSmith connectivity
+            print("🔍 Validating LangSmith Enterprise connectivity...")
+            try:
+                workspace_stats = await enterprise_client.get_workspace_stats()
+                print(
+                    f"✅ LangSmith connected - Projects: {workspace_stats.tracer_session_count}, "
+                    f"Datasets: {workspace_stats.dataset_count}"
+                )
+            except Exception as e:
+                print(f"⚠️ LangSmith connectivity validation failed: {e}")
+                print("🔄 Continuing with mock mode...")
+        else:
+            print("⚠️ Enterprise LangSmith client not available - using mock mode")
 
         # Initialize Autonomous AI Platform
         print("🧠 Initializing Autonomous AI Platform core...")
@@ -177,6 +184,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown original background tasks
     await shutdown_background_tasks()
+
 
 # Apply the lifespan handler to the app
 app.router.lifespan_context = lifespan

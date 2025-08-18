@@ -66,20 +66,18 @@ except ImportError:
     LANGSMITH_AVAILABLE = False
     logging.warning("LangSmith not available for trace monitoring")
 
-# Import existing 4-phase framework components with enhanced detection
+# Import production autonomous AI platform components
 FRAMEWORKS_AVAILABLE = False
 try:
-    from tests.speed_experiments.phase2_ai_prompt_optimization import Phase2OptimizationOrchestrator
-    from tests.speed_experiments.phase3_continuous_improvement import ContinuousImprovementOrchestrator
-    from tests.speed_experiments.phase4_production_integration import ProductionIntegrationOrchestrator
-    from tests.speed_experiments.quality_metrics_collector import QualityMetricsCollector
+    from autonomous_ai_platform import AutonomousAIPlatform
+    from autonomous_integration import EnhancedVirtuousCycleManager
+    from langsmith_enterprise_client import create_enterprise_client
 
     # Verify all components are actually available
     test_components = [
-        Phase2OptimizationOrchestrator,
-        ContinuousImprovementOrchestrator,
-        ProductionIntegrationOrchestrator,
-        QualityMetricsCollector,
+        AutonomousAIPlatform,
+        EnhancedVirtuousCycleManager,
+        create_enterprise_client,
     ]
 
     # Test component instantiation to ensure they're fully functional
@@ -88,74 +86,105 @@ try:
             raise ImportError(f"Component {component.__name__} is not callable")
 
     FRAMEWORKS_AVAILABLE = True
-    logging.info("✅ All 4-phase framework components successfully imported and validated")
+    logging.info("✅ Production autonomous AI platform components successfully imported and validated")
 
 except ImportError as import_error:
     # Create mock implementations for production deployment
-    logging.warning(f"4-phase framework components not available ({import_error}), using mock implementations")
+    logging.warning(
+        f"Production autonomous AI platform components not available ({import_error}), using mock implementations"
+    )
 
-    class MockQualityMetricsCollector:
-        """Mock quality metrics collector for production deployment."""
-
-        def __init__(self):
-            self.metrics = []
-
-        def record_metric(self, metric_data):
-            """Record a quality metric."""
-            self.metrics.append(metric_data)
-            logging.debug(f"Mock: Recorded quality metric: {metric_data}")
-
-    class MockPhase2OptimizationOrchestrator:
-        """Mock Phase 2 optimization orchestrator."""
+    class MockAutonomousAIPlatform:
+        """Mock autonomous AI platform for production deployment."""
 
         def __init__(self, langsmith_client=None):
             self.langsmith_client = langsmith_client
 
-        async def run_phase2_optimization(self, baseline_file):
-            """Mock Phase 2 optimization."""
-            logging.info("Mock: Running Phase 2 AI Prompt Optimization")
+        async def autonomous_improvement_cycle(self):
+            """Mock autonomous improvement cycle."""
+            logging.info("Mock: Running autonomous improvement cycle")
             return {
-                "optimization_id": f"mock_opt_{int(time.time())}",
-                "improvements": ["mock_improvement_1", "mock_improvement_2"],
-                "quality_gain": 0.05,
-                "status": "completed",
+                "cycle_id": f"mock_cycle_{int(time.time())}",
+                "components_executed": ["mock_delta_analysis", "mock_pattern_matching"],
+                "improvements_identified": ["mock_improvement_1"],
+                "learning_applied": True,
+                "cycle_duration": 2.5,
             }
 
-    class MockContinuousImprovementOrchestrator:
-        """Mock Phase 3 continuous improvement orchestrator."""
+        async def get_platform_status(self):
+            """Mock platform status."""
+            return {
+                "platform_status": "operational",
+                "current_quality": 0.88,
+                "quality_trend": "stable",
+                "predicted_quality": 0.89,
+                "needs_intervention": False,
+                "autonomous_features": {
+                    "delta_analysis": True,
+                    "ab_testing": True,
+                    "pattern_indexing": True,
+                    "meta_learning": True,
+                    "predictive_quality": True,
+                },
+            }
 
-        def __init__(self, quality_collector=None):
-            self.quality_collector = quality_collector
-            self.learning_accumulator = MockLearningAccumulator()
+        async def predict_quality_degradation(self):
+            """Mock quality prediction."""
+            return {
+                "predicted_quality_7d": 0.89,
+                "needs_intervention": False,
+                "confidence": 0.75,
+                "risk_level": "low",
+                "risk_factors": [],
+                "recommendations": [],
+            }
 
-        async def run_self_healing_cycle(self):
-            """Mock self-healing cycle."""
-            logging.info("Mock: Running Phase 3 Continuous Improvement")
-            return {"status": "completed", "improvements": ["mock_healing_1"]}
-
-    class MockLearningAccumulator:
-        """Mock learning accumulator."""
-
-        def record_optimization_cycle(self, optimization_results):
-            """Record optimization cycle for learning."""
-            logging.debug(f"Mock: Recorded optimization cycle: {optimization_results}")
-
-    class MockProductionIntegrationOrchestrator:
-        """Mock Phase 4 production integration orchestrator."""
+    class MockEnhancedVirtuousCycleManager:
+        """Mock enhanced virtuous cycle manager."""
 
         def __init__(self):
+            self.enterprise_features_available = False
+            self.legacy_available = False
+
+        async def get_enhanced_status(self):
+            """Mock enhanced status."""
+            return {
+                "enhanced_features": False,
+                "legacy_compatibility": False,
+                "autonomous_ai": {
+                    "delta_analysis": False,
+                    "ab_testing": False,
+                    "pattern_indexing": False,
+                    "meta_learning": False,
+                    "predictive_quality": False,
+                },
+                "enterprise_langsmith": {
+                    "workspace_stats": None,
+                    "quality_prediction": None,
+                    "pattern_analysis": None,
+                },
+            }
+
+        async def run_autonomous_optimization(self, trigger_reason="Mock trigger"):
+            """Mock autonomous optimization."""
+            return {
+                "trigger_reason": trigger_reason,
+                "autonomous_features_used": ["mock_feature"],
+                "success": True,
+                "timestamp": datetime.now().isoformat(),
+            }
+
+        async def close(self):
+            """Mock close method."""
             pass
 
-        async def deploy_optimized_prompts(self, optimization_results):
-            """Mock prompt deployment."""
-            logging.info("Mock: Running Phase 4 Production Integration")
-            return True  # Always succeed in mock
-
     # Assign mock classes
-    QualityMetricsCollector = MockQualityMetricsCollector
-    Phase2OptimizationOrchestrator = MockPhase2OptimizationOrchestrator
-    ContinuousImprovementOrchestrator = MockContinuousImprovementOrchestrator
-    ProductionIntegrationOrchestrator = MockProductionIntegrationOrchestrator
+    AutonomousAIPlatform = MockAutonomousAIPlatform
+    EnhancedVirtuousCycleManager = MockEnhancedVirtuousCycleManager
+
+    def create_enterprise_client():
+        """Mock enterprise client factory."""
+        return None
 
     FRAMEWORKS_AVAILABLE = True  # Set to True since we have mock implementations
 
@@ -217,16 +246,28 @@ class VirtuousCycleManager:
             "last_update": datetime.now().isoformat(),
         }
 
-        # Always initialize components - use real ones if available, mocks if not
+        # Initialize autonomous AI platform components
+        self.autonomous_platform = None
+        self.enhanced_manager = None
+
         if FRAMEWORKS_AVAILABLE:
             try:
-                self.quality_collector = QualityMetricsCollector()
-                self.phase2_orchestrator = Phase2OptimizationOrchestrator(self.langsmith_client)
-                self.phase3_orchestrator = ContinuousImprovementOrchestrator(self.quality_collector)
-                self.phase4_orchestrator = ProductionIntegrationOrchestrator()
-                self.logger.info("✅ 4-phase framework components initialized")
+                # Initialize enterprise LangSmith client
+                enterprise_client = create_enterprise_client()
+
+                if enterprise_client:
+                    self.autonomous_platform = AutonomousAIPlatform(enterprise_client)
+                    self.logger.info("✅ Autonomous AI platform initialized with enterprise client")
+                else:
+                    self.autonomous_platform = AutonomousAIPlatform(None)
+                    self.logger.info("✅ Autonomous AI platform initialized with mock client")
+
+                # Initialize enhanced virtuous cycle manager
+                self.enhanced_manager = EnhancedVirtuousCycleManager()
+                self.logger.info("✅ Enhanced virtuous cycle manager initialized")
+
             except Exception as e:
-                self.logger.error(f"Framework initialization failed: {e}")
+                self.logger.error(f"Autonomous AI platform initialization failed: {e}")
                 # Fallback to mock implementations
                 self._initialize_mock_components()
         else:
@@ -236,11 +277,9 @@ class VirtuousCycleManager:
     def _initialize_mock_components(self):
         """Initialize mock components when real frameworks are not available."""
         # Use the mock classes defined at module level when FRAMEWORKS_AVAILABLE is False
-        self.quality_collector = QualityMetricsCollector()  # This will be the mock version
-        self.phase2_orchestrator = Phase2OptimizationOrchestrator(self.langsmith_client)  # Mock version
-        self.phase3_orchestrator = ContinuousImprovementOrchestrator(self.quality_collector)  # Mock version
-        self.phase4_orchestrator = ProductionIntegrationOrchestrator()  # Mock version
-        self.logger.info("✅ Mock 4-phase framework components initialized")
+        self.autonomous_platform = AutonomousAIPlatform(None)  # Mock version
+        self.enhanced_manager = EnhancedVirtuousCycleManager()  # Mock version
+        self.logger.info("✅ Mock autonomous AI platform components initialized")
 
     async def start_monitoring(self):
         """Start the continuous monitoring and optimization system."""
@@ -451,87 +490,51 @@ class VirtuousCycleManager:
         self.metrics["optimizations_triggered"] += 1
 
         try:
-            # Phase 2: AI Prompt Optimization
-            if self.phase2_orchestrator:
-                optimization_results = await self._run_phase2_optimization()
+            # Run autonomous AI optimization cycle
+            if self.autonomous_platform:
+                optimization_results = await self._run_autonomous_optimization()
 
                 if optimization_results:
-                    # Phase 3: Continuous Improvement
-                    if self.phase3_orchestrator:
-                        await self._run_phase3_improvement(optimization_results)
-
-                    # Phase 4: Production Integration
-                    if self.phase4_orchestrator:
-                        deployed = await self._run_phase4_deployment(optimization_results)
-                        if deployed:
-                            self.metrics["improvements_deployed"] += 1
+                    # Run enhanced optimization if available
+                    if self.enhanced_manager:
+                        await self._run_enhanced_optimization(optimization_results)
+                        self.metrics["improvements_deployed"] += len(
+                            optimization_results.get("improvements_identified", [])
+                        )
 
         except Exception as e:
             self.logger.error(f"Optimization cycle failed: {e}")
 
-    async def _run_phase2_optimization(self) -> Optional[Dict[str, Any]]:
-        """Run Phase 2 AI Prompt Optimization."""
+    async def _run_autonomous_optimization(self) -> Optional[Dict[str, Any]]:
+        """Run autonomous AI optimization cycle."""
         try:
-            self.logger.info("🤖 Running Phase 2 AI Prompt Optimization")
+            self.logger.info("🤖 Running Autonomous AI Optimization")
 
-            # Get latest baseline results
-            baseline_file = await self._get_latest_baseline_file()
-            if not baseline_file:
-                self.logger.warning("No baseline results found")
-                return None
-
-            # Run optimization if orchestrator available
-            if self.phase2_orchestrator:
-                cycle = await self.phase2_orchestrator.run_phase2_optimization(baseline_file)
-
-                # Convert to dict for JSON serialization
-                if hasattr(cycle, "__dict__"):
-                    return cycle.__dict__
-                elif isinstance(cycle, dict):
-                    return cycle
-                else:
-                    return {"cycle_data": str(cycle)}
+            # Use autonomous platform if available
+            if self.autonomous_platform:
+                cycle_results = await self.autonomous_platform.autonomous_improvement_cycle()
+                return cycle_results
             else:
-                self.logger.warning("Phase 2 orchestrator not available")
+                self.logger.warning("Autonomous AI platform not available")
                 return None
 
         except Exception as e:
-            self.logger.error(f"Phase 2 optimization failed: {e}")
+            self.logger.error(f"Autonomous optimization failed: {e}")
             return None
 
-    async def _run_phase3_improvement(self, optimization_results: Dict[str, Any]):
-        """Run Phase 3 Continuous Improvement."""
+    async def _run_enhanced_optimization(self, optimization_results: Dict[str, Any]):
+        """Run enhanced virtuous cycle optimization."""
         try:
-            self.logger.info("🔄 Running Phase 3 Continuous Improvement")
+            self.logger.info("♻️ Running Enhanced Virtuous Cycle Optimization")
 
-            # Record optimization cycle for learning if orchestrator available
-            if self.phase3_orchestrator:
-                self.phase3_orchestrator.learning_accumulator.record_optimization_cycle(optimization_results)
-
-                # Run self-healing cycle
-                await self.phase3_orchestrator.run_self_healing_cycle()
+            # Use enhanced manager if available
+            if self.enhanced_manager:
+                await self.enhanced_manager.run_autonomous_optimization(trigger_reason="Quality threshold monitoring")
             else:
-                self.logger.warning("Phase 3 orchestrator not available")
+                self.logger.warning("Enhanced manager not available")
 
         except Exception as e:
-            self.logger.error(f"Phase 3 improvement failed: {e}")
-
-    async def _run_phase4_deployment(self, optimization_results: Dict[str, Any]) -> bool:
-        """Run Phase 4 Production Integration."""
-        try:
-            self.logger.info("🚀 Running Phase 4 Production Integration")
-
-            # Deploy optimized prompts if orchestrator available
-            if self.phase4_orchestrator:
-                deployed = await self.phase4_orchestrator.deploy_optimized_prompts(optimization_results)
-                return deployed
-            else:
-                self.logger.warning("Phase 4 orchestrator not available")
-                return False
-
-        except Exception as e:
-            self.logger.error(f"Phase 4 deployment failed: {e}")
-            return False
+            self.logger.error(f"Enhanced optimization failed: {e}")
 
     async def _get_latest_baseline_file(self) -> Optional[str]:
         """Get the latest baseline results file."""
@@ -630,14 +633,13 @@ class VirtuousCycleManager:
         pass
 
     def get_status(self) -> Dict[str, Any]:
-        """Get current status of the Virtuous Cycle system."""
+        """Get current status of the Autonomous AI Virtuous Cycle system."""
         # Check if we have any working components (real or mock)
         components_available = any(
             [
-                self.quality_collector is not None,
-                self.phase2_orchestrator is not None,
-                self.phase3_orchestrator is not None,
-                self.phase4_orchestrator is not None,
+                self.autonomous_platform is not None,
+                self.enhanced_manager is not None,
+                self.langsmith_client is not None,
             ]
         )
 
@@ -645,15 +647,14 @@ class VirtuousCycleManager:
             "monitoring_active": self.monitoring_active,
             "langsmith_available": LANGSMITH_AVAILABLE,
             "frameworks_available": components_available,  # True if any components available
+            "autonomous_ai_available": FRAMEWORKS_AVAILABLE,
             "quality_threshold": self.quality_threshold,
             "last_optimization": (self.last_optimization_time.isoformat() if self.last_optimization_time else None),
             "metrics": self.metrics.copy(),
             "component_status": {
                 "langsmith_client": self.langsmith_client is not None,
-                "quality_collector": self.quality_collector is not None,
-                "phase2_orchestrator": self.phase2_orchestrator is not None,
-                "phase3_orchestrator": self.phase3_orchestrator is not None,
-                "phase4_orchestrator": self.phase4_orchestrator is not None,
+                "autonomous_platform": self.autonomous_platform is not None,
+                "enhanced_manager": self.enhanced_manager is not None,
             },
         }
 

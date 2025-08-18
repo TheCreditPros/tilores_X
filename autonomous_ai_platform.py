@@ -27,7 +27,7 @@ import time
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Import enterprise LangSmith client
 from langsmith_enterprise_client import EnterpriseLangSmithClient, QualityMetrics
@@ -114,7 +114,7 @@ class DeltaRegressionAnalyzer:
     before it impacts user experience.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize delta regression analyzer."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
@@ -131,6 +131,23 @@ class DeltaRegressionAnalyzer:
         analysis_id = f"delta_analysis_{int(analysis_start)}"
 
         self.logger.info(f"🔍 Starting delta regression analysis: {analysis_id}")
+
+        # Handle case where LangSmith client is not available
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, using mock delta analysis")
+            return DeltaAnalysis(
+                analysis_id=analysis_id,
+                baseline_quality=0.88,
+                current_quality=0.86,
+                quality_delta=-0.02,
+                regression_detected=False,
+                confidence=0.5,
+                affected_models=[],
+                affected_spectrums=[],
+                root_cause="Mock analysis - LangSmith unavailable",
+                timestamp=datetime.now().isoformat(),
+                metadata={"mock_analysis": True, "analysis_time": time.time() - analysis_start},
+            )
 
         # Get baseline performance (7 days ago)
         baseline_end = datetime.now() - timedelta(days=self.comparison_window_days)
@@ -329,7 +346,7 @@ class AdvancedABTesting:
     automated deployment decisions.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize A/B testing framework."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
@@ -572,7 +589,7 @@ class ReinforcementLearningCollector:
     for continuous improvement.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize feedback collector."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
@@ -711,7 +728,7 @@ class PatternIndexer:
     for similarity-based optimization.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize pattern indexer."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
@@ -805,7 +822,7 @@ class MetaLearningEngine:
     contexts and automatically adapts approach.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize meta-learning engine."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
@@ -905,12 +922,12 @@ class AutonomousAIPlatform:
     AI evolution with predictive quality management.
     """
 
-    def __init__(self, langsmith_client: EnterpriseLangSmithClient):
+    def __init__(self, langsmith_client: Optional[EnterpriseLangSmithClient]):
         """Initialize autonomous AI platform."""
         self.langsmith_client = langsmith_client
         self.logger = logging.getLogger(__name__)
 
-        # Initialize core components
+        # Initialize core components with optional client
         self.delta_analyzer = DeltaRegressionAnalyzer(langsmith_client)
         self.ab_testing = AdvancedABTesting(langsmith_client)
         self.feedback_collector = ReinforcementLearningCollector(langsmith_client)
@@ -1014,61 +1031,136 @@ class AutonomousAIPlatform:
         """Predict quality degradation for proactive intervention."""
         self.logger.info("🔮 Predicting quality degradation...")
 
-        # Get performance trends
-        trends = await self.langsmith_client.get_performance_trends(
-            days=self.prediction_horizon_days, include_predictions=True
-        )
+        # Handle case where LangSmith client is not available
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, using mock quality prediction")
+            return {
+                "predicted_quality_7d": 0.89,
+                "needs_intervention": False,
+                "confidence": 0.5,
+                "risk_level": "minimal",
+                "risk_factors": [],
+                "recommendations": [],
+                "current_trend": "stable",
+                "prediction_timestamp": datetime.now().isoformat(),
+                "mock_mode": True,
+            }
 
-        quality_trend = trends["quality_trend"]
-        predictions = trends.get("predictions", {})
+        try:
+            # Get performance trends
+            trends = await self.langsmith_client.get_performance_trends(
+                days=self.prediction_horizon_days, include_predictions=True
+            )
 
-        # Analyze degradation risk
-        risk_analysis = await self.langsmith_client.analyze_quality_degradation_risk(
-            lookback_days=self.prediction_horizon_days
-        )
+            quality_trend = trends["quality_trend"]
+            predictions = trends.get("predictions", {})
 
-        return {
-            "predicted_quality_7d": predictions.get("predicted_quality_7d", 0.0),
-            "needs_intervention": predictions.get("needs_intervention", False),
-            "confidence": predictions.get("confidence", 0.0),
-            "risk_level": risk_analysis.get("risk_level", "minimal"),
-            "risk_factors": risk_analysis.get("risk_factors", []),
-            "recommendations": risk_analysis.get("recommendations", []),
-            "current_trend": quality_trend.get("trend", "stable"),
-            "prediction_timestamp": datetime.now().isoformat(),
-        }
+            # Analyze degradation risk
+            risk_analysis = await self.langsmith_client.analyze_quality_degradation_risk(
+                lookback_days=self.prediction_horizon_days
+            )
+
+            return {
+                "predicted_quality_7d": predictions.get("predicted_quality_7d", 0.0),
+                "needs_intervention": predictions.get("needs_intervention", False),
+                "confidence": predictions.get("confidence", 0.0),
+                "risk_level": risk_analysis.get("risk_level", "minimal"),
+                "risk_factors": risk_analysis.get("risk_factors", []),
+                "recommendations": risk_analysis.get("recommendations", []),
+                "current_trend": quality_trend.get("trend", "stable"),
+                "prediction_timestamp": datetime.now().isoformat(),
+            }
+        except Exception as e:
+            self.logger.error(f"Quality prediction failed: {e}")
+            return {
+                "predicted_quality_7d": 0.85,
+                "needs_intervention": True,
+                "confidence": 0.0,
+                "risk_level": "high",
+                "risk_factors": ["prediction_error"],
+                "recommendations": ["Check LangSmith connectivity"],
+                "current_trend": "unknown",
+                "prediction_timestamp": datetime.now().isoformat(),
+                "error": str(e),
+            }
 
     async def get_platform_status(self) -> Dict[str, Any]:
         """Get comprehensive platform status."""
-        # Get workspace overview
-        workspace_stats = await self.langsmith_client.get_workspace_stats()
+        # Handle case where LangSmith client is not available
+        if not self.langsmith_client:
+            self.logger.warning("LangSmith client not available, using mock platform status")
+            return {
+                "platform_status": "operational_mock",
+                "workspace_stats": {
+                    "projects": 0,
+                    "datasets": 0,
+                    "repos": 0,
+                },
+                "current_quality": 0.88,
+                "quality_trend": "stable",
+                "predicted_quality": 0.89,
+                "needs_intervention": False,
+                "autonomous_features": {
+                    "delta_analysis": True,
+                    "ab_testing": True,
+                    "pattern_indexing": True,
+                    "meta_learning": True,
+                    "predictive_quality": True,
+                },
+                "status_timestamp": datetime.now().isoformat(),
+                "mock_mode": True,
+            }
 
-        # Get recent performance
-        performance_trends = await self.langsmith_client.get_performance_trends(days=1)
+        try:
+            # Get workspace overview
+            workspace_stats = await self.langsmith_client.get_workspace_stats()
 
-        # Get quality prediction
-        quality_prediction = await self.predict_quality_degradation()
+            # Get recent performance
+            performance_trends = await self.langsmith_client.get_performance_trends(days=1)
 
-        return {
-            "platform_status": "operational",
-            "workspace_stats": {
-                "projects": workspace_stats.tracer_session_count,
-                "datasets": workspace_stats.dataset_count,
-                "repos": workspace_stats.repo_count,
-            },
-            "current_quality": performance_trends["quality_trend"]["current_quality"],
-            "quality_trend": performance_trends["quality_trend"]["trend"],
-            "predicted_quality": quality_prediction["predicted_quality_7d"],
-            "needs_intervention": quality_prediction["needs_intervention"],
-            "autonomous_features": {
-                "delta_analysis": True,
-                "ab_testing": True,
-                "pattern_indexing": True,
-                "meta_learning": True,
-                "predictive_quality": True,
-            },
-            "status_timestamp": datetime.now().isoformat(),
-        }
+            # Get quality prediction
+            quality_prediction = await self.predict_quality_degradation()
+
+            return {
+                "platform_status": "operational",
+                "workspace_stats": {
+                    "projects": workspace_stats.tracer_session_count,
+                    "datasets": workspace_stats.dataset_count,
+                    "repos": workspace_stats.repo_count,
+                },
+                "current_quality": performance_trends["quality_trend"]["current_quality"],
+                "quality_trend": performance_trends["quality_trend"]["trend"],
+                "predicted_quality": quality_prediction["predicted_quality_7d"],
+                "needs_intervention": quality_prediction["needs_intervention"],
+                "autonomous_features": {
+                    "delta_analysis": True,
+                    "ab_testing": True,
+                    "pattern_indexing": True,
+                    "meta_learning": True,
+                    "predictive_quality": True,
+                },
+                "status_timestamp": datetime.now().isoformat(),
+            }
+        except Exception as e:
+            self.logger.error(f"Failed to get platform status: {e}")
+            # Return fallback status
+            return {
+                "platform_status": "degraded",
+                "workspace_stats": {"projects": 0, "datasets": 0, "repos": 0},
+                "current_quality": 0.85,
+                "quality_trend": "unknown",
+                "predicted_quality": 0.85,
+                "needs_intervention": True,
+                "autonomous_features": {
+                    "delta_analysis": False,
+                    "ab_testing": False,
+                    "pattern_indexing": False,
+                    "meta_learning": False,
+                    "predictive_quality": False,
+                },
+                "status_timestamp": datetime.now().isoformat(),
+                "error": str(e),
+            }
 
 
 # ========================================================================

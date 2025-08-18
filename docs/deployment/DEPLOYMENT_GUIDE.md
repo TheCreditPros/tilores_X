@@ -1,7 +1,11 @@
 # Autonomous AI Platform Deployment Guide
 
+## 🚨 CRITICAL: Mandatory GitHub Actions Monitoring Required
+
+**ALL DEPLOYMENTS MUST INCLUDE REAL-TIME MONITORING** - See [Mandatory GitHub Actions Monitoring Protocol](MANDATORY_GITHUB_ACTIONS_MONITORING.md)
+
 ## Overview
-This guide covers the secure deployment of the tilores_X Autonomous AI Platform using GitHub Actions CI/CD pipeline with Railway hosting.
+This guide covers the secure deployment of the tilores_X Autonomous AI Platform using GitHub Actions CI/CD pipeline with Railway hosting. Following critical deployment lessons learned, **all deployments now require mandatory real-time GitHub Actions monitoring**.
 
 ## Architecture
 - **Entry Point**: `main_autonomous_production.py`
@@ -13,6 +17,18 @@ This guide covers the secure deployment of the tilores_X Autonomous AI Platform 
 - **CI/CD**: GitHub Actions with multi-stage validation
 
 ## Deployment Process
+
+### 🚨 MANDATORY: GitHub Actions Monitoring
+
+**CRITICAL REQUIREMENT**: Every deployment MUST include real-time GitHub Actions monitoring using:
+
+```bash
+gh run watch --exit-status
+```
+
+**This command must be executed immediately after triggering any deployment.**
+
+For complete monitoring procedures, see: [Mandatory GitHub Actions Monitoring Protocol](MANDATORY_GITHUB_ACTIONS_MONITORING.md)
 
 ### 1. Security & Compliance
 - Bandit security scanning
@@ -46,10 +62,27 @@ This guide covers the secure deployment of the tilores_X Autonomous AI Platform 
 - **Validation**: Full smoke tests including autonomous AI endpoints
 - **URL**: Configured via `PRODUCTION_URL` secret
 
-### 5. Post-Deployment Monitoring
+### 5. Post-Deployment Validation
+
+#### Mandatory Verification Steps
+- [ ] GitHub Actions monitoring completed with exit status 0
+- [ ] GitHub Actions run ID documented
+- [ ] All workflow jobs marked as successful
+- [ ] Deployment artifacts confirmed
+- [ ] Health endpoints validated
+
+#### Automated Monitoring Setup
 - Automated monitoring setup
 - Deployment report generation
 - Performance metrics collection
+
+#### Deployment Report Requirements
+All deployment reports MUST include:
+- GitHub Actions run ID
+- Exit status confirmation (0 = success)
+- Monitoring command execution evidence
+- Workflow completion timestamp
+- Any error messages or warnings
 
 ## Required GitHub Secrets
 
@@ -91,17 +124,29 @@ ENVIRONMENT=production
 # All deployments must go through GitHub Actions
 ```
 
-### Trigger Deployment
+### Trigger Deployment with Mandatory Monitoring
+
+**CRITICAL**: Every deployment must follow this exact sequence:
+
 ```bash
-# Push to main for staging
-git push origin main
+# 1. Trigger deployment
+git push origin main  # or production branch
 
-# Push to production branch for production
-git push origin production
+# 2. IMMEDIATELY start monitoring (MANDATORY)
+gh run watch --exit-status
 
+# 3. Wait for completion and verify exit status is 0
+# 4. Document GitHub Actions run ID in deployment report
+```
+
+**Alternative Methods:**
+```bash
 # Manual dispatch via GitHub UI
 # Actions -> Deploy Autonomous AI Platform -> Run workflow
+# Then IMMEDIATELY execute: gh run watch --exit-status
 ```
+
+**⚠️ WARNING**: Never report deployment success without GitHub Actions verification!
 
 ## Rollback Procedures
 
