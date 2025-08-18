@@ -413,17 +413,39 @@ class EnterpriseLangSmithClient:
         include_feedback: bool = True,
     ) -> List[Dict[str, Any]]:
         """List runs with comprehensive filtering."""
-        params = {"limit": limit, "offset": offset, "include_feedback": str(include_feedback).lower()}
+        try:
+            params = {"limit": limit, "offset": offset, "include_feedback": str(include_feedback).lower()}
 
-        if session_names:
-            params["session"] = session_names
-        if start_time:
-            params["start_time"] = start_time.isoformat()
-        if end_time:
-            params["end_time"] = end_time.isoformat()
+            if session_names:
+                params["session"] = session_names
+            if start_time:
+                params["start_time"] = start_time.isoformat()
+            if end_time:
+                params["end_time"] = end_time.isoformat()
 
-        response = await self._make_request("GET", "/api/v1/runs", params=params)
-        return response.get("runs", [])
+            response = await self._make_request("GET", "/api/v1/runs", params=params)
+            runs = response.get("runs", [])
+
+            # Ensure we return a list of dicts
+            if not isinstance(runs, list):
+                self.logger.warning(f"Expected list of runs, got {type(runs)}")
+                return []
+
+            return runs
+
+        except Exception as e:
+            if "405" in str(e) or "Method Not Allowed" in str(e):
+                self.logger.warning("HTTP 405 on /api/v1/runs, trying alternative endpoint")
+                try:
+                    # Try alternative endpoint
+                    response = await self._make_request("POST", "/api/v1/runs/query", data=params)
+                    return response.get("runs", [])
+                except Exception:
+                    self.logger.warning("Alternative runs endpoint also failed, returning empty list")
+                    return []
+            else:
+                self.logger.error(f"Failed to list runs: {e}")
+                return []
 
     # ========================================================================
     # DATASET MANAGEMENT (51 Datasets Integration)
@@ -627,37 +649,53 @@ class EnterpriseLangSmithClient:
         limit: int = 1000,
     ) -> List[QualityMetrics]:
         """Get comprehensive quality metrics for autonomous monitoring."""
-        # Get runs with feedback
-        runs = await self.list_runs(
-            session_names=session_names, start_time=start_time, end_time=end_time, limit=limit, include_feedback=True
-        )
-
-        quality_metrics = []
-        for run in runs:
-            # Extract quality metrics
-            feedback_scores = {}
-            for feedback in run.get("feedback", []):
-                feedback_scores[feedback["key"]] = feedback["score"]
-
-            # Calculate overall quality score
-            quality_score = self._calculate_quality_score(feedback_scores, run)
-
-            metrics = QualityMetrics(
-                run_id=run["id"],
-                session_name=run.get("session_name", ""),
-                model=run.get("extra", {}).get("metadata", {}).get("model", ""),
-                quality_score=quality_score,
-                latency_ms=run.get("latency", 0) * 1000,
-                token_count=run.get("total_tokens", 0),
-                cost=run.get("total_cost", 0.0),
-                timestamp=run["start_time"],
-                feedback_scores=feedback_scores,
-                metadata=run.get("extra", {}),
+        try:
+            # Get runs with feedback
+            runs = await self.list_runs(
+                session_names=session_names, start_time=start_time, end_time=end_time, limit=limit, include_feedback=True
             )
 
-            quality_metrics.append(metrics)
+            quality_metrics = []
+            for run in runs:
+                # Handle case where run might be a list instead of dict
+                if isinstance(run, list):
+                    self.logger.warning("Received list instead of dict for run data, skipping")
+                    continue
 
-        return quality_metrics
+                if not isinstance(run, dict):
+                    self.logger.warning(f"Unexpected run data type: {type(run)}, skipping")
+                    continue
+
+                # Extract quality metrics
+                feedback_scores = {}
+                for feedback in run.get("feedback", []):
+                    if isinstance(feedback, dict):
+                        feedback_scores[feedback.get("key", "unknown")] = feedback.get("score", 0.0)
+
+                # Calculate overall quality score
+                quality_score = self._calculate_quality_score(feedback_scores, run)
+
+                metrics = QualityMetrics(
+                    run_id=run.get("id", "unknown"),
+                    session_name=run.get("session_name", ""),
+                    model=run.get("extra", {}).get("metadata", {}).get("model", ""),
+                    quality_score=quality_score,
+                    latency_ms=run.get("latency", 0) * 1000,
+                    token_count=run.get("total_tokens", 0),
+                    cost=run.get("total_cost", 0.0),
+                    timestamp=run.get("start_time", datetime.now().isoformat()),
+                    feedback_scores=feedback_scores,
+                    metadata=run.get("extra", {}),
+                )
+
+                quality_metrics.append(metrics)
+
+            return quality_metrics
+
+        except Exception as e:
+            self.logger.error(f"Failed to get quality metrics: {e}")
+            # Return empty list instead of crashing
+            return []
 
     def _calculate_quality_score(self, feedback_scores: Dict[str, float], run: Dict[str, Any]) -> float:
         """Calculate overall quality score from feedback."""
