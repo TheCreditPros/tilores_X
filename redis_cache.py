@@ -63,15 +63,25 @@ class RedisCacheManager:
             )
 
     def _connect_to_redis(self):
-        """Connect to Redis with Railway and local environment support."""
+        """Connect to Redis with Railway container environment optimizations."""
         try:
-            # Railway Redis URL (production)
+            # Detect container environment for timeout optimization
+            is_container = self._detect_container_environment()
+            is_railway = self._detect_railway_environment()
+
+            # Container-optimized timeouts (Railway constraint: 2-3s max)
+            if is_container or is_railway:
+                connection_timeout = 2  # Railway container limit
+                socket_timeout = 1  # Fast failure for containers
+                debug_print("Container environment detected - using optimized timeouts", "🐳")
+            else:
+                connection_timeout = 10  # Local development
+                socket_timeout = 5
+                debug_print("Local environment detected - using standard timeouts", "🏠")
+
             redis_url = os.getenv("REDIS_URL")
             if redis_url:
-                # Enhanced Railway Redis URL parsing for better authentication
-                debug_print("Connecting to Railway Redis via URL", "🔗")
-
-                # Parse URL to extract password if needed
+                debug_print("Connecting to Redis via URL with container optimizations", "🔗")
                 parsed_url = self._parse_redis_url(redis_url)
                 debug_print(
                     f"Redis URL parsed - host: {parsed_url.get('host', 'unknown')}, auth: {'yes' if parsed_url.get('password') else 'no'}",
@@ -79,30 +89,30 @@ class RedisCacheManager:
                 )
 
                 try:
-                    # Railway Redis requires SSL/TLS connections
                     if "railway.app" in redis_url:
-                        # Railway-specific connection - use rediss:// for SSL
-                        debug_print("Detected Railway Redis - using SSL connection", "🔒")
+                        # Railway-specific connection with container optimizations
+                        debug_print("Railway Redis detected - using SSL with container timeouts", "🚂")
                         ssl_redis_url = redis_url.replace("redis://", "rediss://")
-                        debug_print(f"SSL URL: {ssl_redis_url[:50]}...", "🔒")
 
                         self.redis_client = redis.from_url(
                             ssl_redis_url,
                             decode_responses=True,
-                            socket_connect_timeout=30,  # Longer timeout for cloud
-                            socket_timeout=30,
-                            retry_on_timeout=True,
-                            health_check_interval=30,
+                            socket_connect_timeout=connection_timeout,
+                            socket_timeout=socket_timeout,
+                            retry_on_timeout=False,  # No retries in containers
+                            health_check_interval=0,  # Disable health checks
+                            max_connections=1,  # Minimal connection pool
                         )
                     else:
-                        # Standard Redis connection for other providers
+                        # Standard Redis with container timeouts
                         self.redis_client = redis.from_url(
                             redis_url,
                             decode_responses=True,
-                            socket_connect_timeout=10,
-                            socket_timeout=10,
-                            retry_on_timeout=True,
-                            health_check_interval=30,
+                            socket_connect_timeout=connection_timeout,
+                            socket_timeout=socket_timeout,
+                            retry_on_timeout=False,  # No retries in containers
+                            health_check_interval=0,  # Disable health checks
+                            max_connections=1,
                         )
                 except Exception as url_error:
                     # Fallback to manual connection if URL parsing fails
@@ -148,48 +158,53 @@ class RedisCacheManager:
                     socket_timeout=5,
                 )
 
-            # Test connection with retry logic and graceful fallback
+            # Test connection with single attempt (container optimization)
             if self.redis_client:
-                max_retries = 3
-                for attempt in range(max_retries):
-                    try:
-                        self.redis_client.ping()
-                        self.cache_available = True
-                        logger.info("Redis cache connected and ready")
-                        debug_print("Redis connection established", "✅")
-                        break
-                    except redis.AuthenticationError as auth_error:
-                        if attempt < max_retries - 1:
-                            logger.info(f"Redis authentication failed (attempt {attempt + 1}): {auth_error}")
-                            debug_print(f"Redis auth failed attempt {attempt + 1}, retrying...", "⚠️")
-                            import time
-
-                            time.sleep(2**attempt)  # Exponential backoff
-                            continue  # Continue to next retry attempt
-                        else:
-                            logger.info(f"Redis authentication failed after {max_retries} attempts: {auth_error}")
-                            debug_print("Redis auth failed - falling back to no-cache mode", "⚠️")
-                            # Don't raise auth errors in production - graceful fallback
-                            self.redis_client = None
-                            self.cache_available = False
-                            break
-                    except Exception as retry_error:
-                        if attempt < max_retries - 1:
-                            debug_print(f"Redis connection attempt {attempt + 1} failed, retrying...", "⚠️")
-                            import time
-
-                            time.sleep(2**attempt)  # Exponential backoff
-                            continue  # Continue to next retry attempt
-                        else:
-                            logger.warning(f"Redis connection failed after {max_retries} attempts: {retry_error}")
-                            debug_print("Redis connection failed - falling back to no-cache mode", "⚠️")
-                            self.redis_client = None
-                            self.cache_available = False
+                try:
+                    # Single ping attempt - no retries in container environments
+                    self.redis_client.ping()
+                    self.cache_available = True
+                    logger.info("Redis cache connected (container-optimized)")
+                    debug_print("Redis connection established", "✅")
+                except (redis.AuthenticationError, redis.ConnectionError, redis.TimeoutError) as e:
+                    logger.info(f"Redis connection failed (container environment): {e}")
+                    debug_print("Redis connection failed - immediate fallback to L1 cache", "⚠️")
+                    self.redis_client = None
+                    self.cache_available = False
+                except Exception as e:
+                    logger.warning(f"Redis connection error: {e}")
+                    debug_print("Redis connection error - falling back to no-cache mode", "⚠️")
+                    self.redis_client = None
+                    self.cache_available = False
         except Exception as e:
             logger.warning(f"Redis connection failed: {e}")
             debug_print(f"Redis connection failed - falling back to no-cache mode: {e}", "⚠️")
             self.redis_client = None
             self.cache_available = False
+
+    def _detect_container_environment(self) -> bool:
+        """Detect if running in a container environment."""
+        try:
+            container_indicators = [
+                os.path.exists("/.dockerenv"),
+                os.path.exists("/proc/1/cgroup") and "docker" in open("/proc/1/cgroup", "r").read(),
+                os.getenv("RAILWAY_ENVIRONMENT") is not None,
+                os.getenv("CONTAINER") is not None,
+                os.getenv("KUBERNETES_SERVICE_HOST") is not None,
+            ]
+            return any(container_indicators)
+        except Exception:
+            return False
+
+    def _detect_railway_environment(self) -> bool:
+        """Detect Railway-specific environment."""
+        railway_indicators = [
+            os.getenv("RAILWAY_ENVIRONMENT") is not None,
+            os.getenv("RAILWAY_PROJECT_ID") is not None,
+            "railway.app" in os.getenv("REDIS_URL", ""),
+            "railway" in os.getenv("DATABASE_URL", "").lower(),
+        ]
+        return any(railway_indicators)
 
     def _parse_redis_url(self, redis_url: str) -> Dict[str, Any]:
         """Parse Redis URL to extract connection parameters."""
