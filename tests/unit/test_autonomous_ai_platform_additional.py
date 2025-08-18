@@ -12,8 +12,6 @@ Test Coverage: Additional Autonomous AI Platform Tests
 
 import pytest
 from unittest.mock import MagicMock, patch
-from datetime import datetime, timedelta
-
 # Import components to test
 from autonomous_ai_platform import (
     DeltaRegressionAnalyzer,
@@ -22,8 +20,6 @@ from autonomous_ai_platform import (
     PatternIndexer,
     MetaLearningEngine,
     AutonomousAIPlatform,
-    DeltaAnalysis,
-    ABTestResult,
     FeedbackPattern,
 )
 from langsmith_enterprise_client import EnterpriseLangSmithClient, QualityMetrics, DatasetInfo

@@ -20,8 +20,6 @@ from langsmith_enterprise_client import (
     EnterpriseLangSmithClient,
     LangSmithConfig,
     QualityMetrics,
-    WorkspaceStats,
-    DatasetInfo,
 )
 
 
