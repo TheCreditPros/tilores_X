@@ -956,18 +956,36 @@ class AutonomousAIPlatform:
         }
 
         # 1. Delta/Regression Analysis
-        delta_analysis = await self.delta_analyzer.check_performance_regression()
-        cycle_results["components_executed"].append("delta_analysis")
+        try:
+            delta_analysis = await self.delta_analyzer.check_performance_regression()
+            cycle_results["components_executed"].append("delta_analysis")
 
-        if delta_analysis.regression_detected:
-            cycle_results["improvements_identified"].append(
-                {
-                    "type": "regression_detected",
-                    "severity": "high" if delta_analysis.quality_delta < -0.1 else "medium",
-                    "affected_models": delta_analysis.affected_models,
-                    "affected_spectrums": delta_analysis.affected_spectrums,
-                }
+            if delta_analysis.regression_detected:
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "regression_detected",
+                        "severity": "high" if delta_analysis.quality_delta < -0.1 else "medium",
+                        "affected_models": delta_analysis.affected_models,
+                        "affected_spectrums": delta_analysis.affected_spectrums,
+                    }
+                )
+        except Exception as e:
+            self.logger.warning(f"Delta analysis failed: {e}, using mock analysis")
+            # Create mock delta analysis for fallback
+            delta_analysis = DeltaAnalysis(
+                analysis_id=f"mock_delta_{int(time.time())}",
+                baseline_quality=0.88,
+                current_quality=0.86,
+                quality_delta=-0.02,
+                regression_detected=False,
+                confidence=0.5,
+                affected_models=[],
+                affected_spectrums=[],
+                root_cause="Mock analysis - API error",
+                timestamp=datetime.now().isoformat(),
+                metadata={"mock_analysis": True, "error": str(e)},
             )
+            cycle_results["components_executed"].append("delta_analysis_mock")
 
         # 2. Pattern-based Optimization
         optimization_context = {
@@ -976,46 +994,62 @@ class AutonomousAIPlatform:
             "affected_models": delta_analysis.affected_models,
         }
 
-        similar_patterns = await self.pattern_indexer.find_similar_successful_patterns(optimization_context)
+        try:
+            similar_patterns = await self.pattern_indexer.find_similar_successful_patterns(optimization_context)
 
-        if similar_patterns:
-            cycle_results["components_executed"].append("pattern_matching")
-            cycle_results["learning_applied"] = True
+            if similar_patterns:
+                cycle_results["components_executed"].append("pattern_matching")
+                cycle_results["learning_applied"] = True
+        except Exception as e:
+            self.logger.warning(f"Pattern indexing failed: {e}, skipping pattern matching")
+            cycle_results["components_executed"].append("pattern_matching_skipped")
 
         # 3. Meta-learning Strategy Selection
-        optimal_strategies = await self.meta_learner.identify_best_strategies(optimization_context)
-        cycle_results["components_executed"].append("meta_learning")
+        try:
+            optimal_strategies = await self.meta_learner.identify_best_strategies(optimization_context)
+            cycle_results["components_executed"].append("meta_learning")
 
-        # Apply optimal strategies if available
-        if optimal_strategies:
-            cycle_results["improvements_identified"].append(
-                {
-                    "type": "optimal_strategies_identified",
-                    "severity": "low",
-                    "strategies": [s["strategy"] for s in optimal_strategies[:2]],
-                    "effectiveness_scores": [s["effectiveness_score"] for s in optimal_strategies[:2]],
-                }
-            )
+            # Apply optimal strategies if available
+            if optimal_strategies:
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "optimal_strategies_identified",
+                        "severity": "low",
+                        "strategies": [s["strategy"] for s in optimal_strategies[:2]],
+                        "effectiveness_scores": [s["effectiveness_score"] for s in optimal_strategies[:2]],
+                    }
+                )
+        except Exception as e:
+            self.logger.warning(f"Meta-learning failed: {e}, skipping strategy selection")
+            cycle_results["components_executed"].append("meta_learning_skipped")
 
         # 4. Feedback Integration
-        recent_feedback = await self.feedback_collector.get_recent_corrections()
-        if recent_feedback:
-            cycle_results["components_executed"].append("feedback_integration")
-            cycle_results["learning_applied"] = True
+        try:
+            recent_feedback = await self.feedback_collector.get_recent_corrections()
+            if recent_feedback:
+                cycle_results["components_executed"].append("feedback_integration")
+                cycle_results["learning_applied"] = True
+        except Exception as e:
+            self.logger.warning(f"Feedback collection failed: {e}, skipping feedback integration")
+            cycle_results["components_executed"].append("feedback_integration_skipped")
 
         # 5. Predictive Quality Assessment
-        quality_prediction = await self.predict_quality_degradation()
-        cycle_results["components_executed"].append("quality_prediction")
+        try:
+            quality_prediction = await self.predict_quality_degradation()
+            cycle_results["components_executed"].append("quality_prediction")
 
-        if quality_prediction["needs_intervention"]:
-            cycle_results["improvements_identified"].append(
-                {
-                    "type": "predicted_degradation",
-                    "severity": "medium",
-                    "predicted_quality": quality_prediction["predicted_quality_7d"],
-                    "confidence": quality_prediction["confidence"],
-                }
-            )
+            if quality_prediction["needs_intervention"]:
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "predicted_degradation",
+                        "severity": "medium",
+                        "predicted_quality": quality_prediction["predicted_quality_7d"],
+                        "confidence": quality_prediction["confidence"],
+                    }
+                )
+        except Exception as e:
+            self.logger.warning(f"Quality prediction failed: {e}, skipping prediction")
+            cycle_results["components_executed"].append("quality_prediction_skipped")
 
         cycle_duration = time.time() - cycle_start
         cycle_results["cycle_duration"] = cycle_duration
