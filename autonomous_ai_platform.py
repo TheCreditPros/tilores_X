@@ -33,13 +33,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from langsmith_enterprise_client import EnterpriseLangSmithClient, QualityMetrics
 
 # External dependencies with graceful fallback
-try:
-    import numpy as np
-
-    NUMPY_AVAILABLE = True
-except ImportError:
-    NUMPY_AVAILABLE = False
-    np = None
+NUMPY_AVAILABLE = False
+np = None
 
 
 class OptimizationStrategy(Enum):
@@ -739,12 +734,16 @@ class PatternIndexer:
         dataset_id = await self._ensure_success_patterns_dataset()
 
         # Index patterns
-        indexed_count = 0
+        patterns_to_index = []
         for run_data in high_quality_runs:
             pattern = self._extract_pattern_from_run(run_data)
             if pattern:
-                await self.langsmith_client.add_examples_to_dataset(dataset_id, [pattern])
-                indexed_count += 1
+                patterns_to_index.append(pattern)
+
+        if patterns_to_index:
+            await self.langsmith_client.add_examples_to_dataset(dataset_id, patterns_to_index)
+
+        indexed_count = len(patterns_to_index)
 
         self.logger.info(f"✅ Indexed {indexed_count} successful patterns")
 

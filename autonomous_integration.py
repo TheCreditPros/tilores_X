@@ -18,6 +18,7 @@ Created: 2025-08-17
 Integration: Autonomous AI Platform with 4-Phase Framework
 """
 
+import asyncio
 import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
@@ -28,6 +29,7 @@ from langsmith_enterprise_client import create_enterprise_client
 # Import existing framework with graceful fallback
 try:
     from virtuous_cycle_api import VirtuousCycleManager
+
     VIRTUOUS_CYCLE_AVAILABLE = True
 except ImportError:
     VIRTUOUS_CYCLE_AVAILABLE = False
@@ -82,13 +84,9 @@ class EnhancedVirtuousCycleManager:
                 "ab_testing": False,
                 "pattern_indexing": False,
                 "meta_learning": False,
-                "predictive_quality": False
+                "predictive_quality": False,
             },
-            "enterprise_langsmith": {
-                "workspace_stats": None,
-                "quality_prediction": None,
-                "pattern_analysis": None
-            }
+            "enterprise_langsmith": {"workspace_stats": None, "quality_prediction": None, "pattern_analysis": None},
         }
 
         # Get legacy status if available
@@ -108,7 +106,7 @@ class EnhancedVirtuousCycleManager:
                     "current_quality": platform_status.get("current_quality", 0.0),
                     "quality_trend": platform_status.get("quality_trend", "unknown"),
                     "predicted_quality": platform_status.get("predicted_quality", 0.0),
-                    "needs_intervention": platform_status.get("needs_intervention", False)
+                    "needs_intervention": platform_status.get("needs_intervention", False),
                 }
 
                 # Get quality prediction
@@ -121,9 +119,7 @@ class EnhancedVirtuousCycleManager:
         status["status_timestamp"] = datetime.now().isoformat()
         return status
 
-    async def run_autonomous_optimization(
-        self, trigger_reason: str = "Autonomous cycle"
-    ) -> Dict[str, Any]:
+    async def run_autonomous_optimization(self, trigger_reason: str = "Autonomous cycle") -> Dict[str, Any]:
         """Run autonomous optimization cycle."""
         self.logger.info(f"🤖 Running autonomous optimization: {trigger_reason}")
 
@@ -133,7 +129,7 @@ class EnhancedVirtuousCycleManager:
             "legacy_integration": False,
             "improvements_identified": [],
             "optimizations_deployed": [],
-            "success": False
+            "success": False,
         }
 
         # Run autonomous improvement cycle if available
@@ -141,22 +137,26 @@ class EnhancedVirtuousCycleManager:
             try:
                 cycle_results = await self.autonomous_platform.autonomous_improvement_cycle()
 
-                optimization_results.update({
-                    "autonomous_features_used": cycle_results["components_executed"],
-                    "improvements_identified": cycle_results["improvements_identified"],
-                    "learning_applied": cycle_results["learning_applied"],
-                    "cycle_duration": cycle_results["cycle_duration"],
-                    "success": True
-                })
+                optimization_results.update(
+                    {
+                        "autonomous_features_used": cycle_results["components_executed"],
+                        "improvements_identified": cycle_results["improvements_identified"],
+                        "learning_applied": cycle_results["learning_applied"],
+                        "cycle_duration": cycle_results["cycle_duration"],
+                        "success": True,
+                    }
+                )
 
                 # Check if intervention needed
                 if cycle_results["improvements_identified"]:
                     # Trigger legacy optimization if needed for backward compatibility
                     if self.legacy_available and self.legacy_manager:
-                        legacy_result = await self.legacy_manager.trigger_manual_optimization(
-                            reason=f"Autonomous AI detected: {trigger_reason}"
+                        asyncio.create_task(
+                            self.legacy_manager.trigger_manual_optimization(
+                                reason=f"Autonomous AI detected: {trigger_reason}"
+                            )
                         )
-                        optimization_results["legacy_integration"] = legacy_result.get("success", False)
+                        optimization_results["legacy_integration_task_scheduled"] = True
 
             except Exception as e:
                 self.logger.error(f"Autonomous optimization failed: {e}")
@@ -165,14 +165,14 @@ class EnhancedVirtuousCycleManager:
         # Fallback to legacy optimization if autonomous not available
         elif self.legacy_available and self.legacy_manager:
             try:
-                legacy_result = await self.legacy_manager.trigger_manual_optimization(
-                    reason=trigger_reason
+                legacy_result = await self.legacy_manager.trigger_manual_optimization(reason=trigger_reason)
+                optimization_results.update(
+                    {
+                        "legacy_integration": True,
+                        "success": legacy_result.get("success", False),
+                        "legacy_result": legacy_result,
+                    }
                 )
-                optimization_results.update({
-                    "legacy_integration": True,
-                    "success": legacy_result.get("success", False),
-                    "legacy_result": legacy_result
-                })
             except Exception as e:
                 self.logger.error(f"Legacy optimization failed: {e}")
                 optimization_results["error"] = str(e)
@@ -187,10 +187,7 @@ class EnhancedVirtuousCycleManager:
 
         try:
             # Get comprehensive performance trends
-            trends = await self.langsmith_client.get_performance_trends(
-                days=30,
-                include_predictions=True
-            )
+            trends = await self.langsmith_client.get_performance_trends(days=30, include_predictions=True)
 
             # Get workspace statistics
             workspace_stats = await self.langsmith_client.get_workspace_stats()
@@ -202,14 +199,14 @@ class EnhancedVirtuousCycleManager:
                 "workspace_overview": {
                     "total_projects": workspace_stats.tracer_session_count,
                     "total_datasets": workspace_stats.dataset_count,
-                    "total_repos": workspace_stats.repo_count
+                    "total_repos": workspace_stats.repo_count,
                 },
                 "quality_trends": trends["quality_trend"],
                 "performance_trends": trends["performance_trend"],
                 "cost_trends": trends["cost_trend"],
                 "predictions": trends.get("predictions", {}),
                 "risk_analysis": risk_analysis,
-                "analysis_timestamp": datetime.now().isoformat()
+                "analysis_timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -232,16 +229,12 @@ class EnhancedVirtuousCycleManager:
 
             # Get quality metrics from last 24 hours
             quality_metrics = await self.langsmith_client.get_quality_metrics(
-                session_names=["tilores_x", "tilores_unified", "tilores_production"],
-                limit=1000
+                session_names=["tilores_x", "tilores_unified", "tilores_production"], limit=1000
             )
 
             # Calculate real metrics
             total_runs = len(quality_metrics)
-            avg_quality = (
-                sum(m.quality_score for m in quality_metrics) / total_runs
-                if total_runs > 0 else 0.0
-            )
+            avg_quality = sum(m.quality_score for m in quality_metrics) / total_runs if total_runs > 0 else 0.0
             total_tokens = sum(m.token_count for m in quality_metrics)
             total_cost = sum(m.cost for m in quality_metrics)
 
@@ -250,16 +243,16 @@ class EnhancedVirtuousCycleManager:
                     "tracer_session_count": workspace_stats.tracer_session_count,
                     "dataset_count": workspace_stats.dataset_count,
                     "repo_count": workspace_stats.repo_count,
-                    "annotation_queue_count": workspace_stats.annotation_queue_count
+                    "annotation_queue_count": workspace_stats.annotation_queue_count,
                 },
                 "run_statistics": {
                     "total_runs": total_runs,
                     "average_quality": avg_quality,
                     "total_tokens": total_tokens,
-                    "total_cost": total_cost
+                    "total_cost": total_cost,
                 },
                 "run_stats_api": run_stats,
-                "metrics_timestamp": datetime.now().isoformat()
+                "metrics_timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -298,7 +291,7 @@ class AutonomousQualityMonitor:
             "monitoring_type": "proactive",
             "interventions_triggered": [],
             "predictions_made": [],
-            "quality_status": "unknown"
+            "quality_status": "unknown",
         }
 
         if not self.enhanced_manager.enterprise_features_available:
@@ -315,30 +308,36 @@ class AutonomousQualityMonitor:
             # Check current quality status
             if current_quality < self.quality_threshold:
                 monitoring_results["quality_status"] = "below_threshold"
-                monitoring_results["interventions_triggered"].append({
-                    "type": "immediate_optimization",
-                    "reason": f"Quality {current_quality:.1%} below {self.quality_threshold:.1%}",
-                    "severity": "high"
-                })
+                monitoring_results["interventions_triggered"].append(
+                    {
+                        "type": "immediate_optimization",
+                        "reason": f"Quality {current_quality:.1%} below {self.quality_threshold:.1%}",
+                        "severity": "high",
+                    }
+                )
             elif quality_trend == "declining":
                 monitoring_results["quality_status"] = "declining"
-                monitoring_results["interventions_triggered"].append({
-                    "type": "preventive_optimization",
-                    "reason": "Declining quality trend detected",
-                    "severity": "medium"
-                })
+                monitoring_results["interventions_triggered"].append(
+                    {
+                        "type": "preventive_optimization",
+                        "reason": "Declining quality trend detected",
+                        "severity": "medium",
+                    }
+                )
             else:
                 monitoring_results["quality_status"] = "stable"
 
             # Get quality predictions
             predictions = trends_analysis.get("predictions", {})
             if predictions.get("needs_intervention", False):
-                monitoring_results["predictions_made"].append({
-                    "type": "quality_degradation_predicted",
-                    "predicted_quality": predictions.get("predicted_quality_7d", 0.0),
-                    "confidence": predictions.get("confidence", 0.0),
-                    "recommendation": "Schedule proactive optimization"
-                })
+                monitoring_results["predictions_made"].append(
+                    {
+                        "type": "quality_degradation_predicted",
+                        "predicted_quality": predictions.get("predicted_quality_7d", 0.0),
+                        "confidence": predictions.get("confidence", 0.0),
+                        "recommendation": "Schedule proactive optimization",
+                    }
+                )
 
             # Trigger autonomous optimization if needed
             if monitoring_results["interventions_triggered"]:
@@ -359,13 +358,14 @@ class AutonomousQualityMonitor:
 # INTEGRATION UTILITIES
 # ========================================================================
 
+
 def create_enhanced_virtuous_cycle() -> EnhancedVirtuousCycleManager:
     """Create enhanced virtuous cycle manager."""
     return EnhancedVirtuousCycleManager()
 
 
 def create_autonomous_monitor(
-    enhanced_manager: Optional[EnhancedVirtuousCycleManager] = None
+    enhanced_manager: Optional[EnhancedVirtuousCycleManager] = None,
 ) -> AutonomousQualityMonitor:
     """Create autonomous quality monitor."""
     if not enhanced_manager:
@@ -393,12 +393,12 @@ async def get_comprehensive_system_status() -> Dict[str, Any]:
             "system_overview": {
                 "enhanced_features": enhanced_status.get("enhanced_features", False),
                 "legacy_compatibility": enhanced_status.get("legacy_compatibility", False),
-                "enterprise_langsmith": enhanced_status.get("enterprise_langsmith", {})
+                "enterprise_langsmith": enhanced_status.get("enterprise_langsmith", {}),
             },
             "real_langsmith_metrics": real_metrics,
             "autonomous_monitoring": monitoring_status,
             "integration_status": "operational",
-            "comprehensive_timestamp": datetime.now().isoformat()
+            "comprehensive_timestamp": datetime.now().isoformat(),
         }
 
         return comprehensive_status
@@ -408,7 +408,7 @@ async def get_comprehensive_system_status() -> Dict[str, Any]:
         return {
             "error": str(e),
             "integration_status": "degraded",
-            "comprehensive_timestamp": datetime.now().isoformat()
+            "comprehensive_timestamp": datetime.now().isoformat(),
         }
     finally:
         await enhanced_manager.close()
@@ -418,12 +418,10 @@ async def get_comprehensive_system_status() -> Dict[str, Any]:
 # MAIN EXECUTION FOR TESTING
 # ========================================================================
 
+
 async def main():
     """Main function for testing autonomous integration."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
         print("🚀 Testing Autonomous AI Integration...")
@@ -458,5 +456,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
