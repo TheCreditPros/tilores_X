@@ -15,7 +15,6 @@ import asyncio
 import os
 import sys
 import time
-from typing import Dict, Any
 
 
 # Set up container environment simulation
@@ -103,7 +102,7 @@ def test_framework_component_detection():
         print("📦 Testing framework component imports...")
         from virtuous_cycle_api import VirtuousCycleManager, FRAMEWORKS_AVAILABLE
 
-        print(f"✅ VirtuousCycleManager imported: True")
+        print("✅ VirtuousCycleManager imported: True")
         print(f"📊 Frameworks available: {FRAMEWORKS_AVAILABLE}")
 
         # Test component initialization
@@ -241,13 +240,13 @@ def run_comprehensive_validation():
     passed_tests = sum(1 for result in test_results.values() if result)
     success_rate = (passed_tests / total_tests) * 100
 
-    print(f"\n🎯 COMPREHENSIVE VALIDATION RESULTS")
+    print("\n🎯 COMPREHENSIVE VALIDATION RESULTS")
     print("=" * 60)
     print(f"Total Tests: {total_tests}")
     print(f"Passed Tests: {passed_tests}")
     print(f"Success Rate: {success_rate:.1f}%")
 
-    print(f"\nDetailed Results:")
+    print("\nDetailed Results:")
     for test_name, result in test_results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"  {test_name.upper()}: {status}")
@@ -280,7 +279,7 @@ def create_deployment_report():
         "risk_level": "LOW" if validation_success else "HIGH",
     }
 
-    print(f"\n📋 DEPLOYMENT READINESS REPORT")
+    print("\n📋 DEPLOYMENT READINESS REPORT")
     print("=" * 60)
     for key, value in report.items():
         print(f"{key.upper()}: {value}")

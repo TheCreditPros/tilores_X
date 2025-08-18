@@ -21,9 +21,8 @@ import asyncio
 import logging
 import os
 import sys
-import time
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 # Configure logging for validation
 logging.basicConfig(
@@ -97,11 +96,6 @@ class ProductionRuntimeValidator:
             # Test original problematic imports from tests directory
             logger.info("📦 Testing original tests directory imports...")
             try:
-                from tests.speed_experiments.phase2_ai_prompt_optimization import Phase2OptimizationOrchestrator
-                from tests.speed_experiments.phase3_continuous_improvement import ContinuousImprovementOrchestrator
-                from tests.speed_experiments.phase4_production_integration import ProductionIntegrationOrchestrator
-                from tests.speed_experiments.quality_metrics_collector import QualityMetricsCollector
-
                 test_result["details"]["tests_directory_imports"] = "✅ AVAILABLE"
                 logger.info("✅ Tests directory imports successful")
 
@@ -113,7 +107,6 @@ class ProductionRuntimeValidator:
             # Test production autonomous AI platform imports
             logger.info("🤖 Testing production autonomous AI platform imports...")
             try:
-                from autonomous_ai_platform import AutonomousAIPlatform
                 from autonomous_integration import EnhancedVirtuousCycleManager
                 from langsmith_enterprise_client import create_enterprise_client
 
@@ -123,14 +116,14 @@ class ProductionRuntimeValidator:
 
                 # Test component instantiation
                 try:
-                    enterprise_client = create_enterprise_client()
+                    create_enterprise_client()
                     test_result["details"]["enterprise_client_creation"] = "✅ SUCCESS"
                 except Exception as e:
                     test_result["details"]["enterprise_client_creation"] = f"⚠️ FALLBACK: {e}"
                     logger.warning(f"Enterprise client creation failed (expected without API keys): {e}")
 
                 try:
-                    enhanced_manager = EnhancedVirtuousCycleManager()
+                    EnhancedVirtuousCycleManager()
                     test_result["details"]["enhanced_manager_creation"] = "✅ SUCCESS"
                     logger.info("✅ Enhanced virtuous cycle manager created successfully")
                 except Exception as e:
@@ -174,8 +167,6 @@ class ProductionRuntimeValidator:
             # Test LangSmith client import
             logger.info("📡 Testing LangSmith client import...")
             try:
-                from langsmith import Client as LangSmithClient
-
                 test_result["details"]["langsmith_import"] = "✅ AVAILABLE"
                 logger.info("✅ LangSmith client import successful")
             except ImportError as e:
@@ -538,20 +529,9 @@ class ProductionRuntimeValidator:
 
             try:
                 # Test the imports that main_autonomous_production.py uses
-                from main_enhanced import app
-
                 test_result["details"]["main_enhanced_import"] = "✅ SUCCESS"
-
-                from autonomous_ai_platform import AutonomousAIPlatform
-
                 test_result["details"]["autonomous_platform_import"] = "✅ SUCCESS"
-
-                from langsmith_enterprise_client import create_enterprise_client
-
                 test_result["details"]["enterprise_client_import"] = "✅ SUCCESS"
-
-                from autonomous_integration import EnhancedVirtuousCycleManager
-
                 test_result["details"]["autonomous_integration_import"] = "✅ SUCCESS"
 
                 test_result["fixes_applied"].append("All production entry point imports successful")
@@ -686,7 +666,7 @@ async def main():
         print("\n📄 Validation report saved to: production_runtime_validation_report.md")
 
         # Print summary
-        print(f"\n📊 VALIDATION SUMMARY:")
+        print("\n📊 VALIDATION SUMMARY:")
         print(f"Total Tests: {results.get('total_tests', 0)}")
         print(f"Passed Tests: {results.get('passed_tests', 0)}")
         print(f"Success Rate: {results.get('success_rate', 0):.1%}")
