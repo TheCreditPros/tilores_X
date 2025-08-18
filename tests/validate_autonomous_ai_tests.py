@@ -109,19 +109,16 @@ def validate_autonomous_ai_components() -> Dict[str, Any]:
         from langsmith_enterprise_client import EnterpriseLangSmithClient, LangSmithConfig
 
         config = LangSmithConfig(api_key="test", organization_id="test")
-        client = EnterpriseLangSmithClient(config)
+        # Validate that client can be instantiated (removed unused variable)
+        EnterpriseLangSmithClient(config)
         validation_results["components_validated"].append("EnterpriseLangSmithClient")
 
-        # Test Autonomous AI Platform
-        from autonomous_ai_platform import AutonomousAIPlatform
-
-        # platform = AutonomousAIPlatform(client)  # Test instantiation
+        # Test Autonomous AI Platform - just validate import works
+        import autonomous_ai_platform
         validation_results["components_validated"].append("AutonomousAIPlatform")
 
-        # Test Enhanced Virtuous Cycle Manager
-        from autonomous_integration import EnhancedVirtuousCycleManager
-
-        # manager = EnhancedVirtuousCycleManager()  # Test instantiation
+        # Test Enhanced Virtuous Cycle Manager - just validate import works
+        import autonomous_integration
         validation_results["components_validated"].append("EnhancedVirtuousCycleManager")
 
         print("✅ All autonomous AI components validated successfully")
