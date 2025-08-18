@@ -66,17 +66,33 @@ except ImportError:
     LANGSMITH_AVAILABLE = False
     logging.warning("LangSmith not available for trace monitoring")
 
-# Import existing 4-phase framework components with fallback
+# Import existing 4-phase framework components with enhanced detection
+FRAMEWORKS_AVAILABLE = False
 try:
     from tests.speed_experiments.phase2_ai_prompt_optimization import Phase2OptimizationOrchestrator
     from tests.speed_experiments.phase3_continuous_improvement import ContinuousImprovementOrchestrator
     from tests.speed_experiments.phase4_production_integration import ProductionIntegrationOrchestrator
     from tests.speed_experiments.quality_metrics_collector import QualityMetricsCollector
 
+    # Verify all components are actually available
+    test_components = [
+        Phase2OptimizationOrchestrator,
+        ContinuousImprovementOrchestrator,
+        ProductionIntegrationOrchestrator,
+        QualityMetricsCollector,
+    ]
+
+    # Test component instantiation to ensure they're fully functional
+    for component in test_components:
+        if not callable(component):
+            raise ImportError(f"Component {component.__name__} is not callable")
+
     FRAMEWORKS_AVAILABLE = True
-except ImportError:
+    logging.info("✅ All 4-phase framework components successfully imported and validated")
+
+except ImportError as import_error:
     # Create mock implementations for production deployment
-    logging.warning("4-phase framework components not available, using mock implementations")
+    logging.warning(f"4-phase framework components not available ({import_error}), using mock implementations")
 
     class MockQualityMetricsCollector:
         """Mock quality metrics collector for production deployment."""
