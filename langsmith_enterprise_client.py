@@ -319,7 +319,7 @@ class EnterpriseLangSmithClient:
         params = {
             "limit": limit,
             "offset": offset,
-            "include_feedback": include_feedback
+            "include_feedback": str(include_feedback).lower()
         }
 
         if session_names:
