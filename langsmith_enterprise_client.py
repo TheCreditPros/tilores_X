@@ -24,6 +24,7 @@ Integration: Enterprise Autonomous AI Platform
 import asyncio
 import logging
 import os
+import ssl
 import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
@@ -130,9 +131,33 @@ class EnterpriseLangSmithClient:
         """Ensure aiohttp session is available."""
         if not self.session:
             timeout = aiohttp.ClientTimeout(total=self.config.timeout)
+
+            try:
+                # Create SSL context for production compatibility
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = True
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
+
+                # Create connector with proper SSL configuration
+                connector = aiohttp.TCPConnector(
+                    ssl=ssl_context,
+                    limit=100,
+                    limit_per_host=30,
+                    enable_cleanup_closed=True
+                )
+            except Exception as ssl_error:
+                # Fallback to default connector if SSL configuration fails
+                self.logger.warning(f"SSL configuration failed, using default: {ssl_error}")
+                connector = aiohttp.TCPConnector(
+                    limit=100,
+                    limit_per_host=30,
+                    enable_cleanup_closed=True
+                )
+
             self.session = aiohttp.ClientSession(
                 headers=self.headers,
-                timeout=timeout
+                timeout=timeout,
+                connector=connector
             )
 
     async def close(self):
