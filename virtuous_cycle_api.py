@@ -28,6 +28,35 @@ import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+# Load environment variables early to ensure API keys are available
+try:
+    from pathlib import Path
+    from dotenv import load_dotenv
+
+    # Try to find .env file in order of preference
+    current_dir = Path.cwd()
+    possible_env_paths = [
+        current_dir / ".env",  # Current directory
+        current_dir.parent / ".env",  # Parent directory
+        current_dir.parent.parent / ".env",  # Project root
+        Path(__file__).parent.parent / ".env",  # Relative to this file
+    ]
+
+    env_loaded = False
+    for env_path in possible_env_paths:
+        if env_path.exists():
+            load_dotenv(env_path, override=False)  # Don't override existing env vars
+            env_loaded = True
+            break
+
+    if not env_loaded:
+        logging.info("No .env file found - using system environment variables only")
+
+except ImportError:
+    logging.info("python-dotenv not available - using system environment variables only")
+except Exception as e:
+    logging.warning(f"Error loading .env file: {e}")
+
 # LangSmith integration for trace monitoring
 try:
     from langsmith import Client as LangSmithClient

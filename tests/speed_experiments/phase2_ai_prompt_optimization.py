@@ -24,6 +24,7 @@ Phase: 2 - AI Prompt Optimization
 import asyncio
 import json
 import logging
+import os
 import statistics
 import time
 from dataclasses import dataclass, field
@@ -34,6 +35,7 @@ from typing import Any, Dict, List, Optional
 # LangSmith integration with graceful fallback
 try:
     from langsmith import Client
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LANGSMITH_AVAILABLE = False
@@ -43,6 +45,7 @@ except ImportError:
 try:
     from langchain_core.prompts import PromptTemplate
     from langchain_openai import ChatOpenAI
+
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
@@ -140,35 +143,20 @@ class PromptPatternAnalyzer:
         # Pattern recognition templates
         self.pattern_templates = {
             "high_quality_structure": {
-                "indicators": [
-                    "clear_instructions",
-                    "specific_criteria",
-                    "structured_output"
-                ],
-                "success_threshold": 0.92
+                "indicators": ["clear_instructions", "specific_criteria", "structured_output"],
+                "success_threshold": 0.92,
             },
             "context_integration": {
-                "indicators": [
-                    "customer_data_reference",
-                    "field_specific_analysis",
-                    "cross_field_correlation"
-                ],
-                "success_threshold": 0.90
+                "indicators": ["customer_data_reference", "field_specific_analysis", "cross_field_correlation"],
+                "success_threshold": 0.90,
             },
             "professional_tone": {
-                "indicators": [
-                    "business_appropriate",
-                    "clear_communication",
-                    "actionable_insights"
-                ],
-                "success_threshold": 0.88
-            }
+                "indicators": ["business_appropriate", "clear_communication", "actionable_insights"],
+                "success_threshold": 0.88,
+            },
         }
 
-    async def analyze_baseline_results(
-        self,
-        baseline_file: str
-    ) -> List[PromptPattern]:
+    async def analyze_baseline_results(self, baseline_file: str) -> List[PromptPattern]:
         """
         Analyze Phase 1 baseline results to identify successful patterns.
 
@@ -181,38 +169,30 @@ class PromptPatternAnalyzer:
         logging.info("🔍 Analyzing baseline results for prompt patterns...")
 
         # Load baseline results
-        with open(baseline_file, 'r') as f:
+        with open(baseline_file, "r") as f:
             baseline_data = json.load(f)
 
         patterns = []
 
         # Analyze model performance patterns
-        model_performance = baseline_data.get('metrics', {}).get(
-            'model_performance', {}
-        )
+        model_performance = baseline_data.get("metrics", {}).get("model_performance", {})
 
         for model, perf_data in model_performance.items():
-            avg_quality = perf_data.get('avg_quality', 0)
+            avg_quality = perf_data.get("avg_quality", 0)
 
             if avg_quality >= 0.92:  # High-performing models
-                pattern = await self._extract_high_performance_pattern(
-                    model, perf_data, baseline_data
-                )
+                pattern = await self._extract_high_performance_pattern(model, perf_data, baseline_data)
                 if pattern:
                     patterns.append(pattern)
 
         # Analyze spectrum performance patterns
-        spectrum_performance = baseline_data.get('metrics', {}).get(
-            'spectrum_performance', {}
-        )
+        spectrum_performance = baseline_data.get("metrics", {}).get("spectrum_performance", {})
 
         for spectrum, perf_data in spectrum_performance.items():
-            avg_quality = perf_data.get('avg_quality', 0)
+            avg_quality = perf_data.get("avg_quality", 0)
 
             if avg_quality >= 0.90:  # High-performing spectrums
-                pattern = await self._extract_spectrum_pattern(
-                    spectrum, perf_data, baseline_data
-                )
+                pattern = await self._extract_spectrum_pattern(spectrum, perf_data, baseline_data)
                 if pattern:
                     patterns.append(pattern)
 
@@ -222,82 +202,58 @@ class PromptPatternAnalyzer:
         return patterns
 
     async def _extract_high_performance_pattern(
-        self,
-        model: str,
-        perf_data: Dict[str, Any],
-        baseline_data: Dict[str, Any]
+        self, model: str, perf_data: Dict[str, Any], baseline_data: Dict[str, Any]
     ) -> Optional[PromptPattern]:
         """Extract pattern from high-performing model."""
         pattern_id = f"high_perf_{model}_{int(time.time())}"
 
         # Analyze what makes this model successful
         success_factors = []
-        if perf_data.get('avg_quality', 0) >= 0.95:
+        if perf_data.get("avg_quality", 0) >= 0.95:
             success_factors.append("exceptional_quality_achievement")
-        if perf_data.get('avg_response_time', 10) <= 5.0:
+        if perf_data.get("avg_response_time", 10) <= 5.0:
             success_factors.append("fast_response_time")
-        if perf_data.get('success_rate', 0) >= 0.98:
+        if perf_data.get("success_rate", 0) >= 0.98:
             success_factors.append("high_reliability")
 
         pattern = PromptPattern(
             pattern_id=pattern_id,
             pattern_type="high_performance_model",
             description=f"Pattern from high-performing model {model}",
-            success_rate=perf_data.get('success_rate', 0),
-            quality_impact=perf_data.get('avg_quality', 0) - 0.85,
+            success_rate=perf_data.get("success_rate", 0),
+            quality_impact=perf_data.get("avg_quality", 0) - 0.85,
             applicable_spectrums=["all"],
             applicable_models=[model],
-            pattern_template=self._generate_model_specific_template(
-                model, success_factors
-            ),
-            metadata={
-                "model": model,
-                "performance_data": perf_data,
-                "success_factors": success_factors
-            }
+            pattern_template=self._generate_model_specific_template(model, success_factors),
+            metadata={"model": model, "performance_data": perf_data, "success_factors": success_factors},
         )
 
         return pattern
 
     async def _extract_spectrum_pattern(
-        self,
-        spectrum: str,
-        perf_data: Dict[str, Any],
-        baseline_data: Dict[str, Any]
+        self, spectrum: str, perf_data: Dict[str, Any], baseline_data: Dict[str, Any]
     ) -> Optional[PromptPattern]:
         """Extract pattern from high-performing spectrum."""
         pattern_id = f"spectrum_{spectrum}_{int(time.time())}"
 
         # Determine spectrum-specific success factors
-        success_factors = self._analyze_spectrum_success_factors(
-            spectrum, perf_data
-        )
+        success_factors = self._analyze_spectrum_success_factors(spectrum, perf_data)
 
         pattern = PromptPattern(
             pattern_id=pattern_id,
             pattern_type="spectrum_specific",
             description=f"Successful pattern for {spectrum} spectrum",
-            success_rate=perf_data.get('success_rate', 0),
-            quality_impact=perf_data.get('avg_quality', 0) - 0.85,
+            success_rate=perf_data.get("success_rate", 0),
+            quality_impact=perf_data.get("avg_quality", 0) - 0.85,
             applicable_spectrums=[spectrum],
             applicable_models=["all"],
-            pattern_template=self._generate_spectrum_template(
-                spectrum, success_factors
-            ),
-            metadata={
-                "spectrum": spectrum,
-                "performance_data": perf_data,
-                "success_factors": success_factors
-            }
+            pattern_template=self._generate_spectrum_template(spectrum, success_factors),
+            metadata={"spectrum": spectrum, "performance_data": perf_data, "success_factors": success_factors},
         )
 
         return pattern
 
-    def _generate_model_specific_template(
-        self,
-        model: str,
-        success_factors: List[str]
-    ) -> str:
+    def _generate_model_specific_template(self, model: str, success_factors: List[str]) -> str:
         """Generate model-specific prompt template."""
         base_template = f"""
 You are an expert assistant optimized for {model} capabilities.
@@ -333,11 +289,7 @@ the highest quality standards while leveraging your model's strengths.
 
         return base_template.strip()
 
-    def _generate_spectrum_template(
-        self,
-        spectrum: str,
-        success_factors: List[str]
-    ) -> str:
+    def _generate_spectrum_template(self, spectrum: str, success_factors: List[str]) -> str:
         """Generate spectrum-specific prompt template."""
         spectrum_templates = {
             "customer_profile": """
@@ -381,31 +333,27 @@ QUALITY CRITERIA:
 - Comprehensive transaction pattern analysis
 - Accurate trend identification and interpretation
 - Actionable insights for financial management
-"""
+""",
         }
 
         return spectrum_templates.get(
             spectrum,
             f"You are an expert in {spectrum} analysis. Provide comprehensive, "
-            f"accurate insights with professional recommendations."
+            f"accurate insights with professional recommendations.",
         )
 
-    def _analyze_spectrum_success_factors(
-        self,
-        spectrum: str,
-        perf_data: Dict[str, Any]
-    ) -> List[str]:
+    def _analyze_spectrum_success_factors(self, spectrum: str, perf_data: Dict[str, Any]) -> List[str]:
         """Analyze success factors for a spectrum."""
         factors = []
 
-        avg_quality = perf_data.get('avg_quality', 0)
-        avg_completeness = perf_data.get('avg_completeness', 0)
+        avg_quality = perf_data.get("avg_quality", 0)
+        avg_completeness = perf_data.get("avg_completeness", 0)
 
         if avg_quality >= 0.95:
             factors.append("exceptional_quality")
         if avg_completeness >= 0.90:
             factors.append("high_completeness")
-        if perf_data.get('success_rate', 0) >= 0.95:
+        if perf_data.get("success_rate", 0) >= 0.95:
             factors.append("high_reliability")
 
         return factors
@@ -416,26 +364,28 @@ class AIPromptRefiner:
 
     def __init__(self):
         """Initialize the AI prompt refiner."""
-        if LANGCHAIN_AVAILABLE:
-            self.analyzer_llm = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.1
-            )
-            self.refiner_llm = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.3
-            )
+        if LANGCHAIN_AVAILABLE and os.getenv("OPENAI_API_KEY"):
+            try:
+                self.analyzer_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
+                self.refiner_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+            except Exception as e:
+                logging.warning(f"Failed to initialize ChatOpenAI: {e}")
+                self.analyzer_llm = None
+                self.refiner_llm = None
         else:
             self.analyzer_llm = None
             self.refiner_llm = None
-            logging.warning("LangChain not available, using mock refinement")
+            if not os.getenv("OPENAI_API_KEY"):
+                logging.info("OPENAI_API_KEY not set, using mock refinement")
+            else:
+                logging.warning("LangChain not available, using mock refinement")
 
     async def generate_prompt_variations(
         self,
         base_prompt: str,
         target_spectrum: str,
         successful_patterns: List[PromptPattern],
-        target_quality: float = 0.90
+        target_quality: float = 0.90,
     ) -> List[PromptVariation]:
         """
         Generate prompt variations based on successful patterns.
@@ -455,31 +405,22 @@ class AIPromptRefiner:
 
         # Apply each successful pattern
         for pattern in successful_patterns:
-            if (target_spectrum in pattern.applicable_spectrums or
-                "all" in pattern.applicable_spectrums):
+            if target_spectrum in pattern.applicable_spectrums or "all" in pattern.applicable_spectrums:
 
-                variation = await self._apply_pattern_to_prompt(
-                    base_prompt, pattern, target_spectrum, target_quality
-                )
+                variation = await self._apply_pattern_to_prompt(base_prompt, pattern, target_spectrum, target_quality)
                 if variation:
                     variations.append(variation)
 
         # Generate additional variations using AI
         if self.refiner_llm:
-            ai_variations = await self._generate_ai_variations(
-                base_prompt, target_spectrum, target_quality
-            )
+            ai_variations = await self._generate_ai_variations(base_prompt, target_spectrum, target_quality)
             variations.extend(ai_variations)
 
         logging.info(f"✅ Generated {len(variations)} prompt variations")
         return variations
 
     async def _apply_pattern_to_prompt(
-        self,
-        base_prompt: str,
-        pattern: PromptPattern,
-        target_spectrum: str,
-        target_quality: float
+        self, base_prompt: str, pattern: PromptPattern, target_spectrum: str, target_quality: float
     ) -> Optional[PromptVariation]:
         """Apply a successful pattern to create a prompt variation."""
         variation_id = f"pattern_{pattern.pattern_id}_{int(time.time())}"
@@ -503,22 +444,19 @@ PATTERN ENHANCEMENT:
             variation_prompt=enhanced_prompt.strip(),
             variation_type=PromptVariationType.STRUCTURE_VARIATION,
             hypothesis=f"Applying {pattern.pattern_type} pattern will improve "
-                      f"quality by {pattern.quality_impact:.1%}",
+            f"quality by {pattern.quality_impact:.1%}",
             expected_improvement=pattern.quality_impact,
             metadata={
                 "applied_pattern": pattern.pattern_id,
                 "pattern_type": pattern.pattern_type,
-                "target_spectrum": target_spectrum
-            }
+                "target_spectrum": target_spectrum,
+            },
         )
 
         return variation
 
     async def _generate_ai_variations(
-        self,
-        base_prompt: str,
-        target_spectrum: str,
-        target_quality: float
+        self, base_prompt: str, target_spectrum: str, target_quality: float
     ) -> List[PromptVariation]:
         """Generate AI-driven prompt variations."""
         if not self.refiner_llm:
@@ -531,14 +469,13 @@ PATTERN ENHANCEMENT:
             ("clarity", "Improve instruction clarity and specificity"),
             ("context", "Enhance context integration and data utilization"),
             ("examples", "Add relevant examples and quality criteria"),
-            ("structure", "Optimize prompt structure and flow")
+            ("structure", "Optimize prompt structure and flow"),
         ]
 
         for var_type, description in variation_types:
             try:
                 variation = await self._create_ai_variation(
-                    base_prompt, target_spectrum, target_quality,
-                    var_type, description
+                    base_prompt, target_spectrum, target_quality, var_type, description
                 )
                 if variation:
                     variations.append(variation)
@@ -548,12 +485,7 @@ PATTERN ENHANCEMENT:
         return variations
 
     async def _create_ai_variation(
-        self,
-        base_prompt: str,
-        target_spectrum: str,
-        target_quality: float,
-        variation_type: str,
-        description: str
+        self, base_prompt: str, target_spectrum: str, target_quality: float, variation_type: str, description: str
     ) -> Optional[PromptVariation]:
         """Create a specific AI-driven variation."""
         prompt_template = """
@@ -585,14 +517,13 @@ Generate an optimized prompt variation:
                     description=description,
                     base_prompt=base_prompt,
                     target_spectrum=target_spectrum,
-                    target_quality=target_quality
+                    target_quality=target_quality,
                 )
             )
 
             # Extract content from response
-            if hasattr(response, 'content'):
-                optimized_prompt = (response.content if isinstance(
-                    response.content, str) else str(response.content))
+            if hasattr(response, "content"):
+                optimized_prompt = response.content if isinstance(response.content, str) else str(response.content)
             else:
                 optimized_prompt = str(response)
         else:
@@ -619,17 +550,11 @@ Deliver high-quality analysis that meets professional standards.
             base_prompt=base_prompt,
             variation_prompt=optimized_prompt,
             variation_type=getattr(
-                PromptVariationType,
-                variation_type.upper() + "_VARIATION",
-                PromptVariationType.STRUCTURE_VARIATION
+                PromptVariationType, variation_type.upper() + "_VARIATION", PromptVariationType.STRUCTURE_VARIATION
             ),
             hypothesis=f"AI-driven {description.lower()} will improve quality",
             expected_improvement=0.05,  # Conservative estimate
-            metadata={
-                "ai_generated": True,
-                "variation_type": variation_type,
-                "target_spectrum": target_spectrum
-            }
+            metadata={"ai_generated": True, "variation_type": variation_type, "target_spectrum": target_spectrum},
         )
 
         return variation
@@ -651,17 +576,13 @@ class ABTestingFramework:
             "claude-3-haiku",
             "gemini-1.5-flash-002",
             "gemini-2.5-flash",
-            "gemini-2.5-flash-lite"
+            "gemini-2.5-flash-lite",
         ]
 
         self.test_sample_size = 3  # Tests per model-variation combination
         self.significance_threshold = 0.02  # 2% improvement threshold
 
-    async def run_ab_tests(
-        self,
-        variations: List[PromptVariation],
-        target_spectrum: str
-    ) -> Dict[str, Any]:
+    async def run_ab_tests(self, variations: List[PromptVariation], target_spectrum: str) -> Dict[str, Any]:
         """
         Run A/B tests for prompt variations across all models.
 
@@ -681,14 +602,12 @@ class ABTestingFramework:
             "variations_tested": len(variations),
             "models_tested": len(self.models),
             "results": {},
-            "summary": {}
+            "summary": {},
         }
 
         # Test each variation against baseline
         for variation in variations:
-            variation_results = await self._test_variation_across_models(
-                variation, target_spectrum
-            )
+            variation_results = await self._test_variation_across_models(variation, target_spectrum)
             test_results["results"][variation.variation_id] = variation_results
 
         # Calculate summary statistics
@@ -699,18 +618,14 @@ class ABTestingFramework:
         logging.info(f"✅ A/B testing completed for {target_spectrum}")
         return test_results
 
-    async def _test_variation_across_models(
-        self,
-        variation: PromptVariation,
-        target_spectrum: str
-    ) -> Dict[str, Any]:
+    async def _test_variation_across_models(self, variation: PromptVariation, target_spectrum: str) -> Dict[str, Any]:
         """Test a single variation across all models."""
         variation_results = {
             "variation_id": variation.variation_id,
             "variation_type": variation.variation_type.value,
             "hypothesis": variation.hypothesis,
             "model_results": {},
-            "overall_performance": {}
+            "overall_performance": {},
         }
 
         model_scores = []
@@ -720,21 +635,18 @@ class ABTestingFramework:
             test_scores = []
 
             for test_run in range(self.test_sample_size):
-                score = await self._run_single_test(
-                    variation, model, target_spectrum, test_run
-                )
+                score = await self._run_single_test(variation, model, target_spectrum, test_run)
                 test_scores.append(score)
 
             # Calculate model-specific results
             avg_score = statistics.mean(test_scores)
-            std_score = (statistics.stdev(test_scores)
-                        if len(test_scores) > 1 else 0)
+            std_score = statistics.stdev(test_scores) if len(test_scores) > 1 else 0
 
             variation_results["model_results"][model] = {
                 "average_score": avg_score,
                 "std_deviation": std_score,
                 "test_scores": test_scores,
-                "sample_size": len(test_scores)
+                "sample_size": len(test_scores),
             }
 
             model_scores.append(avg_score)
@@ -745,17 +657,13 @@ class ABTestingFramework:
             "std_deviation": statistics.stdev(model_scores),
             "min_score": min(model_scores),
             "max_score": max(model_scores),
-            "models_above_90": sum(1 for score in model_scores if score >= 0.9)
+            "models_above_90": sum(1 for score in model_scores if score >= 0.9),
         }
 
         return variation_results
 
     async def _run_single_test(
-        self,
-        variation: PromptVariation,
-        model: str,
-        target_spectrum: str,
-        test_run: int
+        self, variation: PromptVariation, model: str, target_spectrum: str, test_run: int
     ) -> float:
         """Run a single test for a variation-model combination."""
         # Simulate test execution (replace with actual implementation)
@@ -816,14 +724,9 @@ class ABTestingFramework:
             "best_score": best_score,
             "average_improvement": statistics.mean(improvements),
             "max_improvement": max(improvements),
-            "variations_above_90": sum(1 for score in variation_scores
-                                     if score >= 0.9),
-            "significant_improvements": sum(1 for imp in improvements
-                                          if imp >= self.significance_threshold),
-            "recommendation": (
-                "deploy_best" if best_score >= 0.90
-                else "continue_optimization"
-            )
+            "variations_above_90": sum(1 for score in variation_scores if score >= 0.9),
+            "significant_improvements": sum(1 for imp in improvements if imp >= self.significance_threshold),
+            "recommendation": ("deploy_best" if best_score >= 0.90 else "continue_optimization"),
         }
 
         return summary
@@ -848,11 +751,7 @@ class Phase2OptimizationOrchestrator:
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    async def run_phase2_optimization(
-        self,
-        baseline_results_file: str,
-        baseline_framework=None
-    ) -> OptimizationCycle:
+    async def run_phase2_optimization(self, baseline_results_file: str, baseline_framework=None) -> OptimizationCycle:
         """
         Run complete Phase 2 AI Prompt Optimization cycle.
 
@@ -874,21 +773,17 @@ class Phase2OptimizationOrchestrator:
 
         # Step 1: Analyze baseline results for patterns
         self.logger.info("📊 Step 1: Analyzing baseline results for patterns")
-        identified_patterns = await self.pattern_analyzer.analyze_baseline_results(  # noqa: E501
-            baseline_results_file
-        )
+        identified_patterns = await self.pattern_analyzer.analyze_baseline_results(baseline_results_file)  # noqa: E501
 
         # Step 2: Generate prompt variations
         self.logger.info("🤖 Step 2: Generating AI-driven prompt variations")
         all_variations = []
 
         # Load baseline data to get spectrums
-        with open(baseline_results_file, 'r') as f:
+        with open(baseline_results_file, "r") as f:
             baseline_data = json.load(f)
 
-        spectrum_performance = baseline_data.get('metrics', {}).get(
-            'spectrum_performance', {}
-        )
+        spectrum_performance = baseline_data.get("metrics", {}).get("spectrum_performance", {})
 
         for spectrum in spectrum_performance.keys():
             base_prompt = f"Analyze {spectrum} data for customer insights."
@@ -904,27 +799,18 @@ class Phase2OptimizationOrchestrator:
 
         if self.ab_testing:
             for spectrum in spectrum_performance.keys():
-                spectrum_variations = [
-                    v for v in all_variations
-                    if v.metadata.get('target_spectrum') == spectrum
-                ]
+                spectrum_variations = [v for v in all_variations if v.metadata.get("target_spectrum") == spectrum]
 
                 if spectrum_variations:
-                    test_results = await self.ab_testing.run_ab_tests(
-                        spectrum_variations, spectrum
-                    )
+                    test_results = await self.ab_testing.run_ab_tests(spectrum_variations, spectrum)
                     ab_test_results[spectrum] = test_results
 
         # Step 4: Generate model-specific strategies
         self.logger.info("🎯 Step 4: Generating model-specific strategies")
-        model_strategies = await self._generate_model_strategies(
-            baseline_data, identified_patterns, ab_test_results
-        )
+        model_strategies = await self._generate_model_strategies(baseline_data, identified_patterns, ab_test_results)
 
         # Step 5: Calculate overall improvement
-        overall_improvement = self._calculate_overall_improvement(
-            baseline_data, ab_test_results
-        )
+        overall_improvement = self._calculate_overall_improvement(baseline_data, ab_test_results)
 
         # Create optimization cycle result
         cycle = OptimizationCycle(
@@ -942,8 +828,8 @@ class Phase2OptimizationOrchestrator:
                 "Implement model-specific optimization strategies",
                 "Monitor quality improvements in production",
                 "Continue iterative optimization cycles",
-                "Validate 90%+ quality achievement across all spectrums"
-            ]
+                "Validate 90%+ quality achievement across all spectrums",
+            ],
         )
 
         # Save results
@@ -960,27 +846,19 @@ class Phase2OptimizationOrchestrator:
         return cycle
 
     async def _generate_model_strategies(
-        self,
-        baseline_data: Dict[str, Any],
-        patterns: List[PromptPattern],
-        ab_results: Dict[str, Any]
+        self, baseline_data: Dict[str, Any], patterns: List[PromptPattern], ab_results: Dict[str, Any]
     ) -> List[ModelOptimizationStrategy]:
         """Generate model-specific optimization strategies."""
         strategies = []
 
-        model_performance = baseline_data.get('metrics', {}).get(
-            'model_performance', {}
-        )
+        model_performance = baseline_data.get("metrics", {}).get("model_performance", {})
 
         for model, perf_data in model_performance.items():
-            current_quality = perf_data.get('avg_quality', 0)
+            current_quality = perf_data.get("avg_quality", 0)
             target_quality = 0.90
 
             # Find applicable patterns for this model
-            applicable_patterns = [
-                p for p in patterns
-                if model in p.applicable_models or "all" in p.applicable_models
-            ]
+            applicable_patterns = [p for p in patterns if model in p.applicable_models or "all" in p.applicable_models]
 
             # Determine optimization approach
             if current_quality >= 0.95:
@@ -992,46 +870,41 @@ class Phase2OptimizationOrchestrator:
 
             # Generate custom instructions
             custom_instructions = [
-                f"Target quality improvement from {current_quality:.1%} to "
-                f"{target_quality:.1%}",
+                f"Target quality improvement from {current_quality:.1%} to " f"{target_quality:.1%}",
                 f"Apply {approach.value} optimization strategy",
-                "Focus on consistent high-quality responses"
+                "Focus on consistent high-quality responses",
             ]
 
             # Calculate expected improvements
             expected_improvements = {
                 "quality_score": min(0.05, target_quality - current_quality),
-                "response_time": perf_data.get('avg_response_time', 5.0) * 0.9,
-                "consistency": 0.02
+                "response_time": perf_data.get("avg_response_time", 5.0) * 0.9,
+                "consistency": 0.02,
             }
 
             strategy = ModelOptimizationStrategy(
                 model_name=model,
                 current_performance={
                     "quality": current_quality,
-                    "response_time": perf_data.get('avg_response_time', 5.0),
-                    "success_rate": perf_data.get('success_rate', 0.95)
+                    "response_time": perf_data.get("avg_response_time", 5.0),
+                    "success_rate": perf_data.get("success_rate", 0.95),
                 },
                 target_performance={
                     "quality": target_quality,
-                    "response_time": perf_data.get('avg_response_time', 5.0) * 0.9,  # noqa: E501
-                    "success_rate": 0.98
+                    "response_time": perf_data.get("avg_response_time", 5.0) * 0.9,  # noqa: E501
+                    "success_rate": 0.98,
                 },
                 optimization_approach=approach,
                 recommended_patterns=applicable_patterns,
                 custom_instructions=custom_instructions,
-                expected_improvements=expected_improvements
+                expected_improvements=expected_improvements,
             )
 
             strategies.append(strategy)
 
         return strategies
 
-    def _calculate_overall_improvement(
-        self,
-        baseline_data: Dict[str, Any],
-        ab_results: Dict[str, Any]
-    ) -> float:
+    def _calculate_overall_improvement(self, baseline_data: Dict[str, Any], ab_results: Dict[str, Any]) -> float:
         """Calculate overall improvement from A/B test results."""
         if not ab_results:
             return 0.0
@@ -1039,8 +912,8 @@ class Phase2OptimizationOrchestrator:
         improvements = []
 
         for spectrum, test_data in ab_results.items():
-            summary = test_data.get('summary', {})
-            avg_improvement = summary.get('average_improvement', 0)
+            summary = test_data.get("summary", {})
+            avg_improvement = summary.get("average_improvement", 0)
             improvements.append(avg_improvement)
 
         return statistics.mean(improvements) if improvements else 0.0
@@ -1067,7 +940,7 @@ class Phase2OptimizationOrchestrator:
                     "applicable_spectrums": p.applicable_spectrums,
                     "applicable_models": p.applicable_models,
                     "pattern_template": p.pattern_template,
-                    "metadata": p.metadata
+                    "metadata": p.metadata,
                 }
                 for p in cycle.identified_patterns
             ],
@@ -1078,7 +951,7 @@ class Phase2OptimizationOrchestrator:
                     "hypothesis": v.hypothesis,
                     "expected_improvement": v.expected_improvement,
                     "test_results": v.test_results,
-                    "metadata": v.metadata
+                    "metadata": v.metadata,
                 }
                 for v in cycle.generated_variations
             ],
@@ -1089,17 +962,17 @@ class Phase2OptimizationOrchestrator:
                     "target_performance": s.target_performance,
                     "optimization_approach": s.optimization_approach.value,
                     "custom_instructions": s.custom_instructions,
-                    "expected_improvements": s.expected_improvements
+                    "expected_improvements": s.expected_improvements,
                 }
                 for s in cycle.model_strategies
             ],
             "ab_test_results": cycle.ab_test_results,
             "overall_improvement": cycle.overall_improvement,
-            "next_actions": cycle.next_actions
+            "next_actions": cycle.next_actions,
         }
 
         try:
-            with open(filepath, 'w') as f:
+            with open(filepath, "w") as f:
                 json.dump(cycle_data, f, indent=2, default=str)
             self.logger.info(f"📄 Cycle results saved: {filename}")
         except Exception as e:
@@ -1109,8 +982,7 @@ class Phase2OptimizationOrchestrator:
 # Main execution function for testing
 async def main():
     """Main function to run Phase 2 optimization."""
-    logging.basicConfig(level=logging.INFO,
-                       format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Initialize LangSmith client if available
     langsmith_client = None
@@ -1130,9 +1002,7 @@ async def main():
         logging.info("🚀 Starting Phase 2 AI Prompt Optimization...")
 
         # Run optimization cycle
-        cycle = await orchestrator.run_phase2_optimization(
-            baseline_file
-        )
+        cycle = await orchestrator.run_phase2_optimization(baseline_file)
 
         # Display results summary
         print("\n" + "=" * 60)
@@ -1146,10 +1016,9 @@ async def main():
         if cycle.model_strategies:
             print("\n🎯 Model-Specific Strategies:")
             for strategy in cycle.model_strategies[:3]:  # Show first 3
-                current = strategy.current_performance.get('quality', 0)
-                target = strategy.target_performance.get('quality', 0)
-                print(f"  • {strategy.model_name}: {current:.1%} → "
-                      f"{target:.1%}")
+                current = strategy.current_performance.get("quality", 0)
+                target = strategy.target_performance.get("quality", 0)
+                print(f"  • {strategy.model_name}: {current:.1%} → " f"{target:.1%}")
 
         print("\n🚀 Next Actions:")
         for action in cycle.next_actions[:3]:  # Show first 3

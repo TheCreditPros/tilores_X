@@ -24,6 +24,7 @@ Phase: 3 - Continuous Improvement
 import asyncio
 import json
 import logging
+import os
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -35,18 +36,21 @@ from typing import Any, Dict, List, Optional
 # External dependencies with graceful fallback
 try:
     import numpy as np
+
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
 
 try:
     from langsmith import Client
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LANGSMITH_AVAILABLE = False
 
 try:
     from langchain_openai import ChatOpenAI
+
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
@@ -56,6 +60,7 @@ try:
     from quality_metrics_collector import QualityMetricsCollector
     from phase2_ai_prompt_optimization import Phase2OptimizationOrchestrator
     from virtuous_cycle_framework import VirtuousCycleOrchestrator
+
     FRAMEWORKS_AVAILABLE = True
 except ImportError:
     FRAMEWORKS_AVAILABLE = False
@@ -66,10 +71,10 @@ class AlertSeverity(Enum):
     """Alert severity levels for quality monitoring."""
 
     CRITICAL = "critical"  # Quality < 85%
-    HIGH = "high"         # Quality < 90%
-    MEDIUM = "medium"     # Quality declining trend
-    LOW = "low"           # Quality variance high
-    INFO = "info"         # Quality improvements
+    HIGH = "high"  # Quality < 90%
+    MEDIUM = "medium"  # Quality declining trend
+    LOW = "low"  # Quality variance high
+    INFO = "info"  # Quality improvements
 
 
 class AlertType(Enum):
@@ -151,10 +156,10 @@ class QualityThresholdMonitor:
         """Initialize the threshold monitor."""
         self.quality_collector = quality_collector
         self.thresholds = {
-            'critical': 0.85,  # 85% - Critical threshold
-            'warning': 0.90,   # 90% - Warning threshold
-            'target': 0.95,    # 95% - Target threshold
-            'excellent': 0.98  # 98% - Excellence threshold
+            "critical": 0.85,  # 85% - Critical threshold
+            "warning": 0.90,  # 90% - Warning threshold
+            "target": 0.95,  # 95% - Target threshold
+            "excellent": 0.98,  # 98% - Excellence threshold
         }
 
         # Monitoring configuration
@@ -174,9 +179,7 @@ class QualityThresholdMonitor:
         alerts = []
 
         # Get recent metrics for spectrum
-        recent_metrics = self.quality_collector.storage.get_spectrum_metrics(
-            spectrum, limit=self.trend_analysis_points
-        )
+        recent_metrics = self.quality_collector.storage.get_spectrum_metrics(spectrum, limit=self.trend_analysis_points)
 
         if not recent_metrics:
             return alerts
@@ -186,16 +189,22 @@ class QualityThresholdMonitor:
         current_quality = sum(scores) / len(scores)
 
         # Check threshold breaches
-        if current_quality < self.thresholds['critical']:
+        if current_quality < self.thresholds["critical"]:
             alert = self._create_threshold_alert(
-                spectrum, current_quality, self.thresholds['critical'],
-                AlertSeverity.CRITICAL, "Quality below critical threshold"
+                spectrum,
+                current_quality,
+                self.thresholds["critical"],
+                AlertSeverity.CRITICAL,
+                "Quality below critical threshold",
             )
             alerts.append(alert)
-        elif current_quality < self.thresholds['warning']:
+        elif current_quality < self.thresholds["warning"]:
             alert = self._create_threshold_alert(
-                spectrum, current_quality, self.thresholds['warning'],
-                AlertSeverity.HIGH, "Quality below warning threshold"
+                spectrum,
+                current_quality,
+                self.thresholds["warning"],
+                AlertSeverity.HIGH,
+                "Quality below warning threshold",
             )
             alerts.append(alert)
 
@@ -213,9 +222,9 @@ class QualityThresholdMonitor:
 
         return alerts
 
-    def _create_threshold_alert(self, spectrum: str, current: float,
-                              threshold: float, severity: AlertSeverity,
-                              message: str) -> QualityAlert:
+    def _create_threshold_alert(
+        self, spectrum: str, current: float, threshold: float, severity: AlertSeverity, message: str
+    ) -> QualityAlert:
         """Create a threshold breach alert."""
         alert_id = f"threshold_{spectrum}_{int(time.time())}"
 
@@ -230,13 +239,12 @@ class QualityThresholdMonitor:
             message=f"{message}: {current:.1%} < {threshold:.1%}",
             timestamp=datetime.now().isoformat(),
             metadata={
-                'threshold_type': 'critical' if severity == AlertSeverity.CRITICAL else 'warning',
-                'breach_amount': threshold - current
-            }
+                "threshold_type": "critical" if severity == AlertSeverity.CRITICAL else "warning",
+                "breach_amount": threshold - current,
+            },
         )
 
-    def _check_quality_trend(self, spectrum: str,
-                           scores: List[float]) -> Optional[QualityAlert]:
+    def _check_quality_trend(self, spectrum: str, scores: List[float]) -> Optional[QualityAlert]:
         """Check for declining quality trends."""
         if len(scores) < 5:
             return None
@@ -254,8 +262,7 @@ class QualityThresholdMonitor:
             sum_xy = sum(x_vals[i] * scores[i] for i in range(n))
             sum_x2 = sum(x * x for x in x_vals)
 
-            trend_slope = ((n * sum_xy - sum_x * sum_y) /
-                          (n * sum_x2 - sum_x ** 2))
+            trend_slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x**2)
 
         # Alert if declining trend
         if trend_slope < -0.01:  # 1% decline per measurement
@@ -268,20 +275,19 @@ class QualityThresholdMonitor:
                 spectrum=spectrum,
                 model=None,
                 current_quality=scores[-1],
-                threshold=self.thresholds['warning'],
+                threshold=self.thresholds["warning"],
                 message=f"Declining quality trend detected: {trend_slope:.3f} per measurement",
                 timestamp=datetime.now().isoformat(),
                 metadata={
-                    'trend_slope': trend_slope,
-                    'measurements_analyzed': len(scores),
-                    'trend_direction': 'declining'
-                }
+                    "trend_slope": trend_slope,
+                    "measurements_analyzed": len(scores),
+                    "trend_direction": "declining",
+                },
             )
 
         return None
 
-    def _check_quality_variance(self, spectrum: str,
-                              scores: List[float]) -> Optional[QualityAlert]:
+    def _check_quality_variance(self, spectrum: str, scores: List[float]) -> Optional[QualityAlert]:
         """Check for high quality variance."""
         if NUMPY_AVAILABLE:
             variance = np.std(scores)
@@ -303,10 +309,10 @@ class QualityThresholdMonitor:
                 message=f"High quality variance detected: {variance:.3f}",
                 timestamp=datetime.now().isoformat(),
                 metadata={
-                    'variance': variance,
-                    'measurements_analyzed': len(scores),
-                    'variance_threshold': self.variance_threshold
-                }
+                    "variance": variance,
+                    "measurements_analyzed": len(scores),
+                    "variance_threshold": self.variance_threshold,
+                },
             )
 
         return None
@@ -331,47 +337,43 @@ class AutomatedAlertingSystem:
     def _initialize_alert_channels(self) -> Dict[str, Any]:
         """Initialize alert delivery channels."""
         return {
-            'console': {'enabled': True, 'level': 'INFO'},
-            'file': {
-                'enabled': True,
-                'path': 'tests/speed_experiments/alerts.log',
-                'level': 'WARNING'
+            "console": {"enabled": True, "level": "INFO"},
+            "file": {"enabled": True, "path": "tests/speed_experiments/alerts.log", "level": "WARNING"},
+            "email": {
+                "enabled": self.config.get("email_alerts", False),
+                "smtp_server": self.config.get("smtp_server", "localhost"),
+                "smtp_port": self.config.get("smtp_port", 587),
+                "recipients": self.config.get("alert_recipients", []),
             },
-            'email': {
-                'enabled': self.config.get('email_alerts', False),
-                'smtp_server': self.config.get('smtp_server', 'localhost'),
-                'smtp_port': self.config.get('smtp_port', 587),
-                'recipients': self.config.get('alert_recipients', [])
-            }
         }
 
     def _initialize_alert_rules(self) -> Dict[str, Any]:
         """Initialize alerting rules and escalation policies."""
         return {
-            'critical': {
-                'immediate_notification': True,
-                'escalation_delay': timedelta(minutes=5),
-                'max_escalations': 3,
-                'channels': ['console', 'file', 'email']
+            "critical": {
+                "immediate_notification": True,
+                "escalation_delay": timedelta(minutes=5),
+                "max_escalations": 3,
+                "channels": ["console", "file", "email"],
             },
-            'high': {
-                'immediate_notification': True,
-                'escalation_delay': timedelta(minutes=15),
-                'max_escalations': 2,
-                'channels': ['console', 'file']
+            "high": {
+                "immediate_notification": True,
+                "escalation_delay": timedelta(minutes=15),
+                "max_escalations": 2,
+                "channels": ["console", "file"],
             },
-            'medium': {
-                'immediate_notification': False,
-                'escalation_delay': timedelta(hours=1),
-                'max_escalations': 1,
-                'channels': ['console', 'file']
+            "medium": {
+                "immediate_notification": False,
+                "escalation_delay": timedelta(hours=1),
+                "max_escalations": 1,
+                "channels": ["console", "file"],
             },
-            'low': {
-                'immediate_notification': False,
-                'escalation_delay': timedelta(hours=4),
-                'max_escalations': 0,
-                'channels': ['file']
-            }
+            "low": {
+                "immediate_notification": False,
+                "escalation_delay": timedelta(hours=4),
+                "max_escalations": 0,
+                "channels": ["file"],
+            },
         }
 
     async def process_alert(self, alert: QualityAlert) -> bool:
@@ -390,7 +392,7 @@ class AutomatedAlertingSystem:
 
         # Get alert rules
         rules = self.alert_rules.get(alert.severity.value, {})
-        channels = rules.get('channels', ['console'])
+        channels = rules.get("channels", ["console"])
 
         # Deliver alert through configured channels
         success = True
@@ -416,11 +418,11 @@ class AutomatedAlertingSystem:
 
     async def _deliver_alert(self, alert: QualityAlert, channel: str):
         """Deliver alert through specific channel."""
-        if channel == 'console':
+        if channel == "console":
             await self._deliver_console_alert(alert)
-        elif channel == 'file':
+        elif channel == "file":
             await self._deliver_file_alert(alert)
-        elif channel == 'email':
+        elif channel == "email":
             await self._deliver_email_alert(alert)
 
     async def _deliver_console_alert(self, alert: QualityAlert):
@@ -429,7 +431,7 @@ class AutomatedAlertingSystem:
             AlertSeverity.CRITICAL: "🚨",
             AlertSeverity.HIGH: "⚠️",
             AlertSeverity.MEDIUM: "📊",
-            AlertSeverity.LOW: "ℹ️"
+            AlertSeverity.LOW: "ℹ️",
         }
 
         icon = severity_icons.get(alert.severity, "📢")
@@ -443,28 +445,28 @@ class AutomatedAlertingSystem:
 
     async def _deliver_file_alert(self, alert: QualityAlert):
         """Deliver alert to log file."""
-        log_path = Path(self.alert_channels['file']['path'])
+        log_path = Path(self.alert_channels["file"]["path"])
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
         log_entry = {
-            'timestamp': alert.timestamp,
-            'alert_id': alert.alert_id,
-            'severity': alert.severity.value,
-            'type': alert.alert_type.value,
-            'spectrum': alert.spectrum,
-            'model': alert.model,
-            'current_quality': alert.current_quality,
-            'threshold': alert.threshold,
-            'message': alert.message,
-            'metadata': alert.metadata
+            "timestamp": alert.timestamp,
+            "alert_id": alert.alert_id,
+            "severity": alert.severity.value,
+            "type": alert.alert_type.value,
+            "spectrum": alert.spectrum,
+            "model": alert.model,
+            "current_quality": alert.current_quality,
+            "threshold": alert.threshold,
+            "message": alert.message,
+            "metadata": alert.metadata,
         }
 
-        with open(log_path, 'a') as f:
-            f.write(json.dumps(log_entry) + '\n')
+        with open(log_path, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
 
     async def _deliver_email_alert(self, alert: QualityAlert):
         """Deliver alert via email (if configured)."""
-        if not self.alert_channels['email']['enabled']:
+        if not self.alert_channels["email"]["enabled"]:
             return
 
         # Email implementation would go here
@@ -498,21 +500,21 @@ class LearningAccumulator:
         # Load learning patterns
         if self.patterns_file.exists():
             try:
-                with open(self.patterns_file, 'r') as f:
+                with open(self.patterns_file, "r") as f:
                     patterns_data = json.load(f)
 
                 for pattern_id, pattern_dict in patterns_data.items():
                     self.learning_patterns[pattern_id] = LearningPattern(
-                        pattern_id=pattern_dict['pattern_id'],
-                        pattern_type=pattern_dict['pattern_type'],
-                        success_count=pattern_dict['success_count'],
-                        failure_count=pattern_dict['failure_count'],
-                        average_improvement=pattern_dict['average_improvement'],
-                        applicable_contexts=pattern_dict['applicable_contexts'],
-                        learned_optimizations=pattern_dict['learned_optimizations'],
-                        confidence_score=pattern_dict['confidence_score'],
-                        last_updated=pattern_dict['last_updated'],
-                        metadata=pattern_dict.get('metadata', {})
+                        pattern_id=pattern_dict["pattern_id"],
+                        pattern_type=pattern_dict["pattern_type"],
+                        success_count=pattern_dict["success_count"],
+                        failure_count=pattern_dict["failure_count"],
+                        average_improvement=pattern_dict["average_improvement"],
+                        applicable_contexts=pattern_dict["applicable_contexts"],
+                        learned_optimizations=pattern_dict["learned_optimizations"],
+                        confidence_score=pattern_dict["confidence_score"],
+                        last_updated=pattern_dict["last_updated"],
+                        metadata=pattern_dict.get("metadata", {}),
                     )
             except (json.JSONDecodeError, KeyError) as e:
                 self.logger.warning(f"Failed to load learning patterns: {e}")
@@ -520,38 +522,40 @@ class LearningAccumulator:
         # Load cycle memory
         if self.cycles_file.exists():
             try:
-                with open(self.cycles_file, 'r') as f:
+                with open(self.cycles_file, "r") as f:
                     cycles_data = json.load(f)
 
                 for cycle_dict in cycles_data:
-                    self.cycle_memory.append(OptimizationCycleMemory(
-                        cycle_id=cycle_dict['cycle_id'],
-                        timestamp=cycle_dict['timestamp'],
-                        phase=cycle_dict['phase'],
-                        strategies_used=cycle_dict['strategies_used'],
-                        improvements_achieved=cycle_dict['improvements_achieved'],
-                        patterns_discovered=cycle_dict['patterns_discovered'],
-                        success_rate=cycle_dict['success_rate'],
-                        lessons_learned=cycle_dict['lessons_learned'],
-                        next_cycle_recommendations=cycle_dict['next_cycle_recommendations'],
-                        metadata=cycle_dict.get('metadata', {})
-                    ))
+                    self.cycle_memory.append(
+                        OptimizationCycleMemory(
+                            cycle_id=cycle_dict["cycle_id"],
+                            timestamp=cycle_dict["timestamp"],
+                            phase=cycle_dict["phase"],
+                            strategies_used=cycle_dict["strategies_used"],
+                            improvements_achieved=cycle_dict["improvements_achieved"],
+                            patterns_discovered=cycle_dict["patterns_discovered"],
+                            success_rate=cycle_dict["success_rate"],
+                            lessons_learned=cycle_dict["lessons_learned"],
+                            next_cycle_recommendations=cycle_dict["next_cycle_recommendations"],
+                            metadata=cycle_dict.get("metadata", {}),
+                        )
+                    )
             except (json.JSONDecodeError, KeyError) as e:
                 self.logger.warning(f"Failed to load cycle memory: {e}")
 
     def record_optimization_cycle(self, cycle_results: Dict[str, Any]):
         """Record results from an optimization cycle for learning."""
         cycle_memory = OptimizationCycleMemory(
-            cycle_id=cycle_results['cycle_id'],
-            timestamp=cycle_results.get('timestamp', datetime.now().isoformat()),
-            phase=cycle_results.get('phase', 'continuous_improvement'),
+            cycle_id=cycle_results["cycle_id"],
+            timestamp=cycle_results.get("timestamp", datetime.now().isoformat()),
+            phase=cycle_results.get("phase", "continuous_improvement"),
             strategies_used=self._extract_strategies_used(cycle_results),
             improvements_achieved=self._extract_improvements(cycle_results),
             patterns_discovered=self._extract_patterns(cycle_results),
             success_rate=self._calculate_cycle_success_rate(cycle_results),
             lessons_learned=self._extract_lessons_learned(cycle_results),
-            next_cycle_recommendations=cycle_results.get('next_actions', []),
-            metadata=cycle_results.get('metadata', {})
+            next_cycle_recommendations=cycle_results.get("next_actions", []),
+            metadata=cycle_results.get("metadata", {}),
         )
 
         self.cycle_memory.append(cycle_memory)
@@ -569,16 +573,16 @@ class LearningAccumulator:
         strategies = []
 
         # Extract from model strategies
-        model_strategies = cycle_results.get('model_strategies', [])
+        model_strategies = cycle_results.get("model_strategies", [])
         for strategy in model_strategies:
-            approach = strategy.get('optimization_approach', '')
+            approach = strategy.get("optimization_approach", "")
             if approach and approach not in strategies:
                 strategies.append(approach)
 
         # Extract from improvements
-        improvements = cycle_results.get('improvements', {})
+        improvements = cycle_results.get("improvements", {})
         for spectrum, improvement in improvements.items():
-            strategy = improvement.get('optimization_strategy', '')
+            strategy = improvement.get("optimization_strategy", "")
             if strategy and strategy not in strategies:
                 strategies.append(strategy)
 
@@ -588,9 +592,9 @@ class LearningAccumulator:
         """Extract quality improvements achieved."""
         improvements = {}
 
-        cycle_improvements = cycle_results.get('improvements', {})
+        cycle_improvements = cycle_results.get("improvements", {})
         for spectrum, improvement in cycle_improvements.items():
-            quality_gain = improvement.get('quality_improvement', 0)
+            quality_gain = improvement.get("quality_improvement", 0)
             improvements[spectrum] = quality_gain
 
         return improvements
@@ -599,9 +603,9 @@ class LearningAccumulator:
         """Extract successful patterns discovered."""
         patterns = []
 
-        identified_patterns = cycle_results.get('identified_patterns', [])
+        identified_patterns = cycle_results.get("identified_patterns", [])
         for pattern in identified_patterns:
-            pattern_id = pattern.get('pattern_id', '')
+            pattern_id = pattern.get("pattern_id", "")
             if pattern_id:
                 patterns.append(pattern_id)
 
@@ -609,13 +613,12 @@ class LearningAccumulator:
 
     def _calculate_cycle_success_rate(self, cycle_results: Dict[str, Any]) -> float:
         """Calculate overall success rate for the cycle."""
-        improvements = cycle_results.get('improvements', {})
+        improvements = cycle_results.get("improvements", {})
         if not improvements:
             return 0.0
 
         successful_improvements = sum(
-            1 for improvement in improvements.values()
-            if improvement.get('quality_improvement', 0) > 0.01
+            1 for improvement in improvements.values() if improvement.get("quality_improvement", 0) > 0.01
         )
 
         return successful_improvements / len(improvements)
@@ -625,17 +628,17 @@ class LearningAccumulator:
         lessons = []
 
         # Extract from validation results
-        validation = cycle_results.get('phases', {}).get('validation', {})
+        validation = cycle_results.get("phases", {}).get("validation", {})
         for spectrum, validation_data in validation.items():
             if isinstance(validation_data, dict):
-                if validation_data.get('is_statistically_significant', False):
+                if validation_data.get("is_statistically_significant", False):
                     lessons.append(f"Successful optimization pattern for {spectrum}")
                 else:
                     lessons.append(f"Optimization approach needs refinement for {spectrum}")
 
         # Extract from recommendations
-        recommendations = cycle_results.get('recommendations', {})
-        strategy = recommendations.get('optimization_strategy', '')
+        recommendations = cycle_results.get("recommendations", {})
+        strategy = recommendations.get("optimization_strategy", "")
         if strategy:
             lessons.append(f"Next cycle should focus on {strategy} strategy")
 
@@ -656,7 +659,7 @@ class LearningAccumulator:
                     applicable_contexts=[],
                     learned_optimizations=[],
                     confidence_score=0.0,
-                    last_updated=datetime.now().isoformat()
+                    last_updated=datetime.now().isoformat(),
                 )
 
             pattern = self.learning_patterns[pattern_id]
@@ -690,38 +693,40 @@ class LearningAccumulator:
         patterns_data = {}
         for pattern_id, pattern in self.learning_patterns.items():
             patterns_data[pattern_id] = {
-                'pattern_id': pattern.pattern_id,
-                'pattern_type': pattern.pattern_type,
-                'success_count': pattern.success_count,
-                'failure_count': pattern.failure_count,
-                'average_improvement': pattern.average_improvement,
-                'applicable_contexts': pattern.applicable_contexts,
-                'learned_optimizations': pattern.learned_optimizations,
-                'confidence_score': pattern.confidence_score,
-                'last_updated': pattern.last_updated,
-                'metadata': pattern.metadata
+                "pattern_id": pattern.pattern_id,
+                "pattern_type": pattern.pattern_type,
+                "success_count": pattern.success_count,
+                "failure_count": pattern.failure_count,
+                "average_improvement": pattern.average_improvement,
+                "applicable_contexts": pattern.applicable_contexts,
+                "learned_optimizations": pattern.learned_optimizations,
+                "confidence_score": pattern.confidence_score,
+                "last_updated": pattern.last_updated,
+                "metadata": pattern.metadata,
             }
 
-        with open(self.patterns_file, 'w') as f:
+        with open(self.patterns_file, "w") as f:
             json.dump(patterns_data, f, indent=2)
 
         # Save cycle memory
         cycles_data = []
         for cycle in self.cycle_memory[-100:]:  # Keep last 100 cycles
-            cycles_data.append({
-                'cycle_id': cycle.cycle_id,
-                'timestamp': cycle.timestamp,
-                'phase': cycle.phase,
-                'strategies_used': cycle.strategies_used,
-                'improvements_achieved': cycle.improvements_achieved,
-                'patterns_discovered': cycle.patterns_discovered,
-                'success_rate': cycle.success_rate,
-                'lessons_learned': cycle.lessons_learned,
-                'next_cycle_recommendations': cycle.next_cycle_recommendations,
-                'metadata': cycle.metadata
-            })
+            cycles_data.append(
+                {
+                    "cycle_id": cycle.cycle_id,
+                    "timestamp": cycle.timestamp,
+                    "phase": cycle.phase,
+                    "strategies_used": cycle.strategies_used,
+                    "improvements_achieved": cycle.improvements_achieved,
+                    "patterns_discovered": cycle.patterns_discovered,
+                    "success_rate": cycle.success_rate,
+                    "lessons_learned": cycle.lessons_learned,
+                    "next_cycle_recommendations": cycle.next_cycle_recommendations,
+                    "metadata": cycle.metadata,
+                }
+            )
 
-        with open(self.cycles_file, 'w') as f:
+        with open(self.cycles_file, "w") as f:
             json.dump(cycles_data, f, indent=2)
 
     def get_learned_patterns_for_context(self, context: str) -> List[LearningPattern]:
@@ -729,8 +734,7 @@ class LearningAccumulator:
         applicable_patterns = []
 
         for pattern in self.learning_patterns.values():
-            if (context in pattern.applicable_contexts and
-                pattern.confidence_score > 0.6):
+            if context in pattern.applicable_contexts and pattern.confidence_score > 0.6:
                 applicable_patterns.append(pattern)
 
         # Sort by confidence score
@@ -748,19 +752,22 @@ class SelfImprovingOptimizer:
         self.optimization_history: deque = deque(maxlen=1000)
 
         # AI integration for self-improvement
-        if LANGCHAIN_AVAILABLE:
-            self.improvement_llm = ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.2
-            )
+        if LANGCHAIN_AVAILABLE and os.getenv("OPENAI_API_KEY"):
+            try:
+                self.improvement_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+            except Exception as e:
+                logging.warning(f"Failed to initialize ChatOpenAI: {e}")
+                self.improvement_llm = None
         else:
             self.improvement_llm = None
+            if not os.getenv("OPENAI_API_KEY"):
+                logging.info("OPENAI_API_KEY not set, using mock improvement")
 
         self.logger = logging.getLogger(__name__)
 
-    async def optimize_with_learning(self, spectrum: str,
-                                   current_quality: float,
-                                   context: Dict[str, Any]) -> Dict[str, Any]:
+    async def optimize_with_learning(
+        self, spectrum: str, current_quality: float, context: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Optimize prompts using accumulated learning."""
         self.logger.info(f"🧠 Self-improving optimization for {spectrum}")
 
@@ -782,26 +789,23 @@ class SelfImprovingOptimizer:
 
     def _analyze_historical_optimizations(self, spectrum: str) -> Dict[str, Any]:
         """Analyze historical optimization attempts for this spectrum."""
-        spectrum_history = [
-            opt for opt in self.optimization_history
-            if opt.get('spectrum') == spectrum
-        ]
+        spectrum_history = [opt for opt in self.optimization_history if opt.get("spectrum") == spectrum]
 
         if not spectrum_history:
-            return {'no_history': True}
+            return {"no_history": True}
 
         # Analyze success patterns
-        successful_opts = [opt for opt in spectrum_history if opt.get('success', False)]
-        failed_opts = [opt for opt in spectrum_history if not opt.get('success', True)]
+        successful_opts = [opt for opt in spectrum_history if opt.get("success", False)]
+        failed_opts = [opt for opt in spectrum_history if not opt.get("success", True)]
 
         analysis = {
-            'total_attempts': len(spectrum_history),
-            'successful_attempts': len(successful_opts),
-            'success_rate': len(successful_opts) / len(spectrum_history),
-            'failure_rate': len(failed_opts) / len(spectrum_history),
-            'recent_attempts': spectrum_history[-5:],
-            'success_patterns': self._extract_success_patterns(successful_opts),
-            'failure_patterns': self._extract_failure_patterns(failed_opts)
+            "total_attempts": len(spectrum_history),
+            "successful_attempts": len(successful_opts),
+            "success_rate": len(successful_opts) / len(spectrum_history),
+            "failure_rate": len(failed_opts) / len(spectrum_history),
+            "recent_attempts": spectrum_history[-5:],
+            "success_patterns": self._extract_success_patterns(successful_opts),
+            "failure_patterns": self._extract_failure_patterns(failed_opts),
         }
 
         return analysis
@@ -810,7 +814,7 @@ class SelfImprovingOptimizer:
         """Extract patterns from successful optimizations."""
         patterns = []
         for opt in successful_opts:
-            strategy = opt.get('strategy', '')
+            strategy = opt.get("strategy", "")
             if strategy and strategy not in patterns:
                 patterns.append(strategy)
         return patterns
@@ -819,7 +823,7 @@ class SelfImprovingOptimizer:
         """Extract patterns from failed optimizations."""
         patterns = []
         for opt in failed_opts:
-            strategy = opt.get('strategy', '')
+            strategy = opt.get("strategy", "")
             if strategy and strategy not in patterns:
                 patterns.append(strategy)
         return patterns
@@ -830,7 +834,7 @@ class SelfImprovingOptimizer:
         current_quality: float,
         learned_patterns: List[LearningPattern],
         historical_context: Dict[str, Any],
-        context: Dict[str, Any]
+        context: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Generate optimization using accumulated learning."""
         optimization_start = time.time()
@@ -846,53 +850,49 @@ class SelfImprovingOptimizer:
 
             strategy = best_pattern.pattern_type
             expected_improvement = best_pattern.average_improvement
-        elif historical_context.get('success_rate', 0) > 0.7:
+        elif historical_context.get("success_rate", 0) > 0.7:
             # Use successful historical approach
-            strategy = 'pattern_reinforcement'
+            strategy = "pattern_reinforcement"
             expected_improvement = 0.03
         else:
             # Use conservative approach for uncertain cases
-            strategy = 'gradual_enhancement'
+            strategy = "gradual_enhancement"
             expected_improvement = 0.02
 
         # Generate optimized prompt using learning
-        optimized_prompt = await self._generate_prompt_with_learning(
-            spectrum, strategy, learned_patterns, context
-        )
+        optimized_prompt = await self._generate_prompt_with_learning(spectrum, strategy, learned_patterns, context)
 
         optimization_result = {
-            'spectrum': spectrum,
-            'strategy': strategy,
-            'optimized_prompt': optimized_prompt,
-            'expected_improvement': expected_improvement,
-            'confidence': best_pattern.confidence_score if best_pattern else 0.5,
-            'learning_applied': len(learned_patterns),
-            'optimization_time': time.time() - optimization_start,
-            'metadata': {
-                'historical_context': historical_context,
-                'learned_patterns_used': [p.pattern_id for p in learned_patterns[:3]],
-                'optimization_timestamp': datetime.now().isoformat()
-            }
+            "spectrum": spectrum,
+            "strategy": strategy,
+            "optimized_prompt": optimized_prompt,
+            "expected_improvement": expected_improvement,
+            "confidence": best_pattern.confidence_score if best_pattern else 0.5,
+            "learning_applied": len(learned_patterns),
+            "optimization_time": time.time() - optimization_start,
+            "metadata": {
+                "historical_context": historical_context,
+                "learned_patterns_used": [p.pattern_id for p in learned_patterns[:3]],
+                "optimization_timestamp": datetime.now().isoformat(),
+            },
         }
 
         return optimization_result
 
     async def _generate_prompt_with_learning(
-        self,
-        spectrum: str,
-        strategy: str,
-        learned_patterns: List[LearningPattern],
-        context: Dict[str, Any]
+        self, spectrum: str, strategy: str, learned_patterns: List[LearningPattern], context: Dict[str, Any]
     ) -> str:
         """Generate optimized prompt incorporating learning."""
         base_prompt = f"Analyze {spectrum} data for customer insights."
 
         if self.improvement_llm and learned_patterns:
             # Use AI with learning context
-            learning_context = "\n".join([
-                f"- {pattern.pattern_type}: {pattern.average_improvement:.1%} improvement"
-                for pattern in learned_patterns[:3]
-            ])
+            learning_context = "\n".join(
+                [
+                    f"- {pattern.pattern_type}: {pattern.average_improvement:.1%} improvement"
+                    for pattern in learned_patterns[:3]
+                ]
+            )
 
             prompt_template = f"""
 You are an expert prompt engineer with access to learning patterns.
@@ -914,7 +914,7 @@ Generate an optimized prompt that incorporates the successful patterns:
 
             try:
                 response = await self.improvement_llm.ainvoke(prompt_template)
-                if hasattr(response, 'content'):
+                if hasattr(response, "content"):
                     content = response.content
                     return content if isinstance(content, str) else str(content)
                 return str(response)
@@ -953,13 +953,13 @@ Provide comprehensive, accurate analysis with professional insights.
     def _record_optimization_attempt(self, spectrum: str, result: Dict[str, Any]):
         """Record optimization attempt for future learning."""
         attempt_record = {
-            'spectrum': spectrum,
-            'timestamp': datetime.now().isoformat(),
-            'strategy': result.get('strategy', ''),
-            'expected_improvement': result.get('expected_improvement', 0),
-            'confidence': result.get('confidence', 0),
-            'success': None,  # Will be updated when results are available
-            'metadata': result.get('metadata', {})
+            "spectrum": spectrum,
+            "timestamp": datetime.now().isoformat(),
+            "strategy": result.get("strategy", ""),
+            "expected_improvement": result.get("expected_improvement", 0),
+            "confidence": result.get("confidence", 0),
+            "success": None,  # Will be updated when results are available
+            "metadata": result.get("metadata", {}),
         }
 
         self.optimization_history.append(attempt_record)
@@ -976,45 +976,38 @@ class AutomatedImprovementDeployment:
 
         # Deployment thresholds
         self.min_improvement_threshold = 0.02  # 2% minimum improvement
-        self.confidence_threshold = 0.8        # 80% confidence required
-        self.validation_sample_size = 5        # Tests required for validation
+        self.confidence_threshold = 0.8  # 80% confidence required
+        self.validation_sample_size = 5  # Tests required for validation
 
         self.logger = logging.getLogger(__name__)
 
-    async def evaluate_deployment_readiness(
-        self,
-        optimization_results: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def evaluate_deployment_readiness(self, optimization_results: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate if optimization results are ready for deployment."""
-        spectrum = optimization_results.get('spectrum', '')
-        improvement = optimization_results.get('expected_improvement', 0)
-        confidence = optimization_results.get('confidence', 0)
+        spectrum = optimization_results.get("spectrum", "")
+        improvement = optimization_results.get("expected_improvement", 0)
+        confidence = optimization_results.get("confidence", 0)
 
         # Check deployment criteria
         meets_improvement = improvement >= self.min_improvement_threshold
         meets_confidence = confidence >= self.confidence_threshold
 
         deployment_decision = {
-            'ready_for_deployment': meets_improvement and meets_confidence,
-            'improvement_check': meets_improvement,
-            'confidence_check': meets_confidence,
-            'spectrum': spectrum,
-            'improvement': improvement,
-            'confidence': confidence,
-            'recommendation': self._generate_deployment_recommendation(
+            "ready_for_deployment": meets_improvement and meets_confidence,
+            "improvement_check": meets_improvement,
+            "confidence_check": meets_confidence,
+            "spectrum": spectrum,
+            "improvement": improvement,
+            "confidence": confidence,
+            "recommendation": self._generate_deployment_recommendation(
                 meets_improvement, meets_confidence, improvement, confidence
             ),
-            'timestamp': datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         return deployment_decision
 
     def _generate_deployment_recommendation(
-        self,
-        meets_improvement: bool,
-        meets_confidence: bool,
-        improvement: float,
-        confidence: float
+        self, meets_improvement: bool, meets_confidence: bool, improvement: float, confidence: float
     ) -> str:
         """Generate deployment recommendation."""
         if meets_improvement and meets_confidence:
@@ -1027,9 +1020,7 @@ class AutomatedImprovementDeployment:
             return f"REJECT - Both improvement ({improvement:.1%}) and confidence ({confidence:.1%}) below thresholds"
 
     async def deploy_optimization(
-        self,
-        optimization_results: Dict[str, Any],
-        target_system: str = "production"
+        self, optimization_results: Dict[str, Any], target_system: str = "production"
     ) -> Dict[str, Any]:
         """Deploy optimization to target system."""
         deployment_start = time.time()
@@ -1037,24 +1028,20 @@ class AutomatedImprovementDeployment:
         # Evaluate readiness
         readiness = await self.evaluate_deployment_readiness(optimization_results)
 
-        if not readiness['ready_for_deployment']:
-            return {
-                'deployed': False,
-                'reason': readiness['recommendation'],
-                'readiness_evaluation': readiness
-            }
+        if not readiness["ready_for_deployment"]:
+            return {"deployed": False, "reason": readiness["recommendation"], "readiness_evaluation": readiness}
 
         # Simulate deployment process
         deployment_result = {
-            'deployed': True,
-            'deployment_id': f"deploy_{int(time.time())}",
-            'spectrum': optimization_results.get('spectrum', ''),
-            'target_system': target_system,
-            'deployment_time': time.time() - deployment_start,
-            'optimized_prompt': optimization_results.get('optimized_prompt', ''),
-            'expected_improvement': optimization_results.get('expected_improvement', 0),
-            'timestamp': datetime.now().isoformat(),
-            'rollback_available': True
+            "deployed": True,
+            "deployment_id": f"deploy_{int(time.time())}",
+            "spectrum": optimization_results.get("spectrum", ""),
+            "target_system": target_system,
+            "deployment_time": time.time() - deployment_start,
+            "optimized_prompt": optimization_results.get("optimized_prompt", ""),
+            "expected_improvement": optimization_results.get("expected_improvement", 0),
+            "timestamp": datetime.now().isoformat(),
+            "rollback_available": True,
         }
 
         # Record deployment
@@ -1136,15 +1123,15 @@ class ContinuousImprovementOrchestrator:
         spectrums = self._get_monitored_spectrums()
 
         cycle_results = {
-            'cycle_id': cycle_id,
-            'timestamp': cycle_start.isoformat(),
-            'spectrums_monitored': len(spectrums),
-            'alerts_generated': 0,
-            'optimizations_triggered': 0,
-            'improvements_deployed': 0,
-            'alerts': [],
-            'optimizations': [],
-            'deployments': []
+            "cycle_id": cycle_id,
+            "timestamp": cycle_start.isoformat(),
+            "spectrums_monitored": len(spectrums),
+            "alerts_generated": 0,
+            "optimizations_triggered": 0,
+            "improvements_deployed": 0,
+            "alerts": [],
+            "optimizations": [],
+            "deployments": [],
         }
 
         # Monitor each spectrum
@@ -1155,16 +1142,14 @@ class ContinuousImprovementOrchestrator:
             for alert in alerts:
                 # Process alert
                 await self.alerting_system.process_alert(alert)
-                cycle_results['alerts'].append(alert.alert_id)
-                cycle_results['alerts_generated'] += 1
+                cycle_results["alerts"].append(alert.alert_id)
+                cycle_results["alerts_generated"] += 1
 
                 # Trigger optimization if needed
                 if alert.severity in [AlertSeverity.CRITICAL, AlertSeverity.HIGH]:
-                    optimization_triggered = await self._trigger_optimization(
-                        spectrum, alert, cycle_results
-                    )
+                    optimization_triggered = await self._trigger_optimization(spectrum, alert, cycle_results)
                     if optimization_triggered:
-                        cycle_results['optimizations_triggered'] += 1
+                        cycle_results["optimizations_triggered"] += 1
 
         # Record cycle
         self.improvement_cycles.append(cycle_results)
@@ -1186,19 +1171,18 @@ class ContinuousImprovementOrchestrator:
         # Default spectrums if no recent data
         if not spectrums:
             spectrums = {
-                'customer_profile', 'credit_analysis', 'transaction_history',
-                'call_center_operations', 'entity_relationship',
-                'geographic_analysis', 'temporal_analysis'
+                "customer_profile",
+                "credit_analysis",
+                "transaction_history",
+                "call_center_operations",
+                "entity_relationship",
+                "geographic_analysis",
+                "temporal_analysis",
             }
 
         return list(spectrums)
 
-    async def _trigger_optimization(
-        self,
-        spectrum: str,
-        alert: QualityAlert,
-        cycle_results: Dict[str, Any]
-    ) -> bool:
+    async def _trigger_optimization(self, spectrum: str, alert: QualityAlert, cycle_results: Dict[str, Any]) -> bool:
         """Trigger optimization for a spectrum based on alert."""
         # Check if optimization is already running
         if spectrum in self.active_optimizations:
@@ -1224,10 +1208,10 @@ class ContinuousImprovementOrchestrator:
         try:
             # Run self-improving optimization
             optimization_context = {
-                'alert': alert,
-                'current_quality': alert.current_quality,
-                'severity': alert.severity.value,
-                'trigger_reason': alert.message
+                "alert": alert,
+                "current_quality": alert.current_quality,
+                "severity": alert.severity.value,
+                "trigger_reason": alert.message,
             }
 
             optimization_result = await self.self_improving_optimizer.optimize_with_learning(
@@ -1235,25 +1219,23 @@ class ContinuousImprovementOrchestrator:
             )
 
             # Evaluate for deployment
-            deployment_decision = await self.deployment_system.evaluate_deployment_readiness(
-                optimization_result
-            )
+            deployment_decision = await self.deployment_system.evaluate_deployment_readiness(optimization_result)
 
             # Deploy if ready
-            if deployment_decision['ready_for_deployment']:
-                deployment_result = await self.deployment_system.deploy_optimization(
-                    optimization_result
-                )
-                cycle_results['deployments'].append(deployment_result)
-                cycle_results['improvements_deployed'] += 1
+            if deployment_decision["ready_for_deployment"]:
+                deployment_result = await self.deployment_system.deploy_optimization(optimization_result)
+                cycle_results["deployments"].append(deployment_result)
+                cycle_results["improvements_deployed"] += 1
 
                 self.logger.info(f"✅ Deployed improvement for {spectrum}")
 
-            cycle_results['optimizations'].append({
-                'spectrum': spectrum,
-                'optimization_result': optimization_result,
-                'deployment_decision': deployment_decision
-            })
+            cycle_results["optimizations"].append(
+                {
+                    "spectrum": spectrum,
+                    "optimization_result": optimization_result,
+                    "deployment_decision": deployment_decision,
+                }
+            )
 
             return True
 
@@ -1274,32 +1256,32 @@ class ContinuousImprovementOrchestrator:
         # Get all spectrums and their current quality
         spectrums = self._get_monitored_spectrums()
         healing_results = {
-            'cycle_id': cycle_id,
-            'timestamp': cycle_start.isoformat(),
-            'spectrums_analyzed': len(spectrums),
-            'healing_actions': [],
-            'improvements_achieved': {},
-            'learning_applied': 0
+            "cycle_id": cycle_id,
+            "timestamp": cycle_start.isoformat(),
+            "spectrums_analyzed": len(spectrums),
+            "healing_actions": [],
+            "improvements_achieved": {},
+            "learning_applied": 0,
         }
 
         for spectrum in spectrums:
             # Analyze spectrum health
             spectrum_health = await self._analyze_spectrum_health(spectrum)
 
-            if spectrum_health['needs_healing']:
+            if spectrum_health["needs_healing"]:
                 # Apply self-healing optimization
                 healing_action = await self._apply_self_healing(spectrum, spectrum_health)
-                healing_results['healing_actions'].append(healing_action)
+                healing_results["healing_actions"].append(healing_action)
 
-                if healing_action.get('improvement_achieved', 0) > 0:
-                    healing_results['improvements_achieved'][spectrum] = healing_action['improvement_achieved']
+                if healing_action.get("improvement_achieved", 0) > 0:
+                    healing_results["improvements_achieved"][spectrum] = healing_action["improvement_achieved"]
 
         # Record learning from healing cycle
         self.learning_accumulator.record_optimization_cycle(healing_results)
-        healing_results['learning_applied'] = len(self.learning_accumulator.learning_patterns)
+        healing_results["learning_applied"] = len(self.learning_accumulator.learning_patterns)
 
         cycle_duration = (datetime.now() - cycle_start).total_seconds()
-        healing_results['duration'] = cycle_duration
+        healing_results["duration"] = cycle_duration
 
         self.logger.info(f"✅ Self-healing cycle completed in {cycle_duration:.1f}s")
 
@@ -1311,26 +1293,26 @@ class ContinuousImprovementOrchestrator:
         recent_metrics = self.quality_collector.storage.get_spectrum_metrics(spectrum, limit=20)
 
         if not recent_metrics:
-            return {'needs_healing': False, 'reason': 'no_data'}
+            return {"needs_healing": False, "reason": "no_data"}
 
         scores = [m.score for m in recent_metrics]
         current_quality = sum(scores) / len(scores)
 
         # Calculate health indicators
         health_analysis = {
-            'spectrum': spectrum,
-            'current_quality': current_quality,
-            'measurement_count': len(scores),
-            'needs_healing': False,
-            'healing_priority': 'low',
-            'issues': []
+            "spectrum": spectrum,
+            "current_quality": current_quality,
+            "measurement_count": len(scores),
+            "needs_healing": False,
+            "healing_priority": "low",
+            "issues": [],
         }
 
         # Check for quality issues
         if current_quality < 0.90:
-            health_analysis['needs_healing'] = True
-            health_analysis['healing_priority'] = 'high' if current_quality < 0.85 else 'medium'
-            health_analysis['issues'].append('below_quality_threshold')
+            health_analysis["needs_healing"] = True
+            health_analysis["healing_priority"] = "high" if current_quality < 0.85 else "medium"
+            health_analysis["issues"].append("below_quality_threshold")
 
         # Check for variance issues
         if len(scores) >= 3:
@@ -1341,8 +1323,8 @@ class ContinuousImprovementOrchestrator:
                 variance = (sum((x - mean_score) ** 2 for x in scores) / len(scores)) ** 0.5
 
             if variance > 0.05:
-                health_analysis['needs_healing'] = True
-                health_analysis['issues'].append('high_variance')
+                health_analysis["needs_healing"] = True
+                health_analysis["issues"].append("high_variance")
 
         return health_analysis
 
@@ -1355,68 +1337,61 @@ class ContinuousImprovementOrchestrator:
 
         # Create healing context
         healing_context = {
-            'health_analysis': health_analysis,
-            'healing_priority': health_analysis['healing_priority'],
-            'issues': health_analysis['issues'],
-            'current_quality': health_analysis['current_quality']
+            "health_analysis": health_analysis,
+            "healing_priority": health_analysis["healing_priority"],
+            "issues": health_analysis["issues"],
+            "current_quality": health_analysis["current_quality"],
         }
 
         # Apply self-improving optimization
         optimization_result = await self.self_improving_optimizer.optimize_with_learning(
-            spectrum, health_analysis['current_quality'], healing_context
+            spectrum, health_analysis["current_quality"], healing_context
         )
 
         # Simulate testing the healing
-        healing_effectiveness = await self._test_healing_effectiveness(
-            spectrum, optimization_result
-        )
+        healing_effectiveness = await self._test_healing_effectiveness(spectrum, optimization_result)
 
         healing_action = {
-            'spectrum': spectrum,
-            'healing_strategy': optimization_result.get('strategy', ''),
-            'optimization_applied': True,
-            'improvement_achieved': healing_effectiveness.get('improvement', 0),
-            'healing_time': time.time() - healing_start,
-            'learned_patterns_used': len(learned_patterns),
-            'metadata': {
-                'health_issues': health_analysis['issues'],
-                'optimization_result': optimization_result,
-                'healing_effectiveness': healing_effectiveness
-            }
+            "spectrum": spectrum,
+            "healing_strategy": optimization_result.get("strategy", ""),
+            "optimization_applied": True,
+            "improvement_achieved": healing_effectiveness.get("improvement", 0),
+            "healing_time": time.time() - healing_start,
+            "learned_patterns_used": len(learned_patterns),
+            "metadata": {
+                "health_issues": health_analysis["issues"],
+                "optimization_result": optimization_result,
+                "healing_effectiveness": healing_effectiveness,
+            },
         }
 
         return healing_action
 
-    async def _test_healing_effectiveness(
-        self,
-        spectrum: str,
-        optimization_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _test_healing_effectiveness(self, spectrum: str, optimization_result: Dict[str, Any]) -> Dict[str, Any]:
         """Test the effectiveness of applied healing."""
         # Simulate testing the optimized prompt
         # In production, this would run actual tests
 
-        baseline_quality = optimization_result.get('metadata', {}).get('current_quality', 0.85)
-        expected_improvement = optimization_result.get('expected_improvement', 0.02)
+        baseline_quality = optimization_result.get("metadata", {}).get("current_quality", 0.85)
+        expected_improvement = optimization_result.get("expected_improvement", 0.02)
 
         # Simulate realistic improvement with some variance
         actual_improvement = expected_improvement * (0.8 + 0.4 * (time.time() % 1))
         new_quality = min(0.999, baseline_quality + actual_improvement)
 
         return {
-            'baseline_quality': baseline_quality,
-            'new_quality': new_quality,
-            'improvement': actual_improvement,
-            'effectiveness_score': actual_improvement / expected_improvement if expected_improvement > 0 else 1.0,
-            'test_timestamp': datetime.now().isoformat()
+            "baseline_quality": baseline_quality,
+            "new_quality": new_quality,
+            "improvement": actual_improvement,
+            "effectiveness_score": actual_improvement / expected_improvement if expected_improvement > 0 else 1.0,
+            "test_timestamp": datetime.now().isoformat(),
         }
 
 
 # Main execution function for testing
 async def main():
     """Main function to demonstrate Phase 3 continuous improvement."""
-    logging.basicConfig(level=logging.INFO,
-                       format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Initialize quality collector (mock for demo)
     if FRAMEWORKS_AVAILABLE:
@@ -1425,10 +1400,14 @@ async def main():
         # Mock quality collector for demo
         class MockQualityCollector:
             def __init__(self):
-                self.storage = type('MockStorage', (), {
-                    'get_spectrum_metrics': lambda self, spectrum, limit=10: [],
-                    'get_recent_metrics': lambda self, limit=100: []
-                })()
+                self.storage = type(
+                    "MockStorage",
+                    (),
+                    {
+                        "get_spectrum_metrics": lambda self, spectrum, limit=10: [],
+                        "get_recent_metrics": lambda self, limit=100: [],
+                    },
+                )()
 
         quality_collector = MockQualityCollector()
 
