@@ -458,8 +458,10 @@ class AdvancedABTesting:
         # Get experiment config from dataset
         examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "experiment_config", limit=1)
 
-        if examples:
-            return examples[0].get("experiment_config")
+        if examples and isinstance(examples, list) and len(examples) > 0:
+            first_example = examples[0]
+            if isinstance(first_example, dict):
+                return first_example.get("experiment_config")
 
         return None
 
