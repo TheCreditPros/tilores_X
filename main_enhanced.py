@@ -546,6 +546,26 @@ async def trigger_virtuous_cycle(request: Request):
         return {"success": False, "reason": f"Trigger failed: {str(e)}", "timestamp": datetime.utcnow().isoformat()}
 
 
+@app.get("/v1/virtuous-cycle/changes")
+@limiter.limit("100/minute")
+async def get_ai_changes_history(request: Request):
+    """Get AI change details for governance and rollback capabilities"""
+    try:
+        # Get query parameters
+        limit = int(request.query_params.get("limit", 20))
+        limit = min(50, max(1, limit))  # Clamp between 1 and 50
+
+        result = virtuous_cycle_manager.get_ai_changes_history(limit)
+        return result
+
+    except Exception as e:
+        return {
+            "recent_changes": [],
+            "summary": {"error": f"Failed to fetch AI changes: {str(e)}"},
+            "governance": {"rollback_available": False}
+        }
+
+
 @app.get("/v1")
 @limiter.limit("1000/minute")
 async def v1_root(request: Request):
