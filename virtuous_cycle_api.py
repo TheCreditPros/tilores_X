@@ -822,6 +822,17 @@ class VirtuousCycleManager:
             self.logger.error(f"Failed to get AI changes history: {e}")
             return {"recent_changes": [], "summary": {"error": str(e)}, "governance": {"rollback_available": False}}
 
+    def clear_ai_changes_history(self) -> Dict[str, Any]:
+        """Clear AI changes history to start fresh with detailed tracking."""
+        try:
+            old_count = len(self.ai_changes_history)
+            self.ai_changes_history = []
+            self.logger.info(f"🗑️ Cleared {old_count} AI changes from history - starting fresh with detailed tracking")
+            return {"success": True, "cleared_changes": old_count, "timestamp": datetime.now().isoformat()}
+        except Exception as e:
+            self.logger.error(f"Failed to clear AI changes history: {e}")
+            return {"success": False, "error": str(e)}
+
     def _get_last_successful_state(self) -> Optional[Dict[str, Any]]:
         """Get the last successful optimization state for rollback."""
         try:

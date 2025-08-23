@@ -565,6 +565,17 @@ async def get_ai_changes_history(request: Request):
             "governance": {"rollback_available": False},
         }
 
+@app.post("/v1/virtuous-cycle/clear-history")
+@limiter.limit("5/minute")  # Very restrictive for clearing history
+async def clear_ai_changes_history(request: Request):
+    """Clear AI changes history to start fresh with detailed tracking"""
+    try:
+        result = virtuous_cycle_manager.clear_ai_changes_history()
+        return result
+
+    except Exception as e:
+        return {"success": False, "error": f"Failed to clear history: {str(e)}"}
+
 
 @app.get("/v1")
 @limiter.limit("1000/minute")
