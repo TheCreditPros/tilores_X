@@ -836,3 +836,47 @@ This decision ensures the tilores_X system remains functional and prevents futur
 - Prevents regression through clear documentation and validation protocols
 
 This decision represents the successful completion of the critical tool calling regression resolution, achieving a fully functional state with both core customer service capabilities and advanced AI optimization systems working correctly.
+
+
+## [2025-08-23 14:28:00] - AI Change Details Detailed Configuration Tracking Implementation
+
+**Decision**: Successfully implemented detailed configuration tracking for AI Change Details section, resolving the critical issue where dashboard showed generic "1 identified" improvements instead of specific configuration changes.
+
+**Rationale**:
+- User feedback indicated that the AI Change Details section was not showing the granular details needed for governance and rollback
+- Dashboard displayed generic "Improvements: 1 identified" instead of specific system prompt changes, temperature adjustments, model switches, and timeout modifications
+- Governance and rollback capabilities required visibility into exact configuration changes with before/after values
+- Multiple attempts were needed to identify and fix the root cause where generic data was being used instead of detailed configuration changes
+
+**Implementation Details**:
+- **Root Cause Identified**: [`virtuous_cycle_api.py`](virtuous_cycle_api.py:554-618) was using `optimization_results.get("improvements_identified", [])` which contained generic data
+- **Critical Fix Applied**: Modified to use `detailed_changes` array containing specific configuration modifications with before/after values
+- **Enhanced Change Generation**: Added detailed configuration change generation for system prompts, temperature, model selection, and timeout adjustments
+- **Dashboard Component Enhancement**: [`dashboard/src/App.jsx`](dashboard/src/App.jsx:688-720) updated to display specific before/after configuration values
+- **API Infrastructure**: Added `/v1/virtuous-cycle/clear-history` endpoint for governance management
+
+**Technical Patterns Used**:
+- **Detailed Configuration Tracking Pattern**: Captures specific before/after values for system prompts, temperature, model selection, and timeout modifications
+- **Governance Data Structure Pattern**: Structured JSON format with type, component, before, after, reason, and impact fields
+- **Dashboard Integration Pattern**: Material-UI components displaying detailed configuration changes with color-coded before/after values
+- **API Management Pattern**: Clear history and trigger optimization endpoints for governance control
+
+**Key Components**:
+1. **Enhanced Change Tracking**: [`virtuous_cycle_api.py`](virtuous_cycle_api.py:554-618) generates detailed configuration changes for each optimization cycle
+2. **Dashboard Display**: [`dashboard/src/App.jsx`](dashboard/src/App.jsx:688-720) shows specific configuration changes with before/after values
+3. **API Integration**: [`dashboard/src/services/dataService.js`](dashboard/src/services/dataService.js:129-142) fetches detailed change data
+4. **Production Deployment**: Commit `d264a9b` successfully deployed with detailed configuration tracking
+
+**Quality Assurance**:
+- **API Validation**: Confirmed detailed configuration changes are captured in API response with specific before/after values
+- **Dashboard Integration**: Verified dashboard component displays detailed configuration modifications
+- **Production Testing**: Successfully tested with real optimization cycles showing specific system prompt changes
+- **Governance Compliance**: Complete audit trail with rollback capabilities and detailed change history
+
+**Impact**:
+- Resolves critical governance requirement for visibility into specific AI system modifications
+- Enables proper rollback capabilities with exact configuration details needed for emergency reversion
+- Provides complete transparency into Virtuous Cycle AI system decision-making and configuration changes
+- Establishes foundation for comprehensive AI system governance and operational safety
+
+This implementation represents the successful completion of detailed configuration tracking for AI Change Details, providing the granular governance and rollback capabilities essential for operational safety and compliance with AI system transparency requirements.
