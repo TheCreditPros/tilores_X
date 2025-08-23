@@ -565,6 +565,7 @@ async def get_ai_changes_history(request: Request):
             "governance": {"rollback_available": False},
         }
 
+
 @app.post("/v1/virtuous-cycle/clear-history")
 @limiter.limit("5/minute")  # Very restrictive for clearing history
 async def clear_ai_changes_history(request: Request):
@@ -575,6 +576,18 @@ async def clear_ai_changes_history(request: Request):
 
     except Exception as e:
         return {"success": False, "error": f"Failed to clear history: {str(e)}"}
+
+
+@app.post("/v1/virtuous-cycle/rollback")
+@limiter.limit("3/minute")  # Very restrictive for rollbacks
+async def rollback_to_last_good_state(request: Request, rollback_id: Optional[str] = None):
+    """Rollback to the last known good configuration state"""
+    try:
+        result = await virtuous_cycle_manager.rollback_to_last_good_state(rollback_id)
+        return result
+
+    except Exception as e:
+        return {"success": False, "error": f"Rollback failed: {str(e)}"}
 
 
 @app.get("/v1")

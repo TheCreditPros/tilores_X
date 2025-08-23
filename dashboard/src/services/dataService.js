@@ -145,6 +145,25 @@ export const fetchAIChangesHistory = async (limit = 20) => {
 };
 
 /**
+ * Trigger rollback to last good state
+ */
+export const triggerRollback = async (rollbackId = null) => {
+  try {
+    const response = await api.post("/v1/virtuous-cycle/rollback", null, {
+      params: rollbackId ? { rollback_id: rollbackId } : {}
+    });
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to trigger rollback:", error);
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message
+    };
+  }
+};
+
+/**
  * Fetch available models
  */
 export const fetchAvailableModels = async () => {

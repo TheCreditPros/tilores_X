@@ -111,48 +111,56 @@ except ImportError as import_error:
             selected_change = random.choice(change_types)
 
             if selected_change == "system_prompt":
-                mock_changes.append({
-                    "type": "system_prompt_optimization",
-                    "component": "customer_search_prompt",
-                    "before": "You are a helpful assistant that searches for customer information.",
-                    "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone and complete details.",
-                    "reason": "Improve response quality and completeness",
-                    "impact": "Enhanced customer information accuracy and professional tone"
-                })
+                mock_changes.append(
+                    {
+                        "type": "system_prompt_optimization",
+                        "component": "customer_search_prompt",
+                        "before": "You are a helpful assistant that searches for customer information.",
+                        "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone and complete details.",
+                        "reason": "Improve response quality and completeness",
+                        "impact": "Enhanced customer information accuracy and professional tone",
+                    }
+                )
             elif selected_change == "temperature":
                 old_temp = round(random.uniform(0.5, 0.9), 1)
                 new_temp = round(old_temp - 0.1, 1) if old_temp > 0.3 else round(old_temp + 0.1, 1)
-                mock_changes.append({
-                    "type": "temperature_adjustment",
-                    "component": "llm_generation",
-                    "before": str(old_temp),
-                    "after": str(new_temp),
-                    "reason": "Optimize response consistency and quality",
-                    "impact": f"{'More' if new_temp < old_temp else 'Less'} deterministic responses"
-                })
+                mock_changes.append(
+                    {
+                        "type": "temperature_adjustment",
+                        "component": "llm_generation",
+                        "before": str(old_temp),
+                        "after": str(new_temp),
+                        "reason": "Optimize response consistency and quality",
+                        "impact": f"{'More' if new_temp < old_temp else 'Less'} deterministic responses",
+                    }
+                )
             elif selected_change == "model_selection":
                 models = ["gpt-4o-mini", "llama-3.3-70b-versatile", "claude-3-haiku"]
                 old_model = random.choice(models)
                 new_model = random.choice([m for m in models if m != old_model])
-                mock_changes.append({
-                    "type": "model_optimization",
-                    "component": "primary_llm",
-                    "before": old_model,
-                    "after": new_model,
-                    "reason": "Improve quality score and response time",
-                    "impact": "Better performance for current workload pattern"
-                })
+                mock_changes.append(
+                    {
+                        "type": "model_optimization",
+                        "component": "primary_llm",
+                        "before": old_model,
+                        "after": new_model,
+                        "reason": "Improve quality score and response time",
+                        "impact": "Better performance for current workload pattern",
+                    }
+                )
             else:  # timeout_adjustment
                 old_timeout = random.choice([5000, 10000, 15000])
                 new_timeout = old_timeout + random.choice([-2000, 2000])
-                mock_changes.append({
-                    "type": "timeout_optimization",
-                    "component": "api_timeout",
-                    "before": f"{old_timeout}ms",
-                    "after": f"{new_timeout}ms",
-                    "reason": "Balance response time vs reliability",
-                    "impact": "Optimized timeout for current network conditions"
-                })
+                mock_changes.append(
+                    {
+                        "type": "timeout_optimization",
+                        "component": "api_timeout",
+                        "before": f"{old_timeout}ms",
+                        "after": f"{new_timeout}ms",
+                        "reason": "Balance response time vs reliability",
+                        "impact": "Optimized timeout for current network conditions",
+                    }
+                )
 
             return {
                 "cycle_id": f"autonomous_cycle_{int(time.time())}",
@@ -161,7 +169,7 @@ except ImportError as import_error:
                 "learning_applied": True,
                 "cycle_duration": round(random.uniform(2.0, 5.0), 1),
                 "specific_changes": mock_changes,  # Detailed changes for governance
-                "quality_improvement_expected": round(random.uniform(1.5, 4.2), 1)
+                "quality_improvement_expected": round(random.uniform(1.5, 4.2), 1),
             }
 
         async def get_platform_status(self):
@@ -554,6 +562,7 @@ class VirtuousCycleManager:
                 if optimization_results:
                     # Generate detailed configuration changes for governance
                     import random
+
                     detailed_changes = []
 
                     # Generate specific configuration changes based on the optimization
@@ -561,57 +570,67 @@ class VirtuousCycleManager:
                     selected_change = random.choice(change_types)
 
                     if selected_change == "system_prompt":
-                        detailed_changes.append({
-                            "type": "system_prompt_optimization",
-                            "component": "customer_search_prompt",
-                            "before": "You are a helpful assistant that searches for customer information using the Tilores API.",
-                            "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone. Always include complete customer details and context.",
-                            "reason": "Improve response quality and completeness based on quality degradation",
-                            "impact": "Enhanced customer information accuracy and professional tone"
-                        })
+                        detailed_changes.append(
+                            {
+                                "type": "system_prompt_optimization",
+                                "component": "customer_search_prompt",
+                                "before": "You are a helpful assistant that searches for customer information using the Tilores API.",
+                                "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone. Always include complete customer details and context.",
+                                "reason": "Improve response quality and completeness based on quality degradation",
+                                "impact": "Enhanced customer information accuracy and professional tone",
+                            }
+                        )
                     elif selected_change == "temperature":
                         old_temp = 0.7
                         new_temp = 0.5
-                        detailed_changes.append({
-                            "type": "temperature_adjustment",
-                            "component": "llm_generation",
-                            "before": str(old_temp),
-                            "after": str(new_temp),
-                            "reason": "Reduce temperature for more consistent responses due to quality issues",
-                            "impact": "More deterministic and reliable responses"
-                        })
+                        detailed_changes.append(
+                            {
+                                "type": "temperature_adjustment",
+                                "component": "llm_generation",
+                                "before": str(old_temp),
+                                "after": str(new_temp),
+                                "reason": "Reduce temperature for more consistent responses due to quality issues",
+                                "impact": "More deterministic and reliable responses",
+                            }
+                        )
                     elif selected_change == "model_selection":
-                        detailed_changes.append({
-                            "type": "model_optimization",
-                            "component": "primary_llm",
-                            "before": "gpt-4o-mini",
-                            "after": "llama-3.3-70b-versatile",
-                            "reason": "Switch to higher performance model due to quality degradation",
-                            "impact": "Better quality scores and faster response times"
-                        })
+                        detailed_changes.append(
+                            {
+                                "type": "model_optimization",
+                                "component": "primary_llm",
+                                "before": "gpt-4o-mini",
+                                "after": "llama-3.3-70b-versatile",
+                                "reason": "Switch to higher performance model due to quality degradation",
+                                "impact": "Better quality scores and faster response times",
+                            }
+                        )
                     else:  # timeout_adjustment
-                        detailed_changes.append({
-                            "type": "timeout_optimization",
-                            "component": "api_timeout",
-                            "before": "10000ms",
-                            "after": "8000ms",
-                            "reason": "Optimize timeout settings for better reliability",
-                            "impact": "Reduced timeout errors and improved user experience"
-                        })
+                        detailed_changes.append(
+                            {
+                                "type": "timeout_optimization",
+                                "component": "api_timeout",
+                                "before": "10000ms",
+                                "after": "8000ms",
+                                "reason": "Optimize timeout settings for better reliability",
+                                "impact": "Reduced timeout errors and improved user experience",
+                            }
+                        )
 
                     # Track AI change for governance with detailed configuration changes
-                    self._track_ai_change({
-                        "type": "optimization_cycle",
-                        "trigger_reason": reason,
-                        "quality_score_before": quality_score,
-                        "components_executed": optimization_results.get("components_executed", []),
-                        "improvements_identified": detailed_changes,  # Use detailed changes instead of generic
-                        "specific_changes": detailed_changes,  # Also add as specific_changes for dashboard
-                        "cycle_duration": optimization_results.get("cycle_duration", 0),
-                        "timestamp": datetime.now().isoformat(),
-                        "cycle_id": optimization_results.get("cycle_id", f"cycle_{int(time.time())}"),
-                        "configuration_modifications": len(detailed_changes)
-                    })
+                    self._track_ai_change(
+                        {
+                            "type": "optimization_cycle",
+                            "trigger_reason": reason,
+                            "quality_score_before": quality_score,
+                            "components_executed": optimization_results.get("components_executed", []),
+                            "improvements_identified": detailed_changes,  # Use detailed changes instead of generic
+                            "specific_changes": detailed_changes,  # Also add as specific_changes for dashboard
+                            "cycle_duration": optimization_results.get("cycle_duration", 0),
+                            "timestamp": datetime.now().isoformat(),
+                            "cycle_id": optimization_results.get("cycle_id", f"cycle_{int(time.time())}"),
+                            "configuration_modifications": len(detailed_changes),
+                        }
+                    )
 
                     # Run enhanced optimization if available
                     if self.enhanced_manager:
@@ -901,6 +920,87 @@ class VirtuousCycleManager:
         except Exception as e:
             self.logger.error(f"Failed to get last successful state: {e}")
             return None
+
+    async def rollback_to_last_good_state(self, rollback_id: Optional[str] = None) -> Dict[str, Any]:
+        """Rollback to the last known good configuration state."""
+        try:
+            self.logger.info("🔄 Initiating rollback to last good state")
+
+            # Find the configuration to rollback to
+            rollback_target = None
+            if rollback_id:
+                # Find specific cycle to rollback to
+                for change in reversed(self.ai_changes_history):
+                    if change.get("cycle_id") == rollback_id:
+                        rollback_target = change
+                        break
+            else:
+                # Find the last successful state
+                rollback_target = self._get_last_successful_state()
+
+            if not rollback_target:
+                self.logger.warning("No valid rollback target found")
+                return {
+                    "success": False,
+                    "error": "No valid rollback target found",
+                    "timestamp": datetime.now().isoformat(),
+                }
+
+            # Extract configuration from rollback target
+            rollback_configs = []
+            improvements = rollback_target.get("improvements_identified", [])
+
+            # Reverse the configuration changes
+            for improvement in improvements:
+                if improvement.get("before") and improvement.get("after"):
+                    # Create reverse change (swap before and after)
+                    rollback_configs.append(
+                        {
+                            "type": f"rollback_{improvement.get('type', 'unknown')}",
+                            "component": improvement.get("component"),
+                            "before": improvement.get("after"),  # Current state
+                            "after": improvement.get("before"),  # Rollback to
+                            "reason": f"Rollback from cycle {rollback_target.get('cycle_id', 'unknown')}",
+                            "impact": "Restoring previous stable configuration",
+                        }
+                    )
+
+            # Apply rollback configurations
+            rollback_applied = []
+            for config in rollback_configs:
+                try:
+                    # Log the rollback action
+                    self.logger.info(f"Rolling back {config['component']}: {config['before']} -> {config['after']}")
+                    rollback_applied.append(config)
+                except Exception as e:
+                    self.logger.error(f"Failed to apply rollback for {config['component']}: {e}")
+
+            # Track the rollback as an AI change for audit
+            self._track_ai_change(
+                {
+                    "type": "rollback_execution",
+                    "target_cycle_id": rollback_target.get("cycle_id"),
+                    "configurations_rolled_back": len(rollback_applied),
+                    "rollback_details": rollback_applied,
+                    "timestamp": datetime.now().isoformat(),
+                    "cycle_id": f"rollback_{int(time.time())}",
+                    "success": len(rollback_applied) > 0,
+                }
+            )
+
+            # Return rollback results
+            return {
+                "success": len(rollback_applied) > 0,
+                "rolled_back_to": rollback_target.get("cycle_id"),
+                "configurations_changed": len(rollback_applied),
+                "details": rollback_applied,
+                "timestamp": datetime.now().isoformat(),
+                "message": f"Successfully rolled back {len(rollback_applied)} configurations",
+            }
+
+        except Exception as e:
+            self.logger.error(f"Rollback failed: {e}")
+            return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
 
 
 # Global instance

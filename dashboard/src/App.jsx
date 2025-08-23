@@ -579,6 +579,32 @@ function EnhancedMUIDashboard() {
   // AI Change Details Component for Governance and Rollback
   const AIChangeDetails = ({ changesData, loading: changesLoading }) => {
     const [expanded, setExpanded] = useState(false);
+    const [isRollingBack, setIsRollingBack] = useState(false);
+    const [rollbackResult, setRollbackResult] = useState(null);
+
+    const handleRollback = async () => {
+      if (window.confirm('Are you sure you want to rollback to the last good state? This will reverse recent AI configuration changes.')) {
+        setIsRollingBack(true);
+        setRollbackResult(null);
+
+        try {
+          const result = await dataService.triggerRollback();
+          setRollbackResult(result);
+
+          if (result.success) {
+            // Refresh the dashboard data after successful rollback
+            window.location.reload();
+          } else {
+            alert(`Rollback failed: ${result.error || 'Unknown error'}`);
+          }
+        } catch (error) {
+          console.error('Rollback error:', error);
+          alert('Failed to perform rollback. Please check the console for details.');
+        } finally {
+          setIsRollingBack(false);
+        }
+      }
+    };
 
     if (changesLoading) {
       return (
@@ -606,11 +632,24 @@ function EnhancedMUIDashboard() {
           title="🤖 AI Change Details - Governance & Rollback"
           action={
             <Stack direction="row" spacing={1} alignItems="center">
-              <Chip
-                label={governance.rollback_available ? "Rollback Available" : "No Rollback"}
-                color={governance.rollback_available ? "success" : "default"}
-                size="small"
-              />
+              {governance.rollback_available ? (
+                <Button
+                  variant="contained"
+                  color="warning"
+                  size="small"
+                  onClick={handleRollback}
+                  disabled={isRollingBack}
+                  startIcon={isRollingBack ? <CircularProgress size={16} /> : null}
+                >
+                  {isRollingBack ? "Rolling Back..." : "Rollback Available"}
+                </Button>
+              ) : (
+                <Chip
+                  label="No Rollback"
+                  color="default"
+                  size="small"
+                />
+              )}
               <IconButton
                 size="small"
                 onClick={() => setExpanded(!expanded)}
