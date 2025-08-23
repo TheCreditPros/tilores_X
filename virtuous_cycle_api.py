@@ -246,6 +246,10 @@ class VirtuousCycleManager:
             "last_update": datetime.now().isoformat(),
         }
 
+        # AI Change Details tracking for governance and rollback
+        self.ai_changes_history = []
+        self.max_changes_history = 50  # Keep last 50 changes
+
         # Initialize autonomous AI platform components
         self.autonomous_platform = None
         self.enhanced_manager = None
@@ -495,6 +499,18 @@ class VirtuousCycleManager:
                 optimization_results = await self._run_autonomous_optimization()
 
                 if optimization_results:
+                    # Track AI change for governance
+                    self._track_ai_change({
+                        "type": "optimization_cycle",
+                        "trigger_reason": reason,
+                        "quality_score_before": quality_score,
+                        "components_executed": optimization_results.get("components_executed", []),
+                        "improvements_identified": optimization_results.get("improvements_identified", []),
+                        "cycle_duration": optimization_results.get("cycle_duration", 0),
+                        "timestamp": datetime.now().isoformat(),
+                        "cycle_id": optimization_results.get("cycle_id", f"cycle_{int(time.time())}")
+                    })
+
                     # Run enhanced optimization if available
                     if self.enhanced_manager:
                         await self._run_enhanced_optimization(optimization_results)
@@ -504,6 +520,14 @@ class VirtuousCycleManager:
 
         except Exception as e:
             self.logger.error(f"Optimization cycle failed: {e}")
+            # Track failed optimization for governance
+            self._track_ai_change({
+                "type": "optimization_failure",
+                "trigger_reason": reason,
+                "error": str(e),
+                "timestamp": datetime.now().isoformat(),
+                "cycle_id": f"failed_cycle_{int(time.time())}"
+            })
 
     async def _run_autonomous_optimization(self) -> Optional[Dict[str, Any]]:
         """Run autonomous AI optimization cycle."""
@@ -674,6 +698,86 @@ class VirtuousCycleManager:
 
         except Exception as e:
             return {"success": False, "reason": f"Optimization failed: {str(e)}"}
+
+    def _track_ai_change(self, change_details: Dict[str, Any]):
+        """Track AI changes for governance and rollback capabilities."""
+        try:
+            # Add timestamp if not present
+            if "timestamp" not in change_details:
+                change_details["timestamp"] = datetime.now().isoformat()
+
+            # Add unique ID for tracking
+            change_details["change_id"] = f"change_{int(time.time())}_{len(self.ai_changes_history)}"
+
+            # Add to history
+            self.ai_changes_history.append(change_details)
+
+            # Maintain max history size
+            if len(self.ai_changes_history) > self.max_changes_history:
+                self.ai_changes_history = self.ai_changes_history[-self.max_changes_history:]
+
+            self.logger.info(f"📝 Tracked AI change: {change_details.get('type', 'unknown')} - {change_details.get('change_id')}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to track AI change: {e}")
+
+    def get_ai_changes_history(self, limit: int = 20) -> Dict[str, Any]:
+        """Get recent AI changes for governance and rollback."""
+        try:
+            # Get recent changes (most recent first)
+            recent_changes = list(reversed(self.ai_changes_history[-limit:]))
+
+            # Calculate summary statistics
+            total_changes = len(self.ai_changes_history)
+            optimization_cycles = len([c for c in self.ai_changes_history if c.get("type") == "optimization_cycle"])
+            failed_optimizations = len([c for c in self.ai_changes_history if c.get("type") == "optimization_failure"])
+
+            return {
+                "recent_changes": recent_changes,
+                "summary": {
+                    "total_changes_tracked": total_changes,
+                    "optimization_cycles_completed": optimization_cycles,
+                    "failed_optimizations": failed_optimizations,
+                    "success_rate": f"{((optimization_cycles / max(1, optimization_cycles + failed_optimizations)) * 100):.1f}%" if (optimization_cycles + failed_optimizations) > 0 else "N/A",
+                    "last_change": self.ai_changes_history[-1]["timestamp"] if self.ai_changes_history else None,
+                    "monitoring_active": self.monitoring_active,
+                    "current_quality": f"{(self.metrics['current_quality'] * 100):.1f}%" if self.metrics['current_quality'] > 0 else "N/A"
+                },
+                "governance": {
+                    "rollback_available": total_changes > 0,
+                    "last_known_good_state": self._get_last_successful_state(),
+                    "quality_threshold": f"{(self.quality_threshold * 100):.0f}%",
+                    "auto_optimization_enabled": self.monitoring_active
+                }
+            }
+
+        except Exception as e:
+            self.logger.error(f"Failed to get AI changes history: {e}")
+            return {
+                "recent_changes": [],
+                "summary": {"error": str(e)},
+                "governance": {"rollback_available": False}
+            }
+
+    def _get_last_successful_state(self) -> Optional[Dict[str, Any]]:
+        """Get the last successful optimization state for rollback."""
+        try:
+            # Find the most recent successful optimization
+            for change in reversed(self.ai_changes_history):
+                if (change.get("type") == "optimization_cycle" and
+                    change.get("improvements_identified") and
+                    len(change.get("improvements_identified", [])) > 0):
+                    return {
+                        "cycle_id": change.get("cycle_id"),
+                        "timestamp": change.get("timestamp"),
+                        "quality_score": change.get("quality_score_before"),
+                        "improvements": len(change.get("improvements_identified", [])),
+                        "components": change.get("components_executed", [])
+                    }
+            return None
+        except Exception as e:
+            self.logger.error(f"Failed to get last successful state: {e}")
+            return None
 
 
 # Global instance

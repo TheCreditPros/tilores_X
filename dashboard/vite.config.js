@@ -5,9 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/v1": "http://localhost:8080",
-      "/health": "http://localhost:8080",
-      "/metrics": "http://localhost:8080",
+      "/v1": "http://localhost:8000",
+      "/health": "http://localhost:8000",
+      "/metrics": "http://localhost:8000",
     },
   },
 });

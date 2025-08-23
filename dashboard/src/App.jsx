@@ -54,6 +54,7 @@ import {
 // Import data service
 import {
   fetchVirtuousCycleStatus,
+  fetchAIChangesHistory,
   transformToDashboardData,
 } from "./services/dataService";
 
@@ -78,6 +79,8 @@ function EnhancedMUIDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [aiChangesData, setAiChangesData] = useState(null);
+  const [aiChangesLoading, setAiChangesLoading] = useState(false);
 
   // --- Data Fetching ---
   const fetchData = async () => {
@@ -99,12 +102,35 @@ function EnhancedMUIDashboard() {
     }
   };
 
+  // --- AI Changes Data Fetching ---
+  const fetchAIChanges = async () => {
+    try {
+      setAiChangesLoading(true);
+      const changesData = await fetchAIChangesHistory(10); // Get last 10 changes
+      setAiChangesData(changesData);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("AI changes fetch failed:", err);
+      setAiChangesData({
+        recent_changes: [],
+        summary: { error: err.message },
+        governance: { rollback_available: false }
+      });
+    } finally {
+      setAiChangesLoading(false);
+    }
+  };
+
   // Initial data load and periodic refresh
   useEffect(() => {
     fetchData();
+    fetchAIChanges();
 
     // Refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(() => {
+      fetchData();
+      fetchAIChanges();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -550,6 +576,177 @@ function EnhancedMUIDashboard() {
     </Card>
   );
 
+  // AI Change Details Component for Governance and Rollback
+  const AIChangeDetails = ({ changesData, loading: changesLoading }) => {
+    const [expanded, setExpanded] = useState(false);
+
+    if (changesLoading) {
+      return (
+        <Card sx={{ mt: 3 }}>
+          <CardHeader title="🤖 AI Change Details - Governance & Rollback" />
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <CircularProgress size={20} />
+              <Typography variant="body2" color="text.secondary">
+                Loading AI changes...
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    const changes = changesData?.recent_changes || [];
+    const summary = changesData?.summary || {};
+    const governance = changesData?.governance || {};
+
+    return (
+      <Card sx={{ mt: 3 }}>
+        <CardHeader
+          title="🤖 AI Change Details - Governance & Rollback"
+          action={
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={governance.rollback_available ? "Rollback Available" : "No Rollback"}
+                color={governance.rollback_available ? "success" : "default"}
+                size="small"
+              />
+              <IconButton
+                size="small"
+                onClick={() => setExpanded(!expanded)}
+                sx={{
+                  transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.3s',
+                }}
+              >
+                <ExpandMore />
+              </IconButton>
+            </Stack>
+          }
+        />
+        <CardContent>
+          {/* Summary Stats */}
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item xs={3}>
+              <Typography variant="caption" color="text.secondary">Total Changes</Typography>
+              <Typography variant="h6">{summary.total_changes_tracked || 0}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="caption" color="text.secondary">Success Rate</Typography>
+              <Typography variant="h6" color="success.main">{summary.success_rate || "N/A"}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="caption" color="text.secondary">Quality Threshold</Typography>
+              <Typography variant="h6">{governance.quality_threshold || "90%"}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="caption" color="text.secondary">Auto-Optimization</Typography>
+              <Typography variant="h6" color={governance.auto_optimization_enabled ? "success.main" : "warning.main"}>
+                {governance.auto_optimization_enabled ? "Enabled" : "Disabled"}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Recent Changes */}
+          <Collapse in={expanded}>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                📋 Recent AI Changes & Optimizations
+              </Typography>
+              {changes.length > 0 ? (
+                <Stack spacing={1}>
+                  {changes.map((change, idx) => (
+                    <Paper key={idx} sx={{ p: 2, bgcolor: "background.default" }}>
+                      <Stack spacing={1}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body2" fontWeight={600}>
+                            {change.type === "optimization_cycle" ? "🔧 Optimization Cycle" :
+                             change.type === "optimization_failure" ? "❌ Optimization Failed" :
+                             "🔄 AI Change"}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(change.timestamp).toLocaleString()}
+                          </Typography>
+                        </Stack>
+
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Trigger:</strong> {change.trigger_reason || "Unknown"}
+                        </Typography>
+
+                        {change.quality_score_before && (
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Quality Before:</strong> {(change.quality_score_before * 100).toFixed(1)}%
+                          </Typography>
+                        )}
+
+                        {change.components_executed && change.components_executed.length > 0 && (
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Components:</strong> {change.components_executed.join(", ")}
+                          </Typography>
+                        )}
+
+                        {change.improvements_identified && change.improvements_identified.length > 0 && (
+                          <Typography variant="body2" color="success.main">
+                            <strong>Improvements:</strong> {change.improvements_identified.length} identified
+                          </Typography>
+                        )}
+
+                        {change.error && (
+                          <Typography variant="body2" color="error.main">
+                            <strong>Error:</strong> {change.error}
+                          </Typography>
+                        )}
+
+                        <Typography variant="caption" color="text.secondary">
+                          ID: {change.change_id || change.cycle_id || "Unknown"}
+                        </Typography>
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
+              ) : (
+                <Alert severity="info">
+                  <Typography variant="body2">
+                    No AI changes recorded yet. The system will track optimization cycles, improvements, and changes here for governance and rollback purposes.
+                  </Typography>
+                </Alert>
+              )}
+
+              {/* Governance Information */}
+              {governance.last_known_good_state && (
+                <Box sx={{ mt: 2, p: 2, bgcolor: "success.light", borderRadius: 1 }}>
+                  <Typography variant="subtitle2" fontWeight={600} gutterBottom color="success.contrastText">
+                    🛡️ Last Known Good State (Rollback Point)
+                  </Typography>
+                  <Typography variant="body2" color="success.contrastText">
+                    <strong>Cycle ID:</strong> {governance.last_known_good_state.cycle_id}
+                  </Typography>
+                  <Typography variant="body2" color="success.contrastText">
+                    <strong>Quality:</strong> {(governance.last_known_good_state.quality_score * 100).toFixed(1)}%
+                  </Typography>
+                  <Typography variant="body2" color="success.contrastText">
+                    <strong>Improvements:</strong> {governance.last_known_good_state.improvements}
+                  </Typography>
+                  <Typography variant="caption" color="success.contrastText">
+                    {new Date(governance.last_known_good_state.timestamp).toLocaleString()}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Collapse>
+
+          {summary.error && (
+            <Alert severity="warning" sx={{ mt: 1 }}>
+              <Typography variant="body2">
+                AI Changes API: {summary.error}
+              </Typography>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -819,6 +1016,9 @@ function EnhancedMUIDashboard() {
             </Card>
           </Grid>
         </Grid>
+
+        {/* AI Change Details Section for Governance and Rollback */}
+        <AIChangeDetails changesData={aiChangesData} loading={aiChangesLoading} />
 
         {/* Version Footer */}
         <Box sx={{ mt: 4, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>

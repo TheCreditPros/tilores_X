@@ -127,6 +127,24 @@ export const fetchLangSmithProjectsHealth = async () => {
 };
 
 /**
+ * Fetch AI changes history for governance and rollback
+ */
+export const fetchAIChangesHistory = async (limit = 20) => {
+  try {
+    const response = await api.get(`/v1/virtuous-cycle/changes?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to fetch AI changes history:", error);
+    return {
+      recent_changes: [],
+      summary: { error: `AI changes unavailable: ${error.message}` },
+      governance: { rollback_available: false }
+    };
+  }
+};
+
+/**
  * Fetch available models
  */
 export const fetchAvailableModels = async () => {
@@ -360,5 +378,6 @@ export default {
   fetchAutonomousAIMetrics,
   fetchMonitoringAlerts,
   fetchLangSmithProjectsHealth,
+  fetchAIChangesHistory,
   transformToDashboardData,
 };
