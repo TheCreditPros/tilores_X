@@ -562,7 +562,7 @@ async def get_ai_changes_history(request: Request):
         return {
             "recent_changes": [],
             "summary": {"error": f"Failed to fetch AI changes: {str(e)}"},
-            "governance": {"rollback_available": False}
+            "governance": {"rollback_available": False},
         }
 
 

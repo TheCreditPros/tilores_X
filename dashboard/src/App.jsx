@@ -686,9 +686,50 @@ function EnhancedMUIDashboard() {
                         )}
 
                         {change.improvements_identified && change.improvements_identified.length > 0 && (
-                          <Typography variant="body2" color="success.main">
-                            <strong>Improvements:</strong> {change.improvements_identified.length} identified
-                          </Typography>
+                          <Box>
+                            <Typography variant="body2" color="success.main" fontWeight={600}>
+                              <strong>Improvements:</strong> {change.improvements_identified.length} identified
+                            </Typography>
+                            {/* Show detailed changes if available */}
+                            {change.specific_changes && change.specific_changes.length > 0 && (
+                              <Box sx={{ mt: 1, ml: 2 }}>
+                                {change.specific_changes.map((specificChange, changeIdx) => (
+                                  <Paper key={changeIdx} sx={{ p: 1.5, mt: 1, bgcolor: "action.hover" }}>
+                                    <Typography variant="body2" fontWeight={600} color="primary.main">
+                                      {specificChange.type === "system_prompt_optimization" ? "🔧 System Prompt" :
+                                       specificChange.type === "temperature_adjustment" ? "🌡️ Temperature" :
+                                       specificChange.type === "model_optimization" ? "🤖 Model Selection" :
+                                       specificChange.type === "timeout_optimization" ? "⏱️ Timeout" :
+                                       "⚙️ Configuration"} Change
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                      <strong>Component:</strong> {specificChange.component}
+                                    </Typography>
+                                    {specificChange.before && specificChange.after && (
+                                      <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="error.main">
+                                          <strong>Before:</strong> {specificChange.before.length > 100 ?
+                                            `${specificChange.before.substring(0, 100)}...` :
+                                            specificChange.before}
+                                        </Typography>
+                                        <Typography variant="body2" color="success.main">
+                                          <strong>After:</strong> {specificChange.after.length > 100 ?
+                                            `${specificChange.after.substring(0, 100)}...` :
+                                            specificChange.after}
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                      <strong>Reason:</strong> {specificChange.reason}
+                                    </Typography>
+                                    <Typography variant="body2" color="info.main" sx={{ mt: 0.5 }}>
+                                      <strong>Impact:</strong> {specificChange.impact}
+                                    </Typography>
+                                  </Paper>
+                                ))}
+                              </Box>
+                            )}
+                          </Box>
                         )}
 
                         {change.error && (
