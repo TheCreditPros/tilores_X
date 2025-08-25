@@ -31,4 +31,4 @@ cmds = [
 ]
 
 [start]
-cmd = "python main_autonomous_production.py"
+cmd = "python main_enhanced.py"
