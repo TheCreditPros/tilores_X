@@ -1,0 +1,31 @@
+--- a/server/utils/helpers/updateENV.js
++++ b/server/utils/helpers/updateENV.js
+@@
+-  await logChangesToEventLog(newValues, userId);
+-  if (process.env.NODE_ENV === "production") dumpENV();
+-  return { newValues, error: error?.length > 0 ? error : false };
++  await logChangesToEventLog(newValues, userId);
++
++  // Guard .env dump in production behind an explicit flag to avoid
++  // accidental writes in containerized or multi-instance deployments.
++  // To enable (not recommended by default), set ALLOW_ENV_DUMP=true
++  // in the environment of a single, controlled operator instance.
++  try {
++    const allowDump = String(process.env.ALLOW_ENV_DUMP || "false").toLowerCase();
++    if (process.env.NODE_ENV === "production" && allowDump === "true") {
++      console.warn(
++        `ENV dump allowed: writing .env from process (NODE_ENV=${process.env.NODE_ENV})`
++      );
++      dumpENV();
++    } else if (process.env.NODE_ENV === "production") {
++      // Log that we purposely skipped dumping env in production for safety
++      console.warn(
++        `ENV dump skipped in production (ALLOW_ENV_DUMP=${process.env.ALLOW_ENV_DUMP}).`+
++          ` To enable set ALLOW_ENV_DUMP=true on a single safe operator instance.`
++      );
++    }
++  } catch (dumpErr) {
++    console.error(`Failed to evaluate env-dump guard: ${dumpErr?.message || dumpErr}`);
++  }
++
++  return { newValues, error: error?.length > 0 ? error : false };

@@ -20,7 +20,7 @@ from multi_spectrum_baseline_framework import (
     ModelProvider,
     MultiSpectrumBaselineFramework,
     EdwinaHawthorneDataProvider,
-    ExperimentResult
+    ExperimentResult,
 )
 
 
@@ -39,9 +39,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_customer_profile_spectrum_data(self):
         """Test Customer Profile spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.CUSTOMER_PROFILE
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.CUSTOMER_PROFILE)
 
         # Validate required fields
         assert "customer_id" in data
@@ -57,9 +55,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_credit_analysis_spectrum_data(self):
         """Test Credit Analysis spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.CREDIT_ANALYSIS
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.CREDIT_ANALYSIS)
 
         # Validate required fields
         assert "credit_score" in data
@@ -72,9 +68,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_transaction_history_spectrum_data(self):
         """Test Transaction History spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.TRANSACTION_HISTORY
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.TRANSACTION_HISTORY)
 
         # Validate required fields
         assert "total_transactions" in data
@@ -87,9 +81,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_call_center_operations_spectrum_data(self):
         """Test Call Center Operations spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.CALL_CENTER_OPERATIONS
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.CALL_CENTER_OPERATIONS)
 
         # Validate required fields
         assert "total_support_calls" in data
@@ -102,9 +94,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_entity_relationship_spectrum_data(self):
         """Test Entity Relationship spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.ENTITY_RELATIONSHIP
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.ENTITY_RELATIONSHIP)
 
         # Validate required fields
         assert "household_members" in data
@@ -117,9 +107,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_geographic_analysis_spectrum_data(self):
         """Test Geographic Analysis spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.GEOGRAPHIC_ANALYSIS
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.GEOGRAPHIC_ANALYSIS)
 
         # Validate required fields
         assert "primary_address" in data
@@ -138,9 +126,7 @@ class TestEdwinaHawthorneDataProvider:
 
     def test_temporal_analysis_spectrum_data(self):
         """Test Temporal Analysis spectrum data extraction."""
-        data = self.data_provider.get_spectrum_data(
-            DataSpectrum.TEMPORAL_ANALYSIS
-        )
+        data = self.data_provider.get_spectrum_data(DataSpectrum.TEMPORAL_ANALYSIS)
 
         # Validate required fields
         assert "account_tenure" in data
@@ -200,9 +186,7 @@ class TestMultiSpectrumBaselineFramework:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.framework = MultiSpectrumBaselineFramework(
-            langsmith_project="test_tilores_x_phase1"
-        )
+        self.framework = MultiSpectrumBaselineFramework(langsmith_project="test_tilores_x_phase1")
 
     def test_framework_initialization(self):
         """Test framework initializes correctly."""
@@ -221,7 +205,7 @@ class TestMultiSpectrumBaselineFramework:
             ModelProvider.CLAUDE_3_HAIKU.value,
             ModelProvider.GEMINI_1_5_FLASH_002.value,
             ModelProvider.GEMINI_2_5_FLASH.value,
-            ModelProvider.GEMINI_2_5_FLASH_LITE.value
+            ModelProvider.GEMINI_2_5_FLASH_LITE.value,
         ]
 
         for model_name in expected_models:
@@ -245,7 +229,7 @@ class TestMultiSpectrumBaselineFramework:
             DataSpectrum.CALL_CENTER_OPERATIONS.value,
             DataSpectrum.ENTITY_RELATIONSHIP.value,
             DataSpectrum.GEOGRAPHIC_ANALYSIS.value,
-            DataSpectrum.TEMPORAL_ANALYSIS.value
+            DataSpectrum.TEMPORAL_ANALYSIS.value,
         ]
 
         for spectrum_name in expected_spectrums:
@@ -263,13 +247,9 @@ class TestMultiSpectrumBaselineFramework:
     def test_experiment_prompt_generation(self):
         """Test experiment prompt generation for different combinations."""
         # Test Customer Profile + GPT-4o-mini combination
-        data = self.framework.data_provider.get_spectrum_data(
-            DataSpectrum.CUSTOMER_PROFILE
-        )
+        data = self.framework.data_provider.get_spectrum_data(DataSpectrum.CUSTOMER_PROFILE)
         prompt = self.framework.generate_experiment_prompt(
-            ModelProvider.GPT_4O_MINI.value,
-            DataSpectrum.CUSTOMER_PROFILE.value,
-            data
+            ModelProvider.GPT_4O_MINI.value, DataSpectrum.CUSTOMER_PROFILE.value, data
         )
 
         # Validate prompt structure
@@ -283,8 +263,7 @@ class TestMultiSpectrumBaselineFramework:
     async def test_single_experiment_execution(self):
         """Test single experiment execution."""
         result = await self.framework.run_single_experiment(
-            ModelProvider.GEMINI_1_5_FLASH_002.value,
-            DataSpectrum.CUSTOMER_PROFILE.value
+            ModelProvider.GEMINI_1_5_FLASH_002.value, DataSpectrum.CUSTOMER_PROFILE.value
         )
 
         # Validate experiment result
@@ -337,18 +316,14 @@ class TestMultiSpectrumBaselineFramework:
         """
 
         data = {"field1": "value1"}
-        score = self.framework._calculate_completeness_score(
-            comprehensive_response, data
-        )
+        score = self.framework._calculate_completeness_score(comprehensive_response, data)
 
         assert 0.0 <= score <= 1.0
         assert score == 1.0  # Should find all 5 components
 
         # Test with partial response
         partial_response = "Some insights and risk assessment."
-        partial_score = self.framework._calculate_completeness_score(
-            partial_response, data
-        )
+        partial_score = self.framework._calculate_completeness_score(partial_response, data)
         assert 0.0 <= partial_score < 1.0
 
     def test_baseline_metrics_calculation(self):
@@ -365,7 +340,7 @@ class TestMultiSpectrumBaselineFramework:
                 response_time=5.2,
                 quality_score=0.94,
                 accuracy_score=0.91,
-                completeness_score=0.88
+                completeness_score=0.88,
             ),
             ExperimentResult(
                 experiment_id="test_2",
@@ -377,8 +352,8 @@ class TestMultiSpectrumBaselineFramework:
                 response_time=3.8,
                 quality_score=0.92,
                 accuracy_score=0.89,
-                completeness_score=0.95
-            )
+                completeness_score=0.95,
+            ),
         ]
 
         metrics = self.framework._calculate_baseline_metrics()
@@ -413,7 +388,7 @@ class TestMultiSpectrumBaselineFramework:
                 response_time=3.1,
                 quality_score=0.95,
                 accuracy_score=0.93,
-                completeness_score=0.90
+                completeness_score=0.90,
             )
         ]
 
@@ -430,7 +405,7 @@ class TestMultiSpectrumBaselineFramework:
         assert "Model Performance Rankings" in report
         assert "Spectrum Performance Rankings" in report
         assert "95.0%" in report  # Quality score
-        assert "3.1s" in report   # Response time
+        assert "3.1s" in report  # Response time
 
 
 class TestIntegrationScenarios:
@@ -439,23 +414,17 @@ class TestIntegrationScenarios:
     @pytest.mark.asyncio
     async def test_small_scale_baseline_run(self):
         """Test small-scale baseline experiment run (2 models, 2 spectrums)."""
-        framework = MultiSpectrumBaselineFramework(
-            langsmith_project="test_integration"
-        )
+        framework = MultiSpectrumBaselineFramework(langsmith_project="test_integration")
 
         # Override models and spectrums for faster testing
         test_models = {
-            ModelProvider.GEMINI_1_5_FLASH_002.value:
-            framework.models[ModelProvider.GEMINI_1_5_FLASH_002.value],
-            ModelProvider.CLAUDE_3_HAIKU.value:
-            framework.models[ModelProvider.CLAUDE_3_HAIKU.value]
+            ModelProvider.GEMINI_1_5_FLASH_002.value: framework.models[ModelProvider.GEMINI_1_5_FLASH_002.value],
+            ModelProvider.CLAUDE_3_HAIKU.value: framework.models[ModelProvider.CLAUDE_3_HAIKU.value],
         }
 
         test_spectrums = {
-            DataSpectrum.CUSTOMER_PROFILE.value:
-            framework.spectrums[DataSpectrum.CUSTOMER_PROFILE.value],
-            DataSpectrum.CREDIT_ANALYSIS.value:
-            framework.spectrums[DataSpectrum.CREDIT_ANALYSIS.value]
+            DataSpectrum.CUSTOMER_PROFILE.value: framework.spectrums[DataSpectrum.CUSTOMER_PROFILE.value],
+            DataSpectrum.CREDIT_ANALYSIS.value: framework.spectrums[DataSpectrum.CREDIT_ANALYSIS.value],
         }
 
         framework.models = test_models
@@ -474,14 +443,10 @@ class TestIntegrationScenarios:
             model_spectrum_combinations.add((result.model, result.spectrum))
 
         expected_combinations = {
-            (ModelProvider.GEMINI_1_5_FLASH_002.value,
-             DataSpectrum.CUSTOMER_PROFILE.value),
-            (ModelProvider.GEMINI_1_5_FLASH_002.value,
-             DataSpectrum.CREDIT_ANALYSIS.value),
-            (ModelProvider.CLAUDE_3_HAIKU.value,
-             DataSpectrum.CUSTOMER_PROFILE.value),
-            (ModelProvider.CLAUDE_3_HAIKU.value,
-             DataSpectrum.CREDIT_ANALYSIS.value)
+            (ModelProvider.GEMINI_1_5_FLASH_002.value, DataSpectrum.CUSTOMER_PROFILE.value),
+            (ModelProvider.GEMINI_1_5_FLASH_002.value, DataSpectrum.CREDIT_ANALYSIS.value),
+            (ModelProvider.CLAUDE_3_HAIKU.value, DataSpectrum.CUSTOMER_PROFILE.value),
+            (ModelProvider.CLAUDE_3_HAIKU.value, DataSpectrum.CREDIT_ANALYSIS.value),
         }
 
         assert model_spectrum_combinations == expected_combinations
@@ -516,10 +481,7 @@ class TestIntegrationScenarios:
 # Test execution configuration
 if __name__ == "__main__":
     # Configure logging for test execution
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Run tests with pytest
     pytest.main([__file__, "-v", "--tb=short"])

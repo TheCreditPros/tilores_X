@@ -1,4 +1,7 @@
-# Gemini 2.5 Models Implementation
+Dashboard Unavailable
+Cannot connect to tilores_X API: API unavailable: Network Error
+
+Please ensure the API server is running and accessible.****# Gemini 2.5 Models Implementation
 **Date**: August 16, 2025
 **Phase**: XI - Gemini 2.5 Integration
 

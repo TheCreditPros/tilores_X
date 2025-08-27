@@ -235,8 +235,8 @@ class TestAutonomousWorkflowEndToEnd:
     async def test_proactive_quality_monitoring_workflow(self):
         """Test proactive quality monitoring with intervention workflow."""
         # Mock enhanced manager with enterprise features
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
-            "autonomous_integration.AutonomousAIPlatform"
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
+            "autonomous_ai_platform.AutonomousAIPlatform"
         ) as mock_platform_class:
 
             mock_client = MagicMock()
@@ -521,7 +521,9 @@ class TestAutonomousWorkflowEndToEnd:
     async def test_error_handling_and_graceful_degradation_workflow(self):
         """Test error handling and graceful degradation workflow."""
         # Test enterprise features unavailable scenario
-        with patch("autonomous_integration.create_enterprise_client", side_effect=Exception("Enterprise unavailable")):
+        with patch(
+            "langsmith_enterprise_client.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
+        ):
             manager = EnhancedVirtuousCycleManager()
 
             # Verify graceful degradation

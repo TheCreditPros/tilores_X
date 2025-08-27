@@ -671,7 +671,9 @@ class ReinforcementLearningCollector:
                 return []
 
             # Search for recent corrections
-            recent_examples = await self.langsmith_client.search_dataset_examples(datasets[0].id, "correction", limit=100)
+            recent_examples = await self.langsmith_client.search_dataset_examples(
+                datasets[0].id, "correction", limit=100
+            )
 
             # Ensure we have a list of dicts
             if not isinstance(recent_examples, list):

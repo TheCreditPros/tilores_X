@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# pyright: reportGeneralTypeIssues=false, reportOptionalMemberAccess=false, reportAttributeAccessIssue=false
+from concurrent.futures import ThreadPoolExecutor
+
 """
 Unified LangChain core logic shared between Chainlit and FastAPI
 Ultra-minimal implementation focused on speed and simplicity
@@ -6,7 +9,7 @@ Ultra-minimal implementation focused on speed and simplicity
 
 import concurrent.futures
 import re
-from typing import Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from langchain_openai import ChatOpenAI
 from tilores import TiloresAPI
@@ -20,13 +23,15 @@ logger = setup_logging(__name__)
 
 # LangSmith observability imports
 try:
-    from langsmith import Client as LangSmithClient
+    from langsmith import Client as LangSmithClient, traceable, wrappers
     from langchain.callbacks.tracers import LangChainTracer
 
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LangSmithClient = None
     LangChainTracer = None
+    traceable = None
+    wrappers = None
     LANGSMITH_AVAILABLE = False
 
 # Redis cache for performance optimization (Phase VI)
@@ -427,14 +432,22 @@ class MultiProviderLLMEngine:
                 print("📊 LangSmith API key not found - tracing disabled")
                 return
 
-            # Initialize LangSmith client
-            self.langsmith_client = LangSmithClient(api_key=api_key)
+            # Set LangChain environment variables for auto-tracing
+            os.environ["LANGCHAIN_TRACING_V2"] = "true"
+            os.environ["LANGCHAIN_API_KEY"] = api_key
+            os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 
             # Get project name from environment
             project_name = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT") or "tilores_unified"
+            os.environ["LANGCHAIN_PROJECT"] = project_name
+
+            # Initialize LangSmith client with explicit API key
+            assert LangSmithClient is not None
+            self.langsmith_client = LangSmithClient(api_key=api_key)  # type: ignore[call-arg]
 
             # Initialize LangChain tracer with project name
-            self.langchain_tracer = LangChainTracer(client=self.langsmith_client, project_name=project_name)
+            assert LangChainTracer is not None
+            self.langchain_tracer = LangChainTracer(client=self.langsmith_client, project_name=project_name)  # type: ignore[call-arg]
 
             print(f"✅ LangSmith initialized - Project: {project_name}")
 
@@ -469,7 +482,7 @@ class MultiProviderLLMEngine:
 
             print("✅ All required Tilores variables present")
 
-            # Use optimized timeout configuration
+            # Use unified timeout configuration
             try:
                 from utils.timeout_config import get_timeout_manager
 
@@ -491,18 +504,20 @@ class MultiProviderLLMEngine:
             tilores_url = os.getenv("TILORES_API_URL", "NOT SET")
             tilores_client_id = os.getenv("TILORES_CLIENT_ID", "NOT SET")
             tilores_token_url = os.getenv("TILORES_TOKEN_URL", "NOT SET")
-            print(f"🔧 TILORES_API_URL: {tilores_url}")
+            print("🔧 TILORES_API_URL: [CONFIGURED]" if tilores_url != "NOT SET" else "🔧 TILORES_API_URL: NOT SET")
             print(
-                f"🔧 TILORES_CLIENT_ID: {tilores_client_id[:10]}..."
+                "🔧 TILORES_CLIENT_ID: [CONFIGURED]"
                 if tilores_client_id != "NOT SET"
                 else "🔧 TILORES_CLIENT_ID: NOT SET"
             )
-            print(f"🔧 TILORES_TOKEN_URL: {tilores_token_url}")
+            print(
+                "🔧 TILORES_TOKEN_URL: [CONFIGURED]"
+                if tilores_token_url != "NOT SET"
+                else "🔧 TILORES_TOKEN_URL: NOT SET"
+            )
 
             # Initialize TiloresAPI with timeout protection and retry logic
-            # Railway environment may need more aggressive retry strategy
-            max_retries = 5  # Increased retries for Railway environment
-            base_delay = 3  # Longer delay between retries
+            # Respect TimeoutManager settings without overriding
 
             for attempt in range(max_retries):
                 try:
@@ -544,6 +559,10 @@ class MultiProviderLLMEngine:
                     print(f"⏳ Retrying in {delay}s...")
                     time.sleep(delay)
 
+            # Ensure Tilores is initialized
+            if self.tilores is None:
+                raise Exception("Tilores initialization did not complete; no TiloresAPI instance available")
+            assert self.tilores is not None
             tilores_tools = TiloresTools(self.tilores)
 
             # Initialize function executor for centralized tool management
@@ -762,7 +781,13 @@ class MultiProviderLLMEngine:
                     }
                 )
 
-                return result
+                # Ensure string return type
+                try:
+                    import json as _json
+
+                    return result if isinstance(result, str) else _json.dumps(result)
+                except Exception:
+                    return str(result)
             except Exception as e:
                 return f"Error searching with comprehensive fields: {str(e)}"
 
@@ -819,7 +844,12 @@ class MultiProviderLLMEngine:
                             if values_list:
                                 search_value = values_list[0]
                         print(f"🔥 Cache HIT: Customer search for {search_value}")
-                        return cached_result
+                        try:
+                            import json as _json
+
+                            return cached_result if isinstance(cached_result, str) else _json.dumps(cached_result)
+                        except Exception:
+                            return str(cached_result)
 
                 print("🔍 Cache MISS: Searching customer data...")
 
@@ -857,11 +887,16 @@ class MultiProviderLLMEngine:
                             print(f"🔍 Search completed in {elapsed:.1f}s")
 
                             # Cache successful search results for 1 hour
-                            if CACHE_AVAILABLE and cache_manager and result:
+                            if CACHE_AVAILABLE and cache_manager and isinstance(result, dict):
                                 cache_manager.set_customer_search(cache_key, result)
                                 print("✅ Cached search result for 1 hour")
 
-                            return result
+                            try:
+                                import json as _json
+
+                                return result if isinstance(result, str) else _json.dumps(result)
+                            except Exception:
+                                return str(result)
                         except concurrent.futures.TimeoutError:
                             elapsed = time.time() - start_time
                             print(f"⏰ Search timed out after {elapsed:.1f}s, trying minimal fields...")
@@ -921,7 +956,12 @@ class MultiProviderLLMEngine:
                             "recordFieldsToQuery": essential_fields,
                         }
                     )
-                    return result
+                    try:
+                        import json as _json
+
+                        return result if isinstance(result, str) else _json.dumps(result)
+                    except Exception:
+                        return str(result)
 
             except Exception as e:
                 return f"Error searching customer data: {str(e)}"
@@ -1012,6 +1052,9 @@ class MultiProviderLLMEngine:
                 }
                 """
 
+                # Ensure Tilores is initialized before use
+                if self.tilores is None:
+                    return "Tilores not initialized"
                 result = self.tilores.gql(query, {"id": record_id})
 
                 if result.get("data", {}).get("entityByRecord", {}).get("entity"):
@@ -1063,7 +1106,7 @@ class MultiProviderLLMEngine:
 
         @tool
         def get_customer_credit_report(
-            customer_id: str = None, client_id: str = None, email: str = None, customer_name: str = None
+            customer_id: str = "", client_id: str = "", email: str = "", customer_name: str = ""
         ) -> str:
             """
             *** MANDATORY: USE THIS FUNCTION FOR ALL CREDIT AND FINANCIAL ANALYSIS QUESTIONS ***
@@ -1161,6 +1204,8 @@ class MultiProviderLLMEngine:
                 # Use the existing working Tilores integration
                 from tilores_langchain import TiloresTools
 
+                if self.tilores is None:
+                    return "Tilores not initialized"
                 tilores_tools = TiloresTools(self.tilores)
                 unified_search = self._create_unified_search_tool(tilores_tools)
                 result = unified_search.invoke({"query": query_string})
@@ -1289,7 +1334,7 @@ class MultiProviderLLMEngine:
         # Use the Credit Pros advisor approach
         return self._generate_credit_advisor_response(
             greeting_name,
-            primary_score,
+            int(primary_score) if isinstance(primary_score, int) else 0,
             has_credit_response,
             has_transunion_data,
             found_indicators,
@@ -1344,7 +1389,7 @@ class MultiProviderLLMEngine:
         # Use the Credit Pros advisor approach even for limited data
         return self._generate_credit_advisor_response(
             greeting_name,
-            credit_score,
+            int(credit_score) if isinstance(credit_score, int) else 0,
             has_credit_response,
             has_transunion_data,
             found_indicators,
@@ -1378,7 +1423,7 @@ class MultiProviderLLMEngine:
             greeting_name = "there"
 
         # Extract credit scores and analyze
-        credit_scores = []
+        credit_scores: list[int] = []
         score_patterns = [
             r"(?:STARTING_CREDIT_SCORE|Credit Score):\s*([0-9]+)",
             r"(?:Current.*Score|Score):\s*([0-9]+)",
@@ -1390,7 +1435,7 @@ class MultiProviderLLMEngine:
 
         # Remove duplicates and get primary score
         unique_scores = list(set(credit_scores))
-        primary_score = unique_scores[0] if unique_scores else None
+        primary_score = unique_scores[0] if unique_scores else 0
 
         # Extract credit bureau data and CREDIT_RESPONSE information
         has_credit_response = "CREDIT_RESPONSE" in result_str
@@ -1412,7 +1457,7 @@ class MultiProviderLLMEngine:
         # Generate intelligent credit analysis using Credit Pros advisor approach
         return self._generate_credit_advisor_response(
             greeting_name,
-            primary_score,
+            int(primary_score) if isinstance(primary_score, int) else 0,
             has_credit_response,
             has_transunion_data,
             found_indicators,
@@ -1682,7 +1727,14 @@ class MultiProviderLLMEngine:
         except Exception as e:
             print(f"❌ Failed to initialize {model_name}: {e}")
             # Fallback to fastest model llama-3.3-70b-versatile
-            return ChatGroq(model="llama-3.3-70b-versatile", **kwargs)
+            try:
+                if ChatGroq:
+                    return ChatGroq(model="llama-3.3-70b-versatile", **kwargs)  # type: ignore[misc]
+                else:
+                    raise e
+            except Exception:
+                # As a last resort, re-raise the original error
+                raise e
 
     def get_provider(self, model_name: str) -> str:
         """Get provider name for a model"""
@@ -1835,18 +1887,18 @@ def run_chain(
             system_prompt = "You are a helpful AI assistant. Provide accurate, concise responses."
 
             # Build messages with conversation history for context
-            llm_messages = [{"role": "system", "content": system_prompt}]
-            llm_messages.extend(conversation_history)  # Add conversation history
-            llm_messages.append({"role": "user", "content": user_input})
+            llm_messages_stream: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
+            llm_messages_stream.extend(conversation_history)  # Add conversation history
+            llm_messages_stream.append({"role": "user", "content": user_input})
 
             if stream:
-                return llm.stream(llm_messages)
+                return llm.stream(llm_messages_stream)
             else:
-                response = llm.invoke(llm_messages)
+                response = llm.invoke(llm_messages_stream)
                 final_response = response.content if hasattr(response, "content") else str(response)
 
                 # Cache successful LLM response for 24 hours
-                if CACHE_AVAILABLE and cache_manager and final_response:
+                if CACHE_AVAILABLE and cache_manager and isinstance(final_response, str):
                     cache_manager.set_llm_response(cache_key, final_response)
                     print("✅ Cached LLM response for 24 hours")
 
@@ -1857,7 +1909,7 @@ def run_chain(
         llm = engine.get_model(model, **kwargs)
 
         # Tilores tools are required - no fallback to direct LLM
-        if not engine.tools:
+        if not engine or not engine.tools:
             print("🚨 CRITICAL: No tools available in production!")
             print(f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}")
             print("   This explains why LLM gives generic responses instead of calling tools")
@@ -1886,7 +1938,7 @@ When using tilores_search, the system automatically optimizes field selection fo
         system_prompt = _get_provider_specific_prompt(provider, comprehensive_fields_text)
 
         # Build messages with conversation history for context-aware tools usage
-        llm_messages = [{"role": "system", "content": system_prompt}]
+        llm_messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
         llm_messages.extend(conversation_history)  # Add conversation history
         llm_messages.append({"role": "user", "content": user_input})
 
@@ -1911,20 +1963,21 @@ When using tilores_search, the system automatically optimizes field selection fo
             # For streaming, we need to handle tool calls differently
             # First, get non-streaming response to check for tool calls
             initial_response = llm_with_tools.invoke(llm_messages)
+            initial_response_any: Any = initial_response  # for typing safety
 
-            if hasattr(initial_response, "tool_calls") and initial_response.tool_calls:
+            tool_calls_initial = getattr(initial_response_any, "tool_calls", None)
+            if tool_calls_initial:
                 # If tools are needed, execute them first, then stream the final response
                 llm_messages.append(
                     {
                         "role": "assistant",
-                        "content": initial_response.content or "",
-                        "tool_calls": initial_response.tool_calls,
+                        "content": getattr(initial_response_any, "content", "") or "",
+                        "tool_calls": tool_calls_initial,
                     }
                 )
 
                 # Execute tool calls - optimized for async concurrent execution
                 import asyncio
-                from concurrent.futures import ThreadPoolExecutor
 
                 async def execute_tool_call_async(tool_call):
                     """Execute a single tool call asynchronously"""
@@ -1953,14 +2006,12 @@ When using tilores_search, the system automatically optimizes field selection fo
                     }
 
                 # Execute all tool calls concurrently
-                if initial_response.tool_calls:
+                if tool_calls_initial:
                     try:
                         loop = asyncio.new_event_loop()
                         asyncio.set_event_loop(loop)
                         tool_results = loop.run_until_complete(
-                            asyncio.gather(
-                                *[execute_tool_call_async(tool_call) for tool_call in initial_response.tool_calls]
-                            )
+                            asyncio.gather(*[execute_tool_call_async(tool_call) for tool_call in tool_calls_initial])
                         )
                         loop.close()
 
@@ -1968,7 +2019,7 @@ When using tilores_search, the system automatically optimizes field selection fo
                         llm_messages.extend(tool_results)
                     except Exception:
                         # Fallback to sequential execution if async fails
-                        for tool_call in initial_response.tool_calls:
+                        for tool_call in tool_calls_initial:
                             tool_name = tool_call["name"]
                             tool_args = tool_call["args"]
                             tool_id = tool_call.get("id", f"call_{tool_name}")
@@ -2001,10 +2052,10 @@ When using tilores_search, the system automatically optimizes field selection fo
                     return f"Tool results too large for {model} context. Please try a different model or shorter query."
 
                 # Now stream the final response
-                return llm.stream(llm_messages)
+                return llm_with_tools.stream(llm_messages)
             else:
                 # No tools needed, stream directly
-                return llm.stream(llm_messages)
+                return llm_with_tools.stream(llm_messages)
         else:
             # Non-streaming path (existing logic)
             print(f"🔍 INVOKING LLM WITH TOOLS: {type(llm_with_tools).__name__}")
@@ -2012,22 +2063,21 @@ When using tilores_search, the system automatically optimizes field selection fo
             # FIXED: Remove all LangSmith callback handling to prevent conflicts
             # Direct invocation without callback complications
             response = llm_with_tools.invoke(llm_messages)
+            response_any: Any = response  # for typing safety
 
             # DEBUG: Check if tools were called with enhanced monitoring
-            has_tool_calls = hasattr(response, "tool_calls") and bool(response.tool_calls)
+            has_tool_calls = bool(getattr(response_any, "tool_calls", None))
             provider = engine.get_provider(model)
             print(f"🎯 LLM RESPONSE: Tool calls = {has_tool_calls}")
 
             if has_tool_calls:
-                tool_names = [tc["name"] for tc in response.tool_calls]
+                tool_names = [tc["name"] for tc in getattr(response_any, "tool_calls", [])]
                 print(f"   Tools called: {tool_names}")
                 # Log successful tool calling
                 for tool_name in tool_names:
                     _log_tool_calling_success(provider, tool_name)
             else:
-                print(
-                    f"   Direct response (no tools): {response.content[:100] if hasattr(response, 'content') else str(response)[:100]}..."
-                )
+                print(f"   Direct response (no tools): {str(getattr(response_any, 'content', response))[:100]}...")
                 print("🚨 PROBLEM: LLM not making tool calls in production!")
                 # Log tool calling failure
                 _log_tool_calling_failure(provider, "no_tool_calls_made")
@@ -2078,14 +2128,13 @@ When using tilores_search, the system automatically optimizes field selection fo
         max_iterations = 5  # Prevent infinite loops
         iteration = 0
 
-        while hasattr(response, "tool_calls") and response.tool_calls and iteration < max_iterations:
+        while bool(getattr(response_any, "tool_calls", None)) and iteration < max_iterations:
             iteration += 1
             # Add the assistant's response with tool calls to the conversation
             llm_messages.append(
                 {
                     "role": "assistant",
-                    "content": response.content or "",
-                    "tool_calls": response.tool_calls,
+                    "content": str(getattr(response_any, "content", "") or ""),
                 }
             )
 
@@ -2170,7 +2219,9 @@ When using tilores_search, the system automatically optimizes field selection fo
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 tool_results = loop.run_until_complete(
-                    asyncio.gather(*[execute_tool_call_async(tool_call) for tool_call in response.tool_calls])
+                    asyncio.gather(
+                        *[execute_tool_call_async(tool_call) for tool_call in getattr(response_any, "tool_calls", [])]
+                    )
                 )
                 loop.close()
 
@@ -2178,7 +2229,7 @@ When using tilores_search, the system automatically optimizes field selection fo
                 llm_messages.extend(tool_results)
             except Exception:
                 # Fallback to sequential execution if async fails
-                for tool_call in response.tool_calls:
+                for tool_call in getattr(response_any, "tool_calls", []):
                     tool_name = tool_call["name"]
                     tool_args = tool_call["args"]
                     tool_id = tool_call.get("id", f"call_{tool_name}")
@@ -2215,6 +2266,7 @@ When using tilores_search, the system automatically optimizes field selection fo
 
             # Get next response from LLM to continue the conversation
             response = llm_with_tools.invoke(llm_messages)
+            response_any = response
 
         # Final response without tool calls or max iterations reached
         if hasattr(response, "content") and response.content:
@@ -2417,3 +2469,8 @@ def get_model_provider(model_name: str) -> str:
     """Get provider for a specific model"""
     initialize_engine()
     return engine.get_provider(model_name)
+
+
+# Apply LangSmith tracing wrapper if available
+if traceable is not None:
+    run_chain = traceable(name="tilores_llm_chain", run_type="chain")(run_chain)

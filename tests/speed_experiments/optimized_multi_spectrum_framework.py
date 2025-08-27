@@ -31,10 +31,7 @@ from langsmith import Client
 load_dotenv()
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Initialize LangSmith client
@@ -42,10 +39,10 @@ langsmith_client = Client()
 
 # Initialize Redis for caching
 redis_client = redis.Redis(
-    host=os.getenv('REDIS_HOST', 'localhost'),
-    port=int(os.getenv('REDIS_PORT', 6379)),
-    db=int(os.getenv('REDIS_DB', 0)),
-    decode_responses=True
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    db=int(os.getenv("REDIS_DB", 0)),
+    decode_responses=True,
 )
 
 
@@ -66,30 +63,21 @@ class OptimizedMultiSpectrumFramework:
     def _initialize_models(self) -> Dict[str, Any]:
         """Initialize context-compatible models for testing."""
         return {
-            'gpt-4o-mini': ChatOpenAI(
-                model="gpt-4o-mini",
-                temperature=0.1
-            ),
-            'llama-3.3-70b-versatile': ChatGroq(
-                model="llama-3.3-70b-versatile",
-                temperature=0.1
-            ),
-            'deepseek-r1-distill-llama-70b': ChatGroq(
-                model="deepseek-r1-distill-llama-70b",
-                temperature=0.1
-            )
+            "gpt-4o-mini": ChatOpenAI(model="gpt-4o-mini", temperature=0.1),
+            "llama-3.3-70b-versatile": ChatGroq(model="llama-3.3-70b-versatile", temperature=0.1),
+            "deepseek-r1-distill-llama-70b": ChatGroq(model="deepseek-r1-distill-llama-70b", temperature=0.1),
         }
 
     def _load_optimized_prompts(self) -> Dict[str, str]:
         """Load AI-generated optimized prompts from optimization results."""
         try:
-            with open('ai_optimization_cycle_20250816_074105.json', 'r') as f:
+            with open("ai_optimization_cycle_20250816_074105.json", "r") as f:
                 optimization_data = json.load(f)
 
             prompts = {}
-            for spectrum_data in optimization_data['spectrum_optimizations']:
-                spectrum = spectrum_data['spectrum']
-                prompts[spectrum] = spectrum_data['optimized_prompt']
+            for spectrum_data in optimization_data["spectrum_optimizations"]:
+                spectrum = spectrum_data["spectrum"]
+                prompts[spectrum] = spectrum_data["optimized_prompt"]
 
             logger.info(f"✅ Loaded {len(prompts)} optimized prompts")
             return prompts
@@ -120,15 +108,10 @@ class OptimizedMultiSpectrumFramework:
             "last_transaction": "2024-08-15",
             "preferred_contact": "email",
             "loyalty_tier": "gold",
-            "risk_category": "low"
+            "risk_category": "low",
         }
 
-    async def run_optimized_spectrum_test(
-        self,
-        spectrum: str,
-        model_name: str,
-        test_scenario: str
-    ) -> Dict[str, Any]:
+    async def run_optimized_spectrum_test(self, spectrum: str, model_name: str, test_scenario: str) -> Dict[str, Any]:
         """
         Execute optimized spectrum test with AI-generated prompts.
 
@@ -153,37 +136,25 @@ class OptimizedMultiSpectrumFramework:
             # Execute with LangSmith tracing
             start_time = time.time()
 
-            messages = [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_prompt)
-            ]
+            messages = [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
 
             model = self.models[model_name]
             response = await model.ainvoke(
                 messages,
                 config={
                     "run_name": f"optimized_{spectrum}_{model_name}",
-                    "tags": [
-                        "optimized_multi_spectrum",
-                        spectrum,
-                        model_name,
-                        "ai_optimized_prompts"
-                    ]
-                }
+                    "tags": ["optimized_multi_spectrum", spectrum, model_name, "ai_optimized_prompts"],
+                },
             )
 
             end_time = time.time()
             response_time = end_time - start_time
 
             # Calculate quality score using enhanced metrics
-            quality_score = self._calculate_quality_score(
-                spectrum, response.content, response_time
-            )
+            quality_score = self._calculate_quality_score(spectrum, response.content, response_time)
 
             # Create LangSmith URL
-            langsmith_url = self._generate_langsmith_url(
-                f"optimized_{spectrum}_{model_name}"
-            )
+            langsmith_url = self._generate_langsmith_url(f"optimized_{spectrum}_{model_name}")
 
             result = {
                 "spectrum": spectrum,
@@ -194,13 +165,11 @@ class OptimizedMultiSpectrumFramework:
                 "response_time": response_time,
                 "langsmith_url": langsmith_url,
                 "timestamp": datetime.now().isoformat(),
-                "optimization_applied": True
+                "optimization_applied": True,
             }
 
             logger.info(
-                f"✅ {spectrum} | {model_name} | "
-                f"Quality: {quality_score:.1%} | "
-                f"Time: {response_time:.3f}s"
+                f"✅ {spectrum} | {model_name} | " f"Quality: {quality_score:.1%} | " f"Time: {response_time:.3f}s"
             )
 
             return result
@@ -212,7 +181,7 @@ class OptimizedMultiSpectrumFramework:
                 "model": model_name,
                 "error": str(e),
                 "quality_score": 0.0,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
     def _create_test_scenario(self, spectrum: str, scenario: str) -> str:
@@ -231,7 +200,6 @@ class OptimizedMultiSpectrumFramework:
 
             Ensure accurate identification and handle any potential conflicts.
             """,
-
             "financial_analysis_depth": f"""
             Perform comprehensive financial analysis for:
             - Customer: {customer['name']} (ID: {customer['client_id']})
@@ -244,7 +212,6 @@ class OptimizedMultiSpectrumFramework:
 
             Provide deep analysis with risk assessment and recommendations.
             """,
-
             "multi_field_integration": f"""
             Integrate and correlate the following customer fields:
             - Personal: {customer['name']}, age {customer['age']}, {customer['marital_status']}
@@ -256,7 +223,6 @@ class OptimizedMultiSpectrumFramework:
 
             Ensure comprehensive data synthesis and field correlation.
             """,
-
             "conversational_context": f"""
             You are having a conversation with {customer['name']}, a valued customer.
             Previous context: Customer inquired about account services.
@@ -265,7 +231,6 @@ class OptimizedMultiSpectrumFramework:
 
             Maintain context and provide natural, helpful responses.
             """,
-
             "performance_scaling": f"""
             Process high-volume customer data efficiently:
             - Customer: {customer['name']} (ID: {customer['client_id']})
@@ -275,7 +240,6 @@ class OptimizedMultiSpectrumFramework:
 
             Optimize for speed and accuracy under load conditions.
             """,
-
             "edge_case_handling": f"""
             Handle the following edge case scenario:
             - Customer: {customer['name']}
@@ -283,7 +247,6 @@ class OptimizedMultiSpectrumFramework:
 
             Provide graceful error handling and recovery options.
             """,
-
             "professional_communication": f"""
             Compose professional communication for:
             - Customer: {customer['name']}
@@ -292,17 +255,12 @@ class OptimizedMultiSpectrumFramework:
             Communication purpose: {scenario}
 
             Maintain professional tone and business appropriateness.
-            """
+            """,
         }
 
         return scenarios.get(spectrum, f"Generic test scenario: {scenario}")
 
-    def _calculate_quality_score(
-        self,
-        spectrum: str,
-        response: str,
-        response_time: float
-    ) -> float:
+    def _calculate_quality_score(self, spectrum: str, response: str, response_time: float) -> float:
         """
         Calculate enhanced quality score with AI optimization metrics.
 
@@ -313,41 +271,13 @@ class OptimizedMultiSpectrumFramework:
 
         # Spectrum-specific quality criteria
         criteria_weights = {
-            "customer_identity_resolution": {
-                "accuracy": 0.4,
-                "completeness": 0.3,
-                "disambiguation": 0.3
-            },
-            "financial_analysis_depth": {
-                "analysis_depth": 0.4,
-                "risk_assessment": 0.3,
-                "compliance": 0.3
-            },
-            "multi_field_integration": {
-                "correlation": 0.4,
-                "synthesis": 0.3,
-                "priority": 0.3
-            },
-            "conversational_context": {
-                "context_maintenance": 0.4,
-                "natural_flow": 0.3,
-                "reference_resolution": 0.3
-            },
-            "performance_scaling": {
-                "response_time": 0.4,
-                "efficiency": 0.3,
-                "resource_usage": 0.3
-            },
-            "edge_case_handling": {
-                "detection": 0.4,
-                "recovery": 0.3,
-                "graceful_degradation": 0.3
-            },
-            "professional_communication": {
-                "tone": 0.4,
-                "clarity": 0.3,
-                "appropriateness": 0.3
-            }
+            "customer_identity_resolution": {"accuracy": 0.4, "completeness": 0.3, "disambiguation": 0.3},
+            "financial_analysis_depth": {"analysis_depth": 0.4, "risk_assessment": 0.3, "compliance": 0.3},
+            "multi_field_integration": {"correlation": 0.4, "synthesis": 0.3, "priority": 0.3},
+            "conversational_context": {"context_maintenance": 0.4, "natural_flow": 0.3, "reference_resolution": 0.3},
+            "performance_scaling": {"response_time": 0.4, "efficiency": 0.3, "resource_usage": 0.3},
+            "edge_case_handling": {"detection": 0.4, "recovery": 0.3, "graceful_degradation": 0.3},
+            "professional_communication": {"tone": 0.4, "clarity": 0.3, "appropriateness": 0.3},
         }
 
         # Apply spectrum-specific scoring
@@ -371,10 +301,10 @@ class OptimizedMultiSpectrumFramework:
             # Content quality indicators
             if "example" in response.lower():
                 quality_factors.append(0.05)
-            if any(keyword in response.lower() for keyword in [
-                "analysis", "assessment", "recommendation",
-                "professional", "accurate", "comprehensive"
-            ]):
+            if any(
+                keyword in response.lower()
+                for keyword in ["analysis", "assessment", "recommendation", "professional", "accurate", "comprehensive"]
+            ):
                 quality_factors.append(0.1)
 
             # Apply quality improvements
@@ -400,19 +330,19 @@ class OptimizedMultiSpectrumFramework:
                 "quality_improvement": 0.0,
                 "target_achievement": "Failed - No Results",
                 "spectrum_performance": {},
-                "baseline_comparison": "79.17%"
+                "baseline_comparison": "79.17%",
             }
 
         # Calculate average quality score
-        valid_results = [r for r in results if 'quality_score' in r]
+        valid_results = [r for r in results if "quality_score" in r]
         if not valid_results:
             return {
                 "average_quality_score": 0.0,
                 "quality_improvement": 0.0,
-                "target_achievement": "Failed - No Valid Results"
+                "target_achievement": "Failed - No Valid Results",
             }
 
-        avg_quality = sum(r['quality_score'] for r in valid_results)
+        avg_quality = sum(r["quality_score"] for r in valid_results)
         avg_quality /= len(valid_results)
 
         # Calculate improvement vs baseline (79.17%)
@@ -432,20 +362,18 @@ class OptimizedMultiSpectrumFramework:
             "conversational_context",
             "performance_scaling",
             "edge_case_handling",
-            "professional_communication"
+            "professional_communication",
         ]
 
         for spectrum in spectrums:
-            spectrum_results = [r for r in valid_results
-                               if r.get('spectrum') == spectrum]
+            spectrum_results = [r for r in valid_results if r.get("spectrum") == spectrum]
             if spectrum_results:
-                spectrum_avg = sum(r['quality_score']
-                                   for r in spectrum_results)
+                spectrum_avg = sum(r["quality_score"] for r in spectrum_results)
                 spectrum_avg /= len(spectrum_results)
                 spectrum_performance[spectrum] = {
                     "average_score": spectrum_avg,
                     "test_count": len(spectrum_results),
-                    "target_met": spectrum_avg >= 0.9
+                    "target_met": spectrum_avg >= 0.9,
                 }
 
         return {
@@ -455,12 +383,12 @@ class OptimizedMultiSpectrumFramework:
             "spectrum_performance": spectrum_performance,
             "baseline_comparison": "79.17%",
             "total_tests": len(valid_results),
-            "successful_tests": len(valid_results)
+            "successful_tests": len(valid_results),
         }
 
     def _generate_langsmith_url(self, run_name: str) -> str:
         """Generate LangSmith URL for experiment tracking."""
-        project_name = os.getenv('LANGCHAIN_PROJECT', 'tilores-optimized')
+        project_name = os.getenv("LANGCHAIN_PROJECT", "tilores-optimized")
         base_url = "https://smith.langchain.com"
         return f"{base_url}/projects/{project_name}/runs/{run_name}"
 
@@ -483,7 +411,7 @@ class OptimizedMultiSpectrumFramework:
             "conversational_context",
             "performance_scaling",
             "edge_case_handling",
-            "professional_communication"
+            "professional_communication",
         ]
 
         test_scenarios = [
@@ -493,7 +421,7 @@ class OptimizedMultiSpectrumFramework:
             "Natural conversation flow with context maintenance",
             "High-performance data processing under load",
             "Unusual edge case handling with graceful recovery",
-            "Professional business communication standards"
+            "Professional business communication standards",
         ]
 
         results = []
@@ -506,21 +434,16 @@ class OptimizedMultiSpectrumFramework:
 
             for model_name in self.models:
                 try:
-                    result = await self.run_optimized_spectrum_test(
-                        spectrum, model_name, scenario
-                    )
+                    result = await self.run_optimized_spectrum_test(spectrum, model_name, scenario)
                     if result:
                         results.append(result)
 
                     completed_tests += 1
                     progress = (completed_tests / total_tests) * 100
-                    print(f"   ⏳ Progress: {progress:.1f}% "
-                          f"({completed_tests}/{total_tests})")
+                    print(f"   ⏳ Progress: {progress:.1f}% " f"({completed_tests}/{total_tests})")
 
                 except Exception as e:
-                    logger.error(
-                        f"❌ Failed {spectrum} with {model_name}: {e}"
-                    )
+                    logger.error(f"❌ Failed {spectrum} with {model_name}: {e}")
 
         # Calculate comprehensive results
         analysis = self._analyze_optimized_results(results)
@@ -535,25 +458,22 @@ class OptimizedMultiSpectrumFramework:
                 "ai_optimization_applied": True,
                 "baseline_comparison": "79.17%",
                 "target_achievement": "90%+",
-                "optimization_cycle_id": "ai_optimization_cycle_1755344465"
+                "optimization_cycle_id": "ai_optimization_cycle_1755344465",
             },
             "results": results,
             "analysis": analysis,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(results_data, f, indent=2)
 
         print("\n✅ Optimized Testing Complete!")
         print(f"📊 Results saved to: {filename}")
         print("🎯 Target Achievement Analysis:")
-        print(f"   📈 Average Quality Score: "
-              f"{analysis['average_quality_score']:.1%}")
-        print(f"   🚀 Quality Improvement: "
-              f"{analysis['quality_improvement']:.1%}")
-        print(f"   ✅ Target Achievement: "
-              f"{analysis['target_achievement']}")
+        print(f"   📈 Average Quality Score: " f"{analysis['average_quality_score']:.1%}")
+        print(f"   🚀 Quality Improvement: " f"{analysis['quality_improvement']:.1%}")
+        print(f"   ✅ Target Achievement: " f"{analysis['target_achievement']}")
 
         return results_data
 
@@ -569,10 +489,8 @@ async def main():
         print("\n🎉 Optimized Multi-Spectrum Testing Complete!")
         print("📋 Key Results:")
         print(f"   • Total Tests: {len(results['results'])}")
-        print(f"   • Average Quality: "
-              f"{results['analysis']['average_quality_score']:.1%}")
-        print(f"   • Target Achievement: "
-              f"{results['analysis']['target_achievement']}")
+        print(f"   • Average Quality: " f"{results['analysis']['average_quality_score']:.1%}")
+        print(f"   • Target Achievement: " f"{results['analysis']['target_achievement']}")
 
         return results
 

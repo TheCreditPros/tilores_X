@@ -34,9 +34,7 @@ class TestVirtuousCycleIntegration:
         return mock_client
 
     @pytest.mark.asyncio
-    async def test_virtuous_cycle_manager_initialization(
-        self, virtuous_cycle_manager
-    ):
+    async def test_virtuous_cycle_manager_initialization(self, virtuous_cycle_manager):
         """Test VirtuousCycleManager initialization."""
         manager = virtuous_cycle_manager
 
@@ -47,10 +45,10 @@ class TestVirtuousCycleIntegration:
         assert not manager.monitoring_active
 
         # Check metrics initialization
-        assert 'traces_processed' in manager.metrics
-        assert 'quality_checks' in manager.metrics
-        assert 'optimizations_triggered' in manager.metrics
-        assert manager.metrics['current_quality'] == 0.0
+        assert "traces_processed" in manager.metrics
+        assert "quality_checks" in manager.metrics
+        assert "optimizations_triggered" in manager.metrics
+        assert manager.metrics["current_quality"] == 0.0
 
     @pytest.mark.asyncio
     async def test_trace_simulation(self, virtuous_cycle_manager):
@@ -64,14 +62,14 @@ class TestVirtuousCycleIntegration:
         assert len(traces) >= 1
 
         for trace in traces:
-            assert 'id' in trace
-            assert 'timestamp' in trace
-            assert 'model' in trace
-            assert 'quality_score' in trace
-            assert 'response_time' in trace
-            assert 'spectrum' in trace
-            assert isinstance(trace['quality_score'], float)
-            assert 0.0 <= trace['quality_score'] <= 1.0
+            assert "id" in trace
+            assert "timestamp" in trace
+            assert "model" in trace
+            assert "quality_score" in trace
+            assert "response_time" in trace
+            assert "spectrum" in trace
+            assert isinstance(trace["quality_score"], float)
+            assert 0.0 <= trace["quality_score"] <= 1.0
 
     @pytest.mark.asyncio
     async def test_trace_batch_analysis(self, virtuous_cycle_manager):
@@ -81,11 +79,11 @@ class TestVirtuousCycleIntegration:
         # Create mock traces
         mock_traces = [
             {
-                'id': f'trace_{i}',
-                'quality_score': 0.85 + (i * 0.02),
-                'response_time': 3.0 + i,
-                'spectrum': 'customer_profile',
-                'model': 'gpt-4o-mini'
+                "id": f"trace_{i}",
+                "quality_score": 0.85 + (i * 0.02),
+                "response_time": 3.0 + i,
+                "spectrum": "customer_profile",
+                "model": "gpt-4o-mini",
             }
             for i in range(5)
         ]
@@ -94,9 +92,9 @@ class TestVirtuousCycleIntegration:
         await manager._analyze_trace_batch(mock_traces)
 
         # Check metrics updated
-        assert manager.metrics['traces_processed'] == 5
-        assert manager.metrics['quality_checks'] == 1
-        assert manager.metrics['current_quality'] > 0.0
+        assert manager.metrics["traces_processed"] == 5
+        assert manager.metrics["quality_checks"] == 1
+        assert manager.metrics["current_quality"] > 0.0
 
     @pytest.mark.asyncio
     async def test_quality_threshold_monitoring(self, virtuous_cycle_manager):
@@ -104,20 +102,19 @@ class TestVirtuousCycleIntegration:
         manager = virtuous_cycle_manager
 
         # Mock low quality to trigger optimization
-        manager.metrics['current_quality'] = 0.85  # Below 90% threshold
+        manager.metrics["current_quality"] = 0.85  # Below 90% threshold
 
         # Mock the optimization trigger
-        with patch.object(manager, '_trigger_optimization') as mock_trigger:
+        with patch.object(manager, "_trigger_optimization") as mock_trigger:
             mock_trigger.return_value = None
 
             # Simulate quality monitoring check
-            current_quality = manager.metrics['current_quality']
+            current_quality = manager.metrics["current_quality"]
 
             if current_quality < manager.quality_threshold:
                 if manager._can_trigger_optimization():
                     await manager._trigger_optimization(
-                        reason=f"Quality degradation: {current_quality:.1%}",
-                        quality_score=current_quality
+                        reason=f"Quality degradation: {current_quality:.1%}", quality_score=current_quality
                     )
 
             # Verify optimization was triggered
@@ -129,23 +126,21 @@ class TestVirtuousCycleIntegration:
         manager = virtuous_cycle_manager
 
         # Mock the optimization methods
-        with patch.object(manager, '_run_phase2_optimization') as mock_phase2, \
-             patch.object(manager, '_run_phase3_improvement') as mock_phase3, \
-             patch.object(manager, '_run_phase4_deployment') as mock_phase4:
+        with patch.object(manager, "_run_phase2_optimization") as mock_phase2, patch.object(
+            manager, "_run_phase3_improvement"
+        ) as mock_phase3, patch.object(manager, "_run_phase4_deployment") as mock_phase4:
 
-            mock_phase2.return_value = {'cycle_id': 'test_cycle'}
+            mock_phase2.return_value = {"cycle_id": "test_cycle"}
             mock_phase3.return_value = None
             mock_phase4.return_value = True
 
             # Trigger manual optimization
-            result = await manager.trigger_manual_optimization(
-                "Test optimization trigger"
-            )
+            result = await manager.trigger_manual_optimization("Test optimization trigger")
 
             # Verify result
-            assert result['success'] is True
-            assert 'timestamp' in result
-            assert manager.metrics['optimizations_triggered'] == 1
+            assert result["success"] is True
+            assert "timestamp" in result
+            assert manager.metrics["optimizations_triggered"] == 1
 
     @pytest.mark.asyncio
     async def test_cooldown_mechanism(self, virtuous_cycle_manager):
@@ -159,8 +154,8 @@ class TestVirtuousCycleIntegration:
         result = await manager.trigger_manual_optimization("Test cooldown")
 
         # Verify cooldown is active
-        assert result['success'] is False
-        assert 'Cooldown active' in result['reason']
+        assert result["success"] is False
+        assert "Cooldown active" in result["reason"]
 
     @pytest.mark.asyncio
     async def test_status_endpoint_data(self, virtuous_cycle_manager):
@@ -170,19 +165,19 @@ class TestVirtuousCycleIntegration:
         status = manager.get_status()
 
         # Verify status structure
-        assert 'monitoring_active' in status
-        assert 'langsmith_available' in status
-        assert 'frameworks_available' in status
-        assert 'quality_threshold' in status
-        assert 'metrics' in status
-        assert 'component_status' in status
+        assert "monitoring_active" in status
+        assert "langsmith_available" in status
+        assert "frameworks_available" in status
+        assert "quality_threshold" in status
+        assert "metrics" in status
+        assert "component_status" in status
 
         # Verify metrics structure
-        metrics = status['metrics']
-        assert 'traces_processed' in metrics
-        assert 'quality_checks' in metrics
-        assert 'optimizations_triggered' in metrics
-        assert 'current_quality' in metrics
+        metrics = status["metrics"]
+        assert "traces_processed" in metrics
+        assert "quality_checks" in metrics
+        assert "optimizations_triggered" in metrics
+        assert "current_quality" in metrics
 
     @pytest.mark.asyncio
     async def test_mock_baseline_creation(self, virtuous_cycle_manager):
@@ -197,14 +192,15 @@ class TestVirtuousCycleIntegration:
 
         # Verify file exists and has correct structure
         import os
+
         if os.path.exists(baseline_file):
-            with open(baseline_file, 'r') as f:
+            with open(baseline_file, "r") as f:
                 baseline_data = json.load(f)
 
-            assert 'timestamp' in baseline_data
-            assert 'metrics' in baseline_data
-            assert 'model_performance' in baseline_data['metrics']
-            assert 'spectrum_performance' in baseline_data['metrics']
+            assert "timestamp" in baseline_data
+            assert "metrics" in baseline_data
+            assert "model_performance" in baseline_data["metrics"]
+            assert "spectrum_performance" in baseline_data["metrics"]
 
     @pytest.mark.asyncio
     async def test_health_check_functionality(self, virtuous_cycle_manager):
@@ -230,22 +226,18 @@ class TestVirtuousCycleIntegration:
 
         # Mock async methods
         manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(
-            return_value=MagicMock(__dict__={'cycle_id': 'test_cycle'})
+            return_value=MagicMock(__dict__={"cycle_id": "test_cycle"})
         )
         manager.phase3_orchestrator.learning_accumulator = MagicMock()
         manager.phase3_orchestrator.run_self_healing_cycle = AsyncMock()
-        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(
-            return_value=True
-        )
+        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(return_value=True)
 
         # Mock baseline file
-        with patch.object(manager, '_get_latest_baseline_file') as mock_baseline:
+        with patch.object(manager, "_get_latest_baseline_file") as mock_baseline:
             mock_baseline.return_value = "mock_baseline.json"
 
             # Trigger optimization
-            await manager._trigger_optimization(
-                "Test coordination", 0.85
-            )
+            await manager._trigger_optimization("Test coordination", 0.85)
 
             # Verify all phases were called
             manager.phase2_orchestrator.run_phase2_optimization.assert_called_once()
@@ -258,10 +250,7 @@ class TestVirtuousCycleIntegration:
         manager = virtuous_cycle_manager
 
         # Add mock traces to queue
-        mock_traces = [
-            {'id': f'trace_{i}', 'quality_score': 0.9 + (i * 0.01)}
-            for i in range(3)
-        ]
+        mock_traces = [{"id": f"trace_{i}", "quality_score": 0.9 + (i * 0.01)} for i in range(3)]
 
         for trace in mock_traces:
             await manager.trace_processing_queue.put(trace)
@@ -271,7 +260,7 @@ class TestVirtuousCycleIntegration:
 
         # Process one trace
         trace = await manager.trace_processing_queue.get()
-        assert trace['id'] == 'trace_0'
+        assert trace["id"] == "trace_0"
 
     def test_can_trigger_optimization_logic(self, virtuous_cycle_manager):
         """Test optimization trigger logic."""
@@ -291,15 +280,13 @@ class TestVirtuousCycleIntegration:
 
         # Mock phase2 to raise exception
         manager.phase2_orchestrator = MagicMock()
-        manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(
-            side_effect=Exception("Test error")
-        )
+        manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(side_effect=Exception("Test error"))
 
         # Trigger optimization (should handle error gracefully)
         await manager._trigger_optimization("Test error handling", 0.85)
 
         # Verify optimization was attempted but handled gracefully
-        assert manager.metrics['optimizations_triggered'] == 1
+        assert manager.metrics["optimizations_triggered"] == 1
 
     @pytest.mark.asyncio
     async def test_monitoring_loop_simulation(self, virtuous_cycle_manager):
@@ -310,13 +297,11 @@ class TestVirtuousCycleIntegration:
         manager.monitoring_active = True
 
         # Mock the monitoring methods to avoid infinite loop
-        with patch.object(manager, '_run_monitoring_cycle') as mock_cycle:
+        with patch.object(manager, "_run_monitoring_cycle") as mock_cycle:
             mock_cycle.return_value = None
 
             # Create a task that will run briefly
-            monitoring_task = asyncio.create_task(
-                manager._trace_monitoring_loop()
-            )
+            monitoring_task = asyncio.create_task(manager._trace_monitoring_loop())
 
             # Let it run briefly then stop
             await asyncio.sleep(0.1)
@@ -351,10 +336,10 @@ class TestVirtuousCycleAPIEndpoints:
         data = response.json()
 
         # Verify required fields
-        assert 'monitoring_active' in data
-        assert 'quality_threshold' in data
-        assert 'metrics' in data
-        assert 'component_status' in data
+        assert "monitoring_active" in data
+        assert "quality_threshold" in data
+        assert "metrics" in data
+        assert "component_status" in data
 
     @pytest.mark.asyncio
     async def test_trigger_endpoint_functionality(self):
@@ -365,17 +350,14 @@ class TestVirtuousCycleAPIEndpoints:
         client = TestClient(app)
 
         # Test trigger endpoint with reason
-        response = client.post(
-            "/v1/virtuous-cycle/trigger",
-            json={"reason": "Test API trigger"}
-        )
+        response = client.post("/v1/virtuous-cycle/trigger", json={"reason": "Test API trigger"})
 
         assert response.status_code == 200
         data = response.json()
 
         # Verify response structure
-        assert 'success' in data
-        assert 'reason' in data or 'timestamp' in data
+        assert "success" in data
+        assert "reason" in data or "timestamp" in data
 
     def test_api_endpoint_rate_limits(self):
         """Test API endpoint rate limiting configuration."""
@@ -386,7 +368,7 @@ class TestVirtuousCycleAPIEndpoints:
         trigger_route = None
 
         for route in app.routes:
-            if hasattr(route, 'path'):
+            if hasattr(route, "path"):
                 if route.path == "/v1/virtuous-cycle/status":
                     status_route = route
                 elif route.path == "/v1/virtuous-cycle/trigger":
@@ -409,7 +391,7 @@ class TestVirtuousCycleBackgroundTasks:
         background_tasks.clear()
 
         # Mock the virtuous cycle manager
-        with patch('main_enhanced.virtuous_cycle_manager') as mock_manager:
+        with patch("main_enhanced.virtuous_cycle_manager") as mock_manager:
             mock_manager.start_monitoring = AsyncMock()
 
             # Start background tasks
@@ -424,11 +406,7 @@ class TestVirtuousCycleBackgroundTasks:
     @pytest.mark.asyncio
     async def test_background_task_shutdown(self):
         """Test background task shutdown functionality."""
-        from main_enhanced import (
-            shutdown_background_tasks,
-            background_tasks,
-            virtuous_cycle_manager
-        )
+        from main_enhanced import shutdown_background_tasks, background_tasks, virtuous_cycle_manager
 
         # Add a mock task
         mock_task = MagicMock()
@@ -437,7 +415,7 @@ class TestVirtuousCycleBackgroundTasks:
         background_tasks.append(mock_task)
 
         # Mock the virtuous cycle manager
-        with patch.object(virtuous_cycle_manager, 'stop_monitoring') as mock_stop:
+        with patch.object(virtuous_cycle_manager, "stop_monitoring") as mock_stop:
             mock_stop.return_value = None
 
             # Shutdown background tasks
@@ -467,21 +445,17 @@ class TestVirtuousCyclePhaseIntegration:
         return manager
 
     @pytest.mark.asyncio
-    async def test_phase2_optimization_integration(
-        self, manager_with_mocked_phases
-    ):
+    async def test_phase2_optimization_integration(self, manager_with_mocked_phases):
         """Test Phase 2 optimization integration."""
         manager = manager_with_mocked_phases
 
         # Mock Phase 2 orchestrator
         mock_cycle = MagicMock()
-        mock_cycle.__dict__ = {'cycle_id': 'test_cycle', 'improvement': 0.05}
-        manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(
-            return_value=mock_cycle
-        )
+        mock_cycle.__dict__ = {"cycle_id": "test_cycle", "improvement": 0.05}
+        manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(return_value=mock_cycle)
 
         # Mock baseline file
-        with patch.object(manager, '_get_latest_baseline_file') as mock_baseline:
+        with patch.object(manager, "_get_latest_baseline_file") as mock_baseline:
             mock_baseline.return_value = "test_baseline.json"
 
             # Run Phase 2 optimization
@@ -489,13 +463,11 @@ class TestVirtuousCyclePhaseIntegration:
 
             # Verify result
             assert result is not None
-            assert 'cycle_id' in result
-            assert result['cycle_id'] == 'test_cycle'
+            assert "cycle_id" in result
+            assert result["cycle_id"] == "test_cycle"
 
     @pytest.mark.asyncio
-    async def test_phase3_improvement_integration(
-        self, manager_with_mocked_phases
-    ):
+    async def test_phase3_improvement_integration(self, manager_with_mocked_phases):
         """Test Phase 3 continuous improvement integration."""
         manager = manager_with_mocked_phases
 
@@ -505,10 +477,7 @@ class TestVirtuousCyclePhaseIntegration:
         manager.phase3_orchestrator.run_self_healing_cycle = AsyncMock()
 
         # Mock optimization results
-        optimization_results = {
-            'cycle_id': 'test_cycle',
-            'improvements': {'customer_profile': 0.05}
-        }
+        optimization_results = {"cycle_id": "test_cycle", "improvements": {"customer_profile": 0.05}}
 
         # Run Phase 3 improvement
         await manager._run_phase3_improvement(optimization_results)
@@ -522,57 +491,42 @@ class TestVirtuousCyclePhaseIntegration:
         manager.phase3_orchestrator.run_self_healing_cycle.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_phase4_deployment_integration(
-        self, manager_with_mocked_phases
-    ):
+    async def test_phase4_deployment_integration(self, manager_with_mocked_phases):
         """Test Phase 4 production deployment integration."""
         manager = manager_with_mocked_phases
 
         # Mock Phase 4 orchestrator
-        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(
-            return_value=True
-        )
+        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(return_value=True)
 
         # Mock optimization results
-        optimization_results = {
-            'cycle_id': 'test_cycle',
-            'best_prompts': {'system_prompt': 'optimized prompt'}
-        }
+        optimization_results = {"cycle_id": "test_cycle", "best_prompts": {"system_prompt": "optimized prompt"}}
 
         # Run Phase 4 deployment
         result = await manager._run_phase4_deployment(optimization_results)
 
         # Verify deployment
         assert result is True
-        manager.phase4_orchestrator.deploy_optimized_prompts.assert_called_once_with(  # noqa: E501
-            optimization_results
-        )
+        manager.phase4_orchestrator.deploy_optimized_prompts.assert_called_once_with(optimization_results)  # noqa: E501
 
     @pytest.mark.asyncio
-    async def test_end_to_end_optimization_cycle(
-        self, manager_with_mocked_phases
-    ):
+    async def test_end_to_end_optimization_cycle(self, manager_with_mocked_phases):
         """Test complete end-to-end optimization cycle."""
         manager = manager_with_mocked_phases
 
         # Mock all phase methods
         manager.phase2_orchestrator.run_phase2_optimization = AsyncMock(
-            return_value=MagicMock(__dict__={'cycle_id': 'e2e_test'})
+            return_value=MagicMock(__dict__={"cycle_id": "e2e_test"})
         )
         manager.phase3_orchestrator.learning_accumulator.record_optimization_cycle = MagicMock()  # noqa: E501
         manager.phase3_orchestrator.run_self_healing_cycle = AsyncMock()
-        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(
-            return_value=True
-        )
+        manager.phase4_orchestrator.deploy_optimized_prompts = AsyncMock(return_value=True)
 
         # Mock baseline file
-        with patch.object(manager, '_get_latest_baseline_file') as mock_baseline:
+        with patch.object(manager, "_get_latest_baseline_file") as mock_baseline:
             mock_baseline.return_value = "test_baseline.json"
 
             # Trigger complete optimization cycle
-            await manager._trigger_optimization(
-                "End-to-end test", 0.85
-            )
+            await manager._trigger_optimization("End-to-end test", 0.85)
 
             # Verify all phases were executed
             manager.phase2_orchestrator.run_phase2_optimization.assert_called_once()  # noqa: E501
@@ -580,8 +534,8 @@ class TestVirtuousCyclePhaseIntegration:
             manager.phase4_orchestrator.deploy_optimized_prompts.assert_called_once()  # noqa: E501
 
             # Verify metrics updated
-            assert manager.metrics['optimizations_triggered'] == 1
-            assert manager.metrics['improvements_deployed'] == 1
+            assert manager.metrics["optimizations_triggered"] == 1
+            assert manager.metrics["improvements_deployed"] == 1
 
 
 class TestVirtuousCycleProduction:
@@ -599,9 +553,9 @@ class TestVirtuousCycleProduction:
         await manager._analyze_trace_batch(traces)
 
         # Verify metrics were updated
-        assert manager.metrics['traces_processed'] == len(traces)
-        assert manager.metrics['quality_checks'] == 1
-        assert manager.metrics['current_quality'] > 0.0
+        assert manager.metrics["traces_processed"] == len(traces)
+        assert manager.metrics["quality_checks"] == 1
+        assert manager.metrics["current_quality"] > 0.0
 
     @pytest.mark.asyncio
     async def test_quality_degradation_response(self):
@@ -610,11 +564,7 @@ class TestVirtuousCycleProduction:
 
         # Simulate quality degradation
         low_quality_traces = [
-            {
-                'id': f'trace_{i}',
-                'quality_score': 0.80,  # Below 90% threshold
-                'spectrum': 'customer_profile'
-            }
+            {"id": f"trace_{i}", "quality_score": 0.80, "spectrum": "customer_profile"}  # Below 90% threshold
             for i in range(5)
         ]
 
@@ -622,7 +572,7 @@ class TestVirtuousCycleProduction:
         await manager._analyze_trace_batch(low_quality_traces)
 
         # Verify quality is below threshold
-        assert manager.metrics['current_quality'] < manager.quality_threshold
+        assert manager.metrics["current_quality"] < manager.quality_threshold
 
         # Verify optimization can be triggered
         assert manager._can_trigger_optimization() is True
@@ -641,7 +591,7 @@ class TestVirtuousCycleProduction:
     async def test_graceful_degradation(self):
         """Test graceful degradation when components unavailable."""
         # Test with no frameworks available
-        with patch('virtuous_cycle_api.FRAMEWORKS_AVAILABLE', False):
+        with patch("virtuous_cycle_api.FRAMEWORKS_AVAILABLE", False):
             manager = VirtuousCycleManager()
 
             # Verify graceful handling
@@ -652,4 +602,4 @@ class TestVirtuousCycleProduction:
 
             # Verify status still works
             status = manager.get_status()
-            assert status['frameworks_available'] is False
+            assert status["frameworks_available"] is False

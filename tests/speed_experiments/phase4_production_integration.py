@@ -37,6 +37,7 @@ from typing import Any, Dict, List, Optional
 # External dependencies with graceful fallback
 try:
     from langsmith import Client  # noqa: F401
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LANGSMITH_AVAILABLE = False
@@ -46,6 +47,7 @@ try:
     from multi_spectrum_baseline_framework import MultiSpectrumBaselineFramework
     from phase2_ai_prompt_optimization import Phase2OptimizationOrchestrator
     from phase3_continuous_improvement import ContinuousImprovementOrchestrator
+
     FRAMEWORKS_AVAILABLE = True
 except ImportError:
     FRAMEWORKS_AVAILABLE = False
@@ -139,11 +141,7 @@ class ProductionPromptManager:
 
         # Prompt location mapping in core_app.py
         self.prompt_locations = {
-            "system_prompt": {
-                "start_line": 1858,
-                "end_line": 1892,
-                "marker": "system_prompt = f\"\"\""
-            }
+            "system_prompt": {"start_line": 1858, "end_line": 1892, "marker": 'system_prompt = f"""'}
         }
 
         self.deployment_history: List[PromptDeployment] = []
@@ -171,13 +169,13 @@ class ProductionPromptManager:
         location_info = self.prompt_locations[location]
 
         try:
-            with open(self.core_app_path, 'r') as f:
+            with open(self.core_app_path, "r") as f:
                 lines = f.readlines()
 
             start_idx = location_info["start_line"] - 1
             end_idx = location_info["end_line"]
 
-            current_prompt = ''.join(lines[start_idx:end_idx])
+            current_prompt = "".join(lines[start_idx:end_idx])
             return current_prompt
         except Exception as e:
             self.logger.error(f"Failed to extract current prompt: {e}")
@@ -196,10 +194,7 @@ class ProductionPromptManager:
             deployment.deployment_status = DeploymentStatus.DEPLOYING
 
             # Apply prompt to core_app.py
-            success = await self._apply_prompt_to_file(
-                deployment.prompt_content,
-                deployment.target_location
-            )
+            success = await self._apply_prompt_to_file(deployment.prompt_content, deployment.target_location)
 
             if success:
                 deployment.deployment_status = DeploymentStatus.DEPLOYED
@@ -218,8 +213,7 @@ class ProductionPromptManager:
             await self.rollback_deployment(deployment)
             return False
 
-    async def _apply_prompt_to_file(self, prompt_content: str,
-                                  location: str) -> bool:
+    async def _apply_prompt_to_file(self, prompt_content: str, location: str) -> bool:
         """Apply prompt content to specific location in core_app.py."""
         if location not in self.prompt_locations:
             raise ValueError(f"Unknown prompt location: {location}")
@@ -227,7 +221,7 @@ class ProductionPromptManager:
         location_info = self.prompt_locations[location]
 
         try:
-            with open(self.core_app_path, 'r') as f:
+            with open(self.core_app_path, "r") as f:
                 lines = f.readlines()
 
             # Replace the prompt section
@@ -238,12 +232,10 @@ class ProductionPromptManager:
             formatted_prompt = self._format_prompt_for_insertion(prompt_content)
 
             # Replace lines
-            new_lines = (lines[:start_idx] +
-                        [formatted_prompt + '\n'] +
-                        lines[end_idx:])
+            new_lines = lines[:start_idx] + [formatted_prompt + "\n"] + lines[end_idx:]
 
             # Write back to file
-            with open(self.core_app_path, 'w') as f:
+            with open(self.core_app_path, "w") as f:
                 f.writelines(new_lines)
 
             return True
@@ -303,7 +295,7 @@ class ProductionPerformanceMonitor:
             "claude-3-haiku",
             "gemini-1.5-flash-002",
             "gemini-2.5-flash",
-            "gemini-2.5-flash-lite"
+            "gemini-2.5-flash-lite",
         ]
 
         self.spectrums = [
@@ -313,7 +305,7 @@ class ProductionPerformanceMonitor:
             "call_center_operations",
             "entity_relationship",
             "geographic_analysis",
-            "temporal_analysis"
+            "temporal_analysis",
         ]
 
         self.logger = logging.getLogger(__name__)
@@ -373,7 +365,7 @@ class ProductionPerformanceMonitor:
             "claude-3-haiku": 0.92,
             "gemini-1.5-flash-002": 0.95,
             "gemini-2.5-flash": 0.96,
-            "gemini-2.5-flash-lite": 0.93
+            "gemini-2.5-flash-lite": 0.93,
         }.get(model, 0.85)
 
         # Add realistic variance
@@ -385,7 +377,7 @@ class ProductionPerformanceMonitor:
             "response_time": 3.0 + (time.time() % 5),
             "success_rate": 0.98 + 0.02 * (time.time() % 1),
             "error_rate": 0.02 * (time.time() % 1),
-            "throughput": 100 + 50 * (time.time() % 1)
+            "throughput": 100 + 50 * (time.time() % 1),
         }
 
     async def _collect_spectrum_metrics(self, spectrum: str) -> Dict[str, float]:
@@ -399,7 +391,7 @@ class ProductionPerformanceMonitor:
             "completeness_score": current_completeness,
             "accuracy_score": 0.90 + 0.05 * (time.time() % 1),
             "data_coverage": 0.88 + 0.08 * (time.time() % 1),
-            "processing_time": 2.0 + (time.time() % 3)
+            "processing_time": 2.0 + (time.time() % 3),
         }
 
     def _calculate_quality_achievement_rate(self, metrics: ProductionMetrics) -> float:
@@ -408,8 +400,7 @@ class ProductionPerformanceMonitor:
             return 0.0
 
         high_quality_models = sum(
-            1 for model_metrics in metrics.model_performance.values()
-            if model_metrics.get("quality_score", 0) >= 0.90
+            1 for model_metrics in metrics.model_performance.values() if model_metrics.get("quality_score", 0) >= 0.90
         )
 
         return high_quality_models / len(metrics.model_performance)
@@ -422,15 +413,13 @@ class ProductionPerformanceMonitor:
         # Compare with previous metrics
         if len(self.metrics_history) > 1:
             previous_metrics = self.metrics_history[-2]
-            current_avg = sum(
-                m.get("response_time", 0)
-                for m in metrics.model_performance.values()
-            ) / len(metrics.model_performance)
+            current_avg = sum(m.get("response_time", 0) for m in metrics.model_performance.values()) / len(
+                metrics.model_performance
+            )
 
-            previous_avg = sum(
-                m.get("response_time", 0)
-                for m in previous_metrics.model_performance.values()
-            ) / len(previous_metrics.model_performance)
+            previous_avg = sum(m.get("response_time", 0) for m in previous_metrics.model_performance.values()) / len(
+                previous_metrics.model_performance
+            )
 
             return (previous_avg - current_avg) / previous_avg if previous_avg > 0 else 0.0
 
@@ -472,11 +461,11 @@ class ProductionPerformanceMonitor:
             "spectrum_performance": metrics.spectrum_performance,
             "quality_achievement_rate": metrics.quality_achievement_rate,
             "response_time_improvement": metrics.response_time_improvement,
-            "customer_satisfaction_score": metrics.customer_satisfaction_score
+            "customer_satisfaction_score": metrics.customer_satisfaction_score,
         }
 
         try:
-            with open(filename, 'w') as f:
+            with open(filename, "w") as f:
                 json.dump(metrics_data, f, indent=2)
         except Exception as e:
             self.logger.error(f"Failed to save metrics: {e}")
@@ -485,8 +474,7 @@ class ProductionPerformanceMonitor:
 class ProductionABTester:
     """A/B testing infrastructure for production environment."""
 
-    def __init__(self, prompt_manager: ProductionPromptManager,
-                 performance_monitor: ProductionPerformanceMonitor):
+    def __init__(self, prompt_manager: ProductionPromptManager, performance_monitor: ProductionPerformanceMonitor):
         """Initialize the A/B tester."""
         self.prompt_manager = prompt_manager
         self.performance_monitor = performance_monitor
@@ -515,8 +503,8 @@ class ProductionABTester:
                 metadata={
                     "ab_test_id": config.test_id,
                     "traffic_split": config.traffic_split,
-                    "test_duration": config.test_duration.total_seconds()
-                }
+                    "test_duration": config.test_duration.total_seconds(),
+                },
             )
 
             # Deploy with traffic splitting logic
@@ -553,8 +541,7 @@ class ProductionABTester:
 
         return True
 
-    async def _deploy_with_traffic_split(self, deployment: PromptDeployment,
-                                       config: ABTestConfiguration) -> bool:
+    async def _deploy_with_traffic_split(self, deployment: PromptDeployment, config: ABTestConfiguration) -> bool:
         """Deploy variant with traffic splitting logic."""
         # In a real implementation, this would modify the routing logic
         # to split traffic between control and variant prompts
@@ -595,7 +582,7 @@ class ProductionABTester:
                 "control_metrics": {},
                 "variant_metrics": {},
                 "sample_sizes": {"control": 0, "variant": 0},
-                "statistical_significance": False
+                "statistical_significance": False,
             }
 
         # Simulate metric collection
@@ -617,8 +604,10 @@ class ProductionABTester:
         results = self.test_results[test_id]
 
         # Check minimum sample size
-        if (results["sample_sizes"]["control"] < config.minimum_sample_size or
-            results["sample_sizes"]["variant"] < config.minimum_sample_size):
+        if (
+            results["sample_sizes"]["control"] < config.minimum_sample_size
+            or results["sample_sizes"]["variant"] < config.minimum_sample_size
+        ):
             return False
 
         # Check for statistical significance (simplified)
@@ -672,7 +661,7 @@ class ProductionABTester:
             target_location="system_prompt",
             deployment_status=DeploymentStatus.PENDING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         await self.prompt_manager.deploy_prompt(deployment)
@@ -707,8 +696,7 @@ class ProductionIntegrationOrchestrator:
                 self.phase2_orchestrator = Phase2OptimizationOrchestrator()
                 if LANGSMITH_AVAILABLE:
                     self.phase3_orchestrator = ContinuousImprovementOrchestrator(
-                        quality_collector=None,  # Mock for now
-                        config={}
+                        quality_collector=None, config={}  # Mock for now
                     )
                 else:
                     self.phase3_orchestrator = None
@@ -743,7 +731,7 @@ class ProductionIntegrationOrchestrator:
                 target_location="system_prompt",
                 deployment_status=DeploymentStatus.PENDING,
                 validation_results={},
-                performance_metrics={}
+                performance_metrics={},
             )
 
             # Validate deployment
@@ -873,7 +861,9 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
             # Integration validation
             integration_valid = await self._validate_integration(deployment)
-            validation_results["integration"] = ValidationResult.PASSED if integration_valid else ValidationResult.FAILED
+            validation_results["integration"] = (
+                ValidationResult.PASSED if integration_valid else ValidationResult.FAILED
+            )
 
             # Quality validation with Edwina Hawthorne data
             quality_valid = await self._validate_with_customer_data(deployment)
@@ -902,12 +892,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
         """Validate prompt syntax and formatting."""
         try:
             # Check for required components
-            required_components = [
-                "customer service assistant",
-                "tools",
-                "CRITICAL",
-                "MANDATORY"
-            ]
+            required_components = ["customer service assistant", "tools", "CRITICAL", "MANDATORY"]
 
             for component in required_components:
                 if component.lower() not in prompt_content.lower():
@@ -933,7 +918,12 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
         """Validate prompt content quality and completeness."""
         try:
             # Check for tool references
-            required_tools = ["tilores_search", "tilores_entity_edges", "tilores_record_lookup", "get_customer_credit_report"]
+            required_tools = [
+                "tilores_search",
+                "tilores_entity_edges",
+                "tilores_record_lookup",
+                "get_customer_credit_report",
+            ]
 
             for tool in required_tools:
                 if tool not in prompt_content:
@@ -984,7 +974,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
             test_queries = [
                 "edwina.hawthorne@example.com",
                 "Find customer Edwina Hawthorne",
-                "Get credit report for customer EDW_HAWTHORNE_001"
+                "Get credit report for customer EDW_HAWTHORNE_001",
             ]
 
             validation_score = 0
@@ -1059,8 +1049,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
         self.logger.info(f"Deployment monitoring completed: {deployment.deployment_id}")
 
-    async def _check_deployment_health(self, deployment: PromptDeployment,
-                                     metrics: ProductionMetrics) -> bool:
+    async def _check_deployment_health(self, deployment: PromptDeployment, metrics: ProductionMetrics) -> bool:
         """Check if deployment is performing within acceptable parameters."""
         # Check quality achievement rate
         if metrics.quality_achievement_rate < 0.80:
@@ -1079,8 +1068,9 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 
         return True
 
-    async def run_production_ab_test(self, control_prompt: str, variant_prompt: str,
-                                   traffic_split: float = 0.1) -> Dict[str, Any]:
+    async def run_production_ab_test(
+        self, control_prompt: str, variant_prompt: str, traffic_split: float = 0.1
+    ) -> Dict[str, Any]:
         """Run A/B test in production environment."""
         test_id = f"prod_ab_{int(time.time())}"
 
@@ -1093,7 +1083,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
             target_spectrums=self.performance_monitor.spectrums,
             success_criteria={"quality_improvement": 0.02, "significance": 0.05},
             test_duration=timedelta(hours=2),
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         success = await self.ab_tester.start_ab_test(config)
@@ -1110,9 +1100,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
         self.logger.info("🔄 Starting continuous optimization pipeline")
 
         # Start performance monitoring
-        monitoring_task = asyncio.create_task(
-            self.performance_monitor.start_monitoring(monitoring_interval=300)
-        )
+        monitoring_task = asyncio.create_task(self.performance_monitor.start_monitoring(monitoring_interval=300))
 
         # Run optimization cycles
         while True:
@@ -1126,9 +1114,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                         # Get latest baseline results
                         latest_baseline = await self._get_latest_baseline_results()
                         if latest_baseline:
-                            optimization_cycle = await self.phase2_orchestrator.run_phase2_optimization(
-                                latest_baseline
-                            )
+                            optimization_cycle = await self.phase2_orchestrator.run_phase2_optimization(latest_baseline)
 
                             # Deploy optimized prompts
                             await self.deploy_optimized_prompts(optimization_cycle.__dict__)
@@ -1199,7 +1185,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
             "deployment_config": False,
             "health_endpoints": False,
             "monitoring_setup": False,
-            "overall_status": "FAILED"
+            "overall_status": "FAILED",
         }
 
         try:
@@ -1209,7 +1195,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
                 "TILORES_CLIENT_ID",
                 "TILORES_CLIENT_SECRET",
                 "LANGSMITH_API_KEY",
-                "LANGSMITH_PROJECT"
+                "LANGSMITH_PROJECT",
             ]
 
             missing_vars = [var for var in required_env_vars if not os.getenv(var)]
@@ -1249,8 +1235,7 @@ MANDATORY: Call tools first, then provide real data. Never guess or make up info
 # Main execution function for testing
 async def main():
     """Main function to demonstrate Phase 4 production integration."""
-    logging.basicConfig(level=logging.INFO,
-                       format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     # Create production integration orchestrator
     orchestrator = ProductionIntegrationOrchestrator(ProductionEnvironment.LOCAL)
@@ -1267,14 +1252,10 @@ async def main():
         mock_optimization_results = {
             "ab_test_results": {
                 "customer_profile": {
-                    "summary": {
-                        "best_variation": "optimized_v1",
-                        "best_score": 0.92,
-                        "average_improvement": 0.05
-                    }
+                    "summary": {"best_variation": "optimized_v1", "best_score": 0.92, "average_improvement": 0.05}
                 }
             },
-            "overall_improvement": 0.04
+            "overall_improvement": 0.04,
         }
 
         # Test prompt deployment
@@ -1287,9 +1268,7 @@ async def main():
         control_prompt = "You are a helpful assistant."
         variant_prompt = "You are an expert customer service assistant with advanced tools."
 
-        ab_test_result = await orchestrator.run_production_ab_test(
-            control_prompt, variant_prompt, traffic_split=0.1
-        )
+        ab_test_result = await orchestrator.run_production_ab_test(control_prompt, variant_prompt, traffic_split=0.1)
         print(f"A/B test result: {ab_test_result['status']}")
 
         print("\n✅ Phase 4 Production Integration demonstration completed")

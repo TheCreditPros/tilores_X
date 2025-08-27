@@ -447,7 +447,7 @@ class TestEnhancedVirtuousCycleManagerPerformance:
     @pytest.mark.asyncio
     async def test_autonomous_optimization_performance_under_load(self):
         """Test autonomous optimization performance under load."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
             "autonomous_integration.AutonomousAIPlatform"
         ) as mock_platform:
 

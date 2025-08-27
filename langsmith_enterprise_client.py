@@ -652,7 +652,11 @@ class EnterpriseLangSmithClient:
         try:
             # Get runs with feedback
             runs = await self.list_runs(
-                session_names=session_names, start_time=start_time, end_time=end_time, limit=limit, include_feedback=True
+                session_names=session_names,
+                start_time=start_time,
+                end_time=end_time,
+                limit=limit,
+                include_feedback=True,
             )
 
             quality_metrics = []

@@ -27,6 +27,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 # Import all phase components
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from multi_spectrum_framework import MultiSpectrumFramework
@@ -47,60 +48,49 @@ class TestPhase1To2Integration:
                 "timestamp": "20250816_123000",
                 "total_experiments": 35,
                 "successful_experiments": 33,
-                "phase": "1_multi_spectrum_foundation"
+                "phase": "1_multi_spectrum_foundation",
             },
             "metrics": {
                 "average_response_time": 4.8,
                 "average_quality_score": 0.89,
                 "quality_target_achievement": 0.83,
                 "model_performance": {
-                    "gpt-4o-mini": {
-                        "count": 7,
-                        "avg_quality": 0.92,
-                        "avg_response_time": 6.2,
-                        "success_rate": 1.0
-                    },
+                    "gpt-4o-mini": {"count": 7, "avg_quality": 0.92, "avg_response_time": 6.2, "success_rate": 1.0},
                     "gemini-2.5-flash": {
                         "count": 7,
                         "avg_quality": 0.94,
                         "avg_response_time": 3.1,
-                        "success_rate": 1.0
+                        "success_rate": 1.0,
                     },
-                    "claude-3-haiku": {
-                        "count": 7,
-                        "avg_quality": 0.88,
-                        "avg_response_time": 4.5,
-                        "success_rate": 0.95
-                    }
+                    "claude-3-haiku": {"count": 7, "avg_quality": 0.88, "avg_response_time": 4.5, "success_rate": 0.95},
                 },
                 "spectrum_performance": {
                     "customer_profile": {
                         "count": 5,
                         "avg_quality": 0.91,
                         "avg_completeness": 0.89,
-                        "success_rate": 1.0
+                        "success_rate": 1.0,
                     },
                     "credit_analysis": {
                         "count": 5,
                         "avg_quality": 0.87,
                         "avg_completeness": 0.85,
-                        "success_rate": 0.95
+                        "success_rate": 0.95,
                     },
                     "transaction_history": {
                         "count": 5,
                         "avg_quality": 0.90,
                         "avg_completeness": 0.88,
-                        "success_rate": 1.0
-                    }
-                }
-            }
+                        "success_rate": 1.0,
+                    },
+                },
+            },
         }
 
     @pytest.fixture
     def temp_baseline_file(self, phase1_results):
         """Create temporary baseline file for integration testing."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(phase1_results, f)
             return f.name
 
@@ -111,9 +101,7 @@ class TestPhase1To2Integration:
         phase2_orchestrator = Phase2OptimizationOrchestrator()
 
         # Run Phase 2 optimization using Phase 1 results
-        optimization_cycle = await phase2_orchestrator.run_phase2_optimization(
-            temp_baseline_file
-        )
+        optimization_cycle = await phase2_orchestrator.run_phase2_optimization(temp_baseline_file)
 
         # Verify Phase 1 data was properly consumed
         assert optimization_cycle.baseline_results is not None
@@ -189,29 +177,21 @@ class TestPhase2To3Integration:
                     "pattern_id": "high_perf_gemini",
                     "pattern_type": "high_performance_model",
                     "success_rate": 0.94,
-                    "quality_impact": 0.05
+                    "quality_impact": 0.05,
                 }
             ],
             "generated_variations": [
-                {
-                    "variation_id": "clarity_v1",
-                    "variation_type": "instruction_clarity",
-                    "expected_improvement": 0.04
-                }
+                {"variation_id": "clarity_v1", "variation_type": "instruction_clarity", "expected_improvement": 0.04}
             ],
             "model_strategies": [
                 {
                     "model_name": "gpt-4o-mini",
                     "optimization_approach": "quality_enhancement",
-                    "expected_improvements": {"quality_score": 0.03}
+                    "expected_improvements": {"quality_score": 0.03},
                 }
             ],
-            "ab_test_results": {
-                "customer_profile": {
-                    "summary": {"average_improvement": 0.04}
-                }
-            },
-            "overall_improvement": 0.04
+            "ab_test_results": {"customer_profile": {"summary": {"average_improvement": 0.04}}},
+            "overall_improvement": 0.04,
         }
 
     @pytest.fixture
@@ -227,9 +207,7 @@ class TestPhase2To3Integration:
     async def test_phase2_to_phase3_learning_transfer(self, phase2_results, mock_quality_collector):
         """Test learning transfer from Phase 2 to Phase 3."""
         # Initialize Phase 3 orchestrator
-        phase3_orchestrator = ContinuousImprovementOrchestrator(
-            mock_quality_collector, config={}
-        )
+        phase3_orchestrator = ContinuousImprovementOrchestrator(mock_quality_collector, config={})
 
         # Record Phase 2 results in learning accumulator
         phase3_orchestrator.learning_accumulator.record_optimization_cycle(phase2_results)
@@ -247,9 +225,7 @@ class TestPhase2To3Integration:
     @pytest.mark.asyncio
     async def test_continuous_improvement_with_phase2_patterns(self, phase2_results, mock_quality_collector):
         """Test continuous improvement using Phase 2 patterns."""
-        phase3_orchestrator = ContinuousImprovementOrchestrator(
-            mock_quality_collector, config={}
-        )
+        phase3_orchestrator = ContinuousImprovementOrchestrator(mock_quality_collector, config={})
 
         # Record Phase 2 learning
         phase3_orchestrator.learning_accumulator.record_optimization_cycle(phase2_results)
@@ -270,16 +246,10 @@ class TestPhase2To3Integration:
     async def test_quality_threshold_monitoring_integration(self, mock_quality_collector):
         """Test quality threshold monitoring with Phase 2 improvements."""
         # Mock metrics showing improvement from Phase 2
-        mock_metrics = [
-            MagicMock(score=0.91),  # Improved from Phase 2
-            MagicMock(score=0.92),
-            MagicMock(score=0.90)
-        ]
+        mock_metrics = [MagicMock(score=0.91), MagicMock(score=0.92), MagicMock(score=0.90)]  # Improved from Phase 2
         mock_quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
-        phase3_orchestrator = ContinuousImprovementOrchestrator(
-            mock_quality_collector, config={}
-        )
+        phase3_orchestrator = ContinuousImprovementOrchestrator(mock_quality_collector, config={})
 
         # Check thresholds - should not trigger alerts for good quality
         alerts = phase3_orchestrator.threshold_monitor.check_quality_thresholds("customer_profile")
@@ -309,7 +279,7 @@ MANDATORY: Call tools first, then provide comprehensive analysis.""",
             "expected_improvement": 0.06,
             "confidence": 0.88,
             "learning_applied": 3,
-            "optimization_time": 2.3
+            "optimization_time": 2.3,
         }
 
     @pytest.mark.asyncio
@@ -317,31 +287,32 @@ MANDATORY: Call tools first, then provide comprehensive analysis.""",
         """Test deployment readiness evaluation from Phase 3 improvements."""
         # Create deployment system for testing
         from phase3_continuous_improvement import AutomatedImprovementDeployment
+
         deployment_system = AutomatedImprovementDeployment()
 
         # Evaluate deployment readiness
-        decision = await deployment_system.evaluate_deployment_readiness(
-            phase3_improvements
-        )
+        decision = await deployment_system.evaluate_deployment_readiness(phase3_improvements)
 
         # Verify deployment criteria
         assert decision["ready_for_deployment"] is True
         assert decision["improvement_check"] is True  # 6% > 2% threshold
-        assert decision["confidence_check"] is True   # 88% > 80% threshold
+        assert decision["confidence_check"] is True  # 88% > 80% threshold
         assert "DEPLOY" in decision["recommendation"]
 
     @pytest.mark.asyncio
     async def test_production_prompt_deployment(self, phase3_improvements):
         """Test production deployment of Phase 3 improvements."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-            f.write("""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(
+                """
         system_prompt = f\"\"\"You are a customer service assistant.
 {comprehensive_fields_text}
 
 # CRITICAL: YOU MUST USE TOOLS
 
 MANDATORY: Call tools first.\"\"\"
-""")
+"""
+            )
             temp_core_app = f.name
 
         try:
@@ -355,7 +326,7 @@ MANDATORY: Call tools first.\"\"\"
                         "summary": {
                             "best_variation": "phase3_improvement",
                             "best_score": 0.94,
-                            "average_improvement": 0.06
+                            "average_improvement": 0.06,
                         }
                     }
                 }
@@ -409,7 +380,7 @@ class TestCompleteVirtuousCycle:
     @pytest.mark.asyncio
     async def test_complete_virtuous_cycle_execution(self, mock_langsmith_client):
         """Test complete virtuous cycle from Phase 1 through Phase 4."""
-        with patch('virtuous_cycle_framework.Client') as mock_client_class:
+        with patch("virtuous_cycle_framework.Client") as mock_client_class:
             mock_client_class.return_value = mock_langsmith_client
 
             # Initialize virtuous cycle orchestrator
@@ -437,29 +408,29 @@ class TestCompleteVirtuousCycle:
     @pytest.mark.asyncio
     async def test_quality_improvement_across_cycle(self, mock_langsmith_client):
         """Test quality improvement measurement across complete cycle."""
-        with patch('virtuous_cycle_framework.Client') as mock_client_class:
+        with patch("virtuous_cycle_framework.Client") as mock_client_class:
             mock_client_class.return_value = mock_langsmith_client
 
             orchestrator = VirtuousCycleOrchestrator(mock_langsmith_client)
 
             # Mock baseline testing with lower quality
-            with patch.object(orchestrator, '_run_baseline_testing') as mock_baseline:
+            with patch.object(orchestrator, "_run_baseline_testing") as mock_baseline:
                 mock_baseline.return_value = {
                     "spectrum_averages": {
                         "customer_profile": 0.87,
                         "credit_analysis": 0.85,
-                        "transaction_history": 0.89
+                        "transaction_history": 0.89,
                     },
-                    "overall_average": 0.87
+                    "overall_average": 0.87,
                 }
 
                 # Mock optimization with improvements
-                with patch.object(orchestrator, '_optimize_and_test_spectrum') as mock_optimize:
+                with patch.object(orchestrator, "_optimize_and_test_spectrum") as mock_optimize:
                     mock_optimize.return_value = {
                         "baseline_quality": 0.87,
                         "improved_quality": 0.93,
                         "quality_improvement": 0.06,
-                        "improvement_percentage": 6.9
+                        "improvement_percentage": 6.9,
                     }
 
                     results = await orchestrator.run_improvement_cycle()
@@ -474,13 +445,13 @@ class TestCompleteVirtuousCycle:
     @pytest.mark.asyncio
     async def test_90_percent_quality_achievement_validation(self, mock_langsmith_client):
         """Test validation of 90%+ quality achievement across the cycle."""
-        with patch('virtuous_cycle_framework.Client') as mock_client_class:
+        with patch("virtuous_cycle_framework.Client") as mock_client_class:
             mock_client_class.return_value = mock_langsmith_client
 
             orchestrator = VirtuousCycleOrchestrator(mock_langsmith_client)
 
             # Mock high-quality baseline
-            with patch.object(orchestrator, '_run_baseline_testing') as mock_baseline:
+            with patch.object(orchestrator, "_run_baseline_testing") as mock_baseline:
                 mock_baseline.return_value = {
                     "spectrum_averages": {
                         "customer_profile": 0.92,
@@ -489,9 +460,9 @@ class TestCompleteVirtuousCycle:
                         "call_center_operations": 0.90,
                         "entity_relationship": 0.94,
                         "geographic_analysis": 0.89,
-                        "temporal_analysis": 0.91
+                        "temporal_analysis": 0.91,
                     },
-                    "overall_average": 0.914
+                    "overall_average": 0.914,
                 }
 
                 results = await orchestrator.run_improvement_cycle()
@@ -516,45 +487,45 @@ class TestEdwinaHawthorneEndToEnd:
                 "query": "Find customer blessedwina@aol.com",
                 "expected_customer": "Edwina Hawthorne",
                 "expected_client_id": "2270",
-                "test_type": "email_lookup"
+                "test_type": "email_lookup",
             },
             {
                 "query": "Get credit report for customer 2270",
                 "expected_content": "credit score 543",
                 "expected_analysis": "Very Poor",
-                "test_type": "credit_analysis"
+                "test_type": "credit_analysis",
             },
             {
                 "query": "What is Edwina Hawthorne's payment history?",
                 "expected_customer": "Edwina Hawthorne",
-                "test_type": "payment_history"
+                "test_type": "payment_history",
             },
             {
                 "query": "Show complete profile for client ID 2270",
                 "expected_customer": "Edwina Hawthorne",
                 "expected_fields": ["name", "email", "phone", "credit_score"],
-                "test_type": "complete_profile"
-            }
+                "test_type": "complete_profile",
+            },
         ]
 
     @pytest.mark.asyncio
     async def test_edwina_hawthorne_across_all_phases(self, edwina_test_scenarios):
         """Test Edwina Hawthorne data validation across all phases."""
         # Phase 1: Multi-spectrum foundation with Edwina data
-        with patch('multi_spectrum_framework.Client'):
-            with patch.dict('os.environ', {'LANGSMITH_API_KEY': 'test_key'}):
+        with patch("multi_spectrum_framework.Client"):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key"}):
                 phase1_framework = MultiSpectrumFramework()
 
                 # Verify Edwina data in customer identity spectrum
                 identity_spectrum = next(
-                    s for s in phase1_framework.data_spectrums
-                    if s.name == "customer_identity_resolution"
+                    s for s in phase1_framework.data_spectrums if s.name == "customer_identity_resolution"
                 )
 
                 edwina_samples = [
-                    sample for sample in identity_spectrum.data_samples
-                    if "blessedwina@aol.com" in sample.get("query", "") or
-                       "Edwina Hawthorne" in sample.get("expected_customer", "")
+                    sample
+                    for sample in identity_spectrum.data_samples
+                    if "blessedwina@aol.com" in sample.get("query", "")
+                    or "Edwina Hawthorne" in sample.get("expected_customer", "")
                 ]
                 assert len(edwina_samples) >= 2
 
@@ -566,7 +537,7 @@ class TestEdwinaHawthorneEndToEnd:
             score = await phase4_orchestrator._test_prompt_effectiveness(
                 """You are a comprehensive customer service assistant with
 mandatory tool usage for accurate customer data analysis.""",
-                scenario["query"]
+                scenario["query"],
             )
 
             # Should achieve high scores for customer-focused prompts
@@ -578,17 +549,13 @@ mandatory tool usage for accurate customer data analysis.""",
         # Mock Phase 1 results with Edwina data
         phase1_results = {
             "metrics": {
-                "model_performance": {
-                    "gpt-4o-mini": {"avg_quality": 0.91, "edwina_test_score": 0.93}
-                },
-                "spectrum_performance": {
-                    "customer_profile": {"avg_quality": 0.90, "edwina_accuracy": 0.95}
-                }
+                "model_performance": {"gpt-4o-mini": {"avg_quality": 0.91, "edwina_test_score": 0.93}},
+                "spectrum_performance": {"customer_profile": {"avg_quality": 0.90, "edwina_accuracy": 0.95}},
             }
         }
 
         # Create temporary file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(phase1_results, f)
             temp_file = f.name
 
@@ -604,9 +571,7 @@ mandatory tool usage for accurate customer data analysis.""",
             mock_quality_collector = MagicMock()
             mock_quality_collector.storage.get_spectrum_metrics.return_value = []
 
-            phase3_orchestrator = ContinuousImprovementOrchestrator(
-                mock_quality_collector, config={}
-            )
+            phase3_orchestrator = ContinuousImprovementOrchestrator(mock_quality_collector, config={})
 
             # Record cycle for learning
             phase3_orchestrator.learning_accumulator.record_optimization_cycle(cycle.__dict__)
@@ -630,9 +595,7 @@ class TestProductionScenarios:
         # Simulate high-volume metrics collection
         metrics_tasks = []
         for _ in range(10):
-            task = asyncio.create_task(
-                phase4_orchestrator.performance_monitor.collect_performance_metrics()
-            )
+            task = asyncio.create_task(phase4_orchestrator.performance_monitor.collect_performance_metrics())
             metrics_tasks.append(task)
 
         metrics_results = await asyncio.gather(*metrics_tasks)
@@ -648,17 +611,11 @@ class TestProductionScenarios:
         phase4_orchestrator = ProductionIntegrationOrchestrator()
 
         # Mock deployment failure
-        with patch.object(phase4_orchestrator.prompt_manager, 'deploy_prompt') as mock_deploy:
+        with patch.object(phase4_orchestrator.prompt_manager, "deploy_prompt") as mock_deploy:
             mock_deploy.return_value = False
 
             # Mock optimization results
-            optimization_results = {
-                "ab_test_results": {
-                    "customer_profile": {
-                        "summary": {"best_score": 0.92}
-                    }
-                }
-            }
+            optimization_results = {"ab_test_results": {"customer_profile": {"summary": {"best_score": 0.92}}}}
 
             # Mock validation success but deployment failure
             phase4_orchestrator._validate_deployment = AsyncMock(return_value=True)
@@ -673,13 +630,16 @@ class TestProductionScenarios:
         phase4_orchestrator = ProductionIntegrationOrchestrator()
 
         # Mock Railway environment variables
-        with patch.dict('os.environ', {
-            'TILORES_API_URL': 'https://api.tilores.com',
-            'TILORES_CLIENT_ID': 'prod_client',
-            'TILORES_CLIENT_SECRET': 'prod_secret',
-            'LANGSMITH_API_KEY': 'prod_key',
-            'LANGSMITH_PROJECT': 'tilores_production'
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "TILORES_API_URL": "https://api.tilores.com",
+                "TILORES_CLIENT_ID": "prod_client",
+                "TILORES_CLIENT_SECRET": "prod_secret",
+                "LANGSMITH_API_KEY": "prod_key",
+                "LANGSMITH_PROJECT": "tilores_production",
+            },
+        ):
             validation_results = await phase4_orchestrator.validate_railway_integration()
 
             # Verify production readiness
@@ -696,11 +656,19 @@ async def main():
     import subprocess
     import sys
 
-    result = subprocess.run([
-        sys.executable, "-m", "pytest",
-        "tests/speed_experiments/test_virtuous_cycle_integration.py",
-        "-v", "--tb=short", "-x"  # Stop on first failure
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/speed_experiments/test_virtuous_cycle_integration.py",
+            "-v",
+            "--tb=short",
+            "-x",  # Stop on first failure
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     print("Integration Test Results:")
     print(result.stdout)

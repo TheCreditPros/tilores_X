@@ -15,6 +15,7 @@ def fix_and_rerun_langsmith_experiments():
     """Fix HTTP 400 errors and rerun LangSmith experiments"""
 
     from dotenv import load_dotenv
+
     load_dotenv()
 
     client = Client(api_key=os.getenv("LANGSMITH_API_KEY"))
@@ -29,7 +30,7 @@ def fix_and_rerun_langsmith_experiments():
         "gpt-4o-mini",
         "deepseek-r1-distill-llama-70b",
         "claude-3-haiku",
-        "gemini-1.5-flash-002"
+        "gemini-1.5-flash-002",
     ]
 
     # Create fixed dataset with simpler queries
@@ -39,39 +40,23 @@ def fix_and_rerun_langsmith_experiments():
         # Create new dataset with FIXED scenarios
         dataset = client.create_dataset(
             dataset_name=dataset_name,
-            description="Fixed scenarios to resolve HTTP 400 errors - simplified queries with reduced token limits"
+            description="Fixed scenarios to resolve HTTP 400 errors - simplified queries with reduced token limits",
         )
 
         # FIXED scenarios - simpler queries that won't cause context/tool issues
         fixed_scenarios = [
             {
-                "inputs": {
-                    "query": "Find customer blessedwina@aol.com",
-                    "test_type": "simple_lookup"
-                },
-                "outputs": {
-                    "expected_name": "Edwina Hawthorne",
-                    "expected_id": "2270"
-                }
+                "inputs": {"query": "Find customer blessedwina@aol.com", "test_type": "simple_lookup"},
+                "outputs": {"expected_name": "Edwina Hawthorne", "expected_id": "2270"},
             },
             {
-                "inputs": {
-                    "query": "Show information for customer 2270",
-                    "test_type": "id_lookup"
-                },
-                "outputs": {
-                    "expected_content": "customer information",
-                    "min_length": 30
-                }
-            }
+                "inputs": {"query": "Show information for customer 2270", "test_type": "id_lookup"},
+                "outputs": {"expected_content": "customer information", "min_length": 30},
+            },
         ]
 
         for scenario in fixed_scenarios:
-            client.create_example(
-                dataset_id=dataset.id,
-                inputs=scenario["inputs"],
-                outputs=scenario["outputs"]
-            )
+            client.create_example(dataset_id=dataset.id, inputs=scenario["inputs"], outputs=scenario["outputs"])
 
         print(f"✅ Created fixed dataset: {dataset_name}")
 
@@ -82,6 +67,7 @@ def fix_and_rerun_langsmith_experiments():
     # Create FIXED target function that prevents HTTP 400 errors
     def create_fixed_target_function(model_id):
         """Create target function with all fixes applied"""
+
         def fixed_target(inputs):
             query = inputs.get("query", "")
 
@@ -95,9 +81,9 @@ def fix_and_rerun_langsmith_experiments():
                     json={
                         "model": model_id,
                         "messages": [{"role": "user", "content": query}],
-                        "max_tokens": 150  # FIXED: Very low to prevent any context issues
+                        "max_tokens": 150,  # FIXED: Very low to prevent any context issues
                     },
-                    timeout=45  # FIXED: Reasonable timeout
+                    timeout=45,  # FIXED: Reasonable timeout
                 )
 
                 end_time = time.time()
@@ -114,7 +100,7 @@ def fix_and_rerun_langsmith_experiments():
                         "success": True,
                         "content_length": len(content),
                         "status_code": 200,
-                        "fixes_applied": "reduced_tokens_simplified_query"
+                        "fixes_applied": "reduced_tokens_simplified_query",
                     }
                 else:
                     # Capture detailed error for analysis
@@ -130,7 +116,7 @@ def fix_and_rerun_langsmith_experiments():
                         "response_time_ms": response_time,
                         "success": False,
                         "error": error_msg,
-                        "status_code": response.status_code
+                        "status_code": response.status_code,
                     }
 
             except Exception as e:
@@ -140,7 +126,7 @@ def fix_and_rerun_langsmith_experiments():
                     "response_time_ms": 0,
                     "success": False,
                     "error": str(e),
-                    "exception_type": type(e).__name__
+                    "exception_type": type(e).__name__,
                 }
 
         return fixed_target
@@ -150,8 +136,11 @@ def fix_and_rerun_langsmith_experiments():
         """Fixed speed evaluator"""
         try:
             if not run.outputs.get("success", False):
-                return {"key": "speed_score", "score": 0.0,
-                        "comment": f"Failed: {run.outputs.get('error', 'Unknown error')}"}
+                return {
+                    "key": "speed_score",
+                    "score": 0.0,
+                    "comment": f"Failed: {run.outputs.get('error', 'Unknown error')}",
+                }
 
             response_time = run.outputs.get("response_time_ms", 0)
 
@@ -164,11 +153,7 @@ def fix_and_rerun_langsmith_experiments():
             else:
                 score = 0.4
 
-            return {
-                "key": "speed_score",
-                "score": score,
-                "comment": f"{response_time:.0f}ms"
-            }
+            return {"key": "speed_score", "score": score, "comment": f"{response_time:.0f}ms"}
         except Exception:
             return {"key": "speed_score", "score": 0.0, "comment": "Evaluation error"}
 
@@ -176,8 +161,11 @@ def fix_and_rerun_langsmith_experiments():
         """Fixed accuracy evaluator"""
         try:
             if not run.outputs.get("success", False):
-                return {"key": "accuracy_score", "score": 0.0,
-                        "comment": f"Failed: {run.outputs.get('error', 'Unknown error')}"}
+                return {
+                    "key": "accuracy_score",
+                    "score": 0.0,
+                    "comment": f"Failed: {run.outputs.get('error', 'Unknown error')}",
+                }
 
             response = run.outputs.get("response", "")
             expected_name = example.outputs.get("expected_name", "")
@@ -189,11 +177,7 @@ def fix_and_rerun_langsmith_experiments():
             if expected_id and expected_id in response:
                 score += 0.4
 
-            return {
-                "key": "accuracy_score",
-                "score": score,
-                "comment": f"Accuracy: {score * 100:.0f}%"
-            }
+            return {"key": "accuracy_score", "score": score, "comment": f"Accuracy: {score * 100:.0f}%"}
         except Exception:
             return {"key": "accuracy_score", "score": 0.0, "comment": "Evaluation error"}
 
@@ -215,34 +199,33 @@ def fix_and_rerun_langsmith_experiments():
                 data=dataset_name,
                 evaluators=[fixed_speed_evaluator, fixed_accuracy_evaluator],
                 experiment_prefix=f"tilores_FIXED_{model_id.replace('-', '_')}",
-                description=(f"FIXED experiment for {model_id} - resolved HTTP 400 errors "
-                             "with reduced tokens and simplified queries"),
+                description=(
+                    f"FIXED experiment for {model_id} - resolved HTTP 400 errors "
+                    "with reduced tokens and simplified queries"
+                ),
                 metadata={
                     "model": model_id,
                     "fixes_applied": [
                         "max_tokens_reduced_to_150",
                         "timeout_increased_to_45s",
                         "simplified_queries",
-                        "error_handling_improved"
+                        "error_handling_improved",
                     ],
-                    "fix_iteration": "targeted_http400_fix"
-                }
+                    "fix_iteration": "targeted_http400_fix",
+                },
             )
 
             fixed_results[model_id] = {
                 "experiment_name": result.experiment_name,
                 "success": True,
-                "url": "https://smith.langchain.com"
+                "url": "https://smith.langchain.com",
             }
 
             print(f"✅ FIXED experiment created: {result.experiment_name}")
 
         except Exception as e:
             print(f"❌ FIXED experiment failed for {model_id}: {e}")
-            fixed_results[model_id] = {
-                "success": False,
-                "error": str(e)
-            }
+            fixed_results[model_id] = {"success": False, "error": str(e)}
 
     # Summary
     successful_fixes = [model for model, data in fixed_results.items() if data.get("success", False)]

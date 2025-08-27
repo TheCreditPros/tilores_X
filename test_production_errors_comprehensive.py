@@ -19,10 +19,7 @@ import sys
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler("comprehensive_production_test.log")
-    ]
+    handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("comprehensive_production_test.log")],
 )
 
 logger = logging.getLogger(__name__)
@@ -137,18 +134,14 @@ async def test_data_structure_handling():
     test_cases = [
         # Case 1: List instead of dict
         [{"id": "test1", "session_name": "test"}],
-
         # Case 2: Empty list
         [],
-
         # Case 3: Malformed dict
         {"runs": [{"id": "test2"}]},
-
         # Case 4: None value
         None,
-
         # Case 5: String instead of expected structure
-        "invalid_data"
+        "invalid_data",
     ]
 
     for i, test_data in enumerate(test_cases):

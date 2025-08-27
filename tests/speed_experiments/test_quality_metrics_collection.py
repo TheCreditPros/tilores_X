@@ -23,6 +23,7 @@ from unittest.mock import MagicMock, patch
 # Import quality metrics components
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from quality_metrics_collector import QualityMetricsCollector
@@ -51,8 +52,8 @@ class TestQualityMetricsCollector:
     def test_quality_collector_initialization(self, quality_collector):
         """Test quality metrics collector initialization."""
         assert quality_collector.storage is not None
-        assert hasattr(quality_collector, 'collect_quality_metrics')
-        assert hasattr(quality_collector, 'analyze_quality_trends')
+        assert hasattr(quality_collector, "collect_quality_metrics")
+        assert hasattr(quality_collector, "analyze_quality_trends")
 
     @pytest.mark.asyncio
     async def test_collect_quality_metrics_single_model(self, quality_collector):
@@ -63,7 +64,7 @@ class TestQualityMetricsCollector:
         spectrum = "customer_profile"
 
         # Mock quality scoring
-        with patch.object(quality_collector, '_calculate_quality_score') as mock_score:
+        with patch.object(quality_collector, "_calculate_quality_score") as mock_score:
             mock_score.return_value = QualityScore(
                 overall_score=0.92,
                 speed_score=0.88,
@@ -72,7 +73,7 @@ class TestQualityMetricsCollector:
                 relevance_score=0.89,
                 professional_tone_score=0.93,
                 customer_satisfaction_score=0.91,
-                improvements=[]
+                improvements=[],
             )
 
             metrics = await quality_collector.collect_quality_metrics(
@@ -95,7 +96,7 @@ class TestQualityMetricsCollector:
             "claude-3-haiku",
             "gemini-1.5-flash-002",
             "gemini-2.5-flash",
-            "gemini-2.5-flash-lite"
+            "gemini-2.5-flash-lite",
         ]
 
         test_response = "Customer analysis complete"
@@ -103,7 +104,7 @@ class TestQualityMetricsCollector:
         spectrum = "customer_profile"
 
         # Mock quality scoring for all models
-        with patch.object(quality_collector, '_calculate_quality_score') as mock_score:
+        with patch.object(quality_collector, "_calculate_quality_score") as mock_score:
             mock_score.return_value = QualityScore(
                 overall_score=0.90,
                 speed_score=0.85,
@@ -112,7 +113,7 @@ class TestQualityMetricsCollector:
                 relevance_score=0.87,
                 professional_tone_score=0.91,
                 customer_satisfaction_score=0.89,
-                improvements=[]
+                improvements=[],
             )
 
             metrics_results = []
@@ -137,7 +138,7 @@ class TestQualityMetricsCollector:
             "call_center_operations",
             "entity_relationship",
             "geographic_analysis",
-            "temporal_analysis"
+            "temporal_analysis",
         ]
 
         model = "gpt-4o-mini"
@@ -145,7 +146,8 @@ class TestQualityMetricsCollector:
         test_response = "Test response"
 
         # Mock quality scoring for all spectrums
-        with patch.object(quality_collector, '_calculate_quality_score') as mock_score:
+        with patch.object(quality_collector, "_calculate_quality_score") as mock_score:
+
             def spectrum_specific_score(query, response, spectrum_name):
                 # Different quality scores for different spectrums
                 base_scores = {
@@ -155,7 +157,7 @@ class TestQualityMetricsCollector:
                     "call_center_operations": 0.88,
                     "entity_relationship": 0.91,
                     "geographic_analysis": 0.87,
-                    "temporal_analysis": 0.93
+                    "temporal_analysis": 0.93,
                 }
 
                 return QualityScore(
@@ -166,7 +168,7 @@ class TestQualityMetricsCollector:
                     relevance_score=0.87,
                     professional_tone_score=0.91,
                     customer_satisfaction_score=0.89,
-                    improvements=[]
+                    improvements=[],
                 )
 
             mock_score.side_effect = lambda q, r, s: spectrum_specific_score(q, r, s)
@@ -258,7 +260,7 @@ This comprehensive analysis provides actionable insights for customer management
         mock_metrics = [
             MagicMock(score=0.87, spectrum="customer_profile"),
             MagicMock(score=0.86, spectrum="customer_profile"),
-            MagicMock(score=0.85, spectrum="customer_profile")
+            MagicMock(score=0.85, spectrum="customer_profile"),
         ]
         quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
@@ -281,7 +283,7 @@ This comprehensive analysis provides actionable insights for customer management
                 spectrum="customer_profile",
                 query=f"Test query {i}",
                 response=f"Test response {i}",
-                response_time=1000 + i * 100
+                response_time=1000 + i * 100,
             )
             tracking_data.append(metrics)
 
@@ -312,7 +314,7 @@ class TestQualityMetricsIntegration:
             "experiments": {
                 "customer_profile": {
                     "gpt-4o-mini": {"quality_score": 0.92, "response_time": 1500},
-                    "gemini-2.5-flash": {"quality_score": 0.95, "response_time": 1200}
+                    "gemini-2.5-flash": {"quality_score": 0.95, "response_time": 1200},
                 }
             }
         }
@@ -326,7 +328,7 @@ class TestQualityMetricsIntegration:
                     spectrum=spectrum,
                     query="Phase 1 baseline test",
                     response="Baseline response",
-                    response_time=results["response_time"]
+                    response_time=results["response_time"],
                 )
                 collected_metrics.append(metrics)
 
@@ -348,7 +350,7 @@ class TestQualityMetricsIntegration:
             spectrum="customer_profile",
             query="Baseline prompt test",
             response="Baseline response",
-            response_time=2000
+            response_time=2000,
         )
 
         # Collect optimized metrics
@@ -357,7 +359,7 @@ class TestQualityMetricsIntegration:
             spectrum="customer_profile",
             query="Optimized prompt test",
             response="Enhanced optimized response with comprehensive analysis",
-            response_time=1800
+            response_time=1800,
         )
 
         # Verify improvement tracking
@@ -365,14 +367,28 @@ class TestQualityMetricsIntegration:
         assert "overall_score" in optimized_metrics
 
         # Mock the scores to test improvement calculation
-        with patch.object(integrated_quality_system, '_calculate_quality_score') as mock_calc:
+        with patch.object(integrated_quality_system, "_calculate_quality_score") as mock_calc:
             mock_calc.side_effect = [
-                QualityScore(overall_score=baseline_score, speed_score=0.8, accuracy_score=0.85,
-                           completeness_score=0.82, relevance_score=0.80, professional_tone_score=0.88,
-                           customer_satisfaction_score=0.85, improvements=["improve_completeness"]),
-                QualityScore(overall_score=optimized_score, speed_score=0.9, accuracy_score=0.95,
-                           completeness_score=0.92, relevance_score=0.90, professional_tone_score=0.95,
-                           customer_satisfaction_score=0.93, improvements=[])
+                QualityScore(
+                    overall_score=baseline_score,
+                    speed_score=0.8,
+                    accuracy_score=0.85,
+                    completeness_score=0.82,
+                    relevance_score=0.80,
+                    professional_tone_score=0.88,
+                    customer_satisfaction_score=0.85,
+                    improvements=["improve_completeness"],
+                ),
+                QualityScore(
+                    overall_score=optimized_score,
+                    speed_score=0.9,
+                    accuracy_score=0.95,
+                    completeness_score=0.92,
+                    relevance_score=0.90,
+                    professional_tone_score=0.95,
+                    customer_satisfaction_score=0.93,
+                    improvements=[],
+                ),
             ]
 
             # Recalculate with mocked scores
@@ -404,11 +420,11 @@ class TestQualityMetricsIntegration:
                 spectrum="customer_profile",
                 query=f"Monitoring query hour {hour}",
                 response="Monitoring response",
-                response_time=1500
+                response_time=1500,
             )
 
             # Mock the quality score for this hour
-            with patch.object(integrated_quality_system, '_calculate_quality_score') as mock_calc:
+            with patch.object(integrated_quality_system, "_calculate_quality_score") as mock_calc:
                 mock_calc.return_value = QualityScore(
                     overall_score=current_quality,
                     speed_score=0.85,
@@ -417,7 +433,7 @@ class TestQualityMetricsIntegration:
                     relevance_score=0.87,
                     professional_tone_score=0.91,
                     customer_satisfaction_score=0.89,
-                    improvements=[]
+                    improvements=[],
                 )
 
                 metrics = await integrated_quality_system.collect_quality_metrics(
@@ -444,7 +460,7 @@ class TestQualityMetricsIntegration:
                 "query": "Production customer lookup",
                 "response": "Comprehensive customer profile with all required fields",
                 "response_time": 800,
-                "expected_quality": 0.96
+                "expected_quality": 0.96,
             },
             {
                 "model": "gpt-4o-mini",
@@ -452,13 +468,13 @@ class TestQualityMetricsIntegration:
                 "query": "Production credit analysis",
                 "response": "Detailed credit analysis with risk assessment",
                 "response_time": 1200,
-                "expected_quality": 0.91
-            }
+                "expected_quality": 0.91,
+            },
         ]
 
         production_metrics = []
         for scenario in production_scenarios:
-            with patch.object(integrated_quality_system, '_calculate_quality_score') as mock_calc:
+            with patch.object(integrated_quality_system, "_calculate_quality_score") as mock_calc:
                 mock_calc.return_value = QualityScore(
                     overall_score=scenario["expected_quality"],
                     speed_score=0.90,
@@ -467,7 +483,7 @@ class TestQualityMetricsIntegration:
                     relevance_score=0.89,
                     professional_tone_score=0.94,
                     customer_satisfaction_score=0.92,
-                    improvements=[]
+                    improvements=[],
                 )
 
                 metrics = await integrated_quality_system.collect_quality_metrics(
@@ -475,7 +491,7 @@ class TestQualityMetricsIntegration:
                     scenario["spectrum"],
                     scenario["query"],
                     scenario["response"],
-                    scenario["response_time"]
+                    scenario["response_time"],
                 )
                 production_metrics.append(metrics)
 
@@ -510,7 +526,7 @@ Status: ACTIVE"""
             spectrum="customer_identity_resolution",
             query=query,
             response=response,
-            response_time=1200
+            response_time=1200,
         )
 
         # Verify high-quality metrics for accurate Edwina lookup
@@ -543,7 +559,7 @@ This analysis indicates significant credit challenges requiring immediate attent
             spectrum="financial_analysis_depth",
             query=query,
             response=response,
-            response_time=1500
+            response_time=1500,
         )
 
         # Verify comprehensive credit analysis quality
@@ -588,7 +604,7 @@ This comprehensive profile integrates 310+ Tilores fields for complete customer 
             spectrum="multi_field_integration",
             query=query,
             response=response,
-            response_time=2200
+            response_time=2200,
         )
 
         # Verify comprehensive field integration quality
@@ -625,7 +641,7 @@ class TestQualityMetricsPerformance:
                         spectrum=spectrum,
                         query="Performance test query",
                         response="Performance test response",
-                        response_time=1000
+                        response_time=1000,
                     )
                 )
                 tasks.append(task)
@@ -647,15 +663,10 @@ class TestQualityMetricsPerformance:
 
         for spectrum in spectrums:
             # Mock metrics for each spectrum
-            mock_metrics = [
-                MagicMock(score=0.90 + i * 0.01, timestamp=datetime.now().isoformat())
-                for i in range(10)
-            ]
+            mock_metrics = [MagicMock(score=0.90 + i * 0.01, timestamp=datetime.now().isoformat()) for i in range(10)]
             performance_quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
-            task = asyncio.create_task(
-                performance_quality_collector.analyze_quality_trends(spectrum)
-            )
+            task = asyncio.create_task(performance_quality_collector.analyze_quality_trends(spectrum))
             analysis_tasks.append(task)
 
         trend_results = await asyncio.gather(*analysis_tasks)
@@ -677,7 +688,7 @@ class TestQualityMetricsPerformance:
                 relevance_score=0.82,
                 professional_tone_score=0.88,
                 customer_satisfaction_score=0.86,
-                improvements=[]
+                improvements=[],
             )
             large_dataset.append(quality_score)
 
@@ -687,6 +698,7 @@ class TestQualityMetricsPerformance:
 
         # Test memory usage (simplified check)
         import sys
+
         dataset_size = sys.getsizeof(large_dataset)
         assert dataset_size < 1024 * 1024  # Should be under 1MB
 
@@ -714,7 +726,7 @@ class TestQualityMetricsErrorHandling:
                 spectrum="customer_profile",
                 query="Test query",
                 response="Test response",
-                response_time=1000
+                response_time=1000,
             )
             # Should return metrics even if storage fails
             assert "overall_score" in metrics
@@ -737,7 +749,7 @@ class TestQualityMetricsErrorHandling:
                 spectrum="customer_profile",
                 query="Test query",
                 response=invalid_response,
-                response_time=1000
+                response_time=1000,
             )
 
             # Should handle invalid responses without crashing
@@ -755,7 +767,7 @@ class TestQualityMetricsErrorHandling:
                 spectrum="customer_profile",
                 query="Test query",
                 response="Test response",
-                response_time=response_time
+                response_time=response_time,
             )
 
             # Should handle extreme times gracefully
@@ -772,11 +784,18 @@ async def main():
     import subprocess
     import sys
 
-    result = subprocess.run([
-        sys.executable, "-m", "pytest",
-        "tests/speed_experiments/test_quality_metrics_collection.py",
-        "-v", "--tb=short"
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/speed_experiments/test_quality_metrics_collection.py",
+            "-v",
+            "--tb=short",
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     print("Quality Metrics Test Results:")
     print(result.stdout)
