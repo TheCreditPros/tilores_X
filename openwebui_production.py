@@ -60,8 +60,8 @@ AVAILABLE_MODELS = {
         "claude-3-haiku": {"description": "Fastest Claude model", "max_tokens": 200000},
     },
     "google": {
-        "gemini-pro": {"description": "Advanced reasoning", "max_tokens": 30720},
-        "gemini-pro-vision": {"description": "Multimodal capabilities", "max_tokens": 30720},
+        "gemini-1.5-flash": {"description": "Advanced reasoning", "max_tokens": 30720},
+        "gemini-1.5-pro": {"description": "Multimodal capabilities", "max_tokens": 30720},
     },
 }
 
@@ -681,8 +681,16 @@ async def chat_with_google(request: ChatRequest) -> str:
             "generationConfig": {"temperature": request.temperature, "maxOutputTokens": request.max_tokens},
         }
 
+        # Map model names to actual API model names
+        model_mapping = {
+            "gemini-1.5-flash": "gemini-1.5-flash",
+            "gemini-1.5-pro": "gemini-1.5-pro"
+        }
+        
+        api_model = model_mapping.get(request.model, request.model)
+        
         response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{request.model}:generateContent?key={GOOGLE_API_KEY}",
+            f"https://generativelanguage.googleapis.com/v1beta/models/{api_model}:generateContent?key={GOOGLE_API_KEY}",
             headers=headers,
             json=payload,
             timeout=30,
