@@ -79,11 +79,10 @@ except ImportError:
 FRAMEWORKS_AVAILABLE = False
 try:
     from autonomous_ai_platform import AutonomousAIPlatform
-    from autonomous_integration import EnhancedVirtuousCycleManager
     from langsmith_enterprise_client import create_enterprise_client
 
     # Basic callable checks
-    for component in [AutonomousAIPlatform, EnhancedVirtuousCycleManager, create_enterprise_client]:
+    for component in [AutonomousAIPlatform, create_enterprise_client]:
         if not callable(component):
             raise ImportError(f"Component {component.__name__} is not callable")
 
@@ -120,8 +119,15 @@ class VirtuousCycleManager:
         self.langsmith_client = None
         if LANGSMITH_AVAILABLE:
             try:
-                self.langsmith_client = LangSmithClient()
-                self.logger.info("✅ LangSmith client initialized")
+                # Get API key and project from environment
+                api_key = os.getenv("LANGSMITH_API_KEY")
+                project_name = os.getenv("LANGSMITH_PROJECT", "tilores_x")
+
+                if api_key:
+                    self.langsmith_client = LangSmithClient(api_key=api_key)
+                    self.logger.info(f"✅ LangSmith client initialized with project: {project_name}")
+                else:
+                    self.logger.warning("LANGSMITH_API_KEY not found - LangSmith client disabled")
             except Exception as e:
                 self.logger.warning(f"LangSmith client init failed: {e}")
 
@@ -187,9 +193,9 @@ class VirtuousCycleManager:
                     self.autonomous_platform = None
                     self.logger.warning("Autonomous AI platform disabled - no enterprise client provided")
 
-                # Initialize enhanced virtuous cycle manager
-                self.enhanced_manager = EnhancedVirtuousCycleManager()
-                self.logger.info("✅ Enhanced virtuous cycle manager initialized")
+                # Enhanced virtuous cycle manager disabled to avoid circular imports
+                self.enhanced_manager = None
+                self.logger.info("ℹ️ Enhanced virtuous cycle manager disabled (circular import prevention)")
 
             except Exception as e:
                 self.logger.error(f"Autonomous AI platform initialization failed: {e}")
@@ -213,19 +219,17 @@ class VirtuousCycleManager:
         self.monitoring_active = True
         self.logger.info("🚀 Starting Virtuous Cycle monitoring system")
 
-        # Start background tasks
-        tasks = [
-            asyncio.create_task(self._trace_monitoring_loop()),
-            asyncio.create_task(self._quality_monitoring_loop()),
-            asyncio.create_task(self._optimization_loop()),
-            asyncio.create_task(self._trace_processor()),
-        ]
-
+        # Start background tasks without waiting for them
         try:
-            await asyncio.gather(*tasks)
+            # Create tasks but don't await them - they run independently
+            asyncio.create_task(self._trace_monitoring_loop())
+            asyncio.create_task(self._quality_monitoring_loop())
+            asyncio.create_task(self._optimization_loop())
+            asyncio.create_task(self._trace_processor())
+
+            self.logger.info("✅ Background monitoring tasks started successfully")
         except Exception as e:
             self.logger.error(f"Monitoring system error: {e}")
-        finally:
             self.monitoring_active = False
 
     async def stop_monitoring(self):
@@ -249,11 +253,25 @@ class VirtuousCycleManager:
 
                     self.logger.debug(f"Queued {len(traces)} traces")
 
-                await asyncio.sleep(60)  # Check every minute
+                # Update metrics timestamp
+                self.metrics["last_update"] = datetime.now().isoformat()
 
+                # Sleep with cancellation handling
+                try:
+                    await asyncio.sleep(60)  # Check every minute
+                except asyncio.CancelledError:
+                    self.logger.info("📊 Trace monitoring loop cancelled")
+                    break
+
+            except asyncio.CancelledError:
+                self.logger.info("📊 Trace monitoring loop cancelled")
+                break
             except Exception as e:
                 self.logger.error(f"Trace monitoring error: {e}")
-                await asyncio.sleep(60)
+                try:
+                    await asyncio.sleep(60)
+                except asyncio.CancelledError:
+                    break
 
     async def _fetch_recent_traces(self) -> List[Dict[str, Any]]:
         """Fetch recent traces from LangSmith API - REAL IMPLEMENTATION."""
@@ -269,8 +287,13 @@ class VirtuousCycleManager:
             self.logger.debug(f"Fetching LangSmith traces from {start_time} to {end_time}")
 
             # Use LangSmith client to get actual traces
+            # Override project name to use tilores_x instead of tilores-speed-experiments
+            project_name = os.getenv("LANGSMITH_PROJECT", "tilores_x")
+            if project_name == "tilores-speed-experiments":
+                project_name = "tilores_x"
+
             runs = self.langsmith_client.list_runs(
-                project_name="tilores_x",
+                project_name=project_name,
                 start_time=start_time,
                 end_time=end_time,
                 limit=self.trace_batch_size,
@@ -390,11 +413,26 @@ class VirtuousCycleManager:
                     await self._analyze_trace_batch(traces_batch)
                     self.metrics["traces_processed"] += len(traces_batch)
 
-                await asyncio.sleep(1)  # Brief pause between batches
+                # Update metrics timestamp
+                self.metrics["last_update"] = datetime.now().isoformat()
 
+                # Sleep with cancellation handling
+                try:
+                    await asyncio.sleep(1)  # Brief pause between batches
+                except asyncio.CancelledError:
+                    self.logger.info("🔄 Trace processor cancelled")
+                    break
+
+            except asyncio.CancelledError:
+                self.logger.info("🔄 Trace processor cancelled")
+                break
             except Exception as e:
                 self.logger.error(f"Trace processing error: {e}")
-                await asyncio.sleep(5)
+                # Don't break the loop on error, just continue
+                try:
+                    await asyncio.sleep(5)
+                except asyncio.CancelledError:
+                    break
 
     async def _analyze_trace_batch(self, traces: List[Dict[str, Any]]):
         """Analyze a batch of traces for quality metrics."""
@@ -527,11 +565,25 @@ class VirtuousCycleManager:
                                 reason=f"Quality degradation: {current_quality:.1%}", quality_score=current_quality
                             )
 
-                await asyncio.sleep(self.monitoring_interval)
+                # Update metrics timestamp
+                self.metrics["last_update"] = datetime.now().isoformat()
 
+                # Sleep with cancellation handling
+                try:
+                    await asyncio.sleep(self.monitoring_interval)
+                except asyncio.CancelledError:
+                    self.logger.info("📈 Quality monitoring loop cancelled")
+                    break
+
+            except asyncio.CancelledError:
+                self.logger.info("📈 Quality monitoring loop cancelled")
+                break
             except Exception as e:
                 self.logger.error(f"Quality monitoring error: {e}")
-                await asyncio.sleep(60)
+                try:
+                    await asyncio.sleep(60)
+                except asyncio.CancelledError:
+                    break
 
     def _can_trigger_optimization(self) -> bool:
         """Check if optimization can be triggered (cooldown check)."""
@@ -687,11 +739,25 @@ class VirtuousCycleManager:
                 # Check for manual optimization triggers
                 await self._check_manual_triggers()
 
-                await asyncio.sleep(300)  # Check every 5 minutes
+                # Update metrics timestamp
+                self.metrics["last_update"] = datetime.now().isoformat()
 
+                # Sleep with cancellation handling
+                try:
+                    await asyncio.sleep(300)  # Check every 5 minutes
+                except asyncio.CancelledError:
+                    self.logger.info("⚙️ Optimization loop cancelled")
+                    break
+
+            except asyncio.CancelledError:
+                self.logger.info("⚙️ Optimization loop cancelled")
+                break
             except Exception as e:
                 self.logger.error(f"Optimization loop error: {e}")
-                await asyncio.sleep(60)
+                try:
+                    await asyncio.sleep(60)
+                except asyncio.CancelledError:
+                    break
 
     async def _health_check(self):
         """Perform system health check."""

@@ -31,7 +31,21 @@ except Exception:
 
 from core_app import get_available_models, initialize_engine, run_chain
 from monitoring import monitor
-from virtuous_cycle_api import virtuous_cycle_manager
+
+# Import virtuous cycle manager lazily to ensure environment is loaded first
+virtuous_cycle_manager = None
+
+
+def ensure_virtuous_cycle_manager():
+    """Ensure virtuous cycle manager is initialized."""
+    global virtuous_cycle_manager
+    if virtuous_cycle_manager is None:
+        from virtuous_cycle_api import VirtuousCycleManager
+
+        virtuous_cycle_manager = VirtuousCycleManager()
+        print("✅ Virtuous Cycle Manager initialized")
+    return virtuous_cycle_manager
+
 
 # LangSmith observability imports
 try:
@@ -593,7 +607,8 @@ async def get_metrics(request: Request):
 @limiter.limit("100/minute")
 async def virtuous_cycle_status(request: Request):
     """Get Virtuous Cycle monitoring and optimization status"""
-    return virtuous_cycle_manager.get_status()
+    manager = ensure_virtuous_cycle_manager()
+    return manager.get_status()
 
 
 @app.post("/v1/virtuous-cycle/trigger")
@@ -605,7 +620,8 @@ async def trigger_virtuous_cycle(request: Request):
         body = await request.json() if request.headers.get("content-type") == "application/json" else {}
         reason = body.get("reason", "Manual API trigger")
 
-        result = await virtuous_cycle_manager.trigger_manual_optimization(reason)
+        manager = ensure_virtuous_cycle_manager()
+        result = await manager.trigger_manual_optimization(reason)
         return result
 
     except Exception as e:
@@ -621,7 +637,8 @@ async def get_ai_changes_history(request: Request):
         limit = int(request.query_params.get("limit", 20))
         limit = min(50, max(1, limit))  # Clamp between 1 and 50
 
-        result = virtuous_cycle_manager.get_ai_changes_history(limit)
+        manager = ensure_virtuous_cycle_manager()
+        result = manager.get_ai_changes_history(limit)
         return result
 
     except Exception as e:
@@ -637,7 +654,8 @@ async def get_ai_changes_history(request: Request):
 async def clear_ai_changes_history(request: Request):
     """Clear AI changes history to start fresh with detailed tracking"""
     try:
-        result = virtuous_cycle_manager.clear_ai_changes_history()
+        manager = ensure_virtuous_cycle_manager()
+        result = manager.clear_ai_changes_history()
         return result
 
     except Exception as e:
@@ -649,7 +667,8 @@ async def clear_ai_changes_history(request: Request):
 async def rollback_to_last_good_state(request: Request, rollback_id: Optional[str] = None):
     """Rollback to the last known good configuration state"""
     try:
-        result = await virtuous_cycle_manager.rollback_to_last_good_state(rollback_id)
+        manager = ensure_virtuous_cycle_manager()
+        result = await manager.rollback_to_last_good_state(rollback_id)
         return result
 
     except Exception as e:
@@ -782,8 +801,12 @@ background_tasks = []
 async def startup_background_tasks():
     """Start background tasks for Virtuous Cycle monitoring."""
     try:
+        # Initialize virtuous cycle manager after environment is loaded
+        ensure_virtuous_cycle_manager()
+
         # Start Virtuous Cycle monitoring
-        monitoring_task = asyncio.create_task(virtuous_cycle_manager.start_monitoring())
+        manager = ensure_virtuous_cycle_manager()
+        monitoring_task = asyncio.create_task(manager.start_monitoring())
         background_tasks.append(monitoring_task)
 
         print("🚀 Virtuous Cycle monitoring started")
@@ -796,7 +819,8 @@ async def shutdown_background_tasks():
     """Shutdown background tasks gracefully."""
     try:
         # Stop Virtuous Cycle monitoring
-        await virtuous_cycle_manager.stop_monitoring()
+        if virtuous_cycle_manager:
+            await virtuous_cycle_manager.stop_monitoring()
 
         # Cancel all background tasks
         for task in background_tasks:
@@ -820,19 +844,20 @@ async def get_quality_status(request: Request):
     """Get current quality monitoring status."""
     try:
         # Get status from multi-tier quality monitor if available
-        if hasattr(virtuous_cycle_manager, "quality_monitor") and virtuous_cycle_manager.quality_monitor:
+        manager = ensure_virtuous_cycle_manager()
+        if hasattr(manager, "quality_monitor") and manager.quality_monitor:
             from quality_threshold_system import get_current_quality_status
 
             return get_current_quality_status()
         else:
             # Fallback to basic metrics
             return {
-                "current_quality": virtuous_cycle_manager.metrics.get("current_quality", 0.0),
+                "current_quality": manager.metrics.get("current_quality", 0.0),
                 "quality_level": "unknown",
                 "trend": "stable",
                 "active_alerts": 0,
                 "monitoring_type": "legacy",
-                "last_update": virtuous_cycle_manager.metrics.get("last_update", "never"),
+                "last_update": manager.metrics.get("last_update", "never"),
             }
     except Exception as e:
         return {"error": f"Failed to get quality status: {str(e)}"}
@@ -843,8 +868,9 @@ async def get_quality_status(request: Request):
 async def get_quality_alerts(request: Request, hours: int = 24):
     """Get quality alerts for the specified time period."""
     try:
-        if hasattr(virtuous_cycle_manager, "quality_monitor") and virtuous_cycle_manager.quality_monitor:
-            alerts = virtuous_cycle_manager.quality_monitor.get_alert_history(hours=hours)
+        manager = ensure_virtuous_cycle_manager()
+        if hasattr(manager, "quality_monitor") and manager.quality_monitor:
+            alerts = manager.quality_monitor.get_alert_history(hours=hours)
             return {
                 "timeframe_hours": hours,
                 "total_alerts": len(alerts),
@@ -874,8 +900,9 @@ async def get_quality_alerts(request: Request, hours: int = 24):
 async def get_quality_trends(request: Request, hours: int = 24):
     """Get quality trends for the specified time period."""
     try:
-        if hasattr(virtuous_cycle_manager, "quality_monitor") and virtuous_cycle_manager.quality_monitor:
-            trends = virtuous_cycle_manager.quality_monitor.get_quality_trends(hours=hours)
+        manager = ensure_virtuous_cycle_manager()
+        if hasattr(manager, "quality_monitor") and manager.quality_monitor:
+            trends = manager.quality_monitor.get_quality_trends(hours=hours)
             return trends
         else:
             return {"error": "Multi-tier quality monitoring not available"}
@@ -888,8 +915,9 @@ async def get_quality_trends(request: Request, hours: int = 24):
 async def resolve_quality_alert(request: Request, alert_id: str):
     """Mark a quality alert as resolved."""
     try:
-        if hasattr(virtuous_cycle_manager, "quality_monitor") and virtuous_cycle_manager.quality_monitor:
-            success = await virtuous_cycle_manager.quality_monitor.resolve_alert(alert_id)
+        manager = ensure_virtuous_cycle_manager()
+        if hasattr(manager, "quality_monitor") and manager.quality_monitor:
+            success = await manager.quality_monitor.resolve_alert(alert_id)
             if success:
                 return {"message": f"Alert {alert_id} resolved successfully"}
             else:
@@ -907,7 +935,8 @@ async def get_autonomous_ai_metrics(request: Request):
     """Get autonomous AI metrics for dashboard display."""
     try:
         # Get basic virtuous cycle metrics
-        status = virtuous_cycle_manager.get_status()
+        manager = ensure_virtuous_cycle_manager()
+        status = manager.get_status()
 
         # Calculate autonomous AI metrics
         metrics = status.get("metrics", {})
@@ -916,7 +945,7 @@ async def get_autonomous_ai_metrics(request: Request):
         return {
             "autonomous_capability_status": {
                 "langsmith_integration": component_status.get("langsmith_client", False),
-                "quality_monitoring": hasattr(virtuous_cycle_manager, "quality_monitor"),
+                "quality_monitoring": hasattr(manager, "quality_monitor"),
                 "optimization_engine": component_status.get("enhanced_manager", False),
                 "pattern_recognition": True,  # Always available in current implementation
                 "self_healing": True,  # Always available in current implementation
@@ -943,8 +972,9 @@ async def get_monitoring_alerts(request: Request):
     """Get monitoring alerts for dashboard display."""
     try:
         # Get quality alerts if available
-        if hasattr(virtuous_cycle_manager, "quality_monitor") and virtuous_cycle_manager.quality_monitor:
-            alerts = virtuous_cycle_manager.quality_monitor.get_alert_history(hours=24)
+        manager = ensure_virtuous_cycle_manager()
+        if hasattr(manager, "quality_monitor") and manager.quality_monitor:
+            alerts = manager.quality_monitor.get_alert_history(hours=24)
             return {
                 "active_alerts": [alert for alert in alerts if not alert.resolved],
                 "alert_history": [
@@ -972,7 +1002,8 @@ async def get_langsmith_projects_health(request: Request):
     """Get LangSmith projects health for dashboard display."""
     try:
         # Get basic virtuous cycle status
-        status = virtuous_cycle_manager.get_status()
+        manager = ensure_virtuous_cycle_manager()
+        status = manager.get_status()
 
         # Check if LangSmith is available
         langsmith_available = status.get("langsmith_available", False)
