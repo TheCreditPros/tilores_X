@@ -15,8 +15,8 @@ import tiktoken
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from slowapi import Limiter
@@ -136,7 +136,6 @@ async def rate_limit_handler(request: Request, exc):
 
 
 # Mount static files for dashboard (check multiple possible paths)
-import os
 
 # Extended list of possible dashboard paths for different deployment scenarios
 dashboard_paths = [
@@ -207,12 +206,6 @@ if not dashboard_mounted:
                 print(f"  📄 {item}")
     except Exception as e:
         print(f"❌ Error listing directory contents: {e}")
-
-# Mount dashboard static files
-app.mount("/dashboard", StaticFiles(directory="dashboard-static"), name="dashboard")
-
-# Mount chat interface
-app.mount("/chat", StaticFiles(directory="chat-interface"), name="chat")
 
 
 # OpenAI-compatible request/response models
