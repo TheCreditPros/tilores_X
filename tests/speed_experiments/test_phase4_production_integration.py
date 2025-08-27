@@ -47,10 +47,10 @@ class TestProductionPromptManager:
     @pytest.fixture
     def temp_core_app(self):
         """Create temporary core_app.py for testing."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py',
-                                       delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             # Write mock core_app.py content
-            f.write("""#!/usr/bin/env python3
+            f.write(
+                """#!/usr/bin/env python3
 # Mock core_app.py for testing
 
 def some_function():
@@ -75,7 +75,8 @@ MANDATORY: Call tools first, then provide real data.\"\"\"
 
         # Rest of function
         return system_prompt
-""")
+"""
+            )
             temp_path = f.name
 
         yield temp_path
@@ -102,7 +103,7 @@ MANDATORY: Call tools first, then provide real data.\"\"\"
 
         assert Path(backup_path).exists()
         assert deployment_id in backup_path
-        assert backup_path.endswith('.py')
+        assert backup_path.endswith(".py")
 
         # Cleanup
         Path(backup_path).unlink(missing_ok=True)
@@ -111,7 +112,7 @@ MANDATORY: Call tools first, then provide real data.\"\"\"
         """Test current prompt extraction."""
         current_prompt = prompt_manager.extract_current_prompt("system_prompt")
 
-        assert "system_prompt = f\"\"\"" in current_prompt
+        assert 'system_prompt = f"""' in current_prompt
         assert "customer service assistant" in current_prompt
         assert "CRITICAL" in current_prompt
 
@@ -129,7 +130,7 @@ MANDATORY: Call tools first, then provide real data.\"\"\"
             target_location="system_prompt",
             deployment_status=DeploymentStatus.PENDING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         success = await prompt_manager.deploy_prompt(deployment)
@@ -150,12 +151,11 @@ MANDATORY: Call tools first, then provide real data.\"\"\"
             deployment_status=DeploymentStatus.DEPLOYED,
             validation_results={},
             performance_metrics={},
-            rollback_data={"backup_path": "fake_backup.py"}
+            rollback_data={"backup_path": "fake_backup.py"},
         )
 
         # Mock the backup file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py',
-                                       delete=False) as backup_file:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as backup_file:
             backup_file.write("# Original content")
             if deployment.rollback_data is None:
                 deployment.rollback_data = {}
@@ -202,9 +202,7 @@ class TestProductionPerformanceMonitor:
     @pytest.mark.asyncio
     async def test_model_metrics_collection(self, performance_monitor):
         """Test individual model metrics collection."""
-        model_metrics = await performance_monitor._collect_model_metrics(
-            "llama-3.3-70b-versatile"
-        )
+        model_metrics = await performance_monitor._collect_model_metrics("llama-3.3-70b-versatile")
 
         assert "quality_score" in model_metrics
         assert "response_time" in model_metrics
@@ -220,9 +218,7 @@ class TestProductionPerformanceMonitor:
     @pytest.mark.asyncio
     async def test_spectrum_metrics_collection(self, performance_monitor):
         """Test individual spectrum metrics collection."""
-        spectrum_metrics = await performance_monitor._collect_spectrum_metrics(
-            "customer_profile"
-        )
+        spectrum_metrics = await performance_monitor._collect_spectrum_metrics("customer_profile")
 
         assert "completeness_score" in spectrum_metrics
         assert "accuracy_score" in spectrum_metrics
@@ -241,7 +237,7 @@ class TestProductionPerformanceMonitor:
             "model1": {"quality_score": 0.95},
             "model2": {"quality_score": 0.88},
             "model3": {"quality_score": 0.92},
-            "model4": {"quality_score": 0.85}
+            "model4": {"quality_score": 0.85},
         }
 
         rate = performance_monitor._calculate_quality_achievement_rate(mock_metrics)
@@ -251,22 +247,14 @@ class TestProductionPerformanceMonitor:
         """Test response time improvement calculation."""
         # Add previous metrics
         previous_metrics = ProductionMetrics()
-        previous_metrics.model_performance = {
-            "model1": {"response_time": 5.0},
-            "model2": {"response_time": 6.0}
-        }
+        previous_metrics.model_performance = {"model1": {"response_time": 5.0}, "model2": {"response_time": 6.0}}
         performance_monitor.metrics_history.append(previous_metrics)
 
         # Current metrics with improvement
         current_metrics = ProductionMetrics()
-        current_metrics.model_performance = {
-            "model1": {"response_time": 4.0},
-            "model2": {"response_time": 5.0}
-        }
+        current_metrics.model_performance = {"model1": {"response_time": 4.0}, "model2": {"response_time": 5.0}}
 
-        improvement = performance_monitor._calculate_response_time_improvement(
-            current_metrics
-        )
+        improvement = performance_monitor._calculate_response_time_improvement(current_metrics)
         assert improvement > 0  # Should show improvement
 
 
@@ -298,7 +286,7 @@ class TestProductionABTester:
             target_spectrums=["spectrum1"],
             success_criteria={"quality": 0.9},
             test_duration=timedelta(hours=2),
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         assert ab_tester._validate_ab_config(config)
@@ -314,7 +302,7 @@ class TestProductionABTester:
             target_spectrums=["spectrum1"],
             success_criteria={"quality": 0.9},
             test_duration=timedelta(hours=2),
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         assert not ab_tester._validate_ab_config(config)
@@ -330,7 +318,7 @@ class TestProductionABTester:
             target_spectrums=["spectrum1"],
             success_criteria={"quality": 0.9},
             test_duration=timedelta(minutes=30),  # Too short
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         assert not ab_tester._validate_ab_config(config)
@@ -347,7 +335,7 @@ class TestProductionABTester:
             target_spectrums=["spectrum1"],
             success_criteria={"quality": 0.9},
             test_duration=timedelta(hours=2),
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         # Mock successful deployment
@@ -371,7 +359,7 @@ class TestProductionABTester:
             target_spectrums=["spectrum1"],
             success_criteria={"quality": 0.9},
             test_duration=timedelta(hours=2),
-            minimum_sample_size=100
+            minimum_sample_size=100,
         )
 
         await ab_tester._collect_ab_test_metrics(config)
@@ -403,11 +391,7 @@ class TestProductionIntegrationOrchestrator:
         optimization_results = {
             "ab_test_results": {
                 "customer_profile": {
-                    "summary": {
-                        "best_variation": "optimized_v1",
-                        "best_score": 0.92,
-                        "average_improvement": 0.05
-                    }
+                    "summary": {"best_variation": "optimized_v1", "best_score": 0.92, "average_improvement": 0.05}
                 }
             }
         }
@@ -492,12 +476,12 @@ Handle customer queries."""
             target_location="system_prompt",
             deployment_status=DeploymentStatus.VALIDATING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         # Mock extract_current_prompt to return valid content
         orchestrator.prompt_manager.extract_current_prompt = MagicMock(
-            return_value="system_prompt = f\"\"\"existing prompt\"\"\""
+            return_value='system_prompt = f"""existing prompt"""'
         )
 
         result = await orchestrator._validate_integration(deployment)
@@ -513,7 +497,7 @@ Provide accurate, professional responses with mandatory tool usage.""",
             target_location="system_prompt",
             deployment_status=DeploymentStatus.VALIDATING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         result = await orchestrator._validate_with_customer_data(deployment)
@@ -525,9 +509,7 @@ Provide accurate, professional responses with mandatory tool usage.""",
         high_quality_prompt = """You are a comprehensive, professional,
 accurate assistant with mandatory tool usage requirements."""
 
-        score = await orchestrator._test_prompt_effectiveness(
-            high_quality_prompt, "test query"
-        )
+        score = await orchestrator._test_prompt_effectiveness(high_quality_prompt, "test query")
 
         assert 0.8 <= score <= 1.0  # Should score high
 
@@ -535,14 +517,7 @@ accurate assistant with mandatory tool usage requirements."""
     async def test_deploy_optimized_prompts_success(self, orchestrator):
         """Test successful deployment of optimized prompts."""
         optimization_results = {
-            "ab_test_results": {
-                "customer_profile": {
-                    "summary": {
-                        "best_variation": "optimized_v1",
-                        "best_score": 0.93
-                    }
-                }
-            }
+            "ab_test_results": {"customer_profile": {"summary": {"best_variation": "optimized_v1", "best_score": 0.93}}}
         }
 
         # Mock validation and deployment
@@ -557,14 +532,7 @@ accurate assistant with mandatory tool usage requirements."""
     async def test_deploy_optimized_prompts_validation_failure(self, orchestrator):
         """Test deployment failure due to validation."""
         optimization_results = {
-            "ab_test_results": {
-                "customer_profile": {
-                    "summary": {
-                        "best_variation": "optimized_v1",
-                        "best_score": 0.93
-                    }
-                }
-            }
+            "ab_test_results": {"customer_profile": {"summary": {"best_variation": "optimized_v1", "best_score": 0.93}}}
         }
 
         # Mock validation failure
@@ -582,9 +550,7 @@ accurate assistant with mandatory tool usage requirements."""
         # Mock A/B test startup
         orchestrator.ab_tester.start_ab_test = AsyncMock(return_value=True)
 
-        result = await orchestrator.run_production_ab_test(
-            control_prompt, variant_prompt, traffic_split=0.1
-        )
+        result = await orchestrator.run_production_ab_test(control_prompt, variant_prompt, traffic_split=0.1)
 
         assert result["status"] == "started"
         assert "test_id" in result
@@ -608,7 +574,7 @@ accurate assistant with mandatory tool usage requirements."""
             "model1": {"quality_score": 0.80},  # Below threshold
             "model2": {"quality_score": 0.82},  # Below threshold
             "model3": {"quality_score": 0.83},  # Below threshold
-            "model4": {"quality_score": 0.95}   # Good
+            "model4": {"quality_score": 0.95},  # Good
         }
         orchestrator.performance_monitor.metrics_history = [mock_metrics]
 
@@ -619,13 +585,16 @@ accurate assistant with mandatory tool usage requirements."""
     async def test_validate_railway_integration(self, orchestrator):
         """Test Railway integration validation."""
         # Mock environment variables
-        with patch.dict(os.environ, {
-            'TILORES_API_URL': 'https://api.tilores.com',
-            'TILORES_CLIENT_ID': 'test_client',
-            'TILORES_CLIENT_SECRET': 'test_secret',
-            'LANGSMITH_API_KEY': 'test_key',
-            'LANGSMITH_PROJECT': 'test_project'
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "TILORES_API_URL": "https://api.tilores.com",
+                "TILORES_CLIENT_ID": "test_client",
+                "TILORES_CLIENT_SECRET": "test_secret",
+                "LANGSMITH_API_KEY": "test_key",
+                "LANGSMITH_PROJECT": "test_project",
+            },
+        ):
             validation_results = await orchestrator.validate_railway_integration()
 
             assert validation_results["environment_variables"]
@@ -640,7 +609,7 @@ accurate assistant with mandatory tool usage requirements."""
             target_location="system_prompt",
             deployment_status=DeploymentStatus.MONITORING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         healthy_metrics = ProductionMetrics()
@@ -648,12 +617,10 @@ accurate assistant with mandatory tool usage requirements."""
         healthy_metrics.model_performance = {
             "model1": {"quality_score": 0.92},
             "model2": {"quality_score": 0.88},
-            "model3": {"quality_score": 0.94}
+            "model3": {"quality_score": 0.94},
         }
 
-        is_healthy = await orchestrator._check_deployment_health(
-            deployment, healthy_metrics
-        )
+        is_healthy = await orchestrator._check_deployment_health(deployment, healthy_metrics)
         assert is_healthy
 
     @pytest.mark.asyncio
@@ -665,7 +632,7 @@ accurate assistant with mandatory tool usage requirements."""
             target_location="system_prompt",
             deployment_status=DeploymentStatus.MONITORING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         unhealthy_metrics = ProductionMetrics()
@@ -674,12 +641,10 @@ accurate assistant with mandatory tool usage requirements."""
             "model1": {"quality_score": 0.70},  # Critical
             "model2": {"quality_score": 0.72},  # Critical
             "model3": {"quality_score": 0.74},  # Critical
-            "model4": {"quality_score": 0.95}   # Good
+            "model4": {"quality_score": 0.95},  # Good
         }
 
-        is_healthy = await orchestrator._check_deployment_health(
-            deployment, unhealthy_metrics
-        )
+        is_healthy = await orchestrator._check_deployment_health(deployment, unhealthy_metrics)
         assert not is_healthy
 
 
@@ -689,16 +654,17 @@ class TestIntegrationScenarios:
     @pytest.fixture
     def full_orchestrator(self):
         """Create fully configured orchestrator for integration tests."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py',
-                                       delete=False) as f:
-            f.write("""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(
+                """
         system_prompt = f\"\"\"You are a customer service assistant.
 {comprehensive_fields_text}
 
 # CRITICAL: YOU MUST USE TOOLS
 
 MANDATORY: Call tools first.\"\"\"
-""")
+"""
+            )
             temp_path = f.name
 
         orchestrator = ProductionIntegrationOrchestrator(ProductionEnvironment.LOCAL)
@@ -716,14 +682,10 @@ MANDATORY: Call tools first.\"\"\"
         optimization_results = {
             "ab_test_results": {
                 "customer_profile": {
-                    "summary": {
-                        "best_variation": "optimized_v1",
-                        "best_score": 0.94,
-                        "average_improvement": 0.06
-                    }
+                    "summary": {"best_variation": "optimized_v1", "best_score": 0.94, "average_improvement": 0.06}
                 }
             },
-            "overall_improvement": 0.05
+            "overall_improvement": 0.05,
         }
 
         # Mock monitoring
@@ -748,7 +710,7 @@ MANDATORY: Call tools first.\"\"\"
             target_location="system_prompt",
             deployment_status=DeploymentStatus.DEPLOYED,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         # Deploy first
@@ -808,12 +770,12 @@ MANDATORY: Call tools first, then provide real data. Never guess.""",
             target_location="system_prompt",
             deployment_status=DeploymentStatus.VALIDATING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         # Mock current prompt extraction
         full_orchestrator.prompt_manager.extract_current_prompt = MagicMock(
-            return_value="system_prompt = f\"\"\"existing\"\"\""
+            return_value='system_prompt = f"""existing"""'
         )
 
         validation_passed = await full_orchestrator._validate_deployment(high_quality_deployment)
@@ -842,7 +804,7 @@ class TestEdwinaHawthorneValidation:
             "Find customer Edwina Hawthorne",
             "Get credit report for customer EDW_HAWTHORNE_001",
             "What is Edwina's credit utilization rate?",
-            "Has Edwina Hawthorne missed any recent payments?"
+            "Has Edwina Hawthorne missed any recent payments?",
         ]
 
         for query in test_queries:
@@ -850,7 +812,7 @@ class TestEdwinaHawthorneValidation:
             score = await orchestrator_with_customer_data._test_prompt_effectiveness(
                 """You are a comprehensive customer service assistant with
 mandatory tool usage for accurate customer data analysis.""",
-                query
+                query,
             )
 
             # Should achieve high scores for customer-focused prompts
@@ -877,12 +839,12 @@ MANDATORY: Call tools first, then provide real data.""",
             target_location="system_prompt",
             deployment_status=DeploymentStatus.VALIDATING,
             validation_results={},
-            performance_metrics={}
+            performance_metrics={},
         )
 
         # Mock integration validation
         orchestrator_with_customer_data.prompt_manager.extract_current_prompt = MagicMock(
-            return_value="system_prompt = f\"\"\"existing\"\"\""
+            return_value='system_prompt = f"""existing"""'
         )
 
         validation_passed = await orchestrator_with_customer_data._validate_with_customer_data(deployment)
@@ -922,9 +884,7 @@ class TestPerformanceScenarios:
         test_results = []
         for i in range(3):
             result = await orchestrator.run_production_ab_test(
-                f"Control prompt {i}",
-                f"Variant prompt {i}",
-                traffic_split=0.1
+                f"Control prompt {i}", f"Variant prompt {i}", traffic_split=0.1
             )
             test_results.append(result)
 
@@ -945,11 +905,11 @@ class TestPerformanceScenarios:
             deployment_status=DeploymentStatus.DEPLOYED,
             validation_results={},
             performance_metrics={},
-            rollback_data={"backup_path": "/tmp/fake_backup.py"}
+            rollback_data={"backup_path": "/tmp/fake_backup.py"},
         )
 
         # Mock file operations for pressure test
-        with patch('shutil.copy2') as mock_copy:
+        with patch("shutil.copy2") as mock_copy:
             mock_copy.return_value = True
 
             success = await orchestrator.prompt_manager.rollback_deployment(deployment)

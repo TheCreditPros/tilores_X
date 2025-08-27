@@ -174,7 +174,7 @@ class QualityMetricsCollector:
 
         # Maintain maximum history size
         if len(self.metrics) > self.max_history:
-            self.metrics = self.metrics[-self.max_history:]
+            self.metrics = self.metrics[-self.max_history :]
 
         logger.debug(f"Collected metric {metric_id}: {value:.3f} " f"(target: {target:.3f})")
 

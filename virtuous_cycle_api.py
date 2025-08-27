@@ -28,6 +28,15 @@ import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+# Optional Redis-backed persistence for audit history
+try:
+    from redis_cache import cache_manager  # noqa: F401
+
+    REDIS_CACHE_AVAILABLE = True
+except Exception:
+    cache_manager = None  # type: ignore
+    REDIS_CACHE_AVAILABLE = False
+
 # Load environment variables early to ensure API keys are available
 try:
     from pathlib import Path
@@ -66,188 +75,24 @@ except ImportError:
     LANGSMITH_AVAILABLE = False
     logging.warning("LangSmith not available for trace monitoring")
 
-# Import production autonomous AI platform components
+"""Import production autonomous AI platform components. No mocks."""
 FRAMEWORKS_AVAILABLE = False
 try:
     from autonomous_ai_platform import AutonomousAIPlatform
     from autonomous_integration import EnhancedVirtuousCycleManager
     from langsmith_enterprise_client import create_enterprise_client
 
-    # Verify all components are actually available
-    test_components = [
-        AutonomousAIPlatform,
-        EnhancedVirtuousCycleManager,
-        create_enterprise_client,
-    ]
-
-    # Test component instantiation to ensure they're fully functional
-    for component in test_components:
+    # Basic callable checks
+    for component in [AutonomousAIPlatform, EnhancedVirtuousCycleManager, create_enterprise_client]:
         if not callable(component):
             raise ImportError(f"Component {component.__name__} is not callable")
 
     FRAMEWORKS_AVAILABLE = True
-    logging.info("✅ Production autonomous AI platform components successfully imported and validated")
-
+    logging.info("✅ Production autonomous AI platform components available")
 except ImportError as import_error:
-    # Create mock implementations for production deployment
     logging.warning(
-        f"Production autonomous AI platform components not available ({import_error}), using mock implementations"
+        f"Autonomous AI platform components not available: {import_error}. Mocks are disabled; features will be inactive."
     )
-
-    class MockAutonomousAIPlatform:
-        """Mock autonomous AI platform for production deployment."""
-
-        def __init__(self, langsmith_client=None):
-            self.langsmith_client = langsmith_client
-
-        async def autonomous_improvement_cycle(self):
-            """Mock autonomous improvement cycle with detailed change tracking."""
-            logging.info("Mock: Running autonomous improvement cycle")
-            import random
-
-            # Simulate specific configuration changes for governance tracking
-            mock_changes = []
-            change_types = ["system_prompt", "temperature", "model_selection", "timeout_adjustment"]
-            selected_change = random.choice(change_types)
-
-            if selected_change == "system_prompt":
-                mock_changes.append(
-                    {
-                        "type": "system_prompt_optimization",
-                        "component": "customer_search_prompt",
-                        "before": "You are a helpful assistant that searches for customer information.",
-                        "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone and complete details.",
-                        "reason": "Improve response quality and completeness",
-                        "impact": "Enhanced customer information accuracy and professional tone",
-                    }
-                )
-            elif selected_change == "temperature":
-                old_temp = round(random.uniform(0.5, 0.9), 1)
-                new_temp = round(old_temp - 0.1, 1) if old_temp > 0.3 else round(old_temp + 0.1, 1)
-                mock_changes.append(
-                    {
-                        "type": "temperature_adjustment",
-                        "component": "llm_generation",
-                        "before": str(old_temp),
-                        "after": str(new_temp),
-                        "reason": "Optimize response consistency and quality",
-                        "impact": f"{'More' if new_temp < old_temp else 'Less'} deterministic responses",
-                    }
-                )
-            elif selected_change == "model_selection":
-                models = ["gpt-4o-mini", "llama-3.3-70b-versatile", "claude-3-haiku"]
-                old_model = random.choice(models)
-                new_model = random.choice([m for m in models if m != old_model])
-                mock_changes.append(
-                    {
-                        "type": "model_optimization",
-                        "component": "primary_llm",
-                        "before": old_model,
-                        "after": new_model,
-                        "reason": "Improve quality score and response time",
-                        "impact": "Better performance for current workload pattern",
-                    }
-                )
-            else:  # timeout_adjustment
-                old_timeout = random.choice([5000, 10000, 15000])
-                new_timeout = old_timeout + random.choice([-2000, 2000])
-                mock_changes.append(
-                    {
-                        "type": "timeout_optimization",
-                        "component": "api_timeout",
-                        "before": f"{old_timeout}ms",
-                        "after": f"{new_timeout}ms",
-                        "reason": "Balance response time vs reliability",
-                        "impact": "Optimized timeout for current network conditions",
-                    }
-                )
-
-            return {
-                "cycle_id": f"autonomous_cycle_{int(time.time())}",
-                "components_executed": ["delta_analysis", "meta_learning", "quality_prediction"],
-                "improvements_identified": mock_changes,
-                "learning_applied": True,
-                "cycle_duration": round(random.uniform(2.0, 5.0), 1),
-                "specific_changes": mock_changes,  # Detailed changes for governance
-                "quality_improvement_expected": round(random.uniform(1.5, 4.2), 1),
-            }
-
-        async def get_platform_status(self):
-            """Mock platform status."""
-            return {
-                "platform_status": "operational",
-                "current_quality": 0.88,
-                "quality_trend": "stable",
-                "predicted_quality": 0.89,
-                "needs_intervention": False,
-                "autonomous_features": {
-                    "delta_analysis": True,
-                    "ab_testing": True,
-                    "pattern_indexing": True,
-                    "meta_learning": True,
-                    "predictive_quality": True,
-                },
-            }
-
-        async def predict_quality_degradation(self):
-            """Mock quality prediction."""
-            return {
-                "predicted_quality_7d": 0.89,
-                "needs_intervention": False,
-                "confidence": 0.75,
-                "risk_level": "low",
-                "risk_factors": [],
-                "recommendations": [],
-            }
-
-    class MockEnhancedVirtuousCycleManager:
-        """Mock enhanced virtuous cycle manager."""
-
-        def __init__(self):
-            self.enterprise_features_available = False
-            self.legacy_available = False
-
-        async def get_enhanced_status(self):
-            """Mock enhanced status."""
-            return {
-                "enhanced_features": False,
-                "legacy_compatibility": False,
-                "autonomous_ai": {
-                    "delta_analysis": False,
-                    "ab_testing": False,
-                    "pattern_indexing": False,
-                    "meta_learning": False,
-                    "predictive_quality": False,
-                },
-                "enterprise_langsmith": {
-                    "workspace_stats": None,
-                    "quality_prediction": None,
-                    "pattern_analysis": None,
-                },
-            }
-
-        async def run_autonomous_optimization(self, trigger_reason="Mock trigger"):
-            """Mock autonomous optimization."""
-            return {
-                "trigger_reason": trigger_reason,
-                "autonomous_features_used": ["mock_feature"],
-                "success": True,
-                "timestamp": datetime.now().isoformat(),
-            }
-
-        async def close(self):
-            """Mock close method."""
-            pass
-
-    # Assign mock classes
-    AutonomousAIPlatform = MockAutonomousAIPlatform
-    EnhancedVirtuousCycleManager = MockEnhancedVirtuousCycleManager
-
-    def create_enterprise_client():
-        """Mock enterprise client factory."""
-        return None
-
-    FRAMEWORKS_AVAILABLE = True  # Set to True since we have mock implementations
 
 # Import monitoring system
 try:
@@ -288,8 +133,19 @@ class VirtuousCycleManager:
 
         # Configuration
         self.monitoring_interval = 300  # 5 minutes
-        self.quality_threshold = 0.90  # 90% quality target
+        self.quality_threshold = 0.90  # 90% quality target (legacy - replaced by multi-tier)
         self.trace_batch_size = 50  # Process traces in batches
+
+        # Initialize multi-tier quality monitoring system
+        self.quality_monitor = None
+        try:
+            from quality_threshold_system import get_quality_monitor
+
+            self.quality_monitor = get_quality_monitor()
+            self.logger.info("✅ Multi-tier quality monitoring system initialized")
+        except ImportError as e:
+            self.logger.warning(f"Multi-tier quality monitoring not available: {e}")
+            self.logger.info("📊 Using legacy single-threshold monitoring")
 
         # State tracking
         self.monitoring_active = False
@@ -311,6 +167,9 @@ class VirtuousCycleManager:
         self.ai_changes_history = []
         self.max_changes_history = 50  # Keep last 50 changes
 
+        # Load persisted history if available
+        self._load_ai_changes_history()
+
         # Initialize autonomous AI platform components
         self.autonomous_platform = None
         self.enhanced_manager = None
@@ -324,8 +183,9 @@ class VirtuousCycleManager:
                     self.autonomous_platform = AutonomousAIPlatform(enterprise_client)
                     self.logger.info("✅ Autonomous AI platform initialized with enterprise client")
                 else:
-                    self.autonomous_platform = AutonomousAIPlatform(None)
-                    self.logger.info("✅ Autonomous AI platform initialized with mock client")
+                    # No client provided; leave platform disabled rather than using mocks
+                    self.autonomous_platform = None
+                    self.logger.warning("Autonomous AI platform disabled - no enterprise client provided")
 
                 # Initialize enhanced virtuous cycle manager
                 self.enhanced_manager = EnhancedVirtuousCycleManager()
@@ -333,18 +193,16 @@ class VirtuousCycleManager:
 
             except Exception as e:
                 self.logger.error(f"Autonomous AI platform initialization failed: {e}")
-                # Fallback to mock implementations
-                self._initialize_mock_components()
+                self.autonomous_platform = None
+                self.enhanced_manager = None
         else:
-            # Use mock implementations when frameworks not available
-            self._initialize_mock_components()
+            self.logger.warning("Autonomous AI platform components unavailable - features disabled")
 
-    def _initialize_mock_components(self):
-        """Initialize mock components when real frameworks are not available."""
-        # Use the mock classes defined at module level when FRAMEWORKS_AVAILABLE is False
-        self.autonomous_platform = AutonomousAIPlatform(None)  # Mock version
-        self.enhanced_manager = EnhancedVirtuousCycleManager()  # Mock version
-        self.logger.info("✅ Mock autonomous AI platform components initialized")
+    def _initialize_mock_components(self):  # Backward compatibility; now a no-op
+        """Deprecated: mocks disabled. Keep method to avoid import-time errors."""
+        self.autonomous_platform = None
+        self.enhanced_manager = None
+        self.logger.info("ℹ️ Mock initialization skipped (mocks disabled)")
 
     async def start_monitoring(self):
         """Start the continuous monitoring and optimization system."""
@@ -398,51 +256,118 @@ class VirtuousCycleManager:
                 await asyncio.sleep(60)
 
     async def _fetch_recent_traces(self) -> List[Dict[str, Any]]:
-        """Fetch recent traces from LangSmith API."""
+        """Fetch recent traces from LangSmith API - REAL IMPLEMENTATION."""
         try:
-            # Get traces from the last 5 minutes
-            # end_time = datetime.now()  # noqa: F841
-            # start_time = end_time - timedelta(minutes=5)  # noqa: F841
+            if not self.langsmith_client:
+                self.logger.debug("LangSmith client unavailable; skipping trace fetch")
+                return []
 
-            # Mock trace fetching - in production this would use LangSmith API
-            # traces = self.langsmith_client.list_runs(
-            #     project_name="tilores_x",
-            #     start_time=start_time,
-            #     end_time=end_time,
-            #     limit=self.trace_batch_size
-            # )
+            # Real LangSmith trace fetching
+            end_time = datetime.now()
+            start_time = end_time - timedelta(minutes=5)  # Last 5 minutes
 
-            # For now, simulate traces
-            traces = self._simulate_traces()
+            self.logger.debug(f"Fetching LangSmith traces from {start_time} to {end_time}")
+
+            # Use LangSmith client to get actual traces
+            runs = self.langsmith_client.list_runs(
+                project_name="tilores_x",
+                start_time=start_time,
+                end_time=end_time,
+                limit=self.trace_batch_size,
+                is_root=True,  # Only get root runs, not child runs
+            )
+
+            traces = []
+            for run in runs:
+                trace = self._convert_run_to_trace(run)
+                if trace:
+                    traces.append(trace)
+
+            self.logger.debug(f"Retrieved {len(traces)} traces from LangSmith")
             return traces
 
         except Exception as e:
-            self.logger.error(f"Failed to fetch traces: {e}")
+            self.logger.error(f"Failed to fetch traces from LangSmith: {e}")
             return []
 
-    def _simulate_traces(self) -> List[Dict[str, Any]]:
-        """Simulate LangSmith traces for development."""
-        import random
+    def _convert_run_to_trace(self, run) -> Optional[Dict[str, Any]]:
+        """Convert LangSmith run to our trace format."""
+        try:
+            # Extract quality score from run
+            quality_score = 0.0
 
-        traces = []
-        for i in range(random.randint(1, 10)):
-            quality_score = random.uniform(0.75, 0.98)
-            traces.append(
-                {
-                    "id": f"trace_{int(time.time())}_{i}",
-                    "timestamp": datetime.now().isoformat(),
-                    "model": random.choice(
-                        ["llama-3.3-70b-versatile", "gpt-4o-mini", "claude-3-haiku", "gemini-1.5-flash-002"]
-                    ),
-                    "quality_score": quality_score,
-                    "response_time": random.uniform(1.0, 8.0),
-                    "tokens_used": random.randint(50, 500),
-                    "success": quality_score > 0.80,
-                    "spectrum": random.choice(["customer_profile", "credit_analysis", "transaction_history"]),
-                }
-            )
+            # Check for feedback scores
+            if hasattr(run, "feedback_stats") and run.feedback_stats:
+                if "quality" in run.feedback_stats:
+                    quality_score = run.feedback_stats["quality"]
+                elif "score" in run.feedback_stats:
+                    quality_score = run.feedback_stats["score"]
 
-        return traces
+            # Check run outputs for quality indicators
+            if hasattr(run, "outputs") and run.outputs:
+                # Look for quality metrics in outputs
+                if isinstance(run.outputs, dict):
+                    if "quality_score" in run.outputs:
+                        quality_score = run.outputs["quality_score"]
+                    elif "score" in run.outputs:
+                        quality_score = run.outputs["score"]
+
+            # Calculate quality from error status if no explicit score
+            if quality_score == 0.0:
+                if run.status == "success":
+                    # Use token efficiency and timing as quality proxy
+                    response_time = (
+                        (run.end_time - run.start_time).total_seconds() if run.end_time and run.start_time else 0
+                    )
+                    if response_time < 2.0:  # Fast response
+                        quality_score = 0.95
+                    elif response_time < 5.0:  # Medium response
+                        quality_score = 0.85
+                    else:  # Slow response
+                        quality_score = 0.75
+                else:
+                    quality_score = 0.3  # Error case
+
+            # Determine model and provider from run
+            model = "unknown"
+            provider = "unknown"
+
+            if hasattr(run, "extra") and run.extra:
+                if "invocation_params" in run.extra:
+                    params = run.extra["invocation_params"]
+                    if "model" in params:
+                        model = params["model"]
+                        # Infer provider from model name
+                        if "gpt" in model or "openai" in model:
+                            provider = "openai"
+                        elif "claude" in model:
+                            provider = "anthropic"
+                        elif "llama" in model or "groq" in model:
+                            provider = "groq"
+                        elif "gemini" in model:
+                            provider = "google"
+
+            trace = {
+                "trace_id": str(run.id),
+                "timestamp": run.start_time.isoformat() if run.start_time else datetime.now().isoformat(),
+                "quality_score": quality_score,
+                "model": model,
+                "provider": provider,
+                "response_time": (
+                    (run.end_time - run.start_time).total_seconds() if run.end_time and run.start_time else 0
+                ),
+                "status": run.status or "unknown",
+                "error": run.error if hasattr(run, "error") and run.error else None,
+                "input_tokens": run.prompt_tokens if hasattr(run, "prompt_tokens") else 0,
+                "output_tokens": run.completion_tokens if hasattr(run, "completion_tokens") else 0,
+                "total_tokens": run.total_tokens if hasattr(run, "total_tokens") else 0,
+            }
+
+            return trace
+
+        except Exception as e:
+            self.logger.error(f"Failed to convert run to trace: {e}")
+            return None
 
     async def _trace_processor(self):
         """Process queued traces for quality analysis."""
@@ -485,12 +410,56 @@ class VirtuousCycleManager:
         self.metrics["quality_checks"] += 1
         self.metrics["last_update"] = datetime.now().isoformat()
 
+        # Calculate per-model and per-provider quality breakdown
+        model_quality = {}
+        provider_quality = {}
+
+        for trace in traces:
+            model = trace.get("model", "unknown")
+            provider = trace.get("provider", "unknown")
+            quality = trace.get("quality_score", 0)
+
+            # Track per-model quality
+            if model not in model_quality:
+                model_quality[model] = []
+            model_quality[model].append(quality)
+
+            # Track per-provider quality
+            if provider not in provider_quality:
+                provider_quality[provider] = []
+            provider_quality[provider].append(quality)
+
         # Store quality metrics if collector available
         if self.quality_collector:
             for trace in traces:
                 await self._store_quality_metric(trace)
 
-        self.logger.debug(f"Analyzed {len(traces)} traces, " f"avg quality: {avg_quality:.1%}")
+        # Enhanced logging with breakdown
+        model_summary = {k: sum(v) / len(v) for k, v in model_quality.items()}
+        provider_summary = {k: sum(v) / len(v) for k, v in provider_quality.items()}
+
+        self.logger.info(f"📊 Analyzed {len(traces)} traces - Overall: {avg_quality:.1%}")
+        if model_summary:
+            self.logger.info(f"  🤖 Model quality: {model_summary}")
+        if provider_summary:
+            self.logger.info(f"  🏢 Provider quality: {provider_summary}")
+
+        # Alert when quality is updated from zero (indicates LangSmith integration is working)
+        if self.metrics["current_quality"] == 0.0 and avg_quality > 0:
+            self.logger.info(f"🎉 LangSmith integration active - receiving real quality data: {avg_quality:.1%}")
+
+        # Pass detailed quality data to multi-tier monitor if available
+        if self.quality_monitor:
+            detailed_metrics = {
+                "overall_quality": avg_quality,
+                "model_quality": model_summary,
+                "provider_quality": provider_summary,
+                "trace_count": len(traces),
+                "timestamp": datetime.now().isoformat(),
+            }
+
+            # Trigger detailed quality analysis
+            await self.quality_monitor.check_quality_thresholds(overall_quality=avg_quality, metadata=detailed_metrics)
 
     async def _store_quality_metric(self, trace: Dict[str, Any]):
         """Store individual trace quality metric."""
@@ -521,17 +490,42 @@ class VirtuousCycleManager:
             try:
                 current_quality = self.metrics["current_quality"]
 
-                # Check if quality is below threshold
-                if current_quality > 0 and current_quality < self.quality_threshold:
-                    self.logger.warning(
-                        f"Quality below threshold: {current_quality:.1%} < " f"{self.quality_threshold:.1%}"
+                # Use multi-tier quality monitoring if available
+                if self.quality_monitor and current_quality > 0:
+                    alerts = await self.quality_monitor.check_quality_thresholds(
+                        overall_quality=current_quality,
+                        metadata={
+                            "traces_processed": self.metrics["traces_processed"],
+                            "optimizations_triggered": self.metrics["optimizations_triggered"],
+                            "timestamp": datetime.now().isoformat(),
+                        },
                     )
 
-                    # Check cooldown period
-                    if self._can_trigger_optimization():
-                        await self._trigger_optimization(
-                            reason=f"Quality degradation: {current_quality:.1%}", quality_score=current_quality
+                    # Process alerts and trigger optimizations for critical/warning levels
+                    for alert in alerts:
+                        if alert.severity.value in ["critical", "high"]:
+                            self.logger.warning(f"🚨 Quality alert: {alert.message}")
+
+                            if self._can_trigger_optimization():
+                                await self._trigger_optimization(
+                                    reason=f"Multi-tier alert: {alert.threshold_level.value} - {alert.message}",
+                                    quality_score=current_quality,
+                                )
+                        else:
+                            self.logger.info(f"📊 Quality status: {alert.message}")
+
+                else:
+                    # Fallback to legacy single-threshold monitoring
+                    if current_quality > 0 and current_quality < self.quality_threshold:
+                        self.logger.warning(
+                            f"Quality below threshold: {current_quality:.1%} < " f"{self.quality_threshold:.1%}"
                         )
+
+                        # Check cooldown period
+                        if self._can_trigger_optimization():
+                            await self._trigger_optimization(
+                                reason=f"Quality degradation: {current_quality:.1%}", quality_score=current_quality
+                            )
 
                 await asyncio.sleep(self.monitoring_interval)
 
@@ -555,76 +549,26 @@ class VirtuousCycleManager:
         self.metrics["optimizations_triggered"] += 1
 
         try:
-            # Run autonomous AI optimization cycle
+            # Run autonomous AI optimization cycle (only if platform available)
             if self.autonomous_platform:
                 optimization_results = await self._run_autonomous_optimization()
 
                 if optimization_results:
-                    # Generate detailed configuration changes for governance
-                    import random
+                    # Use platform-provided changes only
+                    detailed_changes = (
+                        optimization_results.get("specific_changes")
+                        or optimization_results.get("improvements_identified", [])
+                        or []
+                    )
 
-                    detailed_changes = []
-
-                    # Generate specific configuration changes based on the optimization
-                    change_types = ["system_prompt", "temperature", "model_selection", "timeout_adjustment"]
-                    selected_change = random.choice(change_types)
-
-                    if selected_change == "system_prompt":
-                        detailed_changes.append(
-                            {
-                                "type": "system_prompt_optimization",
-                                "component": "customer_search_prompt",
-                                "before": "You are a helpful assistant that searches for customer information using the Tilores API.",
-                                "after": "You are an expert customer service AI that provides comprehensive, accurate customer information with professional tone. Always include complete customer details and context.",
-                                "reason": "Improve response quality and completeness based on quality degradation",
-                                "impact": "Enhanced customer information accuracy and professional tone",
-                            }
-                        )
-                    elif selected_change == "temperature":
-                        old_temp = 0.7
-                        new_temp = 0.5
-                        detailed_changes.append(
-                            {
-                                "type": "temperature_adjustment",
-                                "component": "llm_generation",
-                                "before": str(old_temp),
-                                "after": str(new_temp),
-                                "reason": "Reduce temperature for more consistent responses due to quality issues",
-                                "impact": "More deterministic and reliable responses",
-                            }
-                        )
-                    elif selected_change == "model_selection":
-                        detailed_changes.append(
-                            {
-                                "type": "model_optimization",
-                                "component": "primary_llm",
-                                "before": "gpt-4o-mini",
-                                "after": "llama-3.3-70b-versatile",
-                                "reason": "Switch to higher performance model due to quality degradation",
-                                "impact": "Better quality scores and faster response times",
-                            }
-                        )
-                    else:  # timeout_adjustment
-                        detailed_changes.append(
-                            {
-                                "type": "timeout_optimization",
-                                "component": "api_timeout",
-                                "before": "10000ms",
-                                "after": "8000ms",
-                                "reason": "Optimize timeout settings for better reliability",
-                                "impact": "Reduced timeout errors and improved user experience",
-                            }
-                        )
-
-                    # Track AI change for governance with detailed configuration changes
                     self._track_ai_change(
                         {
                             "type": "optimization_cycle",
                             "trigger_reason": reason,
                             "quality_score_before": quality_score,
                             "components_executed": optimization_results.get("components_executed", []),
-                            "improvements_identified": detailed_changes,  # Use detailed changes instead of generic
-                            "specific_changes": detailed_changes,  # Also add as specific_changes for dashboard
+                            "improvements_identified": detailed_changes,
+                            "specific_changes": detailed_changes,
                             "cycle_duration": optimization_results.get("cycle_duration", 0),
                             "timestamp": datetime.now().isoformat(),
                             "cycle_id": optimization_results.get("cycle_id", f"cycle_{int(time.time())}"),
@@ -635,9 +579,7 @@ class VirtuousCycleManager:
                     # Run enhanced optimization if available
                     if self.enhanced_manager:
                         await self._run_enhanced_optimization(optimization_results)
-                        self.metrics["improvements_deployed"] += len(
-                            optimization_results.get("improvements_identified", [])
-                        )
+                        self.metrics["improvements_deployed"] += len(detailed_changes)
 
         except Exception as e:
             self.logger.error(f"Optimization cycle failed: {e}")
@@ -843,6 +785,9 @@ class VirtuousCycleManager:
                 f"📝 Tracked AI change: {change_details.get('type', 'unknown')} - {change_details.get('change_id')}"
             )
 
+            # Persist history
+            self._save_ai_changes_history()
+
         except Exception as e:
             self.logger.error(f"Failed to track AI change: {e}")
 
@@ -850,7 +795,22 @@ class VirtuousCycleManager:
         """Get recent AI changes for governance and rollback."""
         try:
             # Get recent changes (most recent first)
-            recent_changes = list(reversed(self.ai_changes_history[-limit:]))
+            raw_changes = list(reversed(self.ai_changes_history[-limit:]))
+
+            # Format changes for API consistency
+            recent_changes = []
+            for change in raw_changes:
+                formatted_change = change.copy()
+
+                # Map Redis field names to API field names
+                if "configuration_modifications" in change:
+                    formatted_change["configurations_changed"] = change["configuration_modifications"]
+
+                # Ensure all required fields are present
+                if "configurations_changed" not in formatted_change:
+                    formatted_change["configurations_changed"] = 0
+
+                recent_changes.append(formatted_change)
 
             # Calculate summary statistics
             total_changes = len(self.ai_changes_history)
@@ -894,6 +854,7 @@ class VirtuousCycleManager:
             old_count = len(self.ai_changes_history)
             self.ai_changes_history = []
             self.logger.info(f"🗑️ Cleared {old_count} AI changes from history - starting fresh with detailed tracking")
+            self._save_ai_changes_history()
             return {"success": True, "cleared_changes": old_count, "timestamp": datetime.now().isoformat()}
         except Exception as e:
             self.logger.error(f"Failed to clear AI changes history: {e}")
@@ -935,7 +896,7 @@ class VirtuousCycleManager:
                         rollback_target = change
                         break
             else:
-                # Find the last successful state
+                # Find the last successful state (may be a summary)
                 rollback_target = self._get_last_successful_state()
 
             if not rollback_target:
@@ -945,6 +906,16 @@ class VirtuousCycleManager:
                     "error": "No valid rollback target found",
                     "timestamp": datetime.now().isoformat(),
                 }
+
+            # If we only have a summary, retrieve the full change entry
+            if "improvements_identified" not in rollback_target and rollback_target.get("cycle_id"):
+                full = None
+                for change in reversed(self.ai_changes_history):
+                    if change.get("cycle_id") == rollback_target.get("cycle_id"):
+                        full = change
+                        break
+                if full:
+                    rollback_target = full
 
             # Extract configuration from rollback target
             rollback_configs = []
@@ -1001,6 +972,44 @@ class VirtuousCycleManager:
         except Exception as e:
             self.logger.error(f"Rollback failed: {e}")
             return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
+
+    def _save_ai_changes_history(self) -> None:
+        """Persist AI changes history to Redis if available, else to file."""
+        try:
+            data = json.dumps(self.ai_changes_history)
+            if REDIS_CACHE_AVAILABLE and cache_manager and getattr(cache_manager, "redis_client", None):
+                key = "tilores:ai_changes_history"
+                cache_manager.redis_client.set(key, data)
+            else:
+                import os
+
+                os.makedirs("audit_trails", exist_ok=True)
+                path = os.path.join("audit_trails", "ai_changes_history.json")
+                with open(path, "w") as f:
+                    f.write(data)
+        except Exception as e:
+            self.logger.warning(f"Failed to persist AI changes history: {e}")
+
+    def _load_ai_changes_history(self) -> None:
+        """Load AI changes history from Redis or file into memory."""
+        try:
+            loaded = None
+            if REDIS_CACHE_AVAILABLE and cache_manager and getattr(cache_manager, "redis_client", None):
+                key = "tilores:ai_changes_history"
+                raw = cache_manager.redis_client.get(key)
+                if raw:
+                    loaded = json.loads(raw)
+            if loaded is None:
+                import os
+
+                path = os.path.join("audit_trails", "ai_changes_history.json")
+                if os.path.exists(path):
+                    with open(path, "r") as f:
+                        loaded = json.load(f)
+            if isinstance(loaded, list):
+                self.ai_changes_history = loaded[-self.max_changes_history :]
+        except Exception as e:
+            self.logger.warning(f"Failed to load AI changes history: {e}")
 
 
 # Global instance

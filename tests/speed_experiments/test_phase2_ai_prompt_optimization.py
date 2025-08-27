@@ -21,6 +21,7 @@ from unittest.mock import MagicMock
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from phase2_ai_prompt_optimization import (
@@ -33,7 +34,7 @@ from phase2_ai_prompt_optimization import (
     PromptPattern,
     PromptPatternAnalyzer,
     PromptVariation,
-    PromptVariationType
+    PromptVariationType,
 )
 
 
@@ -51,37 +52,20 @@ class TestPromptPatternAnalyzer:
         return {
             "metrics": {
                 "model_performance": {
-                    "gpt-4o-mini": {
-                        "avg_quality": 0.94,
-                        "avg_response_time": 7.4,
-                        "success_rate": 0.98
-                    },
-                    "gemini-1.5-flash-002": {
-                        "avg_quality": 0.95,
-                        "avg_response_time": 3.1,
-                        "success_rate": 0.99
-                    }
+                    "gpt-4o-mini": {"avg_quality": 0.94, "avg_response_time": 7.4, "success_rate": 0.98},
+                    "gemini-1.5-flash-002": {"avg_quality": 0.95, "avg_response_time": 3.1, "success_rate": 0.99},
                 },
                 "spectrum_performance": {
-                    "customer_profile": {
-                        "avg_quality": 0.92,
-                        "avg_completeness": 0.91,
-                        "success_rate": 0.96
-                    },
-                    "credit_analysis": {
-                        "avg_quality": 0.89,
-                        "avg_completeness": 0.88,
-                        "success_rate": 0.94
-                    }
-                }
+                    "customer_profile": {"avg_quality": 0.92, "avg_completeness": 0.91, "success_rate": 0.96},
+                    "credit_analysis": {"avg_quality": 0.89, "avg_completeness": 0.88, "success_rate": 0.94},
+                },
             }
         }
 
     @pytest.fixture
     def temp_baseline_file(self, mock_baseline_data):
         """Create temporary baseline file for testing."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(mock_baseline_data, f)
             return f.name
 
@@ -101,9 +85,7 @@ class TestPromptPatternAnalyzer:
     def test_generate_model_specific_template(self, analyzer):
         """Test model-specific template generation."""
         success_factors = ["exceptional_quality_achievement", "fast_response_time"]
-        template = analyzer._generate_model_specific_template(
-            "gpt-4o-mini", success_factors
-        )
+        template = analyzer._generate_model_specific_template("gpt-4o-mini", success_factors)
 
         assert "gpt-4o-mini" in template
         assert "exceptional quality" in template
@@ -112,9 +94,7 @@ class TestPromptPatternAnalyzer:
 
     def test_generate_spectrum_template(self, analyzer):
         """Test spectrum-specific template generation."""
-        template = analyzer._generate_spectrum_template(
-            "customer_profile", ["exceptional_quality"]
-        )
+        template = analyzer._generate_spectrum_template("customer_profile", ["exceptional_quality"])
 
         assert "customer profile" in template.lower()
         assert "identification" in template.lower()
@@ -122,15 +102,9 @@ class TestPromptPatternAnalyzer:
 
     def test_analyze_spectrum_success_factors(self, analyzer):
         """Test spectrum success factor analysis."""
-        perf_data = {
-            "avg_quality": 0.96,
-            "avg_completeness": 0.92,
-            "success_rate": 0.97
-        }
+        perf_data = {"avg_quality": 0.96, "avg_completeness": 0.92, "success_rate": 0.97}
 
-        factors = analyzer._analyze_spectrum_success_factors(
-            "test_spectrum", perf_data
-        )
+        factors = analyzer._analyze_spectrum_success_factors("test_spectrum", perf_data)
 
         assert "exceptional_quality" in factors
         assert "high_completeness" in factors
@@ -157,7 +131,7 @@ class TestAIPromptRefiner:
                 quality_impact=0.08,
                 applicable_spectrums=["all"],
                 applicable_models=["gpt-4o-mini"],
-                pattern_template="Test template for optimization"
+                pattern_template="Test template for optimization",
             )
         ]
 
@@ -167,9 +141,7 @@ class TestAIPromptRefiner:
         base_prompt = "Analyze customer data"
         target_spectrum = "customer_profile"
 
-        variations = await refiner.generate_prompt_variations(
-            base_prompt, target_spectrum, mock_patterns
-        )
+        variations = await refiner.generate_prompt_variations(base_prompt, target_spectrum, mock_patterns)
 
         assert len(variations) >= 1  # At least pattern-based variation
         assert all(isinstance(v, PromptVariation) for v in variations)
@@ -182,9 +154,7 @@ class TestAIPromptRefiner:
         pattern = mock_patterns[0]
         target_spectrum = "customer_profile"
 
-        variation = await refiner._apply_pattern_to_prompt(
-            base_prompt, pattern, target_spectrum, 0.90
-        )
+        variation = await refiner._apply_pattern_to_prompt(base_prompt, pattern, target_spectrum, 0.90)
 
         assert variation is not None
         assert variation.base_prompt == base_prompt
@@ -197,9 +167,7 @@ class TestAIPromptRefiner:
         # Ensure LangChain is disabled for this test
         refiner.refiner_llm = None
 
-        variations = await refiner._generate_ai_variations(
-            "Test prompt", "test_spectrum", 0.90
-        )
+        variations = await refiner._generate_ai_variations("Test prompt", "test_spectrum", 0.90)
 
         assert variations == []  # Should return empty list without LangChain
 
@@ -228,7 +196,7 @@ class TestABTestingFramework:
                 variation_type=PromptVariationType.STRUCTURE_VARIATION,
                 hypothesis="Structure improvement",
                 expected_improvement=0.05,
-                metadata={"target_spectrum": "customer_profile"}
+                metadata={"target_spectrum": "customer_profile"},
             ),
             PromptVariation(
                 variation_id="test_var_2",
@@ -237,8 +205,8 @@ class TestABTestingFramework:
                 variation_type=PromptVariationType.INSTRUCTION_CLARITY,
                 hypothesis="Clarity improvement",
                 expected_improvement=0.04,
-                metadata={"target_spectrum": "customer_profile"}
-            )
+                metadata={"target_spectrum": "customer_profile"},
+            ),
         ]
 
     @pytest.mark.asyncio
@@ -260,9 +228,7 @@ class TestABTestingFramework:
         variation = mock_variations[0]
         target_spectrum = "customer_profile"
 
-        results = await ab_testing._test_variation_across_models(
-            variation, target_spectrum
-        )
+        results = await ab_testing._test_variation_across_models(variation, target_spectrum)
 
         assert results["variation_id"] == variation.variation_id
         assert "model_results" in results
@@ -276,9 +242,7 @@ class TestABTestingFramework:
         model = "gpt-4o-mini"
         target_spectrum = "customer_profile"
 
-        score = await ab_testing._run_single_test(
-            variation, model, target_spectrum, 0
-        )
+        score = await ab_testing._run_single_test(variation, model, target_spectrum, 0)
 
         assert 0.0 <= score <= 1.0
         assert isinstance(score, float)
@@ -287,12 +251,8 @@ class TestABTestingFramework:
         """Test test summary calculation."""
         mock_test_results = {
             "results": {
-                "var1": {
-                    "overall_performance": {"average_score": 0.92}
-                },
-                "var2": {
-                    "overall_performance": {"average_score": 0.88}
-                }
+                "var1": {"overall_performance": {"average_score": 0.92}},
+                "var2": {"overall_performance": {"average_score": 0.88}},
             }
         }
 
@@ -321,48 +281,37 @@ class TestPhase2OptimizationOrchestrator:
                 "total_experiments": 49,
                 "successful_experiments": 47,
                 "failed_experiments": 2,
-                "phase": "1_multi_spectrum_foundation"
+                "phase": "1_multi_spectrum_foundation",
             },
             "metrics": {
                 "average_response_time": 5.2,
                 "average_quality_score": 0.91,
                 "quality_target_achievement": 0.85,
                 "model_performance": {
-                    "gpt-4o-mini": {
-                        "count": 7,
-                        "avg_quality": 0.94,
-                        "avg_response_time": 7.4,
-                        "success_rate": 1.0
-                    },
+                    "gpt-4o-mini": {"count": 7, "avg_quality": 0.94, "avg_response_time": 7.4, "success_rate": 1.0},
                     "gemini-1.5-flash-002": {
                         "count": 7,
                         "avg_quality": 0.95,
                         "avg_response_time": 3.1,
-                        "success_rate": 1.0
-                    }
+                        "success_rate": 1.0,
+                    },
                 },
                 "spectrum_performance": {
                     "customer_profile": {
                         "count": 7,
                         "avg_quality": 0.92,
                         "avg_completeness": 0.91,
-                        "success_rate": 1.0
+                        "success_rate": 1.0,
                     },
-                    "credit_analysis": {
-                        "count": 7,
-                        "avg_quality": 0.89,
-                        "avg_completeness": 0.88,
-                        "success_rate": 1.0
-                    }
-                }
-            }
+                    "credit_analysis": {"count": 7, "avg_quality": 0.89, "avg_completeness": 0.88, "success_rate": 1.0},
+                },
+            },
         }
 
     @pytest.fixture
     def temp_baseline_file(self, mock_baseline_data):
         """Create temporary baseline file for testing."""
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(mock_baseline_data, f)
             return f.name
 
@@ -372,9 +321,7 @@ class TestPhase2OptimizationOrchestrator:
         # Mock the baseline framework
         mock_framework = MagicMock()
 
-        cycle = await orchestrator.run_phase2_optimization(
-            temp_baseline_file, mock_framework
-        )
+        cycle = await orchestrator.run_phase2_optimization(temp_baseline_file, mock_framework)
 
         assert isinstance(cycle, OptimizationCycle)
         assert cycle.phase == "2_ai_prompt_optimization"
@@ -398,13 +345,11 @@ class TestPhase2OptimizationOrchestrator:
                 quality_impact=0.05,
                 applicable_spectrums=["all"],
                 applicable_models=["all"],
-                pattern_template="Test template"
+                pattern_template="Test template",
             )
         ]
 
-        strategies = await orchestrator._generate_model_strategies(
-            mock_baseline_data, patterns, {}
-        )
+        strategies = await orchestrator._generate_model_strategies(mock_baseline_data, patterns, {})
 
         assert len(strategies) == 2  # Two models in mock data
         assert all(isinstance(s, ModelOptimizationStrategy) for s in strategies)
@@ -413,17 +358,11 @@ class TestPhase2OptimizationOrchestrator:
     def test_calculate_overall_improvement(self, orchestrator):
         """Test overall improvement calculation."""
         ab_results = {
-            "spectrum1": {
-                "summary": {"average_improvement": 0.05}
-            },
-            "spectrum2": {
-                "summary": {"average_improvement": 0.03}
-            }
+            "spectrum1": {"summary": {"average_improvement": 0.05}},
+            "spectrum2": {"summary": {"average_improvement": 0.03}},
         }
 
-        improvement = orchestrator._calculate_overall_improvement(
-            {}, ab_results
-        )
+        improvement = orchestrator._calculate_overall_improvement({}, ab_results)
 
         assert improvement == 0.04  # Average of 0.05 and 0.03
 
@@ -439,16 +378,14 @@ class TestPhase2OptimizationOrchestrator:
             generated_variations=[],
             model_strategies=[],
             ab_test_results={},
-            overall_improvement=0.05
+            overall_improvement=0.05,
         )
 
         # Test saving (should not raise exception)
         await orchestrator._save_optimization_cycle(cycle)
 
         # Verify file was created
-        expected_files = list(Path("tests/speed_experiments").glob(
-            "phase2_optimization_cycle_*.json"
-        ))
+        expected_files = list(Path("tests/speed_experiments").glob("phase2_optimization_cycle_*.json"))
         assert len(expected_files) >= 1
 
 
@@ -481,7 +418,7 @@ class TestDataStructures:
             quality_impact=0.05,
             applicable_spectrums=["test_spectrum"],
             applicable_models=["test_model"],
-            pattern_template="Test template"
+            pattern_template="Test template",
         )
 
         assert pattern.pattern_id == "test_pattern"
@@ -497,7 +434,7 @@ class TestDataStructures:
             variation_prompt="Enhanced prompt",
             variation_type=PromptVariationType.STRUCTURE_VARIATION,
             hypothesis="Test hypothesis",
-            expected_improvement=0.05
+            expected_improvement=0.05,
         )
 
         assert variation.variation_id == "test_variation"
@@ -514,7 +451,7 @@ class TestDataStructures:
             optimization_approach=OptimizationStrategy.QUALITY_ENHANCEMENT,
             recommended_patterns=[],
             custom_instructions=["Test instruction"],
-            expected_improvements={"quality_score": 0.05}
+            expected_improvements={"quality_score": 0.05},
         )
 
         assert strategy.model_name == "test_model"
@@ -532,7 +469,7 @@ class TestDataStructures:
             generated_variations=[],
             model_strategies=[],
             ab_test_results={},
-            overall_improvement=0.05
+            overall_improvement=0.05,
         )
 
         assert cycle.cycle_id == "test_cycle"
@@ -551,25 +488,16 @@ class TestIntegrationScenarios:
         baseline_data = {
             "metrics": {
                 "model_performance": {
-                    "gpt-4o-mini": {
-                        "avg_quality": 0.88,
-                        "avg_response_time": 7.4,
-                        "success_rate": 0.95
-                    }
+                    "gpt-4o-mini": {"avg_quality": 0.88, "avg_response_time": 7.4, "success_rate": 0.95}
                 },
                 "spectrum_performance": {
-                    "customer_profile": {
-                        "avg_quality": 0.87,
-                        "avg_completeness": 0.85,
-                        "success_rate": 0.93
-                    }
-                }
+                    "customer_profile": {"avg_quality": 0.87, "avg_completeness": 0.85, "success_rate": 0.93}
+                },
             }
         }
 
         # Create temporary file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(baseline_data, f)
             temp_file = f.name
 
@@ -594,7 +522,7 @@ class TestIntegrationScenarios:
         # Test various improvement scenarios
         test_cases = [
             (0.85, 0.90, 0.05),  # 5% improvement needed
-            (0.92, 0.90, 0.0),   # Already above target
+            (0.92, 0.90, 0.0),  # Already above target
             (0.75, 0.90, 0.15),  # 15% improvement needed
         ]
 
@@ -614,13 +542,11 @@ class TestIntegrationScenarios:
             quality_impact=0.08,
             applicable_spectrums=["all"],
             applicable_models=["all"],
-            pattern_template="High-quality template"
+            pattern_template="High-quality template",
         )
 
         refiner = AIPromptRefiner()
-        variation = await refiner._apply_pattern_to_prompt(
-            "Base prompt", pattern, "test_spectrum", 0.90
-        )
+        variation = await refiner._apply_pattern_to_prompt("Base prompt", pattern, "test_spectrum", 0.90)
 
         assert variation is not None
         if variation:
@@ -643,8 +569,7 @@ class TestErrorHandling:
     async def test_invalid_baseline_data(self):
         """Test handling of invalid baseline data."""
         # Create file with invalid JSON
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             f.write("invalid json content")
             temp_file = f.name
 
@@ -663,7 +588,9 @@ class TestErrorHandling:
 
         # Should handle empty patterns gracefully
         result = refiner._apply_pattern_to_prompt.__func__(
-            refiner, "test", PromptPattern(
+            refiner,
+            "test",
+            PromptPattern(
                 pattern_id="empty",
                 pattern_type="empty",
                 description="",
@@ -671,8 +598,10 @@ class TestErrorHandling:
                 quality_impact=0,
                 applicable_spectrums=[],
                 applicable_models=[],
-                pattern_template=""
-            ), "test", 0.90
+                pattern_template="",
+            ),
+            "test",
+            0.90,
         )
 
         # Should not raise exception
@@ -691,24 +620,15 @@ class TestPerformanceValidation:
         baseline_data = {
             "metrics": {
                 "model_performance": {
-                    "test_model": {
-                        "avg_quality": 0.85,
-                        "avg_response_time": 5.0,
-                        "success_rate": 0.95
-                    }
+                    "test_model": {"avg_quality": 0.85, "avg_response_time": 5.0, "success_rate": 0.95}
                 },
                 "spectrum_performance": {
-                    "test_spectrum": {
-                        "avg_quality": 0.87,
-                        "avg_completeness": 0.85,
-                        "success_rate": 0.93
-                    }
-                }
+                    "test_spectrum": {"avg_quality": 0.87, "avg_completeness": 0.85, "success_rate": 0.93}
+                },
             }
         }
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json',
-                                         delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(baseline_data, f)
             temp_file = f.name
 
@@ -739,7 +659,7 @@ class TestPerformanceValidation:
                 quality_impact=0.05,
                 applicable_spectrums=["test"],
                 applicable_models=["test"],
-                pattern_template=f"Template {i}"
+                pattern_template=f"Template {i}",
             )
             patterns.append(pattern)
 
@@ -757,11 +677,18 @@ async def main():
     import subprocess
     import sys
 
-    result = subprocess.run([
-        sys.executable, "-m", "pytest",
-        "tests/speed_experiments/test_phase2_ai_prompt_optimization.py",
-        "-v", "--tb=short"
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/speed_experiments/test_phase2_ai_prompt_optimization.py",
+            "-v",
+            "--tb=short",
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     print("Test Results:")
     print(result.stdout)

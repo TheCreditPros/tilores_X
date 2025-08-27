@@ -13,6 +13,7 @@ def analyze_langsmith_experiment_results():
     """Fetch and analyze actual LangSmith experiment results"""
 
     from dotenv import load_dotenv
+
     load_dotenv()
 
     client = Client(api_key=os.getenv("LANGSMITH_API_KEY"))
@@ -27,7 +28,7 @@ def analyze_langsmith_experiment_results():
         "tilores_gpt_4o_mini-dccf58af",
         "tilores_deepseek_r1_distill_llama_70b-4e8c1e8a",
         "tilores_claude_3_haiku-a70a5b91",
-        "tilores_gemini_1.5_flash_002-4fd12b2c"
+        "tilores_gemini_1.5_flash_002-4fd12b2c",
     ]
 
     all_failures = []
@@ -37,15 +38,14 @@ def analyze_langsmith_experiment_results():
 
         try:
             # Get runs for this experiment
-            runs = list(client.list_runs(
-                project_name="tilores-speed-experiments",
-                filter=f'eq(name, "{experiment_id}")'
-            ))
+            runs = list(
+                client.list_runs(project_name="tilores-speed-experiments", filter=f'eq(name, "{experiment_id}")')
+            )
 
             print(f"   Found {len(runs)} runs")
 
             for run in runs:
-                if hasattr(run, 'outputs') and run.outputs:
+                if hasattr(run, "outputs") and run.outputs:
                     # Check for failures
                     if not run.outputs.get("success", True):
                         failure_info = {
@@ -54,7 +54,7 @@ def analyze_langsmith_experiment_results():
                             "error": run.outputs.get("error", "Unknown error"),
                             "status_code": run.outputs.get("status_code", "Unknown"),
                             "model": run.outputs.get("model", "Unknown"),
-                            "response": run.outputs.get("response", "")[:200]  # First 200 chars
+                            "response": run.outputs.get("response", "")[:200],  # First 200 chars
                         }
                         all_failures.append(failure_info)
 
@@ -110,14 +110,11 @@ def analyze_langsmith_experiment_results():
             "total_failures": len(all_failures),
             "error_patterns": error_patterns,
             "failures": all_failures,
-            "recommendations": recommendations
+            "recommendations": recommendations,
         }
     else:
         print("✅ No failures detected in LangSmith experiments")
-        return {
-            "total_failures": 0,
-            "message": "All experiments successful"
-        }
+        return {"total_failures": 0, "message": "All experiments successful"}
 
 
 def generate_fix_recommendations(error_patterns: Dict[str, int], failures: List[Dict]) -> List[str]:
@@ -140,7 +137,9 @@ def generate_fix_recommendations(error_patterns: Dict[str, int], failures: List[
     for failure in failures:
         error_msg = failure["error"].lower()
         if "null" in error_msg and "tool" in error_msg:
-            recommendations.append("Fix tool parameter schema - ensure all required parameters are provided as strings, not null")
+            recommendations.append(
+                "Fix tool parameter schema - ensure all required parameters are provided as strings, not null"
+            )
             break
 
     if not recommendations:
@@ -174,6 +173,7 @@ def apply_fixes_and_rerun():
 
     # Run the targeted fix framework
     from . import targeted_fix_and_rerun
+
     results = targeted_fix_and_rerun.fix_and_rerun_langsmith_experiments()
 
     return results

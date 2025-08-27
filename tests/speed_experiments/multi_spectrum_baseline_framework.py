@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Tuple
 # LangSmith integration with graceful fallback
 try:
     from langsmith import Client
+
     LANGSMITH_AVAILABLE = True
 except ImportError:
     LANGSMITH_AVAILABLE = False
@@ -107,12 +108,8 @@ class BaselineMetrics:
     average_response_time: float = 0.0
     average_quality_score: float = 0.0
     quality_target_achievement: float = 0.0  # percentage achieving 90%+
-    model_performance: Dict[str, Dict[str, float]] = field(
-        default_factory=dict
-    )
-    spectrum_performance: Dict[str, Dict[str, float]] = field(
-        default_factory=dict
-    )
+    model_performance: Dict[str, Dict[str, float]] = field(default_factory=dict)
+    spectrum_performance: Dict[str, Dict[str, float]] = field(default_factory=dict)
 
 
 class EdwinaHawthorneDataProvider:
@@ -139,7 +136,6 @@ class EdwinaHawthorneDataProvider:
             "customer_status": "ACTIVE",
             "preferred_language": "English",
             "communication_preference": "EMAIL",
-
             # Credit Analysis Spectrum (60+ fields)
             "credit_score": 742,
             "credit_rating": "GOOD",
@@ -151,7 +147,6 @@ class EdwinaHawthorneDataProvider:
             "oldest_account_age": 156,  # months
             "recent_inquiries": 2,
             "delinquent_accounts": 0,
-
             # Transaction History Spectrum (55+ fields)
             "total_transactions": 1247,
             "average_transaction_amount": 156.78,
@@ -159,10 +154,7 @@ class EdwinaHawthorneDataProvider:
             "last_transaction_date": "2025-08-15",
             "monthly_spending_average": 2100.00,
             "preferred_payment_method": "CREDIT_CARD",
-            "transaction_categories": [
-                "GROCERIES", "GAS", "RESTAURANTS", "UTILITIES"
-            ],
-
+            "transaction_categories": ["GROCERIES", "GAS", "RESTAURANTS", "UTILITIES"],
             # Call Center Operations Spectrum (40+ fields)
             "total_support_calls": 12,
             "last_call_date": "2025-07-22",
@@ -171,7 +163,6 @@ class EdwinaHawthorneDataProvider:
             "satisfaction_score": 4.2,  # out of 5
             "escalated_calls": 1,
             "preferred_support_channel": "PHONE",
-
             # Entity Relationship Spectrum (35+ fields)
             "household_members": 3,
             "joint_accounts": 2,
@@ -179,80 +170,99 @@ class EdwinaHawthorneDataProvider:
             "business_relationships": [],
             "referral_count": 2,
             "relationship_strength": "HIGH",
-
             # Geographic Analysis Spectrum (35+ fields)
             "primary_address": {
                 "street": "123 Oak Street",
                 "city": "Springfield",
                 "state": "IL",
                 "zip_code": "62701",
-                "country": "USA"
+                "country": "USA",
             },
             "address_stability": 0.85,
             "regional_risk_score": "LOW",
             "branch_proximity": 2.3,  # miles
-
             # Temporal Analysis Spectrum (40+ fields)
             "account_tenure": 78,  # months
-            "seasonal_spending_patterns": {
-                "Q1": 1800, "Q2": 2200, "Q3": 2400, "Q4": 2800
-            },
+            "seasonal_spending_patterns": {"Q1": 1800, "Q2": 2200, "Q3": 2400, "Q4": 2800},
             "payment_timing_score": 0.94,
             "activity_trend": "STABLE",
-            "last_profile_update": "2025-08-01"
+            "last_profile_update": "2025-08-01",
         }
 
     def _initialize_field_mappings(self) -> Dict[str, List[str]]:
         """Map fields to their respective data spectrums."""
         return {
             DataSpectrum.CUSTOMER_PROFILE.value: [
-                "customer_id", "first_name", "last_name", "full_name",
-                "email", "phone", "date_of_birth", "ssn_last_4",
-                "customer_since", "customer_status", "preferred_language",
-                "communication_preference"
+                "customer_id",
+                "first_name",
+                "last_name",
+                "full_name",
+                "email",
+                "phone",
+                "date_of_birth",
+                "ssn_last_4",
+                "customer_since",
+                "customer_status",
+                "preferred_language",
+                "communication_preference",
             ],
             DataSpectrum.CREDIT_ANALYSIS.value: [
-                "credit_score", "credit_rating", "payment_history_score",
-                "credit_utilization", "total_credit_limit", "total_balance",
-                "number_of_accounts", "oldest_account_age",
-                "recent_inquiries", "delinquent_accounts"
+                "credit_score",
+                "credit_rating",
+                "payment_history_score",
+                "credit_utilization",
+                "total_credit_limit",
+                "total_balance",
+                "number_of_accounts",
+                "oldest_account_age",
+                "recent_inquiries",
+                "delinquent_accounts",
             ],
             DataSpectrum.TRANSACTION_HISTORY.value: [
-                "total_transactions", "average_transaction_amount",
-                "largest_transaction", "last_transaction_date",
-                "monthly_spending_average", "preferred_payment_method",
-                "transaction_categories"
+                "total_transactions",
+                "average_transaction_amount",
+                "largest_transaction",
+                "last_transaction_date",
+                "monthly_spending_average",
+                "preferred_payment_method",
+                "transaction_categories",
             ],
             DataSpectrum.CALL_CENTER_OPERATIONS.value: [
-                "total_support_calls", "last_call_date",
-                "average_call_duration", "call_resolution_rate",
-                "satisfaction_score", "escalated_calls",
-                "preferred_support_channel"
+                "total_support_calls",
+                "last_call_date",
+                "average_call_duration",
+                "call_resolution_rate",
+                "satisfaction_score",
+                "escalated_calls",
+                "preferred_support_channel",
             ],
             DataSpectrum.ENTITY_RELATIONSHIP.value: [
-                "household_members", "joint_accounts", "authorized_users",
-                "business_relationships", "referral_count",
-                "relationship_strength"
+                "household_members",
+                "joint_accounts",
+                "authorized_users",
+                "business_relationships",
+                "referral_count",
+                "relationship_strength",
             ],
             DataSpectrum.GEOGRAPHIC_ANALYSIS.value: [
-                "primary_address", "address_stability",
-                "regional_risk_score", "branch_proximity"
+                "primary_address",
+                "address_stability",
+                "regional_risk_score",
+                "branch_proximity",
             ],
             DataSpectrum.TEMPORAL_ANALYSIS.value: [
-                "account_tenure", "seasonal_spending_patterns",
-                "payment_timing_score", "activity_trend",
-                "last_profile_update"
-            ]
+                "account_tenure",
+                "seasonal_spending_patterns",
+                "payment_timing_score",
+                "activity_trend",
+                "last_profile_update",
+            ],
         }
 
     def get_spectrum_data(self, spectrum: DataSpectrum) -> Dict[str, Any]:
         """Get data for a specific spectrum."""
         fields = self.field_mappings.get(spectrum.value, [])
-        return {
-            field: self.customer_data.get(field)
-            for field in fields
-            if field in self.customer_data
-        }
+        return {field: self.customer_data.get(field) for field in fields if field in self.customer_data}
 
     def get_all_data(self) -> Dict[str, Any]:
         """Get complete customer data."""
@@ -280,8 +290,7 @@ class MultiSpectrumBaselineFramework:
         if LANGSMITH_AVAILABLE:
             try:
                 self.langsmith_client = Client()
-                logging.info(f"LangSmith initialized for project: "
-                           f"{langsmith_project}")
+                logging.info(f"LangSmith initialized for project: " f"{langsmith_project}")
             except Exception as e:
                 logging.warning(f"LangSmith initialization failed: {e}")
                 self.langsmith_client = None
@@ -297,7 +306,7 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=5.1,
                 context_limit=32000,
                 quality_target=0.90,
-                priority="HIGH"
+                priority="HIGH",
             ),
             ModelProvider.GPT_4O_MINI.value: ModelConfiguration(
                 name="gpt-4o-mini",
@@ -305,16 +314,15 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=7.4,
                 context_limit=128000,
                 quality_target=0.94,
-                priority="HIGH"
+                priority="HIGH",
             ),
-            ModelProvider.DEEPSEEK_R1_DISTILL_LLAMA_70B.value:
-            ModelConfiguration(
+            ModelProvider.DEEPSEEK_R1_DISTILL_LLAMA_70B.value: ModelConfiguration(
                 name="deepseek-r1-distill-llama-70b",
                 provider="Groq",
                 response_time_target=8.7,
                 context_limit=32000,
                 quality_target=0.89,
-                priority="MEDIUM"
+                priority="MEDIUM",
             ),
             ModelProvider.CLAUDE_3_HAIKU.value: ModelConfiguration(
                 name="claude-3-haiku",
@@ -322,7 +330,7 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=4.0,
                 context_limit=200000,
                 quality_target=0.92,
-                priority="HIGH"
+                priority="HIGH",
             ),
             ModelProvider.GEMINI_1_5_FLASH_002.value: ModelConfiguration(
                 name="gemini-1.5-flash-002",
@@ -330,7 +338,7 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=3.1,
                 context_limit=1000000,
                 quality_target=0.95,
-                priority="HIGH"
+                priority="HIGH",
             ),
             ModelProvider.GEMINI_2_5_FLASH.value: ModelConfiguration(
                 name="gemini-2.5-flash",
@@ -338,7 +346,7 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=7.2,
                 context_limit=2000000,
                 quality_target=0.96,
-                priority="HIGH"
+                priority="HIGH",
             ),
             ModelProvider.GEMINI_2_5_FLASH_LITE.value: ModelConfiguration(
                 name="gemini-2.5-flash-lite",
@@ -346,8 +354,8 @@ class MultiSpectrumBaselineFramework:
                 response_time_target=3.5,
                 context_limit=1000000,
                 quality_target=0.93,
-                priority="HIGH"
-            )
+                priority="HIGH",
+            ),
         }
 
     def _initialize_spectrums(self) -> Dict[str, SpectrumConfiguration]:
@@ -358,54 +366,53 @@ class MultiSpectrumBaselineFramework:
                 description="Core identification and validation patterns",
                 field_count=45,
                 primary_fields=["customer_id", "full_name", "email"],
-                validation_rules={"required_fields": 3, "min_completeness": 0.8}
+                validation_rules={"required_fields": 3, "min_completeness": 0.8},
             ),
             DataSpectrum.CREDIT_ANALYSIS.value: SpectrumConfiguration(
                 name="Credit Analysis",
                 description="Credit scores, payment history, financial metrics",
                 field_count=60,
                 primary_fields=["credit_score", "credit_rating"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.85}
+                validation_rules={"required_fields": 2, "min_completeness": 0.85},
             ),
             DataSpectrum.TRANSACTION_HISTORY.value: SpectrumConfiguration(
                 name="Transaction History",
                 description="Payment records, account activity patterns",
                 field_count=55,
                 primary_fields=["total_transactions", "last_transaction_date"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.8}
+                validation_rules={"required_fields": 2, "min_completeness": 0.8},
             ),
             DataSpectrum.CALL_CENTER_OPERATIONS.value: SpectrumConfiguration(
                 name="Call Center Operations",
                 description="Support interactions, resolution tracking",
                 field_count=40,
                 primary_fields=["total_support_calls", "satisfaction_score"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.75}
+                validation_rules={"required_fields": 2, "min_completeness": 0.75},
             ),
             DataSpectrum.ENTITY_RELATIONSHIP.value: SpectrumConfiguration(
                 name="Entity Relationship",
                 description="Network analysis, relationship mapping",
                 field_count=35,
                 primary_fields=["household_members", "relationship_strength"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.7}
+                validation_rules={"required_fields": 2, "min_completeness": 0.7},
             ),
             DataSpectrum.GEOGRAPHIC_ANALYSIS.value: SpectrumConfiguration(
                 name="Geographic Analysis",
                 description="Location data, regional patterns",
                 field_count=35,
                 primary_fields=["primary_address", "regional_risk_score"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.8}
+                validation_rules={"required_fields": 2, "min_completeness": 0.8},
             ),
             DataSpectrum.TEMPORAL_ANALYSIS.value: SpectrumConfiguration(
                 name="Temporal Analysis",
                 description="Time-based patterns, historical trends",
                 field_count=40,
                 primary_fields=["account_tenure", "activity_trend"],
-                validation_rules={"required_fields": 2, "min_completeness": 0.75}
-            )
+                validation_rules={"required_fields": 2, "min_completeness": 0.75},
+            ),
         }
 
-    def generate_experiment_prompt(self, model: str, spectrum: str,
-                                 data: Dict[str, Any]) -> str:
+    def generate_experiment_prompt(self, model: str, spectrum: str, data: Dict[str, Any]) -> str:
         """Generate experiment prompt for model-spectrum combination."""
         spectrum_config = self.spectrums[spectrum]
 
@@ -445,38 +452,31 @@ Target quality: 90%+ achievement.
                 model=model,
                 spectrum=spectrum,
                 customer_id="EDW_HAWTHORNE_001",
-                start_time=start_time
+                start_time=start_time,
             )
 
             # Simulate LLM call (replace with actual implementation)
-            response_time, quality_score, response = await self._simulate_llm_call(
-                model, prompt
-            )
+            response_time, quality_score, response = await self._simulate_llm_call(model, prompt)
 
             # Update result
             result.end_time = datetime.now()
             result.response_time = response_time
             result.quality_score = quality_score
-            result.accuracy_score = self._calculate_accuracy_score(
-                response, data
-            )
-            result.completeness_score = self._calculate_completeness_score(
-                response, data
-            )
+            result.accuracy_score = self._calculate_accuracy_score(response, data)
+            result.completeness_score = self._calculate_completeness_score(response, data)
             result.raw_response = response
             result.metadata = {
                 "prompt_length": len(prompt),
                 "response_length": len(response) if response else 0,
                 "data_fields": len(data),
-                "spectrum_config": spectrum
+                "spectrum_config": spectrum,
             }
 
             # Log to LangSmith if available
             if self.langsmith_client:
                 await self._log_to_langsmith(result, prompt)
 
-            logging.info(f"Experiment completed: {experiment_id} - "
-                        f"Quality: {quality_score:.2%}")
+            logging.info(f"Experiment completed: {experiment_id} - " f"Quality: {quality_score:.2%}")
 
             return result
 
@@ -489,7 +489,7 @@ Target quality: 90%+ achievement.
                 customer_id="EDW_HAWTHORNE_001",
                 start_time=start_time,
                 end_time=datetime.now(),
-                error_message=str(e)
+                error_message=str(e),
             )
 
     async def _simulate_llm_call(self, model: str, prompt: str) -> Tuple[float, float, str]:
@@ -505,9 +505,7 @@ Target quality: 90%+ achievement.
         # Simulate quality score based on model target
         base_quality = model_config.quality_target
         quality_variance = 0.05  # ±5% variance
-        quality_score = min(1.0, max(0.0,
-                          base_quality + (time.time() % 1 - 0.5) *
-                          quality_variance * 2))
+        quality_score = min(1.0, max(0.0, base_quality + (time.time() % 1 - 0.5) * quality_variance * 2))
 
         # Generate mock response
         response = f"""
@@ -540,21 +538,17 @@ Next Steps: Regular monitoring, potential upsell opportunities
         base_accuracy = min(1.0, response_length / 500)  # 500 chars = 100%
         data_factor = min(1.0, data_coverage / 10)  # 10 fields = 100%
 
-        return (base_accuracy * 0.7 + data_factor * 0.3)
+        return base_accuracy * 0.7 + data_factor * 0.3
 
-    def _calculate_completeness_score(self, response: str,
-                                    data: Dict[str, Any]) -> float:
+    def _calculate_completeness_score(self, response: str, data: Dict[str, Any]) -> float:
         """Calculate completeness score based on response coverage."""
         if not response:
             return 0.0
 
         # Check for key analysis components
-        components = [
-            "insights", "risk", "recommendations", "quality", "next steps"
-        ]
+        components = ["insights", "risk", "recommendations", "quality", "next steps"]
 
-        found_components = sum(1 for comp in components
-                             if comp.lower() in response.lower())
+        found_components = sum(1 for comp in components if comp.lower() in response.lower())
 
         return found_components / len(components)
 
@@ -567,8 +561,7 @@ Next Steps: Regular monitoring, potential upsell opportunities
             # Log to LangSmith (mock implementation for now)
             logging.info(f"Logged to LangSmith: {result.experiment_id}")
             logging.debug(f"Model: {result.model}, Spectrum: {result.spectrum}")
-            logging.debug(f"Quality: {result.quality_score}, "
-                         f"Response time: {result.response_time}")
+            logging.debug(f"Quality: {result.quality_score}, " f"Response time: {result.response_time}")
 
         except Exception as e:
             logging.warning(f"Failed to log to LangSmith: {e}")
@@ -593,8 +586,7 @@ Next Steps: Regular monitoring, potential upsell opportunities
                 return await self.run_single_experiment(model, spectrum)
 
         # Execute all experiments
-        tasks = [run_with_semaphore(model, spectrum)
-                for model, spectrum in experiments]
+        tasks = [run_with_semaphore(model, spectrum) for model, spectrum in experiments]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Process results
@@ -610,9 +602,11 @@ Next Steps: Regular monitoring, potential upsell opportunities
         # Save results
         await self._save_results()
 
-        logging.info(f"Baseline experiments completed. "
-                    f"Success rate: {self.metrics.successful_experiments}/"
-                    f"{self.metrics.total_experiments}")
+        logging.info(
+            f"Baseline experiments completed. "
+            f"Success rate: {self.metrics.successful_experiments}/"
+            f"{self.metrics.total_experiments}"
+        )
 
         return self.metrics
 
@@ -629,53 +623,42 @@ Next Steps: Regular monitoring, potential upsell opportunities
 
         if successful_results:
             # Calculate averages
-            metrics.average_response_time = sum(
-                r.response_time for r in successful_results
-                if r.response_time
-            ) / len(successful_results)
+            metrics.average_response_time = sum(r.response_time for r in successful_results if r.response_time) / len(
+                successful_results
+            )
 
-            metrics.average_quality_score = sum(
-                r.quality_score for r in successful_results
-                if r.quality_score
-            ) / len(successful_results)
+            metrics.average_quality_score = sum(r.quality_score for r in successful_results if r.quality_score) / len(
+                successful_results
+            )
 
             # Calculate 90%+ achievement rate
-            high_quality_results = [
-                r for r in successful_results
-                if r.quality_score and r.quality_score >= 0.90
-            ]
-            metrics.quality_target_achievement = (
-                len(high_quality_results) / len(successful_results)
-            )
+            high_quality_results = [r for r in successful_results if r.quality_score and r.quality_score >= 0.90]
+            metrics.quality_target_achievement = len(high_quality_results) / len(successful_results)
 
             # Calculate model performance
             for model in self.models.keys():
-                model_results = [r for r in successful_results
-                               if r.model == model]
+                model_results = [r for r in successful_results if r.model == model]
                 if model_results:
                     metrics.model_performance[model] = {
                         "count": len(model_results),
-                        "avg_quality": sum(r.quality_score for r in model_results
-                                         if r.quality_score) / len(model_results),
-                        "avg_response_time": sum(r.response_time
-                                               for r in model_results
-                                               if r.response_time) / len(model_results),
-                        "success_rate": len(model_results) / 7  # 7 spectrums
+                        "avg_quality": sum(r.quality_score for r in model_results if r.quality_score)
+                        / len(model_results),
+                        "avg_response_time": sum(r.response_time for r in model_results if r.response_time)
+                        / len(model_results),
+                        "success_rate": len(model_results) / 7,  # 7 spectrums
                     }
 
             # Calculate spectrum performance
             for spectrum in self.spectrums.keys():
-                spectrum_results = [r for r in successful_results
-                                  if r.spectrum == spectrum]
+                spectrum_results = [r for r in successful_results if r.spectrum == spectrum]
                 if spectrum_results:
                     metrics.spectrum_performance[spectrum] = {
                         "count": len(spectrum_results),
-                        "avg_quality": sum(r.quality_score for r in spectrum_results
-                                         if r.quality_score) / len(spectrum_results),
-                        "avg_completeness": sum(r.completeness_score
-                                              for r in spectrum_results
-                                              if r.completeness_score) / len(spectrum_results),
-                        "success_rate": len(spectrum_results) / 7  # 7 models
+                        "avg_quality": sum(r.quality_score for r in spectrum_results if r.quality_score)
+                        / len(spectrum_results),
+                        "avg_completeness": sum(r.completeness_score for r in spectrum_results if r.completeness_score)
+                        / len(spectrum_results),
+                        "success_rate": len(spectrum_results) / 7,  # 7 models
                     }
 
         return metrics
@@ -692,15 +675,14 @@ Next Steps: Regular monitoring, potential upsell opportunities
                 "total_experiments": len(self.results),
                 "successful_experiments": self.metrics.successful_experiments,
                 "failed_experiments": self.metrics.failed_experiments,
-                "phase": "1_multi_spectrum_foundation"
+                "phase": "1_multi_spectrum_foundation",
             },
             "metrics": {
                 "average_response_time": self.metrics.average_response_time,
                 "average_quality_score": self.metrics.average_quality_score,
-                "quality_target_achievement":
-                self.metrics.quality_target_achievement,
+                "quality_target_achievement": self.metrics.quality_target_achievement,
                 "model_performance": self.metrics.model_performance,
-                "spectrum_performance": self.metrics.spectrum_performance
+                "spectrum_performance": self.metrics.spectrum_performance,
             },
             "results": [
                 {
@@ -715,14 +697,14 @@ Next Steps: Regular monitoring, potential upsell opportunities
                     "accuracy_score": r.accuracy_score,
                     "completeness_score": r.completeness_score,
                     "error_message": r.error_message,
-                    "metadata": r.metadata
+                    "metadata": r.metadata,
                 }
                 for r in self.results
-            ]
+            ],
         }
 
         try:
-            with open(filename, 'w') as f:
+            with open(filename, "w") as f:
                 json.dump(results_data, f, indent=2, default=str)
             logging.info(f"Results saved to: {filename}")
         except Exception as e:
@@ -750,9 +732,7 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
         # Sort models by quality score
         model_rankings = sorted(
-            self.metrics.model_performance.items(),
-            key=lambda x: x[1].get('avg_quality', 0),
-            reverse=True
+            self.metrics.model_performance.items(), key=lambda x: x[1].get("avg_quality", 0), reverse=True
         )
 
         for i, (model, perf) in enumerate(model_rankings, 1):
@@ -763,9 +743,7 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
         # Sort spectrums by quality score
         spectrum_rankings = sorted(
-            self.metrics.spectrum_performance.items(),
-            key=lambda x: x[1].get('avg_quality', 0),
-            reverse=True
+            self.metrics.spectrum_performance.items(), key=lambda x: x[1].get("avg_quality", 0), reverse=True
         )
 
         for i, (spectrum, perf) in enumerate(spectrum_rankings, 1):
@@ -778,8 +756,7 @@ Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 # Main execution function for testing
 async def main():
     """Main function to run baseline experiments."""
-    logging.basicConfig(level=logging.INFO,
-                       format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     framework = MultiSpectrumBaselineFramework()
 

@@ -581,24 +581,21 @@ class TestEnhancedVirtuousCycleManager:
     @pytest.mark.asyncio
     async def test_enhanced_manager_initialization(self):
         """Test enhanced manager initialization."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
-            mock_client = MagicMock()
-            mock_create_client.return_value = mock_client
+        with patch("autonomous_integration.create_production_safe_autonomous_ai") as mock_create_ai:
+            mock_platform = MagicMock()
+            mock_create_ai.return_value = mock_platform
 
-            with patch("autonomous_integration.AutonomousAIPlatform") as mock_platform:
-                mock_platform_instance = MagicMock()
-                mock_platform.return_value = mock_platform_instance
+            manager = EnhancedVirtuousCycleManager()
 
-                manager = EnhancedVirtuousCycleManager()
-
-                assert manager.enterprise_features_available is True
-                assert manager.langsmith_client == mock_client
-                assert manager.autonomous_platform == mock_platform_instance
+            # Test production-safe initialization
+            assert manager.enterprise_features_available is True
+            assert manager.langsmith_client is None  # Production-safe version doesn't use LangSmith client
+            assert manager.autonomous_platform == mock_platform
 
     @pytest.mark.asyncio
     async def test_enhanced_status_retrieval(self):
         """Test enhanced status retrieval."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client:
             mock_client = MagicMock()
             mock_create_client.return_value = mock_client
 
@@ -611,7 +608,7 @@ class TestEnhancedVirtuousCycleManager:
 
             mock_quality_prediction = {"predicted_quality_7d": 0.91, "needs_intervention": False}
 
-            with patch("autonomous_integration.AutonomousAIPlatform") as mock_platform:
+            with patch("autonomous_ai_platform.AutonomousAIPlatform") as mock_platform:
                 mock_platform_instance = MagicMock()
                 mock_platform_instance.get_platform_status.return_value = mock_platform_status
                 mock_platform_instance.predict_quality_degradation.return_value = mock_quality_prediction
@@ -707,11 +704,11 @@ class TestIntegrationWorkflows:
     @pytest.mark.asyncio
     async def test_autonomous_optimization_workflow(self):
         """Test autonomous optimization workflow."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client:
             mock_client = MagicMock()
             mock_create_client.return_value = mock_client
 
-            with patch("autonomous_integration.AutonomousAIPlatform") as mock_platform:
+            with patch("autonomous_ai_platform.AutonomousAIPlatform") as mock_platform:
                 mock_platform_instance = MagicMock()
                 mock_cycle_results = {
                     "components_executed": ["delta_analysis", "pattern_matching"],

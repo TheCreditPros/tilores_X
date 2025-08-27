@@ -22,13 +22,10 @@ from unittest.mock import MagicMock, patch
 # Import Phase 1 components
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from multi_spectrum_framework import (
-    ExperimentSpectrum,
-    MultiSpectrumFramework,
-    QualityScore
-)
+from multi_spectrum_framework import ExperimentSpectrum, MultiSpectrumFramework, QualityScore
 
 
 class TestExperimentSpectrum:
@@ -43,11 +40,11 @@ class TestExperimentSpectrum:
                 {
                     "query": "Find customer test@example.com",
                     "expected_customer": "Test Customer",
-                    "identity_type": "email"
+                    "identity_type": "email",
                 }
             ],
             quality_targets={"accuracy": 0.95, "completeness": 0.90},
-            optimization_focus="customer_identification"
+            optimization_focus="customer_identification",
         )
 
         assert spectrum.name == "test_spectrum"
@@ -63,14 +60,14 @@ class TestExperimentSpectrum:
                 "query": "Find customer blessedwina@aol.com",
                 "expected_customer": "Edwina Hawthorne",
                 "expected_client_id": "2270",
-                "identity_type": "email"
+                "identity_type": "email",
             },
             {
                 "query": "Look up customer 2270",
                 "expected_customer": "Edwina Hawthorne",
                 "expected_client_id": "2270",
-                "identity_type": "client_id"
-            }
+                "identity_type": "client_id",
+            },
         ]
 
         spectrum = ExperimentSpectrum(
@@ -78,7 +75,7 @@ class TestExperimentSpectrum:
             description="Customer identification testing",
             data_samples=data_samples,
             quality_targets={"accuracy": 0.95},
-            optimization_focus="identity_resolution"
+            optimization_focus="identity_resolution",
         )
 
         assert len(spectrum.data_samples) == 2
@@ -101,7 +98,7 @@ class TestQualityScore:
             relevance_score=0.89,
             professional_tone_score=0.93,
             customer_satisfaction_score=0.91,
-            improvements=["improve_response_time", "enhance_accuracy"]
+            improvements=["improve_response_time", "enhance_accuracy"],
         )
 
         assert score.overall_score == 0.92
@@ -120,7 +117,7 @@ class TestQualityScore:
             relevance_score=0.87,
             professional_tone_score=0.92,
             customer_satisfaction_score=0.89,
-            improvements=[]
+            improvements=[],
         )
 
         # All scores should be between 0 and 1
@@ -147,12 +144,9 @@ class TestMultiSpectrumFramework:
     @pytest.fixture
     def framework(self, mock_langsmith_client):
         """Create MultiSpectrumFramework instance with mocked dependencies."""
-        with patch('multi_spectrum_framework.Client') as mock_client_class:
+        with patch("multi_spectrum_framework.Client") as mock_client_class:
             mock_client_class.return_value = mock_langsmith_client
-            with patch.dict('os.environ', {
-                'LANGSMITH_API_KEY': 'test_key',
-                'TILORES_API_URL': 'https://test-api.com'
-            }):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key", "TILORES_API_URL": "https://test-api.com"}):
                 framework = MultiSpectrumFramework()
                 framework.client = mock_langsmith_client
                 return framework
@@ -172,7 +166,7 @@ class TestMultiSpectrumFramework:
             "gpt-4o-mini",
             "deepseek-r1-distill-llama-70b",
             "claude-3-haiku",
-            "gemini-1.5-flash-002"
+            "gemini-1.5-flash-002",
         ]
 
         assert framework.models == expected_models
@@ -190,7 +184,7 @@ class TestMultiSpectrumFramework:
             "conversational_context",
             "performance_scaling",
             "edge_case_handling",
-            "professional_communication"
+            "professional_communication",
         ]
 
         for expected in expected_spectrums:
@@ -199,8 +193,7 @@ class TestMultiSpectrumFramework:
     def test_customer_identity_spectrum_configuration(self, framework):
         """Test customer identity resolution spectrum configuration."""
         identity_spectrum = next(
-            (s for s in framework.data_spectrums
-             if s.name == "customer_identity_resolution"), None
+            (s for s in framework.data_spectrums if s.name == "customer_identity_resolution"), None
         )
 
         assert identity_spectrum is not None
@@ -209,18 +202,16 @@ class TestMultiSpectrumFramework:
 
         # Test Edwina Hawthorne data samples
         edwina_samples = [
-            sample for sample in identity_spectrum.data_samples
-            if "blessedwina@aol.com" in sample.get("query", "") or
-               "Edwina Hawthorne" in sample.get("expected_customer", "")
+            sample
+            for sample in identity_spectrum.data_samples
+            if "blessedwina@aol.com" in sample.get("query", "")
+            or "Edwina Hawthorne" in sample.get("expected_customer", "")
         ]
         assert len(edwina_samples) >= 2  # Email and name queries
 
     def test_financial_analysis_spectrum_configuration(self, framework):
         """Test financial analysis depth spectrum configuration."""
-        financial_spectrum = next(
-            (s for s in framework.data_spectrums
-             if s.name == "financial_analysis_depth"), None
-        )
+        financial_spectrum = next((s for s in framework.data_spectrums if s.name == "financial_analysis_depth"), None)
 
         assert financial_spectrum is not None
         assert financial_spectrum.optimization_focus == "financial_analysis_depth"
@@ -228,8 +219,7 @@ class TestMultiSpectrumFramework:
 
         # Test credit score analysis samples
         credit_samples = [
-            sample for sample in financial_spectrum.data_samples
-            if "credit score" in sample.get("query", "").lower()
+            sample for sample in financial_spectrum.data_samples if "credit score" in sample.get("query", "").lower()
         ]
         assert len(credit_samples) >= 1
 
@@ -242,7 +232,7 @@ class TestMultiSpectrumFramework:
             "completeness_rate": 0.90,
             "relevance_score": 0.88,
             "professional_tone": 0.92,
-            "customer_satisfaction": 0.90
+            "customer_satisfaction": 0.90,
         }
 
         for target, expected_value in expected_targets.items():
@@ -250,12 +240,10 @@ class TestMultiSpectrumFramework:
 
     def test_create_comprehensive_experiments(self, framework):
         """Test comprehensive experiment creation."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             # Mock successful API responses
             mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = {
-                "choices": [{"message": {"content": "Test response"}}]
-            }
+            mock_post.return_value.json.return_value = {"choices": [{"message": {"content": "Test response"}}]}
 
             results = framework.create_comprehensive_experiments()
 
@@ -270,10 +258,7 @@ class TestMultiSpectrumFramework:
     def test_spectrum_evaluators_creation(self, framework):
         """Test spectrum-specific evaluators creation."""
         # Test customer identity evaluators
-        identity_spectrum = next(
-            s for s in framework.data_spectrums
-            if s.name == "customer_identity_resolution"
-        )
+        identity_spectrum = next(s for s in framework.data_spectrums if s.name == "customer_identity_resolution")
         evaluators = framework._create_spectrum_evaluators(identity_spectrum)
 
         assert len(evaluators) >= 3
@@ -282,10 +267,7 @@ class TestMultiSpectrumFramework:
         assert framework._response_speed_evaluator in evaluators
 
         # Test financial analysis evaluators
-        financial_spectrum = next(
-            s for s in framework.data_spectrums
-            if s.name == "financial_analysis_depth"
-        )
+        financial_spectrum = next(s for s in framework.data_spectrums if s.name == "financial_analysis_depth")
         financial_evaluators = framework._create_spectrum_evaluators(financial_spectrum)
 
         assert len(financial_evaluators) >= 3
@@ -295,19 +277,15 @@ class TestMultiSpectrumFramework:
     async def test_execute_spectrum_test(self, framework):
         """Test spectrum test execution."""
         test_spectrum = framework.data_spectrums[0]
-        test_inputs = {
-            "query": "Find customer blessedwina@aol.com"
-        }
+        test_inputs = {"query": "Find customer blessedwina@aol.com"}
 
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
             mock_post.return_value.json.return_value = {
                 "choices": [{"message": {"content": "Customer found: Edwina Hawthorne"}}]
             }
 
-            result = framework._execute_spectrum_test(
-                "gpt-4o-mini", test_spectrum, test_inputs
-            )
+            result = framework._execute_spectrum_test("gpt-4o-mini", test_spectrum, test_inputs)
 
             assert result["success"] is True
             assert result["model"] == "gpt-4o-mini"
@@ -323,12 +301,10 @@ class TestMultiSpectrumFramework:
         test_inputs = {
             "query": "Find customer blessedwina@aol.com",
             "expected_customer": "Edwina Hawthorne",
-            "expected_client_id": "2270"
+            "expected_client_id": "2270",
         }
 
-        quality_score = framework._calculate_quality_score(
-            test_response, test_spectrum, test_inputs
-        )
+        quality_score = framework._calculate_quality_score(test_response, test_spectrum, test_inputs)
 
         assert isinstance(quality_score, QualityScore)
         assert 0.0 <= quality_score.overall_score <= 1.0
@@ -343,14 +319,11 @@ class TestMultiSpectrumFramework:
         mock_run.outputs = {
             "success": True,
             "response": "Customer found: Edwina Hawthorne, Client ID: 2270",
-            "response_time_ms": 1500
+            "response_time_ms": 1500,
         }
 
         mock_example = MagicMock()
-        mock_example.outputs = {
-            "expected_customer": "Edwina Hawthorne",
-            "expected_client_id": "2270"
-        }
+        mock_example.outputs = {"expected_customer": "Edwina Hawthorne", "expected_client_id": "2270"}
 
         # Test identity accuracy evaluator
         result = framework._identity_accuracy_evaluator(mock_run, mock_example)
@@ -365,10 +338,10 @@ class TestMultiSpectrumFramework:
 
     def test_run_comprehensive_cycle(self, framework):
         """Test complete comprehensive cycle execution."""
-        with patch.object(framework, 'create_comprehensive_experiments') as mock_create:
-            with patch.object(framework, 'analyze_multi_spectrum_results') as mock_analyze:
-                with patch.object(framework, 'generate_optimization_recommendations') as mock_optimize:
-                    with patch.object(framework, 'create_virtuous_improvement_cycle') as mock_cycle:
+        with patch.object(framework, "create_comprehensive_experiments") as mock_create:
+            with patch.object(framework, "analyze_multi_spectrum_results") as mock_analyze:
+                with patch.object(framework, "generate_optimization_recommendations") as mock_optimize:
+                    with patch.object(framework, "create_virtuous_improvement_cycle") as mock_cycle:
 
                         # Mock return values
                         mock_create.return_value = {"success": True, "experiments": {}}
@@ -390,15 +363,9 @@ class TestMultiSpectrumFramework:
         mock_experiment_results = {
             "success": True,
             "experiments": {
-                "customer_identity_resolution": {
-                    "gpt-4o-mini": {"success": True},
-                    "claude-3-haiku": {"success": True}
-                },
-                "financial_analysis_depth": {
-                    "gpt-4o-mini": {"success": False},
-                    "claude-3-haiku": {"success": True}
-                }
-            }
+                "customer_identity_resolution": {"gpt-4o-mini": {"success": True}, "claude-3-haiku": {"success": True}},
+                "financial_analysis_depth": {"gpt-4o-mini": {"success": False}, "claude-3-haiku": {"success": True}},
+            },
         }
 
         analysis = framework.analyze_multi_spectrum_results(mock_experiment_results)
@@ -414,8 +381,8 @@ class TestMultiSpectrumFramework:
             "overall_metrics": {"average_quality_score": 0.87},
             "spectrum_performance": {
                 "customer_identity_resolution": {"quality_achievement": True, "average_quality": 0.92},
-                "financial_analysis_depth": {"quality_achievement": False, "average_quality": 0.85}
-            }
+                "financial_analysis_depth": {"quality_achievement": False, "average_quality": 0.85},
+            },
         }
 
         recommendations = framework.generate_optimization_recommendations(mock_analysis)
@@ -427,10 +394,7 @@ class TestMultiSpectrumFramework:
     def test_quality_targets_assessment(self, framework):
         """Test quality targets achievement assessment."""
         mock_analysis = {
-            "overall_metrics": {
-                "average_quality_score": 0.92,
-                "spectrums_above_90_percent": 5
-            },
+            "overall_metrics": {"average_quality_score": 0.92, "spectrums_above_90_percent": 5},
             "spectrum_performance": {
                 "spectrum1": {},
                 "spectrum2": {},
@@ -438,8 +402,8 @@ class TestMultiSpectrumFramework:
                 "spectrum4": {},
                 "spectrum5": {},
                 "spectrum6": {},
-                "spectrum7": {}
-            }
+                "spectrum7": {},
+            },
         }
 
         assessment = framework._assess_quality_targets(mock_analysis)
@@ -456,18 +420,14 @@ class TestEdwinaHawthorneValidation:
     @pytest.fixture
     def framework_with_customer_data(self):
         """Create framework configured for Edwina Hawthorne validation."""
-        with patch('multi_spectrum_framework.Client'):
-            with patch.dict('os.environ', {
-                'LANGSMITH_API_KEY': 'test_key',
-                'TILORES_API_URL': 'https://test-api.com'
-            }):
+        with patch("multi_spectrum_framework.Client"):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key", "TILORES_API_URL": "https://test-api.com"}):
                 return MultiSpectrumFramework()
 
     def test_edwina_hawthorne_data_samples(self, framework_with_customer_data):
         """Test Edwina Hawthorne data samples in customer identity spectrum."""
         identity_spectrum = next(
-            s for s in framework_with_customer_data.data_spectrums
-            if s.name == "customer_identity_resolution"
+            s for s in framework_with_customer_data.data_spectrums if s.name == "customer_identity_resolution"
         )
 
         # Find Edwina Hawthorne samples
@@ -481,18 +441,14 @@ class TestEdwinaHawthorneValidation:
         assert len(edwina_samples) >= 2
 
         # Test email query sample
-        email_sample = next(
-            (s for s in edwina_samples if "blessedwina@aol.com" in s.get("query", "")), None
-        )
+        email_sample = next((s for s in edwina_samples if "blessedwina@aol.com" in s.get("query", "")), None)
         assert email_sample is not None
         assert email_sample["expected_customer"] == "Edwina Hawthorne"
         assert email_sample["expected_client_id"] == "2270"
         assert email_sample["identity_type"] == "email"
 
         # Test name query sample
-        name_sample = next(
-            (s for s in edwina_samples if "Edwina Hawthorne" in s.get("query", "")), None
-        )
+        name_sample = next((s for s in edwina_samples if "Edwina Hawthorne" in s.get("query", "")), None)
         assert name_sample is not None
         assert name_sample["expected_customer"] == "Edwina Hawthorne"
         assert name_sample["identity_type"] == "name"
@@ -500,14 +456,10 @@ class TestEdwinaHawthorneValidation:
     def test_edwina_hawthorne_phone_validation(self, framework_with_customer_data):
         """Test Edwina Hawthorne phone number validation."""
         identity_spectrum = next(
-            s for s in framework_with_customer_data.data_spectrums
-            if s.name == "customer_identity_resolution"
+            s for s in framework_with_customer_data.data_spectrums if s.name == "customer_identity_resolution"
         )
 
-        phone_sample = next(
-            (s for s in identity_spectrum.data_samples
-             if "2672661591" in s.get("query", "")), None
-        )
+        phone_sample = next((s for s in identity_spectrum.data_samples if "2672661591" in s.get("query", "")), None)
 
         assert phone_sample is not None
         assert phone_sample["expected_customer"] == "Edwina Hawthorne"
@@ -517,22 +469,19 @@ class TestEdwinaHawthorneValidation:
     def test_edwina_hawthorne_credit_analysis(self, framework_with_customer_data):
         """Test Edwina Hawthorne credit analysis samples."""
         financial_spectrum = next(
-            s for s in framework_with_customer_data.data_spectrums
-            if s.name == "financial_analysis_depth"
+            s for s in framework_with_customer_data.data_spectrums if s.name == "financial_analysis_depth"
         )
 
         credit_samples = [
-            sample for sample in financial_spectrum.data_samples
-            if "2270" in sample.get("query", "") or
-               "blessedwina@aol.com" in sample.get("query", "")
+            sample
+            for sample in financial_spectrum.data_samples
+            if "2270" in sample.get("query", "") or "blessedwina@aol.com" in sample.get("query", "")
         ]
 
         assert len(credit_samples) >= 1
 
         # Test credit score sample
-        credit_score_sample = next(
-            (s for s in credit_samples if "credit score" in s.get("query", "").lower()), None
-        )
+        credit_score_sample = next((s for s in credit_samples if "credit score" in s.get("query", "").lower()), None)
         if credit_score_sample:
             assert "543" in credit_score_sample.get("expected_content", "")
             assert credit_score_sample.get("expected_analysis") == "Very Poor"
@@ -544,16 +493,11 @@ class TestSevenModelIntegration:
     @pytest.fixture
     def framework_with_models(self):
         """Create framework with all 7 models configured."""
-        with patch('multi_spectrum_framework.Client'):
-            with patch.dict('os.environ', {
-                'LANGSMITH_API_KEY': 'test_key'
-            }):
+        with patch("multi_spectrum_framework.Client"):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key"}):
                 framework = MultiSpectrumFramework()
                 # Add Gemini 2.5 models for complete 7-model testing
-                framework.models.extend([
-                    "gemini-2.5-flash",
-                    "gemini-2.5-flash-lite"
-                ])
+                framework.models.extend(["gemini-2.5-flash", "gemini-2.5-flash-lite"])
                 return framework
 
     def test_seven_model_configuration(self, framework_with_models):
@@ -565,7 +509,7 @@ class TestSevenModelIntegration:
             "claude-3-haiku",
             "gemini-1.5-flash-002",
             "gemini-2.5-flash",
-            "gemini-2.5-flash-lite"
+            "gemini-2.5-flash-lite",
         ]
 
         assert len(framework_with_models.models) == 7
@@ -587,24 +531,22 @@ class TestSevenModelIntegration:
     @pytest.mark.asyncio
     async def test_model_performance_across_spectrums(self, framework_with_models):
         """Test model performance measurement across all spectrums."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             # Mock different performance levels for different models
             def mock_response(*args, **kwargs):
                 response = MagicMock()
                 response.status_code = 200
 
                 # Simulate different quality levels based on model
-                model = kwargs.get('json', {}).get('model', '')
-                if 'gemini-2.5' in model:
+                model = kwargs.get("json", {}).get("model", "")
+                if "gemini-2.5" in model:
                     content = "High quality response with comprehensive analysis"
-                elif 'gpt-4o' in model:
+                elif "gpt-4o" in model:
                     content = "Good quality response with detailed information"
                 else:
                     content = "Standard quality response"
 
-                response.json.return_value = {
-                    "choices": [{"message": {"content": content}}]
-                }
+                response.json.return_value = {"choices": [{"message": {"content": content}}]}
                 return response
 
             mock_post.side_effect = mock_response
@@ -615,9 +557,7 @@ class TestSevenModelIntegration:
 
             results = []
             for model in framework_with_models.models:
-                result = framework_with_models._execute_spectrum_test(
-                    model, test_spectrum, test_inputs
-                )
+                result = framework_with_models._execute_spectrum_test(model, test_spectrum, test_inputs)
                 results.append(result)
 
             assert len(results) == 7
@@ -631,24 +571,20 @@ class TestPerformanceAndScalability:
     @pytest.fixture
     def performance_framework(self):
         """Create framework for performance testing."""
-        with patch('multi_spectrum_framework.Client'):
-            with patch.dict('os.environ', {'LANGSMITH_API_KEY': 'test_key'}):
+        with patch("multi_spectrum_framework.Client"):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key"}):
                 return MultiSpectrumFramework()
 
     def test_large_scale_experiment_creation(self, performance_framework):
         """Test creation of large-scale experiments (7x7 matrix)."""
-        with patch.object(performance_framework, '_execute_spectrum_test') as mock_execute:
-            mock_execute.return_value = {
-                "success": True,
-                "quality_score": 0.90,
-                "response_time_ms": 1000
-            }
+        with patch.object(performance_framework, "_execute_spectrum_test") as mock_execute:
+            mock_execute.return_value = {"success": True, "quality_score": 0.90, "response_time_ms": 1000}
 
             # Mock dataset creation
             performance_framework.client.create_dataset.return_value = MagicMock(id="test_id")
             performance_framework.client.create_example.return_value = MagicMock(id="example_id")
 
-            with patch('multi_spectrum_framework.evaluate') as mock_evaluate:
+            with patch("multi_spectrum_framework.evaluate") as mock_evaluate:
                 mock_evaluate.return_value = MagicMock(experiment_name="test_experiment")
 
                 results = performance_framework.create_comprehensive_experiments()
@@ -665,14 +601,11 @@ class TestPerformanceAndScalability:
             name="large_test_spectrum",
             description="Large dataset for memory testing",
             data_samples=[
-                {
-                    "query": f"Test query {i}",
-                    "expected_result": f"Expected result {i}"
-                }
+                {"query": f"Test query {i}", "expected_result": f"Expected result {i}"}
                 for i in range(100)  # 100 samples
             ],
             quality_targets={"accuracy": 0.90},
-            optimization_focus="memory_efficiency"
+            optimization_focus="memory_efficiency",
         )
 
         # Should handle large datasets without memory issues
@@ -682,11 +615,9 @@ class TestPerformanceAndScalability:
     @pytest.mark.asyncio
     async def test_concurrent_spectrum_execution(self, performance_framework):
         """Test concurrent execution across multiple spectrums."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = {
-                "choices": [{"message": {"content": "Test response"}}]
-            }
+            mock_post.return_value.json.return_value = {"choices": [{"message": {"content": "Test response"}}]}
 
             # Execute multiple spectrums concurrently
             tasks = []
@@ -696,7 +627,7 @@ class TestPerformanceAndScalability:
                         performance_framework._execute_spectrum_test,
                         "gpt-4o-mini",
                         spectrum,
-                        {"query": "Test concurrent query"}
+                        {"query": "Test concurrent query"},
                     )
                 )
                 tasks.append(task)
@@ -713,21 +644,19 @@ class TestErrorHandlingAndEdgeCases:
     @pytest.fixture
     def error_test_framework(self):
         """Create framework for error testing."""
-        with patch('multi_spectrum_framework.Client'):
-            with patch.dict('os.environ', {'LANGSMITH_API_KEY': 'test_key'}):
+        with patch("multi_spectrum_framework.Client"):
+            with patch.dict("os.environ", {"LANGSMITH_API_KEY": "test_key"}):
                 return MultiSpectrumFramework()
 
     def test_api_failure_handling(self, error_test_framework):
         """Test handling of API failures."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             # Simulate API failure
             mock_post.return_value.status_code = 500
             mock_post.return_value.json.return_value = {"error": "Internal server error"}
 
             test_spectrum = error_test_framework.data_spectrums[0]
-            result = error_test_framework._execute_spectrum_test(
-                "gpt-4o-mini", test_spectrum, {"query": "Test query"}
-            )
+            result = error_test_framework._execute_spectrum_test("gpt-4o-mini", test_spectrum, {"query": "Test query"})
 
             assert result["success"] is False
             assert "HTTP 500" in result["response"]
@@ -735,14 +664,12 @@ class TestErrorHandlingAndEdgeCases:
 
     def test_network_timeout_handling(self, error_test_framework):
         """Test handling of network timeouts."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             # Simulate timeout
             mock_post.side_effect = Exception("Request timeout")
 
             test_spectrum = error_test_framework.data_spectrums[0]
-            result = error_test_framework._execute_spectrum_test(
-                "gpt-4o-mini", test_spectrum, {"query": "Test query"}
-            )
+            result = error_test_framework._execute_spectrum_test("gpt-4o-mini", test_spectrum, {"query": "Test query"})
 
             assert result["success"] is False
             assert "Request timeout" in result["error"]
@@ -763,16 +690,12 @@ class TestErrorHandlingAndEdgeCases:
 
     def test_empty_response_handling(self, error_test_framework):
         """Test handling of empty API responses."""
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = {
-                "choices": [{"message": {"content": ""}}]
-            }
+            mock_post.return_value.json.return_value = {"choices": [{"message": {"content": ""}}]}
 
             test_spectrum = error_test_framework.data_spectrums[0]
-            result = error_test_framework._execute_spectrum_test(
-                "gpt-4o-mini", test_spectrum, {"query": "Test query"}
-            )
+            result = error_test_framework._execute_spectrum_test("gpt-4o-mini", test_spectrum, {"query": "Test query"})
 
             assert result["success"] is True
             assert result["response"] == ""
@@ -788,11 +711,18 @@ async def main():
     import subprocess
     import sys
 
-    result = subprocess.run([
-        sys.executable, "-m", "pytest",
-        "tests/speed_experiments/test_phase1_multi_spectrum_foundation.py",
-        "-v", "--tb=short"
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "tests/speed_experiments/test_phase1_multi_spectrum_foundation.py",
+            "-v",
+            "--tb=short",
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     print("Test Results:")
     print(result.stdout)

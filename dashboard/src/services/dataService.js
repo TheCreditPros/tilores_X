@@ -6,11 +6,9 @@
  */
 
 import axios from "axios";
-import { enhanceDataWithLangSmith } from "./langsmithRealDataService";
 
-// Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "https://tilores-x.up.railway.app" : "http://localhost:8080");
+// Configuration - Force localhost for development
+const API_BASE_URL = "http://localhost:8080";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -36,9 +34,8 @@ api.interceptors.response.use(
 export const fetchVirtuousCycleStatus = async () => {
   try {
     const response = await api.get("/v1/virtuous-cycle/status");
-    // Enhance with real LangSmith data
-    const enhancedData = await enhanceDataWithLangSmith(response.data);
-    return enhancedData;
+    // Backend already includes LangSmith data - no need for frontend enhancement
+    return response.data;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Failed to fetch virtuous cycle status:", error);
@@ -139,7 +136,7 @@ export const fetchAIChangesHistory = async (limit = 20) => {
     return {
       recent_changes: [],
       summary: { error: `AI changes unavailable: ${error.message}` },
-      governance: { rollback_available: false }
+      governance: { rollback_available: false },
     };
   }
 };
@@ -150,7 +147,7 @@ export const fetchAIChangesHistory = async (limit = 20) => {
 export const triggerRollback = async (rollbackId = null) => {
   try {
     const response = await api.post("/v1/virtuous-cycle/rollback", null, {
-      params: rollbackId ? { rollback_id: rollbackId } : {}
+      params: rollbackId ? { rollback_id: rollbackId } : {},
     });
     return response.data;
   } catch (error) {
@@ -158,7 +155,7 @@ export const triggerRollback = async (rollbackId = null) => {
     console.error("Failed to trigger rollback:", error);
     return {
       success: false,
-      error: error.response?.data?.error || error.message
+      error: error.response?.data?.error || error.message,
     };
   }
 };
@@ -211,16 +208,25 @@ export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
     },
     // Add autonomous AI metrics
     autonomousCapabilities: {
-      value: autonomousMetrics?.autonomous_capability_status ?
-        `${Object.values(autonomousMetrics.autonomous_capability_status).filter(s => s === 'monitoring').length}/8` : "0/8",
+      value: autonomousMetrics?.autonomous_capability_status
+        ? `${
+            Object.values(
+              autonomousMetrics.autonomous_capability_status
+            ).filter((s) => s === "monitoring").length
+          }/8`
+        : "0/8",
       trend: "Capabilities Active",
-      status: autonomousMetrics?.autonomous_capability_status ? "success" : "warning",
+      status: autonomousMetrics?.autonomous_capability_status
+        ? "success"
+        : "warning",
     },
     predictiveAccuracy: {
-      value: autonomousMetrics?.predictive_accuracy ?
-        `${autonomousMetrics.predictive_accuracy.toFixed(1)}%` : "0%",
+      value: autonomousMetrics?.predictive_accuracy
+        ? `${autonomousMetrics.predictive_accuracy.toFixed(1)}%`
+        : "0%",
       trend: "7-day forecast",
-      status: autonomousMetrics?.predictive_accuracy > 85 ? "success" : "warning",
+      status:
+        autonomousMetrics?.predictive_accuracy > 85 ? "success" : "warning",
     },
   };
 
@@ -246,7 +252,7 @@ export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
         { label: "A/B Tests Active", value: "12" },
         { label: "Cost Efficiency", value: "+15%" },
       ],
-      status: component_status?.phase2_orchestrator ? "operational" : "warning",
+      status: component_status?.autonomous_platform ? "operational" : "warning",
     },
     {
       phase: "3",
@@ -257,7 +263,7 @@ export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
         { label: "Avg Cycle Gain", value: "+2.3%" },
         { label: "Quality Breaches", value: "2 (resolved)" },
       ],
-      status: component_status?.phase3_orchestrator ? "operational" : "warning",
+      status: component_status?.enhanced_manager ? "operational" : "warning",
     },
     {
       phase: "4",
@@ -268,7 +274,7 @@ export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
         { label: "Success Rate", value: "99.2%", progress: 99.2 },
         { label: "Railway Status", value: "Healthy" },
       ],
-      status: component_status?.phase4_orchestrator ? "operational" : "warning",
+      status: component_status?.enhanced_manager ? "operational" : "warning",
     },
   ];
 
@@ -293,16 +299,21 @@ export const transformToDashboardData = (apiData, autonomousMetrics = null) => {
       component_health: Object.values(component_status).filter(Boolean).length,
     },
     // Add autonomous AI dashboard data
-    autonomousAI: autonomousMetrics ? {
-      qualityAchievementRate: autonomousMetrics.quality_achievement_rate,
-      predictiveAccuracy: autonomousMetrics.predictive_accuracy,
-      autonomousCapabilityStatus: autonomousMetrics.autonomous_capability_status,
-      optimizationCycleEffectiveness: autonomousMetrics.optimization_cycle_effectiveness,
-      metaLearningProgress: autonomousMetrics.meta_learning_progress,
-      langsmithProjectsHealth: autonomousMetrics.langsmith_projects_health,
-      endpointMonitoringStatus: autonomousMetrics.endpoint_monitoring_status,
-      alertSummary: autonomousMetrics.alert_summary,
-    } : null,
+    autonomousAI: autonomousMetrics
+      ? {
+          qualityAchievementRate: autonomousMetrics.quality_achievement_rate,
+          predictiveAccuracy: autonomousMetrics.predictive_accuracy,
+          autonomousCapabilityStatus:
+            autonomousMetrics.autonomous_capability_status,
+          optimizationCycleEffectiveness:
+            autonomousMetrics.optimization_cycle_effectiveness,
+          metaLearningProgress: autonomousMetrics.meta_learning_progress,
+          langsmithProjectsHealth: autonomousMetrics.langsmith_projects_health,
+          endpointMonitoringStatus:
+            autonomousMetrics.endpoint_monitoring_status,
+          alertSummary: autonomousMetrics.alert_summary,
+        }
+      : null,
   };
 };
 

@@ -177,7 +177,11 @@ def create_model_comparison_experiment():
                 if expected_client_id and expected_client_id in response:
                     score += 0.5
 
-                return {"key": "accuracy_score", "score": score, "comment": f"Customer data accuracy: {score * 100:.0f}%"}
+                return {
+                    "key": "accuracy_score",
+                    "score": score,
+                    "comment": f"Customer data accuracy: {score * 100:.0f}%",
+                }
             else:
                 # For credit analysis, check for expected keywords
                 found_keywords = sum(1 for keyword in expected_items if keyword.lower() in response.lower())

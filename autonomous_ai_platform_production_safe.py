@@ -15,12 +15,14 @@ import logging
 import time
 from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
 
 # Simple dataclasses for production use
 @dataclass
 class ProductionDeltaAnalysis:
     """Simplified delta analysis for production."""
+
     analysis_id: str
     baseline_quality: float
     current_quality: float
@@ -75,11 +77,13 @@ class ProductionSafeAutonomousAI:
             cycle_results["components_executed"].append("production_delta_analysis")
 
             if delta_analysis.regression_detected:
-                cycle_results["improvements_identified"].append({
-                    "type": "regression_detected",
-                    "severity": "medium",
-                    "quality_delta": delta_analysis.quality_delta,
-                })
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "regression_detected",
+                        "severity": "medium",
+                        "quality_delta": delta_analysis.quality_delta,
+                    }
+                )
 
         except Exception as e:
             self.logger.error(f"Production delta analysis failed: {e}")
@@ -92,11 +96,13 @@ class ProductionSafeAutonomousAI:
 
             if patterns_found:
                 cycle_results["learning_applied"] = True
-                cycle_results["improvements_identified"].append({
-                    "type": "patterns_applied",
-                    "severity": "low",
-                    "patterns_count": len(patterns_found),
-                })
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "patterns_applied",
+                        "severity": "low",
+                        "patterns_count": len(patterns_found),
+                    }
+                )
 
         except Exception as e:
             self.logger.error(f"Production pattern recognition failed: {e}")
@@ -108,11 +114,13 @@ class ProductionSafeAutonomousAI:
             cycle_results["components_executed"].append("production_quality_prediction")
 
             if quality_prediction["needs_intervention"]:
-                cycle_results["improvements_identified"].append({
-                    "type": "predicted_degradation",
-                    "severity": "medium",
-                    "predicted_quality": quality_prediction["predicted_quality_7d"],
-                })
+                cycle_results["improvements_identified"].append(
+                    {
+                        "type": "predicted_degradation",
+                        "severity": "medium",
+                        "predicted_quality": quality_prediction["predicted_quality_7d"],
+                    }
+                )
 
         except Exception as e:
             self.logger.error(f"Production quality prediction failed: {e}")
@@ -147,7 +155,7 @@ class ProductionSafeAutonomousAI:
             quality_delta=quality_delta,
             regression_detected=regression_detected,
             timestamp=datetime.now().isoformat(),
-            metadata={"production_safe": True, "api_independent": True}
+            metadata={"production_safe": True, "api_independent": True},
         )
 
     async def _production_safe_pattern_recognition(self) -> List[Dict[str, Any]]:
@@ -158,14 +166,14 @@ class ProductionSafeAutonomousAI:
                 "pattern_id": "high_quality_customer_query",
                 "success_rate": 0.95,
                 "context": "customer_profile",
-                "recommendation": "Use structured customer data format"
+                "recommendation": "Use structured customer data format",
             },
             {
                 "pattern_id": "efficient_credit_analysis",
                 "success_rate": 0.92,
                 "context": "credit_analysis",
-                "recommendation": "Include payment history context"
-            }
+                "recommendation": "Include payment history context",
+            },
         ]
 
         self.logger.info(f"🔍 Production pattern recognition: {len(successful_patterns)} patterns available")
@@ -184,10 +192,12 @@ class ProductionSafeAutonomousAI:
             "risk_level": "low" if predicted_quality_7d > 0.85 else "medium",
             "current_trend": self.quality_trend,
             "prediction_timestamp": datetime.now().isoformat(),
-            "production_safe": True
+            "production_safe": True,
         }
 
-        self.logger.info(f"🔮 Production quality prediction: {predicted_quality_7d:.1%} (intervention: {needs_intervention})")
+        self.logger.info(
+            f"🔮 Production quality prediction: {predicted_quality_7d:.1%} (intervention: {needs_intervention})"
+        )
         return prediction
 
     async def get_platform_status(self) -> Dict[str, Any]:
@@ -259,4 +269,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

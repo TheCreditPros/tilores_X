@@ -38,7 +38,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_initialization_with_enterprise_features(self):
         """Test initialization with enterprise features available."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
             "autonomous_integration.AutonomousAIPlatform"
         ) as mock_platform:
 
@@ -59,7 +59,9 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_initialization_without_enterprise_features(self):
         """Test initialization when enterprise features fail."""
-        with patch("autonomous_integration.create_enterprise_client", side_effect=Exception("Enterprise unavailable")):
+        with patch(
+            "langsmith_enterprise_client.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
+        ):
             manager = EnhancedVirtuousCycleManager()
 
             assert manager.enterprise_features_available is False
@@ -70,7 +72,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     async def test_initialization_with_legacy_compatibility(self):
         """Test initialization with legacy virtuous cycle available."""
         with patch(
-            "autonomous_integration.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
+            "langsmith_enterprise_client.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
         ), patch("autonomous_integration.VIRTUOUS_CYCLE_AVAILABLE", True), patch(
             "autonomous_integration.VirtuousCycleManager"
         ) as mock_legacy:
@@ -86,7 +88,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_get_enhanced_status_with_enterprise_features(self):
         """Test enhanced status retrieval with enterprise features."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
             "autonomous_integration.AutonomousAIPlatform"
         ) as mock_platform:
 
@@ -142,7 +144,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     async def test_get_enhanced_status_with_legacy_fallback(self):
         """Test enhanced status with legacy fallback."""
         with patch(
-            "autonomous_integration.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
+            "langsmith_enterprise_client.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
         ), patch("autonomous_integration.VIRTUOUS_CYCLE_AVAILABLE", True), patch(
             "autonomous_integration.VirtuousCycleManager"
         ) as mock_legacy:
@@ -163,7 +165,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_run_autonomous_optimization_with_enterprise(self):
         """Test autonomous optimization with enterprise features."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
             "autonomous_integration.AutonomousAIPlatform"
         ) as mock_platform:
 
@@ -200,7 +202,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_run_autonomous_optimization_with_legacy_integration(self):
         """Test autonomous optimization with legacy integration."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client, patch(
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client, patch(
             "autonomous_integration.AutonomousAIPlatform"
         ) as mock_platform, patch("autonomous_integration.VIRTUOUS_CYCLE_AVAILABLE", True), patch(
             "autonomous_integration.VirtuousCycleManager"
@@ -241,7 +243,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     async def test_run_autonomous_optimization_legacy_fallback(self):
         """Test autonomous optimization with legacy fallback only."""
         with patch(
-            "autonomous_integration.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
+            "langsmith_enterprise_client.create_enterprise_client", side_effect=Exception("Enterprise unavailable")
         ), patch("autonomous_integration.VIRTUOUS_CYCLE_AVAILABLE", True), patch(
             "autonomous_integration.VirtuousCycleManager"
         ) as mock_legacy:
@@ -265,7 +267,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_analyze_quality_trends_comprehensive(self):
         """Test comprehensive quality trends analysis."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client:
             mock_client = MagicMock()
             mock_create_client.return_value = mock_client
 
@@ -316,7 +318,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_get_real_langsmith_metrics_comprehensive(self):
         """Test comprehensive real LangSmith metrics retrieval."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client:
             mock_client = MagicMock()
             mock_create_client.return_value = mock_client
 
@@ -370,7 +372,7 @@ class TestEnhancedVirtuousCycleManagerComprehensive:
     @pytest.mark.asyncio
     async def test_close_enterprise_connections(self):
         """Test closing enterprise client connections."""
-        with patch("autonomous_integration.create_enterprise_client") as mock_create_client:
+        with patch("langsmith_enterprise_client.create_enterprise_client") as mock_create_client:
             mock_client = MagicMock()
             mock_client.close = AsyncMock()
             mock_create_client.return_value = mock_client

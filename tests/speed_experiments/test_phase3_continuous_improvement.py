@@ -26,6 +26,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 # Import Phase 3 components
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from phase3_continuous_improvement import (
@@ -38,7 +39,7 @@ from phase3_continuous_improvement import (
     LearningPattern,
     QualityAlert,
     QualityThresholdMonitor,
-    SelfImprovingOptimizer
+    SelfImprovingOptimizer,
 )
 
 
@@ -59,20 +60,16 @@ class TestQualityThresholdMonitor:
 
     def test_threshold_monitor_initialization(self, threshold_monitor):
         """Test threshold monitor initialization."""
-        assert threshold_monitor.thresholds['critical'] == 0.85
-        assert threshold_monitor.thresholds['warning'] == 0.90
-        assert threshold_monitor.thresholds['target'] == 0.95
-        assert threshold_monitor.thresholds['excellent'] == 0.98
+        assert threshold_monitor.thresholds["critical"] == 0.85
+        assert threshold_monitor.thresholds["warning"] == 0.90
+        assert threshold_monitor.thresholds["target"] == 0.95
+        assert threshold_monitor.thresholds["excellent"] == 0.98
         assert threshold_monitor.variance_threshold == 0.05
 
     def test_critical_threshold_breach_detection(self, threshold_monitor):
         """Test detection of critical quality threshold breaches."""
         # Mock metrics with quality below critical threshold
-        mock_metrics = [
-            MagicMock(score=0.82),
-            MagicMock(score=0.83),
-            MagicMock(score=0.84)
-        ]
+        mock_metrics = [MagicMock(score=0.82), MagicMock(score=0.83), MagicMock(score=0.84)]
         threshold_monitor.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
         alerts = threshold_monitor.check_quality_thresholds("test_spectrum")
@@ -86,11 +83,7 @@ class TestQualityThresholdMonitor:
     def test_warning_threshold_breach_detection(self, threshold_monitor):
         """Test detection of warning quality threshold breaches."""
         # Mock metrics with quality below warning threshold
-        mock_metrics = [
-            MagicMock(score=0.87),
-            MagicMock(score=0.88),
-            MagicMock(score=0.89)
-        ]
+        mock_metrics = [MagicMock(score=0.87), MagicMock(score=0.88), MagicMock(score=0.89)]
         threshold_monitor.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
         alerts = threshold_monitor.check_quality_thresholds("test_spectrum")
@@ -108,7 +101,7 @@ class TestQualityThresholdMonitor:
             MagicMock(score=0.93),
             MagicMock(score=0.91),
             MagicMock(score=0.89),
-            MagicMock(score=0.87)
+            MagicMock(score=0.87),
         ]
         threshold_monitor.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
@@ -128,7 +121,7 @@ class TestQualityThresholdMonitor:
             MagicMock(score=0.85),
             MagicMock(score=0.98),
             MagicMock(score=0.82),
-            MagicMock(score=0.96)
+            MagicMock(score=0.96),
         ]
         threshold_monitor.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
@@ -146,7 +139,7 @@ class TestQualityThresholdMonitor:
             MagicMock(score=0.96),
             MagicMock(score=0.94),
             MagicMock(score=0.97),
-            MagicMock(score=0.95)
+            MagicMock(score=0.95),
         ]
         threshold_monitor.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
@@ -161,10 +154,7 @@ class TestAutomatedAlertingSystem:
     @pytest.fixture
     def alerting_system(self):
         """Create alerting system instance."""
-        config = {
-            'email_alerts': False,
-            'alert_recipients': ['test@example.com']
-        }
+        config = {"email_alerts": False, "alert_recipients": ["test@example.com"]}
         return AutomatedAlertingSystem(config)
 
     @pytest.fixture
@@ -179,13 +169,13 @@ class TestAutomatedAlertingSystem:
             current_quality=0.87,
             threshold=0.90,
             message="Quality below warning threshold",
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
 
     @pytest.mark.asyncio
     async def test_alert_processing(self, alerting_system, sample_alert):
         """Test alert processing functionality."""
-        with patch.object(alerting_system, '_deliver_alert', new_callable=AsyncMock) as mock_deliver:
+        with patch.object(alerting_system, "_deliver_alert", new_callable=AsyncMock) as mock_deliver:
             success = await alerting_system.process_alert(sample_alert)
 
             assert success is True
@@ -209,10 +199,10 @@ class TestAutomatedAlertingSystem:
             current_quality=0.86,
             threshold=0.90,
             message="Another quality alert",
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
 
-        with patch.object(alerting_system, '_deliver_alert', new_callable=AsyncMock):
+        with patch.object(alerting_system, "_deliver_alert", new_callable=AsyncMock):
             # Second alert should be rate limited
             success = await alerting_system.process_alert(second_alert)
             assert success is False
@@ -232,7 +222,7 @@ class TestAutomatedAlertingSystem:
         """Test file alert delivery."""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Update alert channels to use temp directory
-            alerting_system.alert_channels['file']['path'] = f"{temp_dir}/test_alerts.log"
+            alerting_system.alert_channels["file"]["path"] = f"{temp_dir}/test_alerts.log"
 
             await alerting_system._deliver_file_alert(sample_alert)
 
@@ -240,13 +230,13 @@ class TestAutomatedAlertingSystem:
             log_file = Path(temp_dir) / "test_alerts.log"
             assert log_file.exists()
 
-            with open(log_file, 'r') as f:
+            with open(log_file, "r") as f:
                 log_content = f.read()
                 log_data = json.loads(log_content.strip())
 
-            assert log_data['alert_id'] == sample_alert.alert_id
-            assert log_data['spectrum'] == sample_alert.spectrum
-            assert log_data['severity'] == sample_alert.severity.value
+            assert log_data["alert_id"] == sample_alert.alert_id
+            assert log_data["spectrum"] == sample_alert.spectrum
+            assert log_data["severity"] == sample_alert.severity.value
 
 
 class TestLearningAccumulator:
@@ -262,30 +252,25 @@ class TestLearningAccumulator:
     def sample_cycle_results(self):
         """Create sample optimization cycle results."""
         return {
-            'cycle_id': 'test_cycle_001',
-            'timestamp': datetime.now().isoformat(),
-            'phase': 'continuous_improvement',
-            'model_strategies': [
-                {'optimization_approach': 'quality_enhancement'},
-                {'optimization_approach': 'pattern_reinforcement'}
+            "cycle_id": "test_cycle_001",
+            "timestamp": datetime.now().isoformat(),
+            "phase": "continuous_improvement",
+            "model_strategies": [
+                {"optimization_approach": "quality_enhancement"},
+                {"optimization_approach": "pattern_reinforcement"},
             ],
-            'improvements': {
-                'customer_profile': {'quality_improvement': 0.05, 'optimization_strategy': 'ai_driven'},
-                'credit_analysis': {'quality_improvement': 0.03, 'optimization_strategy': 'pattern_based'}
+            "improvements": {
+                "customer_profile": {"quality_improvement": 0.05, "optimization_strategy": "ai_driven"},
+                "credit_analysis": {"quality_improvement": 0.03, "optimization_strategy": "pattern_based"},
             },
-            'identified_patterns': [
-                {'pattern_id': 'pattern_001'},
-                {'pattern_id': 'pattern_002'}
-            ],
-            'phases': {
-                'validation': {
-                    'customer_profile': {'is_statistically_significant': True},
-                    'credit_analysis': {'is_statistically_significant': False}
+            "identified_patterns": [{"pattern_id": "pattern_001"}, {"pattern_id": "pattern_002"}],
+            "phases": {
+                "validation": {
+                    "customer_profile": {"is_statistically_significant": True},
+                    "credit_analysis": {"is_statistically_significant": False},
                 }
             },
-            'recommendations': {
-                'optimization_strategy': 'expand'
-            }
+            "recommendations": {"optimization_strategy": "expand"},
         }
 
     def test_learning_accumulator_initialization(self, learning_accumulator):
@@ -306,7 +291,7 @@ class TestLearningAccumulator:
         # Check cycle was recorded
         assert len(learning_accumulator.cycle_memory) == initial_cycles_count + 1
         recorded_cycle = learning_accumulator.cycle_memory[-1]
-        assert recorded_cycle.cycle_id == 'test_cycle_001'
+        assert recorded_cycle.cycle_id == "test_cycle_001"
 
         # Check learning patterns were updated
         assert len(learning_accumulator.learning_patterns) > initial_patterns_count
@@ -317,19 +302,19 @@ class TestLearningAccumulator:
         improvements = learning_accumulator._extract_improvements(sample_cycle_results)
         patterns = learning_accumulator._extract_patterns(sample_cycle_results)
 
-        assert 'quality_enhancement' in strategies
-        assert 'pattern_reinforcement' in strategies
-        assert improvements['customer_profile'] == 0.05
-        assert improvements['credit_analysis'] == 0.03
-        assert 'pattern_001' in patterns
-        assert 'pattern_002' in patterns
+        assert "quality_enhancement" in strategies
+        assert "pattern_reinforcement" in strategies
+        assert improvements["customer_profile"] == 0.05
+        assert improvements["credit_analysis"] == 0.03
+        assert "pattern_001" in patterns
+        assert "pattern_002" in patterns
 
     def test_learning_pattern_updates(self, learning_accumulator, sample_cycle_results):
         """Test learning pattern updates from cycle results."""
         learning_accumulator.record_optimization_cycle(sample_cycle_results)
 
         # Check that patterns were created/updated
-        strategy_pattern = learning_accumulator.learning_patterns.get('strategy_quality_enhancement')
+        strategy_pattern = learning_accumulator.learning_patterns.get("strategy_quality_enhancement")
         assert strategy_pattern is not None
         assert strategy_pattern.success_count > 0
         assert strategy_pattern.confidence_score > 0
@@ -346,7 +331,7 @@ class TestLearningAccumulator:
             applicable_contexts=["customer_profile", "credit_analysis"],
             learned_optimizations=[],
             confidence_score=0.83,
-            last_updated=datetime.now().isoformat()
+            last_updated=datetime.now().isoformat(),
         )
         learning_accumulator.learning_patterns["test_pattern"] = test_pattern
 
@@ -387,54 +372,52 @@ class TestSelfImprovingOptimizer:
             applicable_contexts=["test_spectrum"],
             learned_optimizations=[],
             confidence_score=0.83,
-            last_updated=datetime.now().isoformat()
+            last_updated=datetime.now().isoformat(),
         )
         learning_accumulator.learning_patterns["test_pattern"] = test_pattern
 
         # Run optimization
-        context = {'current_quality': 0.85, 'trigger_reason': 'quality_below_threshold'}
-        result = await self_improving_optimizer.optimize_with_learning(
-            "test_spectrum", 0.85, context
-        )
+        context = {"current_quality": 0.85, "trigger_reason": "quality_below_threshold"}
+        result = await self_improving_optimizer.optimize_with_learning("test_spectrum", 0.85, context)
 
-        assert result['spectrum'] == "test_spectrum"
-        assert result['strategy'] == "quality_enhancement"
-        assert result['expected_improvement'] == 0.06
-        assert result['confidence'] == 0.83
-        assert result['learning_applied'] == 1
-        assert 'optimized_prompt' in result
+        assert result["spectrum"] == "test_spectrum"
+        assert result["strategy"] == "quality_enhancement"
+        assert result["expected_improvement"] == 0.06
+        assert result["confidence"] == 0.83
+        assert result["learning_applied"] == 1
+        assert "optimized_prompt" in result
 
     @pytest.mark.asyncio
     async def test_optimization_without_learning(self, self_improving_optimizer):
         """Test optimization when no learning patterns available."""
-        context = {'current_quality': 0.85}
-        result = await self_improving_optimizer.optimize_with_learning(
-            "unknown_spectrum", 0.85, context
-        )
+        context = {"current_quality": 0.85}
+        result = await self_improving_optimizer.optimize_with_learning("unknown_spectrum", 0.85, context)
 
-        assert result['spectrum'] == "unknown_spectrum"
-        assert result['strategy'] == "gradual_enhancement"
-        assert result['expected_improvement'] == 0.02
-        assert result['confidence'] == 0.5
-        assert result['learning_applied'] == 0
+        assert result["spectrum"] == "unknown_spectrum"
+        assert result["strategy"] == "gradual_enhancement"
+        assert result["expected_improvement"] == 0.02
+        assert result["confidence"] == 0.5
+        assert result["learning_applied"] == 0
 
     def test_historical_analysis(self, self_improving_optimizer):
         """Test historical optimization analysis."""
         # Add mock optimization history
-        self_improving_optimizer.optimization_history.extend([
-            {'spectrum': 'test_spectrum', 'success': True, 'strategy': 'pattern_a'},
-            {'spectrum': 'test_spectrum', 'success': False, 'strategy': 'pattern_b'},
-            {'spectrum': 'test_spectrum', 'success': True, 'strategy': 'pattern_a'},
-            {'spectrum': 'other_spectrum', 'success': True, 'strategy': 'pattern_c'}
-        ])
+        self_improving_optimizer.optimization_history.extend(
+            [
+                {"spectrum": "test_spectrum", "success": True, "strategy": "pattern_a"},
+                {"spectrum": "test_spectrum", "success": False, "strategy": "pattern_b"},
+                {"spectrum": "test_spectrum", "success": True, "strategy": "pattern_a"},
+                {"spectrum": "other_spectrum", "success": True, "strategy": "pattern_c"},
+            ]
+        )
 
-        analysis = self_improving_optimizer._analyze_historical_optimizations('test_spectrum')
+        analysis = self_improving_optimizer._analyze_historical_optimizations("test_spectrum")
 
-        assert analysis['total_attempts'] == 3
-        assert analysis['successful_attempts'] == 2
-        assert analysis['success_rate'] == 2 / 3
-        assert 'pattern_a' in analysis['success_patterns']
-        assert 'pattern_b' in analysis['failure_patterns']
+        assert analysis["total_attempts"] == 3
+        assert analysis["successful_attempts"] == 2
+        assert analysis["success_rate"] == 2 / 3
+        assert "pattern_a" in analysis["success_patterns"]
+        assert "pattern_b" in analysis["failure_patterns"]
 
 
 class TestAutomatedImprovementDeployment:
@@ -449,24 +432,24 @@ class TestAutomatedImprovementDeployment:
     def good_optimization_result(self):
         """Create optimization result that meets deployment criteria."""
         return {
-            'spectrum': 'test_spectrum',
-            'strategy': 'quality_enhancement',
-            'optimized_prompt': 'Optimized prompt content',
-            'expected_improvement': 0.05,  # 5% improvement
-            'confidence': 0.85,            # 85% confidence
-            'learning_applied': 3
+            "spectrum": "test_spectrum",
+            "strategy": "quality_enhancement",
+            "optimized_prompt": "Optimized prompt content",
+            "expected_improvement": 0.05,  # 5% improvement
+            "confidence": 0.85,  # 85% confidence
+            "learning_applied": 3,
         }
 
     @pytest.fixture
     def poor_optimization_result(self):
         """Create optimization result that doesn't meet deployment criteria."""
         return {
-            'spectrum': 'test_spectrum',
-            'strategy': 'gradual_enhancement',
-            'optimized_prompt': 'Basic prompt content',
-            'expected_improvement': 0.01,  # 1% improvement (below threshold)
-            'confidence': 0.6,             # 60% confidence (below threshold)
-            'learning_applied': 0
+            "spectrum": "test_spectrum",
+            "strategy": "gradual_enhancement",
+            "optimized_prompt": "Basic prompt content",
+            "expected_improvement": 0.01,  # 1% improvement (below threshold)
+            "confidence": 0.6,  # 60% confidence (below threshold)
+            "learning_applied": 0,
         }
 
     @pytest.mark.asyncio
@@ -474,30 +457,30 @@ class TestAutomatedImprovementDeployment:
         """Test deployment readiness evaluation for good results."""
         decision = await deployment_system.evaluate_deployment_readiness(good_optimization_result)
 
-        assert decision['ready_for_deployment'] is True
-        assert decision['improvement_check'] is True
-        assert decision['confidence_check'] is True
-        assert "DEPLOY" in decision['recommendation']
+        assert decision["ready_for_deployment"] is True
+        assert decision["improvement_check"] is True
+        assert decision["confidence_check"] is True
+        assert "DEPLOY" in decision["recommendation"]
 
     @pytest.mark.asyncio
     async def test_deployment_readiness_evaluation_failure(self, deployment_system, poor_optimization_result):
         """Test deployment readiness evaluation for poor results."""
         decision = await deployment_system.evaluate_deployment_readiness(poor_optimization_result)
 
-        assert decision['ready_for_deployment'] is False
-        assert decision['improvement_check'] is False
-        assert decision['confidence_check'] is False
-        assert "REJECT" in decision['recommendation']
+        assert decision["ready_for_deployment"] is False
+        assert decision["improvement_check"] is False
+        assert decision["confidence_check"] is False
+        assert "REJECT" in decision["recommendation"]
 
     @pytest.mark.asyncio
     async def test_successful_deployment(self, deployment_system, good_optimization_result):
         """Test successful optimization deployment."""
         result = await deployment_system.deploy_optimization(good_optimization_result)
 
-        assert result['deployed'] is True
-        assert 'deployment_id' in result
-        assert result['spectrum'] == 'test_spectrum'
-        assert result['rollback_available'] is True
+        assert result["deployed"] is True
+        assert "deployment_id" in result
+        assert result["spectrum"] == "test_spectrum"
+        assert result["rollback_available"] is True
         assert len(deployment_system.deployment_history) == 1
 
     @pytest.mark.asyncio
@@ -505,9 +488,9 @@ class TestAutomatedImprovementDeployment:
         """Test failed optimization deployment."""
         result = await deployment_system.deploy_optimization(poor_optimization_result)
 
-        assert result['deployed'] is False
-        assert 'reason' in result
-        assert 'readiness_evaluation' in result
+        assert result["deployed"] is False
+        assert "reason" in result
+        assert "readiness_evaluation" in result
         assert len(deployment_system.deployment_history) == 0
 
 
@@ -526,7 +509,7 @@ class TestContinuousImprovementOrchestrator:
     @pytest.fixture
     def orchestrator(self, mock_quality_collector):
         """Create orchestrator instance."""
-        config = {'email_alerts': False}
+        config = {"email_alerts": False}
         return ContinuousImprovementOrchestrator(mock_quality_collector, config)
 
     def test_orchestrator_initialization(self, orchestrator):
@@ -544,9 +527,13 @@ class TestContinuousImprovementOrchestrator:
         spectrums = orchestrator._get_monitored_spectrums()
 
         expected_spectrums = {
-            'customer_profile', 'credit_analysis', 'transaction_history',
-            'call_center_operations', 'entity_relationship',
-            'geographic_analysis', 'temporal_analysis'
+            "customer_profile",
+            "credit_analysis",
+            "transaction_history",
+            "call_center_operations",
+            "entity_relationship",
+            "geographic_analysis",
+            "temporal_analysis",
         }
 
         assert set(spectrums) == expected_spectrums
@@ -555,58 +542,47 @@ class TestContinuousImprovementOrchestrator:
         """Test monitored spectrums extraction from recent metrics."""
         # Mock recent metrics
         mock_metrics = [
-            MagicMock(spectrum='spectrum_a'),
-            MagicMock(spectrum='spectrum_b'),
-            MagicMock(spectrum='spectrum_a'),  # Duplicate
-            MagicMock(spectrum='spectrum_c')
+            MagicMock(spectrum="spectrum_a"),
+            MagicMock(spectrum="spectrum_b"),
+            MagicMock(spectrum="spectrum_a"),  # Duplicate
+            MagicMock(spectrum="spectrum_c"),
         ]
         orchestrator.quality_collector.storage.get_recent_metrics.return_value = mock_metrics
 
         spectrums = orchestrator._get_monitored_spectrums()
 
-        assert set(spectrums) == {'spectrum_a', 'spectrum_b', 'spectrum_c'}
+        assert set(spectrums) == {"spectrum_a", "spectrum_b", "spectrum_c"}
 
     @pytest.mark.asyncio
     async def test_self_healing_cycle(self, orchestrator):
         """Test self-healing cycle execution."""
         # Mock spectrum health analysis
-        with patch.object(orchestrator, '_analyze_spectrum_health') as mock_analyze:
-            with patch.object(orchestrator, '_apply_self_healing') as mock_healing:
-                mock_analyze.return_value = {
-                    'needs_healing': True,
-                    'current_quality': 0.85,
-                    'healing_priority': 'high'
-                }
-                mock_healing.return_value = {
-                    'improvement_achieved': 0.04,
-                    'healing_strategy': 'quality_enhancement'
-                }
+        with patch.object(orchestrator, "_analyze_spectrum_health") as mock_analyze:
+            with patch.object(orchestrator, "_apply_self_healing") as mock_healing:
+                mock_analyze.return_value = {"needs_healing": True, "current_quality": 0.85, "healing_priority": "high"}
+                mock_healing.return_value = {"improvement_achieved": 0.04, "healing_strategy": "quality_enhancement"}
 
                 results = await orchestrator.run_self_healing_cycle()
 
-                assert 'cycle_id' in results
-                assert results['spectrums_analyzed'] > 0
-                assert len(results['healing_actions']) > 0
-                assert 'duration' in results
+                assert "cycle_id" in results
+                assert results["spectrums_analyzed"] > 0
+                assert len(results["healing_actions"]) > 0
+                assert "duration" in results
 
     @pytest.mark.asyncio
     async def test_spectrum_health_analysis(self, orchestrator):
         """Test spectrum health analysis."""
         # Mock quality metrics for health analysis
-        mock_metrics = [
-            MagicMock(score=0.87),
-            MagicMock(score=0.86),
-            MagicMock(score=0.88)
-        ]
+        mock_metrics = [MagicMock(score=0.87), MagicMock(score=0.86), MagicMock(score=0.88)]
         orchestrator.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
-        health = await orchestrator._analyze_spectrum_health('test_spectrum')
+        health = await orchestrator._analyze_spectrum_health("test_spectrum")
 
-        assert health['spectrum'] == 'test_spectrum'
-        assert health['current_quality'] == 0.87  # Average
-        assert health['needs_healing'] is True  # Below 0.90 threshold
-        assert health['healing_priority'] == 'medium'  # Above 0.85
-        assert 'below_quality_threshold' in health['issues']
+        assert health["spectrum"] == "test_spectrum"
+        assert health["current_quality"] == 0.87  # Average
+        assert health["needs_healing"] is True  # Below 0.90 threshold
+        assert health["healing_priority"] == "medium"  # Above 0.85
+        assert "below_quality_threshold" in health["issues"]
 
 
 class TestIntegrationScenarios:
@@ -622,42 +598,35 @@ class TestIntegrationScenarios:
     @pytest.fixture
     def full_system(self, mock_quality_collector):
         """Create full Phase 3 system for integration testing."""
-        config = {'email_alerts': False}
+        config = {"email_alerts": False}
         return ContinuousImprovementOrchestrator(mock_quality_collector, config)
 
     @pytest.mark.asyncio
     async def test_end_to_end_quality_degradation_response(self, full_system):
         """Test complete response to quality degradation."""
         # Mock poor quality metrics
-        mock_metrics = [
-            MagicMock(score=0.82),  # Below critical threshold
-            MagicMock(score=0.83),
-            MagicMock(score=0.81)
-        ]
+        mock_metrics = [MagicMock(score=0.82), MagicMock(score=0.83), MagicMock(score=0.81)]  # Below critical threshold
         full_system.quality_collector.storage.get_spectrum_metrics.return_value = mock_metrics
 
         # Mock successful optimization and deployment
-        with patch.object(full_system.self_improving_optimizer, 'optimize_with_learning') as mock_optimize:
-            with patch.object(full_system.deployment_system, 'deploy_optimization') as mock_deploy:
+        with patch.object(full_system.self_improving_optimizer, "optimize_with_learning") as mock_optimize:
+            with patch.object(full_system.deployment_system, "deploy_optimization") as mock_deploy:
                 mock_optimize.return_value = {
-                    'spectrum': 'test_spectrum',
-                    'strategy': 'quality_enhancement',
-                    'expected_improvement': 0.08,
-                    'confidence': 0.9,
-                    'optimized_prompt': 'Enhanced prompt'
+                    "spectrum": "test_spectrum",
+                    "strategy": "quality_enhancement",
+                    "expected_improvement": 0.08,
+                    "confidence": 0.9,
+                    "optimized_prompt": "Enhanced prompt",
                 }
-                mock_deploy.return_value = {
-                    'deployed': True,
-                    'deployment_id': 'deploy_001'
-                }
+                mock_deploy.return_value = {"deployed": True, "deployment_id": "deploy_001"}
 
                 # Run monitoring cycle
                 results = await full_system._run_monitoring_cycle()
 
                 # Verify complete workflow
-                assert results['alerts_generated'] > 0
-                assert results['optimizations_triggered'] > 0
-                assert results['improvements_deployed'] > 0
+                assert results["alerts_generated"] > 0
+                assert results["optimizations_triggered"] > 0
+                assert results["improvements_deployed"] > 0
 
     @pytest.mark.asyncio
     async def test_learning_accumulation_across_cycles(self, full_system):
@@ -665,10 +634,10 @@ class TestIntegrationScenarios:
         # Simulate multiple optimization cycles
         cycle_results = [
             {
-                'cycle_id': f'cycle_{i}',
-                'improvements': {'test_spectrum': {'quality_improvement': 0.03 + i * 0.01}},
-                'model_strategies': [{'optimization_approach': 'quality_enhancement'}],
-                'identified_patterns': [{'pattern_id': f'pattern_{i}'}]
+                "cycle_id": f"cycle_{i}",
+                "improvements": {"test_spectrum": {"quality_improvement": 0.03 + i * 0.01}},
+                "model_strategies": [{"optimization_approach": "quality_enhancement"}],
+                "identified_patterns": [{"pattern_id": f"pattern_{i}"}],
             }
             for i in range(3)
         ]
@@ -682,7 +651,7 @@ class TestIntegrationScenarios:
         assert len(patterns) > 0
 
         # Check that success counts increased
-        strategy_pattern = patterns.get('strategy_quality_enhancement')
+        strategy_pattern = patterns.get("strategy_quality_enhancement")
         assert strategy_pattern is not None
         assert strategy_pattern.success_count == 3
         assert strategy_pattern.confidence_score == 1.0  # All successful
@@ -691,7 +660,7 @@ class TestIntegrationScenarios:
     async def test_concurrent_optimization_limits(self, full_system):
         """Test concurrent optimization limits."""
         # Add spectrums to active optimizations
-        full_system.active_optimizations.update(['spectrum_1', 'spectrum_2', 'spectrum_3'])
+        full_system.active_optimizations.update(["spectrum_1", "spectrum_2", "spectrum_3"])
 
         # Create mock alert
         alert = QualityAlert(
@@ -703,11 +672,11 @@ class TestIntegrationScenarios:
             current_quality=0.80,
             threshold=0.85,
             message="Test alert",
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
 
         # Try to trigger optimization (should fail due to limit)
-        cycle_results = {'optimizations': [], 'deployments': []}
+        cycle_results = {"optimizations": [], "deployments": []}
         triggered = await full_system._trigger_optimization("spectrum_4", alert, cycle_results)
 
         assert triggered is False  # Should be rejected due to concurrent limit
@@ -729,11 +698,11 @@ class TestIntegrationScenarios:
             current_quality=0.87,
             threshold=0.90,
             message="Test alert",
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
 
         # Should be in cooldown (2 hours default)
-        cycle_results = {'optimizations': [], 'deployments': []}
+        cycle_results = {"optimizations": [], "deployments": []}
 
         # Use asyncio.run for the async method
         async def test_trigger():
@@ -757,17 +726,17 @@ class TestQualityMetricsIntegration:
 
             # Simulate quality metrics being fed to learning system
             cycle_data = {
-                'cycle_id': 'integration_test',
-                'improvements': {'test_spectrum': {'quality_improvement': 0.04}},
-                'model_strategies': [{'optimization_approach': 'integration_test'}],
-                'identified_patterns': []
+                "cycle_id": "integration_test",
+                "improvements": {"test_spectrum": {"quality_improvement": 0.04}},
+                "model_strategies": [{"optimization_approach": "integration_test"}],
+                "identified_patterns": [],
             }
 
             learning_accumulator.record_optimization_cycle(cycle_data)
 
             # Verify learning was recorded
             assert len(learning_accumulator.cycle_memory) == 1
-            assert 'strategy_integration_test' in learning_accumulator.learning_patterns
+            assert "strategy_integration_test" in learning_accumulator.learning_patterns
 
 
 # Performance and stress tests
@@ -791,12 +760,12 @@ class TestPerformanceAndStress:
                 current_quality=0.85,
                 threshold=0.90,
                 message=f"Stress test alert {i}",
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
             )
             alerts.append(alert)
 
         # Process all alerts
-        with patch.object(alerting_system, '_deliver_alert', new_callable=AsyncMock):
+        with patch.object(alerting_system, "_deliver_alert", new_callable=AsyncMock):
             start_time = datetime.now()
 
             tasks = [alerting_system.process_alert(alert) for alert in alerts]
@@ -829,7 +798,7 @@ class TestPerformanceAndStress:
                 applicable_contexts=["test_context"],
                 learned_optimizations=[],
                 confidence_score=0.83,
-                last_updated=datetime.now().isoformat()
+                last_updated=datetime.now().isoformat(),
             )
 
             accumulator1.learning_patterns["persistence_test"] = test_pattern

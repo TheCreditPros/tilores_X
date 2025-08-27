@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional
 # Graceful numpy import with fallback
 try:
     import numpy as np
+
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
@@ -80,7 +81,7 @@ class PromptAnalysis:
             QualityMetric.CLARITY: 0.15,
             QualityMetric.CONSISTENCY: 0.10,
             QualityMetric.PROFESSIONAL_TONE: 0.10,
-            QualityMetric.RESPONSE_TIME: 0.05
+            QualityMetric.RESPONSE_TIME: 0.05,
         }
 
         total_score = 0.0
@@ -122,7 +123,7 @@ class PromptAnalyzer:
             QualityMetric.CLARITY: 0.85,
             QualityMetric.CONSISTENCY: 0.90,
             QualityMetric.PROFESSIONAL_TONE: 0.95,
-            QualityMetric.RESPONSE_TIME: 0.75
+            QualityMetric.RESPONSE_TIME: 0.75,
         }
 
     def _initialize_analysis_patterns(self) -> Dict[str, Dict]:
@@ -130,43 +131,33 @@ class PromptAnalyzer:
         return {
             "clarity_indicators": {
                 "positive": [
-                    r"\bspecifically\b", r"\bclearly\b", r"\bexactly\b",
-                    r"\bprecisely\b", r"\bstep.by.step\b"
+                    r"\bspecifically\b",
+                    r"\bclearly\b",
+                    r"\bexactly\b",
+                    r"\bprecisely\b",
+                    r"\bstep.by.step\b",
                 ],
-                "negative": [
-                    r"\bmaybe\b", r"\bperhaps\b", r"\bsomewhat\b",
-                    r"\bkind of\b", r"\bsort of\b"
-                ]
+                "negative": [r"\bmaybe\b", r"\bperhaps\b", r"\bsomewhat\b", r"\bkind of\b", r"\bsort of\b"],
             },
             "instruction_quality": {
                 "strong_verbs": [
-                    r"\banalyze\b", r"\bevaluate\b", r"\bidentify\b",
-                    r"\bdetermine\b", r"\bcalculate\b", r"\bgenerate\b"
+                    r"\banalyze\b",
+                    r"\bevaluate\b",
+                    r"\bidentify\b",
+                    r"\bdetermine\b",
+                    r"\bcalculate\b",
+                    r"\bgenerate\b",
                 ],
-                "weak_verbs": [
-                    r"\btry\b", r"\battempt\b", r"\bconsider\b",
-                    r"\bthink about\b"
-                ]
+                "weak_verbs": [r"\btry\b", r"\battempt\b", r"\bconsider\b", r"\bthink about\b"],
             },
             "context_completeness": {
-                "context_markers": [
-                    r"\bgiven\b", r"\bcontext\b", r"\bbackground\b",
-                    r"\binformation\b", r"\bdata\b"
-                ],
-                "example_markers": [
-                    r"\bfor example\b", r"\bsuch as\b", r"\blike\b",
-                    r"\bincluding\b"
-                ]
+                "context_markers": [r"\bgiven\b", r"\bcontext\b", r"\bbackground\b", r"\binformation\b", r"\bdata\b"],
+                "example_markers": [r"\bfor example\b", r"\bsuch as\b", r"\blike\b", r"\bincluding\b"],
             },
             "professional_tone": {
-                "professional": [
-                    r"\bplease\b", r"\bkindly\b", r"\bthank you\b",
-                    r"\brespectfully\b"
-                ],
-                "unprofessional": [
-                    r"\bhey\b", r"\bguys\b", r"\bokay\b", r"\bawesome\b"
-                ]
-            }
+                "professional": [r"\bplease\b", r"\bkindly\b", r"\bthank you\b", r"\brespectfully\b"],
+                "unprofessional": [r"\bhey\b", r"\bguys\b", r"\bokay\b", r"\bawesome\b"],
+            },
         }
 
     def analyze_prompt(self, prompt: str, prompt_id: Optional[str] = None) -> PromptAnalysis:
@@ -192,9 +183,7 @@ class PromptAnalyzer:
         issues = self._identify_issues(prompt, quality_scores)
 
         # Determine improvement opportunities
-        opportunities = self._identify_improvement_opportunities(
-            prompt, quality_scores, issues
-        )
+        opportunities = self._identify_improvement_opportunities(prompt, quality_scores, issues)
 
         # Calculate complexity and readability
         complexity = self._calculate_complexity(prompt)
@@ -207,11 +196,10 @@ class PromptAnalyzer:
             identified_issues=issues,
             improvement_opportunities=opportunities,
             complexity_score=complexity,
-            readability_score=readability
+            readability_score=readability,
         )
 
-        logger.info(f"Analysis completed for {prompt_id}: "
-                    f"Overall quality={analysis.overall_quality:.3f}")
+        logger.info(f"Analysis completed for {prompt_id}: " f"Overall quality={analysis.overall_quality:.3f}")
 
         return analysis
 
@@ -220,10 +208,7 @@ class PromptAnalyzer:
         scores = {}
 
         # Accuracy score based on specific instructions
-        accuracy_indicators = len(re.findall(
-            r'\b(specific|exact|precise|accurate|correct)\b',
-            prompt.lower()
-        ))
+        accuracy_indicators = len(re.findall(r"\b(specific|exact|precise|accurate|correct)\b", prompt.lower()))
         scores[QualityMetric.ACCURACY] = min(1.0, accuracy_indicators * 0.2 + 0.5)
 
         # Relevance score based on context markers
@@ -236,22 +221,28 @@ class PromptAnalyzer:
 
         # Completeness score based on instruction coverage
         instruction_elements = [
-            r'\btask\b', r'\bgoal\b', r'\bobjective\b', r'\bformat\b',
-            r'\bexample\b', r'\bconstraint\b'
+            r"\btask\b",
+            r"\bgoal\b",
+            r"\bobjective\b",
+            r"\bformat\b",
+            r"\bexample\b",
+            r"\bconstraint\b",
         ]
-        completeness = sum(1 for pattern in instruction_elements
-                           if re.search(pattern, prompt.lower()))
+        completeness = sum(1 for pattern in instruction_elements if re.search(pattern, prompt.lower()))
         scores[QualityMetric.COMPLETENESS] = completeness / len(instruction_elements)
 
         # Clarity score based on clear language patterns
-        clarity_positive = sum(1 for pattern in
-                               self.analysis_patterns["clarity_indicators"]["positive"]
-                               if re.search(pattern, prompt.lower()))
-        clarity_negative = sum(1 for pattern in
-                               self.analysis_patterns["clarity_indicators"]["negative"]
-                               if re.search(pattern, prompt.lower()))
-        scores[QualityMetric.CLARITY] = max(0.0, min(1.0,
-                                                       0.7 + (clarity_positive * 0.1) - (clarity_negative * 0.2)))
+        clarity_positive = sum(
+            1
+            for pattern in self.analysis_patterns["clarity_indicators"]["positive"]
+            if re.search(pattern, prompt.lower())
+        )
+        clarity_negative = sum(
+            1
+            for pattern in self.analysis_patterns["clarity_indicators"]["negative"]
+            if re.search(pattern, prompt.lower())
+        )
+        scores[QualityMetric.CLARITY] = max(0.0, min(1.0, 0.7 + (clarity_positive * 0.1) - (clarity_negative * 0.2)))
 
         # Consistency score based on uniform terminology
         word_count = len(prompt.split())
@@ -260,14 +251,19 @@ class PromptAnalyzer:
         scores[QualityMetric.CONSISTENCY] = max(0.0, min(1.0, 1.2 - consistency_ratio))
 
         # Professional tone score
-        professional_markers = sum(1 for pattern in
-                                   self.analysis_patterns["professional_tone"]["professional"]
-                                   if re.search(pattern, prompt.lower()))
-        unprofessional_markers = sum(1 for pattern in
-                                     self.analysis_patterns["professional_tone"]["unprofessional"]
-                                     if re.search(pattern, prompt.lower()))
-        scores[QualityMetric.PROFESSIONAL_TONE] = max(0.0, min(1.0,
-                                                                0.8 + (professional_markers * 0.1) - (unprofessional_markers * 0.3)))
+        professional_markers = sum(
+            1
+            for pattern in self.analysis_patterns["professional_tone"]["professional"]
+            if re.search(pattern, prompt.lower())
+        )
+        unprofessional_markers = sum(
+            1
+            for pattern in self.analysis_patterns["professional_tone"]["unprofessional"]
+            if re.search(pattern, prompt.lower())
+        )
+        scores[QualityMetric.PROFESSIONAL_TONE] = max(
+            0.0, min(1.0, 0.8 + (professional_markers * 0.1) - (unprofessional_markers * 0.3))
+        )
 
         # Response time score (estimated based on prompt length)
         prompt_length = len(prompt)
@@ -282,8 +278,7 @@ class PromptAnalyzer:
 
         return scores
 
-    def _identify_issues(self, prompt: str,
-                         quality_scores: Dict[QualityMetric, float]) -> List[str]:
+    def _identify_issues(self, prompt: str, quality_scores: Dict[QualityMetric, float]) -> List[str]:
         """Identify specific issues in the prompt."""
         issues = []
 
@@ -309,17 +304,17 @@ class PromptAnalyzer:
         if len(prompt) < 50:
             issues.append("Prompt too short for comprehensive guidance")
 
-        if not re.search(r'\?', prompt):
+        if not re.search(r"\?", prompt):
             issues.append("No clear questions or tasks defined")
 
-        if prompt.count('.') < 2:
+        if prompt.count(".") < 2:
             issues.append("Lacks structured instructions")
 
         return issues
 
-    def _identify_improvement_opportunities(self, prompt: str,
-                                           quality_scores: Dict[QualityMetric, float],
-                                           issues: List[str]) -> List[OptimizationStrategy]:
+    def _identify_improvement_opportunities(
+        self, prompt: str, quality_scores: Dict[QualityMetric, float], issues: List[str]
+    ) -> List[OptimizationStrategy]:
         """Identify optimization strategies for improvement."""
         opportunities = []
 
@@ -333,15 +328,14 @@ class PromptAnalyzer:
         if quality_scores.get(QualityMetric.ACCURACY, 1.0) < 0.9:
             opportunities.append(OptimizationStrategy.INSTRUCTION_REFINEMENT)
 
-        if "No clear questions" in ' '.join(issues):
+        if "No clear questions" in " ".join(issues):
             opportunities.append(OptimizationStrategy.STRUCTURE_IMPROVEMENT)
 
         if quality_scores.get(QualityMetric.PROFESSIONAL_TONE, 1.0) < 0.9:
             opportunities.append(OptimizationStrategy.TONE_ADJUSTMENT)
 
         # Add example integration if prompt lacks examples
-        if not re.search(r'\bexample\b|\bfor instance\b|\bsuch as\b',
-                         prompt.lower()):
+        if not re.search(r"\bexample\b|\bfor instance\b|\bsuch as\b", prompt.lower()):
             opportunities.append(OptimizationStrategy.EXAMPLE_INTEGRATION)
 
         # Add constraint optimization if prompt is too lengthy
@@ -354,7 +348,7 @@ class PromptAnalyzer:
         """Calculate prompt complexity score."""
         # Factors contributing to complexity
         word_count = len(prompt.split())
-        sentence_count = len(re.findall(r'[.!?]+', prompt))
+        sentence_count = len(re.findall(r"[.!?]+", prompt))
         avg_sentence_length = word_count / sentence_count if sentence_count > 0 else word_count
 
         # Complex words (more than 6 characters)
@@ -362,21 +356,19 @@ class PromptAnalyzer:
         complex_word_ratio = complex_words / word_count if word_count > 0 else 0
 
         # Nested instructions (parentheses, colons, semicolons)
-        nesting_indicators = prompt.count('(') + prompt.count(':') + prompt.count(';')
+        nesting_indicators = prompt.count("(") + prompt.count(":") + prompt.count(";")
 
         # Normalize complexity score (0-1 scale)
-        complexity = min(1.0, (
-            (avg_sentence_length / 20) * 0.4
-            + complex_word_ratio * 0.4
-            + (nesting_indicators / 10) * 0.2
-        ))
+        complexity = min(
+            1.0, ((avg_sentence_length / 20) * 0.4 + complex_word_ratio * 0.4 + (nesting_indicators / 10) * 0.2)
+        )
 
         return complexity
 
     def _calculate_readability(self, prompt: str) -> float:
         """Calculate prompt readability score (simplified Flesch-like)."""
         words = prompt.split()
-        sentences = re.findall(r'[.!?]+', prompt)
+        sentences = re.findall(r"[.!?]+", prompt)
 
         if not words or not sentences:
             return 0.5
@@ -386,13 +378,12 @@ class PromptAnalyzer:
         # Count syllables (simplified: vowel groups)
         syllable_count = 0
         for word in words:
-            syllable_count += max(1, len(re.findall(r'[aeiouAEIOU]+', word)))
+            syllable_count += max(1, len(re.findall(r"[aeiouAEIOU]+", word)))
 
         avg_syllables_per_word = syllable_count / len(words)
 
         # Simplified readability score (higher is more readable)
-        readability = max(0.0, min(1.0,
-                                   1.2 - (avg_sentence_length / 25) - (avg_syllables_per_word / 3)))
+        readability = max(0.0, min(1.0, 1.2 - (avg_sentence_length / 25) - (avg_syllables_per_word / 3)))
 
         return readability
 
@@ -423,19 +414,16 @@ class AIPromptOptimizer:
                     ("might", "will"),
                     ("try to", ""),
                     ("kind of", ""),
-                    ("sort of", "")
+                    ("sort of", ""),
                 ],
-                "additions": [
-                    "Be specific and precise in your response.",
-                    "Provide clear, unambiguous information."
-                ]
+                "additions": ["Be specific and precise in your response.", "Provide clear, unambiguous information."],
             },
             OptimizationStrategy.CONTEXT_EXPANSION: {
                 "additions": [
                     "Context: You are working with Tilores customer data containing "
                     "310+ fields across multiple data spectrums.",
                     "Background: This system integrates with LangSmith for "
-                    "comprehensive monitoring and quality tracking."
+                    "comprehensive monitoring and quality tracking.",
                 ]
             },
             OptimizationStrategy.INSTRUCTION_REFINEMENT: {
@@ -443,39 +431,29 @@ class AIPromptOptimizer:
                     ("please try", "please"),
                     ("you should", "you must"),
                     ("consider", "analyze"),
-                    ("think about", "evaluate")
+                    ("think about", "evaluate"),
                 ],
-                "additions": [
-                    "Follow these instructions precisely.",
-                    "Ensure accuracy in all responses."
-                ]
+                "additions": ["Follow these instructions precisely.", "Ensure accuracy in all responses."],
             },
             OptimizationStrategy.EXAMPLE_INTEGRATION: {
                 "additions": [
                     "For example: When searching for customer 'John Doe', include client ID, email, and phone number in results.",
-                    "Example format: Provide structured data with clear field labels and values."
+                    "Example format: Provide structured data with clear field labels and values.",
                 ]
             },
             OptimizationStrategy.CONSTRAINT_OPTIMIZATION: {
                 "patterns": [
-                    (r'\s+', ' '),  # Multiple spaces to single space
-                    (r'\n\s*\n', '\n'),  # Multiple newlines to single
+                    (r"\s+", " "),  # Multiple spaces to single space
+                    (r"\n\s*\n", "\n"),  # Multiple newlines to single
                 ],
-                "removals": [
-                    "obviously", "clearly", "of course", "as you know"
-                ]
+                "removals": ["obviously", "clearly", "of course", "as you know"],
             },
             OptimizationStrategy.TONE_ADJUSTMENT: {
-                "patterns": [
-                    ("hey", ""),
-                    ("guys", ""),
-                    ("awesome", "excellent"),
-                    ("cool", "appropriate")
-                ],
+                "patterns": [("hey", ""), ("guys", ""), ("awesome", "excellent"), ("cool", "appropriate")],
                 "additions": [
                     "Maintain a professional and helpful tone.",
-                    "Provide courteous and respectful responses."
-                ]
+                    "Provide courteous and respectful responses.",
+                ],
             },
             OptimizationStrategy.STRUCTURE_IMPROVEMENT: {
                 "structure_template": """
@@ -490,11 +468,12 @@ class AIPromptOptimizer:
 
                 Constraints: {constraints}
                 """
-            }
+            },
         }
 
-    async def optimize_prompt(self, prompt: str,
-                            strategies: Optional[List[OptimizationStrategy]] = None) -> OptimizationResult:
+    async def optimize_prompt(
+        self, prompt: str, strategies: Optional[List[OptimizationStrategy]] = None
+    ) -> OptimizationResult:
         """
         Optimize a system prompt using AI-driven strategies.
 
@@ -525,7 +504,7 @@ class AIPromptOptimizer:
                 strategy_applied=OptimizationStrategy.CLARITY_ENHANCEMENT,
                 expected_improvement=0.0,
                 confidence_level=1.0,
-                validation_results={"no_optimization_needed": True}
+                validation_results={"no_optimization_needed": True},
             )
 
         # Apply optimization strategies
@@ -537,13 +516,10 @@ class AIPromptOptimizer:
             applied_strategies.append(strategy)
 
         # Analyze optimized prompt
-        optimized_analysis = self.analyzer.analyze_prompt(
-            optimized_prompt, f"{optimization_id}_optimized"
-        )
+        optimized_analysis = self.analyzer.analyze_prompt(optimized_prompt, f"{optimization_id}_optimized")
 
         # Calculate improvement metrics
-        expected_improvement = (optimized_analysis.overall_quality -
-                              analysis.overall_quality)
+        expected_improvement = optimized_analysis.overall_quality - analysis.overall_quality
         confidence_level = self._calculate_confidence(analysis, optimized_analysis)
 
         # Create optimization result
@@ -558,24 +534,22 @@ class AIPromptOptimizer:
                 "original_quality": analysis.overall_quality,
                 "optimized_quality": optimized_analysis.overall_quality,
                 "strategies_applied": [s.value for s in applied_strategies],
-                "issues_resolved": len(analysis.identified_issues) - len(optimized_analysis.identified_issues)
+                "issues_resolved": len(analysis.identified_issues) - len(optimized_analysis.identified_issues),
             },
-            metadata={
-                "original_analysis": analysis,
-                "optimized_analysis": optimized_analysis
-            }
+            metadata={"original_analysis": analysis, "optimized_analysis": optimized_analysis},
         )
 
         self.optimization_history.append(result)
 
-        logger.info(f"Optimization {optimization_id} completed: "
-                   f"Improvement={expected_improvement:.3f}, "
-                   f"Confidence={confidence_level:.3f}")
+        logger.info(
+            f"Optimization {optimization_id} completed: "
+            f"Improvement={expected_improvement:.3f}, "
+            f"Confidence={confidence_level:.3f}"
+        )
 
         return result
 
-    async def _apply_strategy(self, prompt: str,
-                            strategy: OptimizationStrategy) -> str:
+    async def _apply_strategy(self, prompt: str, strategy: OptimizationStrategy) -> str:
         """Apply a specific optimization strategy to a prompt."""
         template = self.strategy_templates.get(strategy, {})
         optimized_prompt = prompt
@@ -602,20 +576,18 @@ class AIPromptOptimizer:
         structure_template = template.get("structure_template")
         if structure_template and strategy == OptimizationStrategy.STRUCTURE_IMPROVEMENT:
             # Extract components from original prompt for structured format
-            optimized_prompt = self._apply_structure_template(
-                optimized_prompt, structure_template
-            )
+            optimized_prompt = self._apply_structure_template(optimized_prompt, structure_template)
 
         # Clean up extra whitespace
-        optimized_prompt = re.sub(r'\s+', ' ', optimized_prompt).strip()
-        optimized_prompt = re.sub(r'\n\s*\n', '\n\n', optimized_prompt)
+        optimized_prompt = re.sub(r"\s+", " ", optimized_prompt).strip()
+        optimized_prompt = re.sub(r"\n\s*\n", "\n\n", optimized_prompt)
 
         return optimized_prompt
 
     def _apply_structure_template(self, prompt: str, template: str) -> str:
         """Apply structured template to prompt."""
         # Simple structure application - in production, this would be more sophisticated
-        lines = prompt.split('\n')
+        lines = prompt.split("\n")
 
         # Extract task description (first meaningful line)
         task_description = next((line.strip() for line in lines if line.strip()), "Complete the requested task")
@@ -627,17 +599,15 @@ class AIPromptOptimizer:
             instruction_2="Apply appropriate processing based on data type",
             instruction_3="Provide accurate and complete results",
             output_format="Structured response with clear field labels",
-            constraints="Maintain data accuracy and professional tone"
+            constraints="Maintain data accuracy and professional tone",
         )
 
         return structured_prompt.strip()
 
-    def _calculate_confidence(self, original_analysis: PromptAnalysis,
-                            optimized_analysis: PromptAnalysis) -> float:
+    def _calculate_confidence(self, original_analysis: PromptAnalysis, optimized_analysis: PromptAnalysis) -> float:
         """Calculate confidence level for optimization results."""
         # Factors affecting confidence
-        quality_improvement = (optimized_analysis.overall_quality -
-                             original_analysis.overall_quality)
+        quality_improvement = optimized_analysis.overall_quality - original_analysis.overall_quality
 
         # Higher confidence for larger improvements
         improvement_confidence = min(1.0, max(0.0, quality_improvement * 2))
@@ -649,9 +619,7 @@ class AIPromptOptimizer:
         complexity_penalty = max(0.0, 1.0 - optimized_analysis.complexity_score)
 
         # Combined confidence score
-        confidence = (improvement_confidence * 0.5 +
-                     readability_confidence * 0.3 +
-                     complexity_penalty * 0.2)
+        confidence = improvement_confidence * 0.5 + readability_confidence * 0.3 + complexity_penalty * 0.2
 
         return max(0.1, min(1.0, confidence))
 
@@ -702,39 +670,30 @@ class AIPromptOptimizer:
             "success_rate": success_rate,
             "target_quality": self.target_quality,
             "strategy_performance": strategy_averages,
-            "recommendations": self._generate_recommendations(
-                avg_improvement, success_rate, strategy_averages
-            )
+            "recommendations": self._generate_recommendations(avg_improvement, success_rate, strategy_averages),
         }
 
-    def _generate_recommendations(self, avg_improvement: float,
-                                success_rate: float,
-                                strategy_performance: Dict[str, float]) -> List[str]:
+    def _generate_recommendations(
+        self, avg_improvement: float, success_rate: float, strategy_performance: Dict[str, float]
+    ) -> List[str]:
         """Generate recommendations based on optimization history."""
         recommendations = []
 
         if avg_improvement < 0.05:
-            recommendations.append(
-                "Average improvement is low. Consider more aggressive optimization strategies."
-            )
+            recommendations.append("Average improvement is low. Consider more aggressive optimization strategies.")
 
         if success_rate < 0.7:
-            recommendations.append(
-                "Success rate below 70%. Review prompt selection criteria."
-            )
+            recommendations.append("Success rate below 70%. Review prompt selection criteria.")
 
         # Identify best performing strategies
         if strategy_performance:
             best_strategy = max(strategy_performance.items(), key=lambda x: x[1])
             recommendations.append(
-                f"Most effective strategy: {best_strategy[0]} "
-                f"(avg improvement: {best_strategy[1]:.3f})"
+                f"Most effective strategy: {best_strategy[0]} " f"(avg improvement: {best_strategy[1]:.3f})"
             )
 
         if avg_improvement > 0.1:
-            recommendations.append(
-                "High improvement rates achieved. Consider applying optimizations more broadly."
-            )
+            recommendations.append("High improvement rates achieved. Consider applying optimizations more broadly.")
 
         return recommendations
 
@@ -743,7 +702,7 @@ class AIPromptOptimizer:
         export_data = {
             "optimizer_config": {
                 "target_quality": self.target_quality,
-                "total_optimizations": len(self.optimization_history)
+                "total_optimizations": len(self.optimization_history),
             },
             "optimizations": [
                 {
@@ -752,14 +711,14 @@ class AIPromptOptimizer:
                     "expected_improvement": r.expected_improvement,
                     "confidence_level": r.confidence_level,
                     "validation_results": r.validation_results,
-                    "timestamp": r.timestamp.isoformat()
+                    "timestamp": r.timestamp.isoformat(),
                 }
                 for r in self.optimization_history
             ],
-            "export_timestamp": datetime.now().isoformat()
+            "export_timestamp": datetime.now().isoformat(),
         }
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(export_data, f, indent=2)
 
         logger.info(f"Optimization history exported to {filename}")
