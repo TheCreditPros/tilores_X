@@ -715,6 +715,7 @@ if __name__ == "__main__":
     print("   • Professional UI comparable to ChatGPT")
     print("\n✅ Note: This version now uses REAL API calls to OpenAI, Anthropic, and Google!")
     print("   Set your API keys as environment variables to enable full functionality.")
+    print("   Deployment timestamp: 2025-08-27 18:05")
 
     # Use Railway's PORT environment variable or default to 8080
     port = int(os.getenv("PORT", 8080))
