@@ -208,6 +208,12 @@ if not dashboard_mounted:
     except Exception as e:
         print(f"❌ Error listing directory contents: {e}")
 
+# Mount dashboard static files
+app.mount("/dashboard", StaticFiles(directory="dashboard-static"), name="dashboard")
+
+# Mount chat interface
+app.mount("/chat", StaticFiles(directory="chat-interface"), name="chat")
+
 
 # OpenAI-compatible request/response models
 class ChatMessage(BaseModel):
