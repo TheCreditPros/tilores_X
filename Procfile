@@ -1,1 +1,1 @@
-web: python main_enhanced.py
+web: python openwebui_production.py
