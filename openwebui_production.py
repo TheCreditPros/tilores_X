@@ -606,11 +606,30 @@ async def chat_with_openai(request: ChatRequest) -> str:
         return "OpenAI API key not configured. Please set OPENAI_API_KEY environment variable."
 
     try:
-        # This would make actual OpenAI API calls
-        # For now, returning a simulated response
-        return f"OpenAI {request.model} response to: '{request.message}'\n\nThis is a simulated response. To enable real OpenAI integration, the actual API calls need to be implemented in the chat_with_openai function."
+        import requests
+
+        # Make actual OpenAI API call
+        headers = {"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"}
+
+        payload = {
+            "model": request.model,
+            "messages": [{"role": "user", "content": request.message}],
+            "max_tokens": request.max_tokens,
+            "temperature": request.temperature,
+        }
+
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=30
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
+        else:
+            return f"OpenAI API error: {response.status_code} - {response.text}"
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
+        return f"OpenAI API call failed: {str(e)}"
 
 
 async def chat_with_anthropic(request: ChatRequest) -> str:
@@ -619,10 +638,31 @@ async def chat_with_anthropic(request: ChatRequest) -> str:
         return "Anthropic API key not configured. Please set ANTHROPIC_API_KEY environment variable."
 
     try:
-        # This would make actual Anthropic API calls
-        return f"Anthropic {request.model} response to: '{request.message}'\n\nThis is a simulated response. To enable real Anthropic integration, the actual API calls need to be implemented in the chat_with_anthropic function."
+        import requests
+
+        # Make actual Anthropic API call
+        headers = {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "Content-Type": "application/json",
+            "anthropic-version": "2023-06-01",
+        }
+
+        payload = {
+            "model": request.model,
+            "max_tokens": request.max_tokens,
+            "messages": [{"role": "user", "content": request.message}],
+        }
+
+        response = requests.post("https://api.anthropic.com/v1/messages", headers=headers, json=payload, timeout=30)
+
+        if response.status_code == 200:
+            data = response.json()
+            return data["content"][0]["text"]
+        else:
+            return f"Anthropic API error: {response.status_code} - {response.text}"
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
+        return f"Anthropic API call failed: {str(e)}"
 
 
 async def chat_with_google(request: ChatRequest) -> str:
@@ -631,10 +671,31 @@ async def chat_with_google(request: ChatRequest) -> str:
         return "Google API key not configured. Please set GOOGLE_API_KEY environment variable."
 
     try:
-        # This would make actual Google API calls
-        return f"Google {request.model} response to: '{request.message}'\n\nThis is a simulated response. To enable real Google integration, the actual API calls need to be implemented in the chat_with_google function."
+        import requests
+
+        # Make actual Google Gemini API call
+        headers = {"Content-Type": "application/json"}
+
+        payload = {
+            "contents": [{"parts": [{"text": request.message}]}],
+            "generationConfig": {"temperature": request.temperature, "maxOutputTokens": request.max_tokens},
+        }
+
+        response = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{request.model}:generateContent?key={GOOGLE_API_KEY}",
+            headers=headers,
+            json=payload,
+            timeout=30,
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        else:
+            return f"Google API error: {response.status_code} - {response.text}"
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Google error: {str(e)}")
+        return f"Google API call failed: {str(e)}"
 
 
 @app.get("/v1/models/available")
@@ -652,8 +713,8 @@ if __name__ == "__main__":
     print("   • Model selection (OpenAI, Anthropic, Google)")
     print("   • Provider switching")
     print("   • Professional UI comparable to ChatGPT")
-    print("\n⚠️  Note: This is a simplified version with simulated responses.")
-    print("   To get real AI responses, implement the actual API calls in the chat functions.")
+    print("\n✅ Note: This version now uses REAL API calls to OpenAI, Anthropic, and Google!")
+    print("   Set your API keys as environment variables to enable full functionality.")
 
     # Use Railway's PORT environment variable or default to 8080
     port = int(os.getenv("PORT", 8080))
