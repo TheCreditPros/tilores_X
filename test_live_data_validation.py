@@ -11,7 +11,7 @@ from datetime import datetime
 def test_live_data_accuracy():
     """Test that all dashboard data points are live and accurate."""
 
-    base_url = "http://localhost:8080"
+    base_url = "http://localhost:9000"
 
     print("🔍 Testing Dashboard Data Live Accuracy & Virtuous Cycle Operations")
     print("=" * 70)
