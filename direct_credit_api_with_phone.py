@@ -14,10 +14,11 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
 import requests
+import redis
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ValidationError
 from dotenv import load_dotenv
 
@@ -53,13 +54,24 @@ class MultiProviderCreditAPI:
     def __init__(self):
         self.tilores_token = None
         self.token_expires_at = None
-        
+
         # Performance optimization - simple in-memory cache for recent queries
         self.query_cache = {}
         self.cache_ttl = 300  # 5 minutes cache for repeated queries
-        
+
         # Performance tracking
         self.active_requests = 0
+        
+        # Redis caching for Tilores responses
+        try:
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+            self.redis_client = redis.from_url(redis_url, decode_responses=True)
+            # Test connection
+            self.redis_client.ping()
+            print("✅ Redis connected successfully")
+        except Exception as e:
+            print(f"⚠️ Redis connection failed: {e}")
+            self.redis_client = None
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -211,9 +223,21 @@ class MultiProviderCreditAPI:
             return None
 
     async def _fetch_credit_data_async(self, entity_id: str) -> Optional[List[Dict]]:
-        """Async version of credit data fetch for parallel processing"""
-        return await asyncio.to_thread(self._fetch_credit_data, entity_id)
-    
+        """Async version of credit data fetch for parallel processing with caching"""
+        # Check cache first
+        cached_data = self._get_cached_tilores_data(entity_id, "credit")
+        if cached_data:
+            return cached_data.get("records")
+        
+        # Fetch from API
+        result = await asyncio.to_thread(self._fetch_credit_data, entity_id)
+        
+        # Cache the result
+        if result:
+            self._cache_tilores_data(entity_id, "credit", {"records": result})
+        
+        return result
+
     def _fetch_credit_data(self, entity_id=None):
         """Fetch credit data from Tilores API using proven working logic"""
         if not entity_id:
@@ -1254,7 +1278,7 @@ class MultiProviderCreditAPI:
         """Generate cache key for query"""
         cache_data = f"{query}:{json.dumps(search_params, sort_keys=True)}"
         return hashlib.md5(cache_data.encode()).hexdigest()
-    
+
     def _check_cache(self, cache_key: str) -> Optional[str]:
         """Check if response is cached"""
         if cache_key in self.query_cache:
@@ -1266,21 +1290,117 @@ class MultiProviderCreditAPI:
                 # Remove expired cache
                 del self.query_cache[cache_key]
         return None
-    
+
     def _cache_response(self, cache_key: str, response: str):
-        """Cache response"""
+        """Cache response in both memory and Redis"""
+        # Memory cache
         self.query_cache[cache_key] = {
             'response': response,
             'timestamp': datetime.now().timestamp()
         }
-        print(f"💾 Cached response for: {cache_key[:8]}...")
+        
+        # Redis cache for Tilores data
+        if self.redis_client:
+            try:
+                self.redis_client.setex(f"response:{cache_key}", self.cache_ttl, response)
+                print(f"💾 Cached response (Redis + Memory): {cache_key[:8]}...")
+            except Exception as e:
+                print(f"⚠️ Redis cache failed: {e}")
+                print(f"💾 Cached response (Memory only): {cache_key[:8]}...")
+        else:
+            print(f"💾 Cached response (Memory only): {cache_key[:8]}...")
+    
+    def _get_redis_cache(self, cache_key: str) -> Optional[str]:
+        """Get cached response from Redis"""
+        if self.redis_client:
+            try:
+                cached = self.redis_client.get(f"response:{cache_key}")
+                if cached:
+                    print(f"🚀 Redis cache hit: {cache_key[:8]}...")
+                    return cached
+            except Exception as e:
+                print(f"⚠️ Redis get failed: {e}")
+        return None
+    
+    def _cache_tilores_data(self, entity_id: str, data_type: str, data: dict):
+        """Cache Tilores API responses"""
+        if self.redis_client:
+            try:
+                cache_key = f"tilores:{data_type}:{entity_id}"
+                self.redis_client.setex(cache_key, 1800, json.dumps(data))  # 30 min cache
+                print(f"💾 Cached Tilores {data_type} data: {entity_id}")
+            except Exception as e:
+                print(f"⚠️ Tilores cache failed: {e}")
+    
+    def _get_cached_tilores_data(self, entity_id: str, data_type: str) -> Optional[dict]:
+        """Get cached Tilores data"""
+        if self.redis_client:
+            try:
+                cache_key = f"tilores:{data_type}:{entity_id}"
+                cached = self.redis_client.get(cache_key)
+                if cached:
+                    print(f"🚀 Tilores cache hit ({data_type}): {entity_id}")
+                    return json.loads(cached)
+            except Exception as e:
+                print(f"⚠️ Tilores cache get failed: {e}")
+        return None
+    
+    async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
+        """Generate streaming response chunks"""
+        import time
+        
+        # Split response into chunks for streaming
+        words = response_content.split()
+        chunk_size = 10  # Words per chunk
+        
+        for i in range(0, len(words), chunk_size):
+            chunk_words = words[i:i + chunk_size]
+            chunk_content = " " + " ".join(chunk_words) if i > 0 else " ".join(chunk_words)
+            
+            # Create SSE-formatted chunk
+            chunk_data = {
+                "id": request_id,
+                "object": "chat.completion.chunk",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "delta": {
+                            "content": chunk_content
+                        },
+                        "finish_reason": None
+                    }
+                ]
+            }
+            
+            yield f"data: {json.dumps(chunk_data)}\n\n"
+            await asyncio.sleep(0.05)  # Small delay for streaming effect
+        
+        # Send final chunk
+        final_chunk = {
+            "id": request_id,
+            "object": "chat.completion.chunk",
+            "created": int(time.time()),
+            "model": model,
+            "choices": [
+                {
+                    "index": 0,
+                    "delta": {},
+                    "finish_reason": "stop"
+                }
+            ]
+        }
+        
+        yield f"data: {json.dumps(final_chunk)}\n\n"
+        yield "data: [DONE]\n\n"
 
     async def process_chat_request(self, messages: List[ChatMessage], model: str, temperature: float = 0.7, max_tokens: Optional[int] = None):
         """Process chat request with credit data analysis using proven working logic"""
         self.active_requests += 1
         start_time = datetime.now()
         print(f"🔄 Processing request #{self.active_requests} started at {start_time.strftime('%H:%M:%S')}")
-        
+
         try:
             # Extract query from messages
             query = messages[-1].content if messages else ""
@@ -1309,9 +1429,16 @@ class MultiProviderCreditAPI:
 
             # Check cache for this query + customer combination
             cache_key = self._get_cache_key(query, search_params)
+            
+            # Check memory cache first
             cached_response = self._check_cache(cache_key)
             if cached_response:
                 return cached_response
+            
+            # Check Redis cache
+            redis_cached = self._get_redis_cache(cache_key)
+            if redis_cached:
+                return redis_cached
 
             # Search for the specific customer
             entity_id = self._search_for_customer(search_params)
@@ -1342,10 +1469,10 @@ class MultiProviderCreditAPI:
                 # Multi-data analysis - fetch all requested data types IN PARALLEL
                 print("🚀 Fetching multiple data types in parallel...")
                 fetch_start = datetime.now()
-                
+
                 # Create async tasks for parallel execution
                 tasks = []
-                
+
                 if has_credit_keywords or has_combined_keywords:
                     tasks.append(self._fetch_credit_data_async(entity_id))
                 else:
@@ -1370,7 +1497,7 @@ class MultiProviderCreditAPI:
                     tasks.append(self.get_zoho_ticket_data(entity_id))
                 else:
                     tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
-                
+
                 # Execute all data fetches in parallel with timeout
                 try:
                     results = await asyncio.wait_for(
@@ -1380,20 +1507,20 @@ class MultiProviderCreditAPI:
                 except asyncio.TimeoutError:
                     print("⚠️ Data fetch timeout - using partial results")
                     results = [None] * len(tasks)
-                
+
                 fetch_duration = (datetime.now() - fetch_start).total_seconds()
                 print(f"⚡ Parallel data fetch completed in {fetch_duration:.1f}s")
-                
+
                 # Process results
                 credit_records, phone_data, transaction_data, card_data, ticket_data = results
-                
+
                 # Handle credit data
                 if credit_records and not isinstance(credit_records, Exception):
                     temporal_data = self.extract_temporal_credit_data(credit_records)
                     context["temporal_credit_data"] = temporal_data
                 else:
                     context["temporal_credit_data"] = {}
-                
+
                 # Handle other data types
                 context["phone_call_data"] = phone_data if phone_data and not isinstance(phone_data, Exception) else {}
                 context["transaction_data"] = transaction_data if transaction_data and not isinstance(transaction_data, Exception) else {}
@@ -1443,7 +1570,7 @@ class MultiProviderCreditAPI:
                 credit_records = await self._fetch_credit_data_async(entity_id)
                 fetch_duration = (datetime.now() - fetch_start).total_seconds()
                 print(f"⚡ Credit data fetch completed in {fetch_duration:.1f}s")
-                
+
                 if not credit_records:
                     return f"No credit data found for the requested customer (Entity ID: {entity_id})."
 
@@ -1534,7 +1661,7 @@ class MultiProviderCreditAPI:
             else:
                 # Default to OpenAI
                 response = self._call_openai_with_context(ai_messages, "gpt-4o-mini", temperature, max_tokens)
-            
+
             # Cache successful response
             self._cache_response(cache_key, response)
             return response
@@ -1662,6 +1789,7 @@ async def chat_completions(request: Request):
         messages = request_data.get("messages", [])
         temperature = request_data.get("temperature", 0.7)
         max_tokens = request_data.get("max_tokens")
+        stream = request_data.get("stream", False)
 
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
 
@@ -1690,30 +1818,43 @@ async def chat_completions(request: Request):
             max_tokens
         )
 
-        # Create OpenAI-compatible response
-        response = {
-            "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
-            "object": "chat.completion",
-            "created": int(datetime.now().timestamp()),
-            "model": model,
-            "choices": [
-                {
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": response_content
-                    },
-                    "finish_reason": "stop"
+        # Handle streaming vs non-streaming response
+        if stream:
+            request_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
+            return StreamingResponse(
+                api._generate_streaming_response(response_content, request_id, model),
+                media_type="text/plain",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                    "Content-Type": "text/event-stream"
                 }
-            ],
-            "usage": {
-                "prompt_tokens": 0,  # Would need to implement token counting
-                "completion_tokens": 0,
-                "total_tokens": 0
+            )
+        else:
+            # Create OpenAI-compatible response
+            response = {
+                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
+                "object": "chat.completion",
+                "created": int(datetime.now().timestamp()),
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {
+                            "role": "assistant",
+                            "content": response_content
+                        },
+                        "finish_reason": "stop"
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 0,  # Would need to implement token counting
+                    "completion_tokens": 0,
+                    "total_tokens": 0
+                }
             }
-        }
 
-        return response
+            return response
 
     except json.JSONDecodeError as je:
         print(f"🚨 DEBUG: JSON decode error: {str(je)}")
