@@ -1494,100 +1494,99 @@ class MultiProviderCreditAPI:
             if has_status_keywords and not any([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords, has_combined_keywords]):
                 print("🔍 Processing customer status query...")
 
-                # Use transaction data to determine customer status (more reliable)
+                # Fetch Salesforce status data directly using entity records
                 try:
-                    transaction_data = await self.get_transaction_data(entity_id)
-                    print(f"🔍 Transaction data result: {transaction_data is not None}")
-                    if transaction_data:
-                        print(f"🔍 Transaction data keys: {list(transaction_data.keys())}")
-                        print(f"🔍 Records count: {len(transaction_data.get('records', []))}")
-                except Exception as e:
-                    print(f"⚠️ Error fetching transaction data: {e}")
-                    transaction_data = None
-
-                if transaction_data and transaction_data.get("records"):
-                    # Extract customer info and status from transaction data
-                    current_product = None
-                    latest_transaction_date = None
-                    total_amount = 0
-                    transaction_count = len(transaction_data["records"])
-                    recent_transactions = []
+                    # Use a simple GraphQL query to get Salesforce STATUS field
+                    query = """
+                    query SalesforceStatus($id: ID!) {
+                      entity(input: { id: $id }) {
+                        entity {
+                          id
+                          records {
+                            id
+                            STATUS
+                            FIRST_NAME
+                            LAST_NAME
+                            EMAIL
+                            CLIENT_ID
+                            PRODUCT_NAME
+                            CURRENT_PRODUCT
+                            ENROLL_DATE
+                          }
+                        }
+                      }
+                    }
+                    """
                     
-                    for record in transaction_data["records"]:
-                        if record.get("CURRENT_PRODUCT"):
-                            current_product = record.get("CURRENT_PRODUCT")
-                        
-                        # Get transaction date and amount
-                        trans_date = record.get("TRANSACTION_CREATED_DATE")
-                        if trans_date and (not latest_transaction_date or trans_date > latest_transaction_date):
-                            latest_transaction_date = trans_date
-                        
-                        amount = record.get("TRANSACTION_AMOUNT")
-                        if amount:
-                            try:
-                                amount_float = float(amount)
-                                total_amount += amount_float
-                                recent_transactions.append({
-                                    "date": trans_date,
-                                    "amount": amount_float,
-                                    "type": record.get("TYPE", "Unknown")
-                                })
-                            except (ValueError, TypeError):
-                                pass
+                    # Execute the query using the existing Tilores connection pattern
+                    token = self.get_tilores_token()
+                    response = requests.post(
+                        self.tilores_api_url,
+                        json={"query": query, "variables": {"id": entity_id}},
+                        headers={
+                            "Authorization": f"Bearer {token}",
+                            "Content-Type": "application/json"
+                        }
+                    )
+                    response.raise_for_status()
+                    result = response.json()
+                    print(f"🔍 Salesforce status query result: {result is not None}")
                     
-                    # Sort transactions by date (most recent first)
-                    recent_transactions.sort(key=lambda x: x.get("date", ""), reverse=True)
-                    
-                    # Determine account status based on transaction patterns
-                    if transaction_count > 0 and current_product:
-                        # Check for recent activity (within last 6 months)
-                        from datetime import timedelta
-                        six_months_ago = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
+                    entity_data = result.get("data", {}).get("entity", {}).get("entity")
+                    if entity_data and entity_data.get("records"):
+                        records = entity_data.get("records", [])
+                        print(f"🔍 Found {len(records)} records for status analysis")
                         
-                        recent_activity = any(
-                            trans.get("date", "") > six_months_ago 
-                            for trans in recent_transactions
-                        )
+                        # Extract status and customer info from records
+                        customer_status = None
+                        customer_name = None
+                        current_product = None
+                        enroll_date = None
                         
-                        if recent_activity:
-                            # Look for refunds/credits which might indicate cancellation
-                            has_refunds = any(
-                                trans.get("type", "").lower() in ["credit", "refund"] 
-                                for trans in recent_transactions[:3]  # Check last 3 transactions
-                            )
+                        for record in records:
+                            # Get the STATUS field (active/past due/cancelled)
+                            if record.get("STATUS"):
+                                customer_status = record.get("STATUS")
+                                print(f"🔍 Found STATUS: {customer_status}")
                             
-                            if has_refunds:
-                                inferred_status = "Recently Canceled (refund activity detected)"
-                            else:
-                                inferred_status = "Active"
+                            # Get customer name
+                            if record.get("FIRST_NAME") and record.get("LAST_NAME"):
+                                customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
+                            
+                            # Get product info
+                            if record.get("CURRENT_PRODUCT"):
+                                current_product = record.get("CURRENT_PRODUCT")
+                            elif record.get("PRODUCT_NAME"):
+                                current_product = record.get("PRODUCT_NAME")
+                            
+                            # Get enrollment date
+                            if record.get("ENROLL_DATE"):
+                                enroll_date = record.get("ENROLL_DATE")
+                        
+                        # Create concise Salesforce account status response
+                        if customer_status:
+                            response = "**Salesforce Account Status:**\n\n"
+                            response += f"• **Status:** {customer_status.title()}\n"
+                            
+                            if customer_name:
+                                response += f"• **Customer:** {customer_name}\n"
+                            
+                            if current_product:
+                                response += f"• **Product:** {current_product}\n"
+                            
+                            if enroll_date:
+                                response += f"• **Enrolled:** {enroll_date}\n"
+                            
+                            self._cache_response(cache_key, response)
+                            return response
                         else:
-                            inferred_status = "Inactive (no recent transactions)"
-                    elif transaction_count > 0:
-                        inferred_status = "Active (transaction history present)"
+                            return "**Salesforce Account Status:**\n\nNo STATUS field found in customer records. The customer may not have a defined account status."
                     else:
-                        inferred_status = "Unknown (no transaction data)"
-                    
-                    # Create concise status response focused on account status
-                    response = "**Salesforce Account Status:**\n\n"
-                    response += f"• **Account Status:** {inferred_status}\n"
-                    
-                    if current_product:
-                        response += f"• **Current Product:** {current_product}\n"
-                    
-                    if latest_transaction_date:
-                        response += f"• **Last Activity:** {latest_transaction_date}\n"
-                    
-                    # Show recent transaction summary
-                    if recent_transactions:
-                        response += f"• **Recent Transactions:** {len(recent_transactions[:5])} transactions\n"
-                        if len(recent_transactions) > 0:
-                            latest = recent_transactions[0]
-                            response += f"• **Latest Transaction:** ${latest.get('amount', 0):.2f} ({latest.get('type', 'Unknown')})\n"
-                    
-                    self._cache_response(cache_key, response)
-                    return response
-                else:
-                    return "No transaction data found for the specified customer. Unable to determine account status."
+                        return "No Salesforce records found for the specified customer."
+                        
+                except Exception as e:
+                    print(f"⚠️ Error fetching Salesforce status: {e}")
+                    return f"Error retrieving account status: {str(e)}"
 
             # Count how many data types are requested
             data_type_count = sum([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords])
