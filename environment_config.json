@@ -1,0 +1,16 @@
+{
+  "production": {
+    "API_BASE_URL": "https://tilores-x.up.railway.app",
+    "CHAT_ENDPOINT": "https://tilores-x.up.railway.app/v1/chat/completions",
+    "HEALTH_ENDPOINT": "https://tilores-x.up.railway.app/health",
+    "WEBHOOK_BASE": "https://tilores-x.up.railway.app/webhooks",
+    "ENVIRONMENT": "production"
+  },
+  "development": {
+    "API_BASE_URL": "http://localhost:8080",
+    "CHAT_ENDPOINT": "http://localhost:8080/v1/chat/completions",
+    "HEALTH_ENDPOINT": "http://localhost:8080/health",
+    "WEBHOOK_BASE": "http://localhost:8080/webhooks",
+    "ENVIRONMENT": "development"
+  }
+}
