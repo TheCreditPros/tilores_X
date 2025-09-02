@@ -1028,5 +1028,5 @@ async def get_langsmith_projects_health(request: Request):
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 9000))
     uvicorn.run(app, host="0.0.0.0", port=port)
