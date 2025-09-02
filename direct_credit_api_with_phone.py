@@ -43,6 +43,14 @@ class MultiProviderCreditAPI:
         self.tilores_client_id = os.getenv("TILORES_CLIENT_ID")
         self.tilores_client_secret = os.getenv("TILORES_CLIENT_SECRET")
         self.tilores_token_url = os.getenv("TILORES_OAUTH_TOKEN_URL")
+        
+        # Log configuration status for debugging
+        print(f"🔧 API Configuration:")
+        print(f"  - Tilores API URL: {'✅ Set' if self.tilores_api_url else '❌ Missing'}")
+        print(f"  - Tilores Client ID: {'✅ Set' if self.tilores_client_id else '❌ Missing'}")
+        print(f"  - Tilores Client Secret: {'✅ Set' if self.tilores_client_secret else '❌ Missing'}")
+        print(f"  - Tilores Token URL: {'✅ Set' if self.tilores_token_url else '❌ Missing'}")
+        print(f"  - OpenAI API Key: {'✅ Set' if os.getenv('OPENAI_API_KEY') else '❌ Missing'}")
 
         # Provider configurations
         self.providers = {
@@ -1406,6 +1414,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    print("🚀 Multi-Provider Credit Analysis API starting up...")
+    print(f"🌐 Server will bind to 0.0.0.0:{os.environ.get('PORT', 8081)}")
+    print("✅ Application startup complete")
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "multi-provider-credit-api", "version": "1.0.0"}
@@ -1486,4 +1500,8 @@ async def chat_completions(request: ChatCompletionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8081)
+    import os
+    
+    # Railway provides PORT environment variable
+    port = int(os.environ.get("PORT", 8081))
+    uvicorn.run(app, host="0.0.0.0", port=port)
