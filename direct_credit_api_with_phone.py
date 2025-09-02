@@ -42,7 +42,7 @@ class ChatCompletionRequest(BaseModel):
     top_p: Optional[float] = None
     n: Optional[int] = None
     user: Optional[str] = None
-    
+
     class Config:
         # Allow extra fields that we don't explicitly define
         extra = "allow"
@@ -1450,14 +1450,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     print(f"🚨 DEBUG: Request URL: {request.url}")
     print(f"🚨 DEBUG: Request method: {request.method}")
     print(f"🚨 DEBUG: Validation errors: {exc.errors()}")
-    
+
     # Try to get the raw request body for debugging
     try:
         body = await request.body()
         print(f"🚨 DEBUG: Request body: {body.decode()}")
     except:
         print("🚨 DEBUG: Could not read request body")
-    
+
     return JSONResponse(
         status_code=422,
         content={"detail": f"Validation error: {exc.errors()}", "body": "Check server logs for details"}
@@ -1512,22 +1512,37 @@ async def get_models():
     return {"object": "list", "data": models}
 
 @app.post("/v1/chat/completions")
-async def chat_completions(request: ChatCompletionRequest):
+async def chat_completions(request: Request):
     """Chat completions endpoint supporting multiple providers"""
     try:
+        # Get raw request body and parse it
+        body = await request.body()
+        request_data = json.loads(body.decode())
+        
         # Debug logging for troubleshooting Agenta.ai requests
-        print(f"🔍 DEBUG: Received request with model: {request.model}")
-        print(f"🔍 DEBUG: Messages count: {len(request.messages)}")
-        print(f"🔍 DEBUG: First message: {request.messages[0] if request.messages else 'None'}")
-        print(f"🔍 DEBUG: Temperature: {request.temperature}")
-        print(f"🔍 DEBUG: Max tokens: {request.max_tokens}")
-
+        print(f"🔍 DEBUG: Raw request body: {body.decode()}")
+        print(f"🔍 DEBUG: Parsed request data: {request_data}")
+        print(f"🔍 DEBUG: Request headers: {dict(request.headers)}")
+        
+        # Extract required fields with defaults
+        model = request_data.get("model", "gpt-4o-mini")
+        messages = request_data.get("messages", [])
+        temperature = request_data.get("temperature", 0.7)
+        max_tokens = request_data.get("max_tokens")
+        
+        print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
+        
+        # Convert messages to our format
+        chat_messages = []
+        for msg in messages:
+            chat_messages.append(ChatMessage(role=msg.get("role", "user"), content=msg.get("content", "")))
+        
         # Process the request
         response_content = await api.process_chat_request(
-            request.messages,
-            request.model,
-            request.temperature,
-            request.max_tokens
+            chat_messages,
+            model,
+            temperature,
+            max_tokens
         )
 
         # Create OpenAI-compatible response
@@ -1555,11 +1570,17 @@ async def chat_completions(request: ChatCompletionRequest):
 
         return response
 
+    except json.JSONDecodeError as je:
+        print(f"🚨 DEBUG: JSON decode error: {str(je)}")
+        raise HTTPException(status_code=422, detail=f"Invalid JSON: {str(je)}")
     except ValueError as ve:
         print(f"🚨 DEBUG: ValueError in chat_completions: {str(ve)}")
         raise HTTPException(status_code=422, detail=f"Validation error: {str(ve)}")
     except Exception as e:
         print(f"🚨 DEBUG: Exception in chat_completions: {str(e)}")
+        print(f"🚨 DEBUG: Exception type: {type(e)}")
+        import traceback
+        print(f"🚨 DEBUG: Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
