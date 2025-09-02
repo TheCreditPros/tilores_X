@@ -12,9 +12,11 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ValidationError
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -32,7 +34,18 @@ class ChatCompletionRequest(BaseModel):
     messages: List[ChatMessage]
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = None
-    stream: bool = False
+    stream: Optional[bool] = False
+    # Additional OpenAI-compatible fields that Agenta.ai might send
+    stop: Optional[List[str]] = None
+    presence_penalty: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    top_p: Optional[float] = None
+    n: Optional[int] = None
+    user: Optional[str] = None
+    
+    class Config:
+        # Allow extra fields that we don't explicitly define
+        extra = "allow"
 
 class MultiProviderCreditAPI:
     def __init__(self):
@@ -1430,6 +1443,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add validation error handler for debugging
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print(f"🚨 DEBUG: Validation error from {request.client.host}")
+    print(f"🚨 DEBUG: Request URL: {request.url}")
+    print(f"🚨 DEBUG: Request method: {request.method}")
+    print(f"🚨 DEBUG: Validation errors: {exc.errors()}")
+    
+    # Try to get the raw request body for debugging
+    try:
+        body = await request.body()
+        print(f"🚨 DEBUG: Request body: {body.decode()}")
+    except:
+        print("🚨 DEBUG: Could not read request body")
+    
+    return JSONResponse(
+        status_code=422,
+        content={"detail": f"Validation error: {exc.errors()}", "body": "Check server logs for details"}
+    )
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "multi-provider-credit-api", "version": "1.0.0"}
@@ -1488,7 +1521,7 @@ async def chat_completions(request: ChatCompletionRequest):
         print(f"🔍 DEBUG: First message: {request.messages[0] if request.messages else 'None'}")
         print(f"🔍 DEBUG: Temperature: {request.temperature}")
         print(f"🔍 DEBUG: Max tokens: {request.max_tokens}")
-        
+
         # Process the request
         response_content = await api.process_chat_request(
             request.messages,
