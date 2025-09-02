@@ -1,34 +1,12 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "gcc", "nodejs", "nodePackages.npm"]
+nixPkgs = ["python311", "python311Packages.pip"]
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements.txt",
-  "cd dashboard && npm install --include=dev",
-  "cd dashboard && npm run build",
-  "echo 'Build completed, checking artifacts:'",
-  "ls -la dashboard/",
-  "ls -la dashboard/dist/ || echo 'ERROR: Dashboard dist directory not found'",
-  "ls -la dashboard/dist/assets/ || echo 'ERROR: Dashboard assets not found'",
-  "find dashboard/dist -type f -name '*.js' -o -name '*.html' || echo 'ERROR: No build files found'",
-  "echo 'Copying dashboard build to root directory for deployment:'",
-  "cp -r dashboard/dist ./dashboard-static",
-  "ls -la dashboard-static/ || echo 'ERROR: Failed to copy dashboard-static'",
-  "ls -la dashboard-static/assets/ || echo 'ERROR: Dashboard-static assets missing'",
-  "echo 'Current working directory contents:'",
-  "pwd && ls -la"
-]
-
-[phases.build]
-cmds = [
-  "echo 'Build phase - verifying dashboard artifacts are preserved'",
-  "ls -la dashboard/dist/ || echo 'WARNING: Dashboard dist missing in build phase'",
-  "ls -la dashboard-static/ || echo 'WARNING: Dashboard-static missing in build phase'",
-  "cp -r dashboard/dist /tmp/dashboard-backup || echo 'Could not backup dashboard'",
-  "cp -r dashboard-static /tmp/dashboard-static-backup || echo 'Could not backup dashboard-static'",
-  "ls -la /tmp/dashboard-backup || echo 'Backup verification failed'",
-  "ls -la /tmp/dashboard-static-backup || echo 'Static backup verification failed'"
+  "pip install --break-system-packages -r requirements_direct.txt",
+  "echo 'Production API build completed'",
+  "ls -la direct_credit_api_with_phone.py"
 ]
 
 [start]
-cmd = "python main_enhanced.py"
+cmd = "python direct_credit_api_with_phone.py"
