@@ -1518,25 +1518,25 @@ async def chat_completions(request: Request):
         # Get raw request body and parse it
         body = await request.body()
         request_data = json.loads(body.decode())
-        
+
         # Debug logging for troubleshooting Agenta.ai requests
         print(f"🔍 DEBUG: Raw request body: {body.decode()}")
         print(f"🔍 DEBUG: Parsed request data: {request_data}")
         print(f"🔍 DEBUG: Request headers: {dict(request.headers)}")
-        
+
         # Extract required fields with defaults
         model = request_data.get("model", "gpt-4o-mini")
         messages = request_data.get("messages", [])
         temperature = request_data.get("temperature", 0.7)
         max_tokens = request_data.get("max_tokens")
-        
+
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
-        
+
         # Convert messages to our format
         chat_messages = []
         for msg in messages:
             chat_messages.append(ChatMessage(role=msg.get("role", "user"), content=msg.get("content", "")))
-        
+
         # Process the request
         response_content = await api.process_chat_request(
             chat_messages,
@@ -1550,7 +1550,7 @@ async def chat_completions(request: Request):
             "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
             "object": "chat.completion",
             "created": int(datetime.now().timestamp()),
-            "model": request.model,
+            "model": model,
             "choices": [
                 {
                     "index": 0,
