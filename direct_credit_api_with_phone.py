@@ -1416,7 +1416,7 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="Multi-Provider Credit Analysis API", 
+    title="Multi-Provider Credit Analysis API",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -1433,6 +1433,16 @@ app.add_middleware(
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "multi-provider-credit-api", "version": "1.0.0"}
+
+@app.get("/v1")
+async def v1_info():
+    """OpenAI-compatible API info endpoint for validation"""
+    return {
+        "object": "api",
+        "version": "v1",
+        "service": "tilores-multi-data-analysis",
+        "compatible": "openai"
+    }
 
 @app.get("/v1/models")
 async def get_models():
@@ -1510,7 +1520,7 @@ async def chat_completions(request: ChatCompletionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     # Railway provides PORT environment variable
     port = int(os.environ.get("PORT", 8081))
     uvicorn.run(app, host="0.0.0.0", port=port)
