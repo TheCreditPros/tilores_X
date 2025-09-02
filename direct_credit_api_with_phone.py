@@ -165,7 +165,7 @@ class MultiProviderCreditAPI:
             for pattern in general_question_patterns:
                 if re.search(pattern, query, re.IGNORECASE):
                     return {}  # This is a general question, not a customer lookup
-            
+
             # Special case: "status with thecreditpros" without customer identifier
             if re.search(r'\bstatus\s+with\s+(thecreditpros|credit\s*pros)\b', query, re.IGNORECASE):
                 return {}  # General company status question
@@ -237,83 +237,7 @@ class MultiProviderCreditAPI:
             print(f"Error searching for customer: {e}")
             return None
 
-    def _fetch_customer_status_data(self, entity_id: str) -> Optional[Dict]:
-        """Fetch customer status and account information from Salesforce data"""
-        try:
-            query = """
-            query CustomerStatusData($id: ID!) {
-              entity(input: { id: $id }) {
-                entity {
-                  id
-                  recordInsights {
-                    customerStatus: frequencyDistribution(field: "STATUS", direction: DESC) {
-                      value
-                      frequency
-                    }
-                    products: valuesDistinct(field: "PRODUCT_NAME")
-                    enrollmentDates: valuesDistinct(field: "ENROLL_DATE")
-                    currentProducts: valuesDistinct(field: "CURRENT_PRODUCT")
-                  }
-                  records {
-                    id
-                    STATUS
-                    PRODUCT_NAME
-                    CURRENT_PRODUCT
-                    ENROLL_DATE
-                    FIRST_NAME
-                    LAST_NAME
-                    EMAIL
-                    CLIENT_ID
-                  }
-                }
-              }
-            }
-            """
-            
-            result = self.tilores.gql(query, {"id": entity_id})
-            print(f"🔍 Status query result: {result}")
-            entity_data = result.get("data", {}).get("entity", {}).get("entity")
-            
-            if not entity_data:
-                print("⚠️ No entity data found for status query")
-                return None
-                
-            records = entity_data.get("records", [])
-            insights = entity_data.get("recordInsights", {})
-            
-            # Extract current status from records
-            current_status = None
-            customer_name = None
-            current_product = None
-            enroll_date = None
-            
-            # Get the most recent status from records
-            for record in records:
-                if record.get("STATUS"):
-                    current_status = record.get("STATUS")
-                if record.get("FIRST_NAME") and record.get("LAST_NAME"):
-                    customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
-                if record.get("CURRENT_PRODUCT"):
-                    current_product = record.get("CURRENT_PRODUCT")
-                if record.get("ENROLL_DATE"):
-                    enroll_date = record.get("ENROLL_DATE")
-            
-            # Get status distribution from insights
-            status_distribution = insights.get("customerStatus", [])
-            
-            return {
-                "entity_id": entity_id,
-                "current_status": current_status,
-                "customer_name": customer_name,
-                "current_product": current_product,
-                "enroll_date": enroll_date,
-                "status_distribution": status_distribution,
-                "records_count": len(records)
-            }
-            
-        except Exception as e:
-            print(f"⚠️ Error fetching customer status: {e}")
-            return None
+    
 
     async def _fetch_credit_data_async(self, entity_id: str) -> Optional[List[Dict]]:
         """Async version of credit data fetch for parallel processing with caching"""
@@ -1541,7 +1465,16 @@ class MultiProviderCreditAPI:
 
             # Determine query type and route accordingly
             query_lower = query.lower()
-            has_status_keywords = any(keyword in query_lower for keyword in ['status', 'active', 'canceled', 'cancelled', 'past due', 'current status', 'account status'])
+            # Detect account status queries (Salesforce status: active/canceled/past due)
+            account_status_keywords = ['account status', 'customer status', 'subscription status', 'enrollment status', 'active', 'canceled', 'cancelled', 'past due', 'current status']
+            has_status_keywords = any(keyword in query_lower for keyword in account_status_keywords)
+            
+            # Exclude credit-related status queries
+            credit_status_indicators = ['credit status', 'credit score', 'bureau', 'utilization', 'tradeline']
+            is_credit_status_query = any(indicator in query_lower for indicator in credit_status_indicators)
+            
+            # Only treat as account status if it's not a credit status query
+            has_status_keywords = has_status_keywords and not is_credit_status_query
             print(f"🔍 Query analysis: has_status_keywords={has_status_keywords}, query='{query_lower}'")
             has_credit_keywords = any(keyword in query_lower for keyword in ['credit', 'score', 'bureau', 'utilization', 'inquiry'])
             has_phone_keywords = any(keyword in query_lower for keyword in ['call', 'phone', 'agent', 'campaign', 'duration'])
@@ -1560,21 +1493,25 @@ class MultiProviderCreditAPI:
             # Handle status queries with concise responses
             if has_status_keywords and not any([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords, has_combined_keywords]):
                 print("🔍 Processing customer status query...")
-                
+
                 # Use transaction data to determine customer status (more reliable)
                 try:
-                    transaction_data = self.get_transaction_data(entity_id)
+                    transaction_data = await self.get_transaction_data(entity_id)
                     print(f"🔍 Transaction data result: {transaction_data is not None}")
+                    if transaction_data:
+                        print(f"🔍 Transaction data keys: {list(transaction_data.keys())}")
+                        print(f"🔍 Records count: {len(transaction_data.get('records', []))}")
                 except Exception as e:
                     print(f"⚠️ Error fetching transaction data: {e}")
                     transaction_data = None
-                
+
                 if transaction_data and transaction_data.get("records"):
                     # Extract customer info and status from transaction data
                     current_product = None
                     latest_transaction_date = None
                     total_amount = 0
                     transaction_count = len(transaction_data["records"])
+                    recent_transactions = []
                     
                     for record in transaction_data["records"]:
                         if record.get("CURRENT_PRODUCT"):
@@ -1588,32 +1525,64 @@ class MultiProviderCreditAPI:
                         amount = record.get("TRANSACTION_AMOUNT")
                         if amount:
                             try:
-                                total_amount += float(amount)
+                                amount_float = float(amount)
+                                total_amount += amount_float
+                                recent_transactions.append({
+                                    "date": trans_date,
+                                    "amount": amount_float,
+                                    "type": record.get("TYPE", "Unknown")
+                                })
                             except (ValueError, TypeError):
                                 pass
                     
-                    # Infer status from transaction activity
-                    if transaction_count > 0 and current_product:
-                        inferred_status = "Active"
-                    elif transaction_count > 0:
-                        inferred_status = "Active (transactions present)"
-                    else:
-                        inferred_status = "Unknown"
+                    # Sort transactions by date (most recent first)
+                    recent_transactions.sort(key=lambda x: x.get("date", ""), reverse=True)
                     
-                    # Create concise status response
-                    response = "**Customer Account Status:**\n\n"
-                    response += f"• **Status:** {inferred_status}\n"
+                    # Determine account status based on transaction patterns
+                    if transaction_count > 0 and current_product:
+                        # Check for recent activity (within last 6 months)
+                        from datetime import timedelta
+                        six_months_ago = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
+                        
+                        recent_activity = any(
+                            trans.get("date", "") > six_months_ago 
+                            for trans in recent_transactions
+                        )
+                        
+                        if recent_activity:
+                            # Look for refunds/credits which might indicate cancellation
+                            has_refunds = any(
+                                trans.get("type", "").lower() in ["credit", "refund"] 
+                                for trans in recent_transactions[:3]  # Check last 3 transactions
+                            )
+                            
+                            if has_refunds:
+                                inferred_status = "Recently Canceled (refund activity detected)"
+                            else:
+                                inferred_status = "Active"
+                        else:
+                            inferred_status = "Inactive (no recent transactions)"
+                    elif transaction_count > 0:
+                        inferred_status = "Active (transaction history present)"
+                    else:
+                        inferred_status = "Unknown (no transaction data)"
+                    
+                    # Create concise status response focused on account status
+                    response = "**Salesforce Account Status:**\n\n"
+                    response += f"• **Account Status:** {inferred_status}\n"
                     
                     if current_product:
                         response += f"• **Current Product:** {current_product}\n"
                     
                     if latest_transaction_date:
-                        response += f"• **Latest Transaction:** {latest_transaction_date}\n"
+                        response += f"• **Last Activity:** {latest_transaction_date}\n"
                     
-                    response += f"• **Total Transactions:** {transaction_count}\n"
-                    
-                    if total_amount > 0:
-                        response += f"• **Total Transaction Amount:** ${total_amount:.2f}\n"
+                    # Show recent transaction summary
+                    if recent_transactions:
+                        response += f"• **Recent Transactions:** {len(recent_transactions[:5])} transactions\n"
+                        if len(recent_transactions) > 0:
+                            latest = recent_transactions[0]
+                            response += f"• **Latest Transaction:** ${latest.get('amount', 0):.2f} ({latest.get('type', 'Unknown')})\n"
                     
                     self._cache_response(cache_key, response)
                     return response
