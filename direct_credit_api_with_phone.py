@@ -44,9 +44,9 @@ class MultiProviderCreditAPI:
         self.tilores_client_id = os.getenv("TILORES_CLIENT_ID")
         self.tilores_client_secret = os.getenv("TILORES_CLIENT_SECRET")
         self.tilores_token_url = os.getenv("TILORES_OAUTH_TOKEN_URL")
-        
+
         # Log configuration status for debugging
-        print(f"🔧 API Configuration:")
+        print("🔧 API Configuration:")
         print(f"  - Tilores API URL: {'✅ Set' if self.tilores_api_url else '❌ Missing'}")
         print(f"  - Tilores Client ID: {'✅ Set' if self.tilores_client_id else '❌ Missing'}")
         print(f"  - Tilores Client Secret: {'✅ Set' if self.tilores_client_secret else '❌ Missing'}")
@@ -1403,6 +1403,17 @@ class MultiProviderCreditAPI:
 # Initialize the API
 api = MultiProviderCreditAPI()
 
+# Define lifespan handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    print("🚀 Multi-Provider Credit Analysis API starting up...")
+    print(f"🌐 Server will bind to 0.0.0.0:{os.environ.get('PORT', 8081)}")
+    print("✅ Application startup complete")
+    yield
+    # Shutdown (if needed)
+    print("🛑 Application shutting down...")
+
 # Create FastAPI app
 app = FastAPI(
     title="Multi-Provider Credit Analysis API", 
@@ -1418,16 +1429,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    print("🚀 Multi-Provider Credit Analysis API starting up...")
-    print(f"🌐 Server will bind to 0.0.0.0:{os.environ.get('PORT', 8081)}")
-    print("✅ Application startup complete")
-    yield
-    # Shutdown (if needed)
-    print("🛑 Application shutting down...")
 
 @app.get("/health")
 async def health_check():
@@ -1509,7 +1510,6 @@ async def chat_completions(request: ChatCompletionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    import os
     
     # Railway provides PORT environment variable
     port = int(os.environ.get("PORT", 8081))
