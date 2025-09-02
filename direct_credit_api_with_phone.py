@@ -121,7 +121,20 @@ class MultiProviderCreditAPI:
         """Parse query to extract customer search parameters"""
         import re
 
-        # Email extraction
+        # Skip general questions that don't reference specific customers
+        general_question_patterns = [
+            r'\bwhat\s+is\s+the\s+(current\s+)?status\s+with\b',
+            r'\bhow\s+does\s+.*\s+work\b',
+            r'\bwhat\s+does\s+.*\s+do\b',
+            r'\bcan\s+you\s+(help|tell|explain)\b',
+            r'\bwhat\s+are\s+the\s+(features|benefits|options)\b'
+        ]
+        
+        for pattern in general_question_patterns:
+            if re.search(pattern, query, re.IGNORECASE):
+                return {}  # This is a general question, not a customer lookup
+
+        # Email extraction (most reliable identifier)
         email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', query)
         if email_match:
             return {"EMAIL": email_match.group()}
@@ -131,10 +144,18 @@ class MultiProviderCreditAPI:
         if phone_match:
             return {"PHONE_NUMBER": phone_match.group()}
 
-        # Client ID extraction
-        client_id_match = re.search(r'\b[A-Za-z0-9]{10,20}\b', query)
+        # Client ID extraction (numeric only, 4-15 digits, but avoid years/dates)
+        client_id_match = re.search(r'\b\d{4,15}\b', query)
         if client_id_match:
-            return {"CLIENT_ID": client_id_match.group()}
+            # Avoid matching years (1900-2100) or common numbers
+            number = client_id_match.group()
+            if not (1900 <= int(number) <= 2100 and len(number) == 4):
+                return {"CLIENT_ID": number}
+
+        # Salesforce ID pattern (more specific)
+        salesforce_match = re.search(r'\b003[A-Za-z0-9]{15}\b', query)
+        if salesforce_match:
+            return {"SALESFORCE_ID": salesforce_match.group()}
 
         return {}
 
@@ -1225,9 +1246,13 @@ class MultiProviderCreditAPI:
             # Parse query to find customer identifier
             search_params = self._parse_query_for_customer(query)
 
-            # If no customer found in query, return error (no fallback to sensitive data)
+            # If no customer found in query, handle as general question
             if not search_params:
-                return "Error: Could not identify customer from query. Please provide email, phone number, client ID, or customer name."
+                # Check if this is a general question about the company/service
+                if any(keyword in query.lower() for keyword in ['thecreditpros', 'credit pros', 'company', 'service', 'status', 'help']):
+                    return "I'm a customer service assistant for TheCreditPros. I can help you analyze customer credit data, transaction history, call records, and support tickets. To get started, please provide a customer identifier such as an email address, phone number, or client ID."
+                else:
+                    return "Error: Could not identify customer from query. Please provide email, phone number, client ID, or customer name."
 
             # Search for the specific customer
             entity_id = self._search_for_customer(search_params)
@@ -1536,8 +1561,8 @@ async def chat_completions(request: Request):
         chat_messages = []
         for msg in messages:
             content = msg.get("content", "")
-            
-            # Handle structured content (list format) - extract text from first text block
+
+            # Handle structured content (list format) - extract text from ALL text blocks
             if isinstance(content, list):
                 print(f"🔍 DEBUG: Converting structured content: {content}")
                 text_content = ""
@@ -1546,7 +1571,7 @@ async def chat_completions(request: Request):
                         text_content += block.get("text", "")
                 content = text_content
                 print(f"🔍 DEBUG: Extracted text: '{content}'")
-            
+
             chat_messages.append(ChatMessage(role=msg.get("role", "user"), content=content))
 
         # Process the request
