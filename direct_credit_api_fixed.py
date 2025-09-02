@@ -146,21 +146,15 @@ class MultiProviderCreditAPI:
         transaction_keywords = ['transaction', 'payment', 'billing', 'charge', 'amount', 'invoice']
         has_transaction_keywords = any(keyword in query_lower for keyword in transaction_keywords)
 
-        # Phone call analysis queries
-        phone_keywords = ['call', 'phone', 'agent', 'campaign', 'duration', 'call history', 'phone call']
-        has_phone_keywords = any(keyword in query_lower for keyword in phone_keywords)
-
         # Multi-data queries
         combined_keywords = ['comprehensive', 'complete', 'full analysis', 'everything', 'all data', 'overview']
         has_combined_keywords = any(keyword in query_lower for keyword in combined_keywords)
 
         # Count data types requested
-        data_type_count = sum([has_credit_keywords, has_transaction_keywords, has_phone_keywords])
+        data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
         if has_combined_keywords or data_type_count > 1:
             return "multi_data"
-        elif has_phone_keywords:
-            return "phone"
         elif has_credit_keywords:
             return "credit"
         elif has_transaction_keywords:
@@ -398,10 +392,6 @@ class MultiProviderCreditAPI:
             # Process based on query type
             if query_type == "status":
                 response = self._process_status_query(query)
-            elif query_type == "phone":
-                response = self._process_phone_query(query)
-            elif query_type == "general":
-                response = self._process_general_query(query, prompt_config, model, temperature, max_tokens)
             else:
                 # For other query types, use the full data analysis with dynamic prompt
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
@@ -550,110 +540,6 @@ class MultiProviderCreditAPI:
         except Exception as e:
             print(f"⚠️ Error fetching Salesforce status: {e}")
             return f"Error retrieving account status: {str(e)}"
-
-    def _process_phone_query(self, query: str) -> str:
-        """Process phone call data queries with enhanced error messaging"""
-        print("📞 Processing phone call query...")
-
-        # Parse customer information from query
-        customer_info = self._parse_query_for_customer(query)
-        if not customer_info:
-            return "I need customer information (email, phone, name, or client ID) to analyze phone call data."
-
-        # Search for customer
-        entity_id = self._search_for_customer(customer_info)
-        if not entity_id:
-            return "No customer records found for the provided information."
-
-        # Check for phone call data availability
-        try:
-            # Quick check for phone call data
-            query_gql = """
-            query PhoneDataCheck($id: ID!) {
-              entity(input: { id: $id }) {
-                entity {
-                  id
-                  recordInsights {
-                    call_ids: valuesDistinct(field: "CALL_ID")
-                    transaction_amounts: valuesDistinct(field: "TRANSACTION_AMOUNT")
-                    credit_scores: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_SCORE.Value")
-                  }
-                }
-              }
-            }
-            """
-
-            token = self.get_tilores_token()
-            response = requests.post(
-                self.tilores_api_url,
-                json={"query": query_gql, "variables": {"id": entity_id}},
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json"
-                },
-                timeout=10
-            )
-            response.raise_for_status()
-            result = response.json()
-
-            entity_data = result.get("data", {}).get("entity", {}).get("entity")
-            if entity_data and entity_data.get("recordInsights"):
-                insights = entity_data.get("recordInsights", {})
-                
-                has_phone_data = bool(insights.get("call_ids"))
-                has_transaction_data = bool(insights.get("transaction_amounts"))
-                has_credit_data = bool(insights.get("credit_scores"))
-
-                if not has_phone_data:
-                    # Build available data types list
-                    available_types = []
-                    if has_credit_data:
-                        available_types.append("📊 Credit Reports (Equifax, Experian, TransUnion)")
-                    if has_transaction_data:
-                        available_types.append("💳 Transaction History")
-                    
-                    available_text = "\n".join(f"• ✅ {dtype}" for dtype in available_types) if available_types else "• ❌ No data types currently available"
-                    
-                    return f"""📞 **Phone Call Data Analysis Request**
-
-**Customer:** Found (Entity ID: {entity_id})
-**Request:** Phone call data analysis
-**Status:** ❌ Phone call data not available in current dataset
-
-**Available Data Types:**
-{available_text}
-
-**Note:** Phone call history data integration is planned for future releases. The system infrastructure is ready to handle phone call analysis when this data becomes available.
-
-Would you like me to analyze the available data instead?"""
-                else:
-                    # This shouldn't happen with current data, but handle gracefully
-                    return f"Phone call data found for customer (Entity ID: {entity_id}). Processing phone call analysis..."
-            else:
-                return "Unable to check data availability for the specified customer."
-
-        except Exception as e:
-            print(f"⚠️ Error checking phone data availability: {e}")
-            return f"Error checking phone call data availability: {str(e)}"
-
-    def _process_general_query(self, query: str, prompt_config: Dict, model: str, temperature: float, max_tokens: int) -> str:
-        """Process general queries that don't require customer data"""
-        print("🤖 Processing general query...")
-
-        # Use dynamic prompt from Agenta
-        system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
-
-        # Override temperature and max_tokens from prompt config if not explicitly set
-        if temperature == 0.7:  # Default value
-            temperature = prompt_config.get('temperature', 0.7)
-        if max_tokens is None:
-            max_tokens = prompt_config.get('max_tokens', 1000)
-
-        # Create the full prompt for general queries
-        full_prompt = f"{system_prompt}\n\n**USER QUERY:** {query}"
-
-        # Call LLM with dynamic prompt
-        return self._call_llm(full_prompt, model, temperature, max_tokens)
 
     def _process_data_analysis_query(self, query: str, query_type: str, prompt_config: Dict,
                                    model: str, temperature: float, max_tokens: int) -> str:
