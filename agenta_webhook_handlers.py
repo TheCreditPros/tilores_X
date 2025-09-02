@@ -61,11 +61,11 @@ async def handle_evaluation_complete(
 ):
     """Handle evaluation completion webhook"""
     logger.info(f"📊 Evaluation Complete: {payload.test_set_name} for {payload.variant_name}")
-    
+
     try:
         # Log evaluation results
         logger.info(f"🎯 Results: {json.dumps(payload.results, indent=2)}")
-        
+
         # Add background task for processing
         background_tasks.add_task(
             process_evaluation_results,
@@ -73,13 +73,13 @@ async def handle_evaluation_complete(
             payload.variant_name,
             payload.results
         )
-        
+
         return {
             "status": "received",
             "evaluation_id": payload.evaluation_id,
             "message": f"Evaluation results for {payload.variant_name} received and queued for processing"
         }
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing evaluation webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -92,7 +92,7 @@ async def handle_deployment_status(
 ):
     """Handle deployment status webhook"""
     logger.info(f"🚀 Deployment Status: {payload.status} for {payload.variant_name} in {payload.environment}")
-    
+
     try:
         # Log deployment status
         if payload.status == "completed":
@@ -101,7 +101,7 @@ async def handle_deployment_status(
             logger.error(f"❌ Deployment failed: {payload.variant_name}")
             if payload.logs:
                 logger.error(f"📋 Logs: {payload.logs}")
-        
+
         # Add background task for processing
         background_tasks.add_task(
             process_deployment_status,
@@ -109,13 +109,13 @@ async def handle_deployment_status(
             payload.environment,
             payload.status
         )
-        
+
         return {
             "status": "received",
             "deployment_id": payload.deployment_id,
             "message": f"Deployment status {payload.status} received"
         }
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing deployment webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -129,7 +129,7 @@ async def handle_performance_alert(
     """Handle performance alert webhook"""
     logger.warning(f"⚠️ Performance Alert: {payload.alert_type} - {payload.metric_name}")
     logger.warning(f"📊 Current: {payload.current_value}, Threshold: {payload.threshold_value}")
-    
+
     try:
         # Add background task for alert processing
         background_tasks.add_task(
@@ -140,13 +140,13 @@ async def handle_performance_alert(
             payload.threshold_value,
             payload.variant_name
         )
-        
+
         return {
             "status": "received",
             "alert_type": payload.alert_type,
             "message": f"Performance alert for {payload.variant_name} received"
         }
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing performance alert webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -159,7 +159,7 @@ async def webhook_health():
         "timestamp": datetime.now().isoformat(),
         "endpoints": [
             "/webhooks/evaluation-complete",
-            "/webhooks/deployment-status", 
+            "/webhooks/deployment-status",
             "/webhooks/performance-alert"
         ]
     }
@@ -173,27 +173,27 @@ async def process_evaluation_results(
 ):
     """Process evaluation results in background"""
     logger.info(f"🔄 Processing evaluation results for {variant_name}")
-    
+
     try:
         # Extract key metrics
         accuracy = results.get("accuracy", 0)
         response_time = results.get("response_time", 0)
         token_usage = results.get("token_usage", 0)
-        
+
         # Log performance metrics
         logger.info(f"📊 Variant Performance - {variant_name}:")
         logger.info(f"  - Accuracy: {accuracy}%")
         logger.info(f"  - Response Time: {response_time}s")
         logger.info(f"  - Token Usage: {token_usage}")
-        
+
         # Here you could:
         # - Store results in database
         # - Send notifications
         # - Trigger automated actions
         # - Update monitoring dashboards
-        
+
         logger.info(f"✅ Evaluation results processed for {variant_name}")
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing evaluation results: {e}")
 
@@ -204,30 +204,30 @@ async def process_deployment_status(
 ):
     """Process deployment status in background"""
     logger.info(f"🔄 Processing deployment status: {status} in {environment}")
-    
+
     try:
         if status == "completed":
             # Deployment successful
             logger.info(f"✅ Deployment {deployment_id} completed successfully")
-            
+
             # Here you could:
             # - Update deployment tracking
             # - Send success notifications
             # - Trigger post-deployment tests
             # - Update monitoring
-            
+
         elif status == "failed":
             # Deployment failed
             logger.error(f"❌ Deployment {deployment_id} failed")
-            
+
             # Here you could:
             # - Send failure alerts
             # - Trigger rollback procedures
             # - Log failure details
             # - Notify development team
-        
+
         logger.info(f"✅ Deployment status processed for {deployment_id}")
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing deployment status: {e}")
 
@@ -240,7 +240,7 @@ async def process_performance_alert(
 ):
     """Process performance alert in background"""
     logger.warning(f"🔄 Processing performance alert: {alert_type}")
-    
+
     try:
         # Calculate severity
         if current_value > threshold_value * 1.5:
@@ -249,26 +249,26 @@ async def process_performance_alert(
             severity = "high"
         else:
             severity = "medium"
-        
+
         logger.warning(f"⚠️ Alert Severity: {severity}")
         logger.warning(f"📊 Metric: {metric_name} = {current_value} (threshold: {threshold_value})")
-        
+
         # Here you could:
         # - Send alerts to monitoring systems
         # - Trigger auto-scaling
         # - Send notifications to team
         # - Log performance issues
         # - Trigger circuit breakers
-        
+
         if severity == "critical":
             logger.critical(f"🚨 CRITICAL ALERT: {metric_name} for {variant_name}")
             # Could trigger immediate actions like:
             # - Automatic failover
             # - Emergency notifications
             # - Circuit breaker activation
-        
+
         logger.info(f"✅ Performance alert processed for {variant_name}")
-        
+
     except Exception as e:
         logger.error(f"❌ Error processing performance alert: {e}")
 
