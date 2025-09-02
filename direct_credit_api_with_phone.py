@@ -7,6 +7,7 @@ Supports OpenAI, Anthropic, Google Gemini, and other providers
 import json
 import os
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
@@ -1403,7 +1404,11 @@ class MultiProviderCreditAPI:
 api = MultiProviderCreditAPI()
 
 # Create FastAPI app
-app = FastAPI(title="Multi-Provider Credit Analysis API", version="1.0.0")
+app = FastAPI(
+    title="Multi-Provider Credit Analysis API", 
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -1414,11 +1419,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
     print("🚀 Multi-Provider Credit Analysis API starting up...")
     print(f"🌐 Server will bind to 0.0.0.0:{os.environ.get('PORT', 8081)}")
     print("✅ Application startup complete")
+    yield
+    # Shutdown (if needed)
+    print("🛑 Application shutting down...")
 
 @app.get("/health")
 async def health_check():
