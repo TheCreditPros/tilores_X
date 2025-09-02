@@ -1482,6 +1482,13 @@ async def get_models():
 async def chat_completions(request: ChatCompletionRequest):
     """Chat completions endpoint supporting multiple providers"""
     try:
+        # Debug logging for troubleshooting Agenta.ai requests
+        print(f"🔍 DEBUG: Received request with model: {request.model}")
+        print(f"🔍 DEBUG: Messages count: {len(request.messages)}")
+        print(f"🔍 DEBUG: First message: {request.messages[0] if request.messages else 'None'}")
+        print(f"🔍 DEBUG: Temperature: {request.temperature}")
+        print(f"🔍 DEBUG: Max tokens: {request.max_tokens}")
+        
         # Process the request
         response_content = await api.process_chat_request(
             request.messages,
@@ -1515,7 +1522,11 @@ async def chat_completions(request: ChatCompletionRequest):
 
         return response
 
+    except ValueError as ve:
+        print(f"🚨 DEBUG: ValueError in chat_completions: {str(ve)}")
+        raise HTTPException(status_code=422, detail=f"Validation error: {str(ve)}")
     except Exception as e:
+        print(f"🚨 DEBUG: Exception in chat_completions: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
