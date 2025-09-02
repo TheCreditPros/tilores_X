@@ -237,7 +237,7 @@ class MultiProviderCreditAPI:
             print(f"Error searching for customer: {e}")
             return None
 
-    
+
 
     async def _fetch_credit_data_async(self, entity_id: str) -> Optional[List[Dict]]:
         """Async version of credit data fetch for parallel processing with caching"""
@@ -386,6 +386,57 @@ class MultiProviderCreditAPI:
                             pass
 
         return temporal_data
+
+    async def check_data_availability(self, entity_id: str) -> Dict[str, bool]:
+        """Check which data types are available for an entity"""
+        availability = {
+            "credit_data": False,
+            "phone_data": False, 
+            "transaction_data": False,
+            "card_data": False,
+            "ticket_data": False
+        }
+        
+        # Quick check query to determine available data types
+        query = """
+        query DataAvailabilityCheck($id: ID!) {
+          entity(input: { id: $id }) {
+            entity {
+              recordInsights {
+                credit_scores: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_SCORE.Value")
+                call_ids: valuesDistinct(field: "CALL_ID") 
+                transaction_amounts: valuesDistinct(field: "TRANSACTION_AMOUNT")
+                card_numbers: valuesDistinct(field: "CARD_LAST_4")
+                ticket_ids: valuesDistinct(field: "ZOHO_TICKET_ID")
+              }
+            }
+          }
+        }
+        """
+        
+        try:
+            token = self.get_tilores_token()
+            response = requests.post(
+                self.tilores_api_url,
+                json={"query": query, "variables": {"id": entity_id}},
+                headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                insights = result.get("data", {}).get("entity", {}).get("entity", {}).get("recordInsights", {})
+                
+                availability["credit_data"] = bool(insights.get("credit_scores"))
+                availability["phone_data"] = bool(insights.get("call_ids"))
+                availability["transaction_data"] = bool(insights.get("transaction_amounts"))
+                availability["card_data"] = bool(insights.get("card_numbers"))
+                availability["ticket_data"] = bool(insights.get("ticket_ids"))
+                
+        except Exception as e:
+            print(f"Data availability check failed: {e}")
+        
+        return availability
 
     async def get_phone_call_data(self, entity_id: str) -> Optional[Dict[str, Any]]:
         """Get phone call data for a specific entity using the correct filtering approach"""
@@ -1468,11 +1519,11 @@ class MultiProviderCreditAPI:
             # Detect account status queries (Salesforce status: active/canceled/past due)
             account_status_keywords = ['account status', 'customer status', 'subscription status', 'enrollment status', 'active', 'canceled', 'cancelled', 'past due', 'current status']
             has_status_keywords = any(keyword in query_lower for keyword in account_status_keywords)
-            
+
             # Exclude credit-related status queries
             credit_status_indicators = ['credit status', 'credit score', 'bureau', 'utilization', 'tradeline']
             is_credit_status_query = any(indicator in query_lower for indicator in credit_status_indicators)
-            
+
             # Only treat as account status if it's not a credit status query
             has_status_keywords = has_status_keywords and not is_credit_status_query
             print(f"🔍 Query analysis: has_status_keywords={has_status_keywords}, query='{query_lower}'")
@@ -1517,7 +1568,7 @@ class MultiProviderCreditAPI:
                       }
                     }
                     """
-                    
+
                     # Execute the query using the existing Tilores connection pattern
                     token = self.get_tilores_token()
                     response = requests.post(
@@ -1531,59 +1582,59 @@ class MultiProviderCreditAPI:
                     response.raise_for_status()
                     result = response.json()
                     print(f"🔍 Salesforce status query result: {result is not None}")
-                    
+
                     entity_data = result.get("data", {}).get("entity", {}).get("entity")
                     if entity_data and entity_data.get("records"):
                         records = entity_data.get("records", [])
                         print(f"🔍 Found {len(records)} records for status analysis")
-                        
+
                         # Extract status and customer info from records
                         customer_status = None
                         customer_name = None
                         current_product = None
                         enroll_date = None
-                        
+
                         for record in records:
                             # Get the STATUS field (active/past due/cancelled)
                             if record.get("STATUS"):
                                 customer_status = record.get("STATUS")
                                 print(f"🔍 Found STATUS: {customer_status}")
-                            
+
                             # Get customer name
                             if record.get("FIRST_NAME") and record.get("LAST_NAME"):
                                 customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
-                            
+
                             # Get product info
                             if record.get("CURRENT_PRODUCT"):
                                 current_product = record.get("CURRENT_PRODUCT")
                             elif record.get("PRODUCT_NAME"):
                                 current_product = record.get("PRODUCT_NAME")
-                            
+
                             # Get enrollment date
                             if record.get("ENROLL_DATE"):
                                 enroll_date = record.get("ENROLL_DATE")
-                        
+
                         # Create concise Salesforce account status response
                         if customer_status:
                             response = "**Salesforce Account Status:**\n\n"
                             response += f"• **Status:** {customer_status.title()}\n"
-                            
+
                             if customer_name:
                                 response += f"• **Customer:** {customer_name}\n"
-                            
+
                             if current_product:
                                 response += f"• **Product:** {current_product}\n"
-                            
+
                             if enroll_date:
                                 response += f"• **Enrolled:** {enroll_date}\n"
-                            
+
                             self._cache_response(cache_key, response)
                             return response
                         else:
                             return "**Salesforce Account Status:**\n\nNo STATUS field found in customer records. The customer may not have a defined account status."
                     else:
                         return "No Salesforce records found for the specified customer."
-                        
+
                 except Exception as e:
                     print(f"⚠️ Error fetching Salesforce status: {e}")
                     return f"Error retrieving account status: {str(e)}"
@@ -1662,7 +1713,36 @@ class MultiProviderCreditAPI:
                 }
 
             elif has_phone_keywords:
-                # Phone-only analysis
+                # Phone-only analysis - check data availability first
+                data_availability = await self.check_data_availability(entity_id)
+                
+                if not data_availability["phone_data"]:
+                    # Build available data types list
+                    available_types = []
+                    if data_availability["credit_data"]:
+                        available_types.append("📊 Credit Reports (Equifax, Experian, TransUnion)")
+                    if data_availability["transaction_data"]:
+                        available_types.append("💳 Transaction History")
+                    if data_availability["card_data"]:
+                        available_types.append("🎫 Credit Card Information")
+                    if data_availability["ticket_data"]:
+                        available_types.append("🎫 Support Tickets")
+                    
+                    available_text = "\n".join(f"• ✅ {dtype}" for dtype in available_types) if available_types else "• ❌ No data types currently available"
+                    
+                    return f"""📞 **Phone Call Data Analysis Request**
+
+**Customer:** Found (Entity ID: {entity_id})
+**Request:** Phone call data analysis
+**Status:** ❌ Phone call data not available in current dataset
+
+**Available Data Types:**
+{available_text}
+
+**Note:** Phone call history data integration is planned for future releases. The system infrastructure is ready to handle phone call analysis when this data becomes available.
+
+Would you like me to analyze the available data instead?"""
+                
                 phone_data = await self.get_phone_call_data(entity_id)
                 if not phone_data:
                     return f"No phone call data found for the requested customer (Entity ID: {entity_id})."
