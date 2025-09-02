@@ -19,7 +19,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -61,7 +61,7 @@ class MultiProviderCreditAPI:
 
         # Performance tracking
         self.active_requests = 0
-        
+
         # Redis caching for Tilores responses
         try:
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
@@ -142,18 +142,33 @@ class MultiProviderCreditAPI:
         """Parse query to extract customer search parameters"""
         import re
 
-        # Skip general questions that don't reference specific customers
+        # Skip ONLY truly general questions that don't reference specific customers
+        # IMPORTANT: Don't block customer status queries that contain identifiers
         general_question_patterns = [
-            r'\bwhat\s+is\s+the\s+(current\s+)?status\s+with\b',
             r'\bhow\s+does\s+.*\s+work\b',
             r'\bwhat\s+does\s+.*\s+do\b',
             r'\bcan\s+you\s+(help|tell|explain)\b',
             r'\bwhat\s+are\s+the\s+(features|benefits|options)\b'
         ]
 
-        for pattern in general_question_patterns:
-            if re.search(pattern, query, re.IGNORECASE):
-                return {}  # This is a general question, not a customer lookup
+        # Check for general questions ONLY if no customer identifiers are present
+        has_customer_identifier = bool(
+            re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', query) or  # Email
+            re.search(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', query) or  # Phone
+            re.search(r'\b\d{4,15}\b', query) or  # Client ID
+            re.search(r'\b003[A-Za-z0-9]{15}\b', query) or  # Salesforce ID
+            re.search(r'\b[A-Z][a-z]+\s+[A-Z][a-z]+\b', query)  # Name pattern
+        )
+
+        # Only treat as general question if no customer identifiers found
+        if not has_customer_identifier:
+            for pattern in general_question_patterns:
+                if re.search(pattern, query, re.IGNORECASE):
+                    return {}  # This is a general question, not a customer lookup
+            
+            # Special case: "status with thecreditpros" without customer identifier
+            if re.search(r'\bstatus\s+with\s+(thecreditpros|credit\s*pros)\b', query, re.IGNORECASE):
+                return {}  # General company status question
 
         # Email extraction (most reliable identifier)
         email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', query)
@@ -222,20 +237,98 @@ class MultiProviderCreditAPI:
             print(f"Error searching for customer: {e}")
             return None
 
+    def _fetch_customer_status_data(self, entity_id: str) -> Optional[Dict]:
+        """Fetch customer status and account information from Salesforce data"""
+        try:
+            query = """
+            query CustomerStatusData($id: ID!) {
+              entity(input: { id: $id }) {
+                entity {
+                  id
+                  recordInsights {
+                    customerStatus: frequencyDistribution(field: "STATUS", direction: DESC) {
+                      value
+                      frequency
+                    }
+                    products: valuesDistinct(field: "PRODUCT_NAME")
+                    enrollmentDates: valuesDistinct(field: "ENROLL_DATE")
+                    currentProducts: valuesDistinct(field: "CURRENT_PRODUCT")
+                  }
+                  records {
+                    id
+                    STATUS
+                    PRODUCT_NAME
+                    CURRENT_PRODUCT
+                    ENROLL_DATE
+                    FIRST_NAME
+                    LAST_NAME
+                    EMAIL
+                    CLIENT_ID
+                  }
+                }
+              }
+            }
+            """
+            
+            result = self.tilores.gql(query, {"id": entity_id})
+            print(f"🔍 Status query result: {result}")
+            entity_data = result.get("data", {}).get("entity", {}).get("entity")
+            
+            if not entity_data:
+                print("⚠️ No entity data found for status query")
+                return None
+                
+            records = entity_data.get("records", [])
+            insights = entity_data.get("recordInsights", {})
+            
+            # Extract current status from records
+            current_status = None
+            customer_name = None
+            current_product = None
+            enroll_date = None
+            
+            # Get the most recent status from records
+            for record in records:
+                if record.get("STATUS"):
+                    current_status = record.get("STATUS")
+                if record.get("FIRST_NAME") and record.get("LAST_NAME"):
+                    customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
+                if record.get("CURRENT_PRODUCT"):
+                    current_product = record.get("CURRENT_PRODUCT")
+                if record.get("ENROLL_DATE"):
+                    enroll_date = record.get("ENROLL_DATE")
+            
+            # Get status distribution from insights
+            status_distribution = insights.get("customerStatus", [])
+            
+            return {
+                "entity_id": entity_id,
+                "current_status": current_status,
+                "customer_name": customer_name,
+                "current_product": current_product,
+                "enroll_date": enroll_date,
+                "status_distribution": status_distribution,
+                "records_count": len(records)
+            }
+            
+        except Exception as e:
+            print(f"⚠️ Error fetching customer status: {e}")
+            return None
+
     async def _fetch_credit_data_async(self, entity_id: str) -> Optional[List[Dict]]:
         """Async version of credit data fetch for parallel processing with caching"""
         # Check cache first
         cached_data = self._get_cached_tilores_data(entity_id, "credit")
         if cached_data:
             return cached_data.get("records")
-        
+
         # Fetch from API
         result = await asyncio.to_thread(self._fetch_credit_data, entity_id)
-        
+
         # Cache the result
         if result:
             self._cache_tilores_data(entity_id, "credit", {"records": result})
-        
+
         return result
 
     def _fetch_credit_data(self, entity_id=None):
@@ -1298,7 +1391,7 @@ class MultiProviderCreditAPI:
             'response': response,
             'timestamp': datetime.now().timestamp()
         }
-        
+
         # Redis cache for Tilores data
         if self.redis_client:
             try:
@@ -1309,7 +1402,7 @@ class MultiProviderCreditAPI:
                 print(f"💾 Cached response (Memory only): {cache_key[:8]}...")
         else:
             print(f"💾 Cached response (Memory only): {cache_key[:8]}...")
-    
+
     def _get_redis_cache(self, cache_key: str) -> Optional[str]:
         """Get cached response from Redis"""
         if self.redis_client:
@@ -1321,7 +1414,7 @@ class MultiProviderCreditAPI:
             except Exception as e:
                 print(f"⚠️ Redis get failed: {e}")
         return None
-    
+
     def _cache_tilores_data(self, entity_id: str, data_type: str, data: dict):
         """Cache Tilores API responses"""
         if self.redis_client:
@@ -1331,7 +1424,7 @@ class MultiProviderCreditAPI:
                 print(f"💾 Cached Tilores {data_type} data: {entity_id}")
             except Exception as e:
                 print(f"⚠️ Tilores cache failed: {e}")
-    
+
     def _get_cached_tilores_data(self, entity_id: str, data_type: str) -> Optional[dict]:
         """Get cached Tilores data"""
         if self.redis_client:
@@ -1344,19 +1437,19 @@ class MultiProviderCreditAPI:
             except Exception as e:
                 print(f"⚠️ Tilores cache get failed: {e}")
         return None
-    
+
     async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
         """Generate streaming response chunks"""
         import time
-        
+
         # Split response into chunks for streaming
         words = response_content.split()
         chunk_size = 10  # Words per chunk
-        
+
         for i in range(0, len(words), chunk_size):
             chunk_words = words[i:i + chunk_size]
             chunk_content = " " + " ".join(chunk_words) if i > 0 else " ".join(chunk_words)
-            
+
             # Create SSE-formatted chunk
             chunk_data = {
                 "id": request_id,
@@ -1373,10 +1466,10 @@ class MultiProviderCreditAPI:
                     }
                 ]
             }
-            
+
             yield f"data: {json.dumps(chunk_data)}\n\n"
             await asyncio.sleep(0.05)  # Small delay for streaming effect
-        
+
         # Send final chunk
         final_chunk = {
             "id": request_id,
@@ -1391,7 +1484,7 @@ class MultiProviderCreditAPI:
                 }
             ]
         }
-        
+
         yield f"data: {json.dumps(final_chunk)}\n\n"
         yield "data: [DONE]\n\n"
 
@@ -1429,12 +1522,12 @@ class MultiProviderCreditAPI:
 
             # Check cache for this query + customer combination
             cache_key = self._get_cache_key(query, search_params)
-            
+
             # Check memory cache first
             cached_response = self._check_cache(cache_key)
             if cached_response:
                 return cached_response
-            
+
             # Check Redis cache
             redis_cached = self._get_redis_cache(cache_key)
             if redis_cached:
@@ -1448,6 +1541,8 @@ class MultiProviderCreditAPI:
 
             # Determine query type and route accordingly
             query_lower = query.lower()
+            has_status_keywords = any(keyword in query_lower for keyword in ['status', 'active', 'canceled', 'cancelled', 'past due', 'current status', 'account status'])
+            print(f"🔍 Query analysis: has_status_keywords={has_status_keywords}, query='{query_lower}'")
             has_credit_keywords = any(keyword in query_lower for keyword in ['credit', 'score', 'bureau', 'utilization', 'inquiry'])
             has_phone_keywords = any(keyword in query_lower for keyword in ['call', 'phone', 'agent', 'campaign', 'duration'])
             has_transaction_keywords = any(keyword in query_lower for keyword in ['transaction', 'payment', 'charge', 'refund', 'amount', 'billing'])
@@ -1461,6 +1556,69 @@ class MultiProviderCreditAPI:
                 "analysis_timestamp": datetime.now().isoformat(),
                 "entity_id": entity_id
             }
+
+            # Handle status queries with concise responses
+            if has_status_keywords and not any([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords, has_combined_keywords]):
+                print("🔍 Processing customer status query...")
+                
+                # Use transaction data to determine customer status (more reliable)
+                try:
+                    transaction_data = self.get_transaction_data(entity_id)
+                    print(f"🔍 Transaction data result: {transaction_data is not None}")
+                except Exception as e:
+                    print(f"⚠️ Error fetching transaction data: {e}")
+                    transaction_data = None
+                
+                if transaction_data and transaction_data.get("records"):
+                    # Extract customer info and status from transaction data
+                    current_product = None
+                    latest_transaction_date = None
+                    total_amount = 0
+                    transaction_count = len(transaction_data["records"])
+                    
+                    for record in transaction_data["records"]:
+                        if record.get("CURRENT_PRODUCT"):
+                            current_product = record.get("CURRENT_PRODUCT")
+                        
+                        # Get transaction date and amount
+                        trans_date = record.get("TRANSACTION_CREATED_DATE")
+                        if trans_date and (not latest_transaction_date or trans_date > latest_transaction_date):
+                            latest_transaction_date = trans_date
+                        
+                        amount = record.get("TRANSACTION_AMOUNT")
+                        if amount:
+                            try:
+                                total_amount += float(amount)
+                            except (ValueError, TypeError):
+                                pass
+                    
+                    # Infer status from transaction activity
+                    if transaction_count > 0 and current_product:
+                        inferred_status = "Active"
+                    elif transaction_count > 0:
+                        inferred_status = "Active (transactions present)"
+                    else:
+                        inferred_status = "Unknown"
+                    
+                    # Create concise status response
+                    response = "**Customer Account Status:**\n\n"
+                    response += f"• **Status:** {inferred_status}\n"
+                    
+                    if current_product:
+                        response += f"• **Current Product:** {current_product}\n"
+                    
+                    if latest_transaction_date:
+                        response += f"• **Latest Transaction:** {latest_transaction_date}\n"
+                    
+                    response += f"• **Total Transactions:** {transaction_count}\n"
+                    
+                    if total_amount > 0:
+                        response += f"• **Total Transaction Amount:** ${total_amount:.2f}\n"
+                    
+                    self._cache_response(cache_key, response)
+                    return response
+                else:
+                    return "No transaction data found for the specified customer. Unable to determine account status."
 
             # Count how many data types are requested
             data_type_count = sum([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords])
@@ -1715,8 +1873,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     try:
         body = await request.body()
         print(f"🚨 DEBUG: Request body: {body.decode()}")
-    except:
-        print("🚨 DEBUG: Could not read request body")
+    except Exception as e:
+        print(f"🚨 DEBUG: Could not read request body: {e}")
 
     return JSONResponse(
         status_code=422,
