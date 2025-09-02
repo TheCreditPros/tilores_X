@@ -1532,10 +1532,22 @@ async def chat_completions(request: Request):
 
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
 
-        # Convert messages to our format
+        # Convert messages to our format, handling both string and structured content
         chat_messages = []
         for msg in messages:
-            chat_messages.append(ChatMessage(role=msg.get("role", "user"), content=msg.get("content", "")))
+            content = msg.get("content", "")
+            
+            # Handle structured content (list format) - extract text from first text block
+            if isinstance(content, list):
+                print(f"🔍 DEBUG: Converting structured content: {content}")
+                text_content = ""
+                for block in content:
+                    if isinstance(block, dict) and block.get("type") == "text":
+                        text_content += block.get("text", "")
+                content = text_content
+                print(f"🔍 DEBUG: Extracted text: '{content}'")
+            
+            chat_messages.append(ChatMessage(role=msg.get("role", "user"), content=content))
 
         # Process the request
         response_content = await api.process_chat_request(
