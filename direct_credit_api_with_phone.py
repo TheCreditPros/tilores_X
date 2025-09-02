@@ -7,6 +7,7 @@ Supports OpenAI, Anthropic, Google Gemini, and other providers
 import json
 import os
 import uuid
+import hashlib
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
@@ -51,6 +52,10 @@ class MultiProviderCreditAPI:
     def __init__(self):
         self.tilores_token = None
         self.token_expires_at = None
+        
+        # Performance optimization - simple in-memory cache for recent queries
+        self.query_cache = {}
+        self.cache_ttl = 300  # 5 minutes cache for repeated queries
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -129,7 +134,7 @@ class MultiProviderCreditAPI:
             r'\bcan\s+you\s+(help|tell|explain)\b',
             r'\bwhat\s+are\s+the\s+(features|benefits|options)\b'
         ]
-        
+
         for pattern in general_question_patterns:
             if re.search(pattern, query, re.IGNORECASE):
                 return {}  # This is a general question, not a customer lookup
@@ -1237,6 +1242,31 @@ class MultiProviderCreditAPI:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Google API error: {str(e)}")
 
+    def _get_cache_key(self, query: str, search_params: dict) -> str:
+        """Generate cache key for query"""
+        cache_data = f"{query}:{json.dumps(search_params, sort_keys=True)}"
+        return hashlib.md5(cache_data.encode()).hexdigest()
+    
+    def _check_cache(self, cache_key: str) -> Optional[str]:
+        """Check if response is cached"""
+        if cache_key in self.query_cache:
+            cached_data = self.query_cache[cache_key]
+            if datetime.now().timestamp() - cached_data['timestamp'] < self.cache_ttl:
+                print(f"🚀 Cache hit for query: {cache_key[:8]}...")
+                return cached_data['response']
+            else:
+                # Remove expired cache
+                del self.query_cache[cache_key]
+        return None
+    
+    def _cache_response(self, cache_key: str, response: str):
+        """Cache response"""
+        self.query_cache[cache_key] = {
+            'response': response,
+            'timestamp': datetime.now().timestamp()
+        }
+        print(f"💾 Cached response for: {cache_key[:8]}...")
+
     async def process_chat_request(self, messages: List[ChatMessage], model: str, temperature: float = 0.7, max_tokens: Optional[int] = None):
         """Process chat request with credit data analysis using proven working logic"""
         try:
@@ -1246,13 +1276,30 @@ class MultiProviderCreditAPI:
             # Parse query to find customer identifier
             search_params = self._parse_query_for_customer(query)
 
-            # If no customer found in query, handle as general question
+            # If no customer found in current query, check previous messages for context
+            if not search_params and len(messages) > 1:
+                # Look for customer identifier in previous messages
+                for msg in reversed(messages[:-1]):
+                    if hasattr(msg, 'content') and msg.content:
+                        prev_params = self._parse_query_for_customer(msg.content)
+                        if prev_params:
+                            search_params = prev_params
+                            print(f"🔍 DEBUG: Found customer context from previous message: {search_params}")
+                            break
+
+            # If still no customer found, handle as general question
             if not search_params:
                 # Check if this is a general question about the company/service
                 if any(keyword in query.lower() for keyword in ['thecreditpros', 'credit pros', 'company', 'service', 'status', 'help']):
                     return "I'm a customer service assistant for TheCreditPros. I can help you analyze customer credit data, transaction history, call records, and support tickets. To get started, please provide a customer identifier such as an email address, phone number, or client ID."
                 else:
                     return "Error: Could not identify customer from query. Please provide email, phone number, client ID, or customer name."
+
+            # Check cache for this query + customer combination
+            cache_key = self._get_cache_key(query, search_params)
+            cached_response = self._check_cache(cache_key)
+            if cached_response:
+                return cached_response
 
             # Search for the specific customer
             entity_id = self._search_for_customer(search_params)
@@ -1426,14 +1473,18 @@ class MultiProviderCreditAPI:
 
             # Determine provider and call appropriate API
             if model.startswith("gpt-") or model in self.providers["openai"]["models"]:
-                return self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
+                response = self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
             elif model.startswith("gemini-") or model in self.providers["google"]["models"]:
-                return self._call_google_with_context(ai_messages, model, temperature, max_tokens)
+                response = self._call_google_with_context(ai_messages, model, temperature, max_tokens)
             elif model in self.providers["groq"]["models"]:
-                return self._call_groq_with_context(ai_messages, model, temperature, max_tokens)
+                response = self._call_groq_with_context(ai_messages, model, temperature, max_tokens)
             else:
                 # Default to OpenAI
-                return self._call_openai_with_context(ai_messages, "gpt-4o-mini", temperature, max_tokens)
+                response = self._call_openai_with_context(ai_messages, "gpt-4o-mini", temperature, max_tokens)
+            
+            # Cache successful response
+            self._cache_response(cache_key, response)
+            return response
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
