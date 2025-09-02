@@ -8,6 +8,7 @@ import json
 import os
 import uuid
 import hashlib
+import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
@@ -56,6 +57,9 @@ class MultiProviderCreditAPI:
         # Performance optimization - simple in-memory cache for recent queries
         self.query_cache = {}
         self.cache_ttl = 300  # 5 minutes cache for repeated queries
+        
+        # Performance tracking
+        self.active_requests = 0
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -206,6 +210,10 @@ class MultiProviderCreditAPI:
             print(f"Error searching for customer: {e}")
             return None
 
+    async def _fetch_credit_data_async(self, entity_id: str) -> Optional[List[Dict]]:
+        """Async version of credit data fetch for parallel processing"""
+        return await asyncio.to_thread(self._fetch_credit_data, entity_id)
+    
     def _fetch_credit_data(self, entity_id=None):
         """Fetch credit data from Tilores API using proven working logic"""
         if not entity_id:
@@ -1269,6 +1277,10 @@ class MultiProviderCreditAPI:
 
     async def process_chat_request(self, messages: List[ChatMessage], model: str, temperature: float = 0.7, max_tokens: Optional[int] = None):
         """Process chat request with credit data analysis using proven working logic"""
+        self.active_requests += 1
+        start_time = datetime.now()
+        print(f"🔄 Processing request #{self.active_requests} started at {start_time.strftime('%H:%M:%S')}")
+        
         try:
             # Extract query from messages
             query = messages[-1].content if messages else ""
@@ -1327,30 +1339,66 @@ class MultiProviderCreditAPI:
             data_type_count = sum([has_credit_keywords, has_phone_keywords, has_transaction_keywords, has_card_keywords, has_zoho_keywords])
 
             if has_combined_keywords or data_type_count > 1:
-                # Multi-data analysis - fetch all requested data types
+                # Multi-data analysis - fetch all requested data types IN PARALLEL
+                print("🚀 Fetching multiple data types in parallel...")
+                fetch_start = datetime.now()
+                
+                # Create async tasks for parallel execution
+                tasks = []
+                
                 if has_credit_keywords or has_combined_keywords:
-                    credit_records = self._fetch_credit_data(entity_id)
-                    if credit_records:
-                        temporal_data = self.extract_temporal_credit_data(credit_records)
-                        context["temporal_credit_data"] = temporal_data
-                    else:
-                        context["temporal_credit_data"] = {}
+                    tasks.append(self._fetch_credit_data_async(entity_id))
+                else:
+                    tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
 
                 if has_phone_keywords or has_combined_keywords:
-                    phone_data = await self.get_phone_call_data(entity_id)
-                    context["phone_call_data"] = phone_data if phone_data else {}
+                    tasks.append(self.get_phone_call_data(entity_id))
+                else:
+                    tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
 
                 if has_transaction_keywords or has_combined_keywords:
-                    transaction_data = await self.get_transaction_data(entity_id)
-                    context["transaction_data"] = transaction_data if transaction_data else {}
+                    tasks.append(self.get_transaction_data(entity_id))
+                else:
+                    tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
 
                 if has_card_keywords or has_combined_keywords:
-                    card_data = await self.get_credit_card_data(entity_id)
-                    context["credit_card_data"] = card_data if card_data else {}
+                    tasks.append(self.get_credit_card_data(entity_id))
+                else:
+                    tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
 
                 if has_zoho_keywords or has_combined_keywords:
-                    ticket_data = await self.get_zoho_ticket_data(entity_id)
-                    context["zoho_ticket_data"] = ticket_data if ticket_data else {}
+                    tasks.append(self.get_zoho_ticket_data(entity_id))
+                else:
+                    tasks.append(asyncio.create_task(asyncio.sleep(0, result=None)))
+                
+                # Execute all data fetches in parallel with timeout
+                try:
+                    results = await asyncio.wait_for(
+                        asyncio.gather(*tasks, return_exceptions=True),
+                        timeout=15.0  # 15 second timeout for data fetching
+                    )
+                except asyncio.TimeoutError:
+                    print("⚠️ Data fetch timeout - using partial results")
+                    results = [None] * len(tasks)
+                
+                fetch_duration = (datetime.now() - fetch_start).total_seconds()
+                print(f"⚡ Parallel data fetch completed in {fetch_duration:.1f}s")
+                
+                # Process results
+                credit_records, phone_data, transaction_data, card_data, ticket_data = results
+                
+                # Handle credit data
+                if credit_records and not isinstance(credit_records, Exception):
+                    temporal_data = self.extract_temporal_credit_data(credit_records)
+                    context["temporal_credit_data"] = temporal_data
+                else:
+                    context["temporal_credit_data"] = {}
+                
+                # Handle other data types
+                context["phone_call_data"] = phone_data if phone_data and not isinstance(phone_data, Exception) else {}
+                context["transaction_data"] = transaction_data if transaction_data and not isinstance(transaction_data, Exception) else {}
+                context["credit_card_data"] = card_data if card_data and not isinstance(card_data, Exception) else {}
+                context["zoho_ticket_data"] = ticket_data if ticket_data and not isinstance(ticket_data, Exception) else {}
 
                 context["data_summary"] = {
                     "has_credit_data": bool(context.get("temporal_credit_data")),
@@ -1389,8 +1437,13 @@ class MultiProviderCreditAPI:
                 context["zoho_ticket_data"] = ticket_data
 
             else:
-                # Credit-only analysis (default)
-                credit_records = self._fetch_credit_data(entity_id)
+                # Credit-only analysis (default) - use async for consistency
+                print("🚀 Fetching credit data...")
+                fetch_start = datetime.now()
+                credit_records = await self._fetch_credit_data_async(entity_id)
+                fetch_duration = (datetime.now() - fetch_start).total_seconds()
+                print(f"⚡ Credit data fetch completed in {fetch_duration:.1f}s")
+                
                 if not credit_records:
                     return f"No credit data found for the requested customer (Entity ID: {entity_id})."
 
@@ -1488,6 +1541,10 @@ class MultiProviderCreditAPI:
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+        finally:
+            self.active_requests -= 1
+            duration = (datetime.now() - start_time).total_seconds()
+            print(f"✅ Request #{self.active_requests + 1} completed in {duration:.1f}s")
 
 # Initialize the API
 api = MultiProviderCreditAPI()
