@@ -19,21 +19,21 @@ class AgentaSDKConfiguration:
         self.app_slug = os.getenv("AGENTA_APP_SLUG", "tilores-x")
         self.sdk_available = False
         self.ag = None
-
+        
         self._initialize_sdk()
-
+        
         print(f"🔧 Agenta SDK Configuration:")
         print(f"  - Host: {self.host}")
         print(f"  - App Slug: {self.app_slug}")
         print(f"  - API Key: {'✅ Set' if self.api_key != 'your_api_key_here' else '❌ Missing'}")
         print(f"  - SDK Available: {'✅' if self.sdk_available else '❌'}")
-
+    
     def _initialize_sdk(self):
         """Initialize the Agenta SDK"""
         if self.api_key == "your_api_key_here":
             print("⚠️ AGENTA_API_KEY not found in environment")
             return
-
+        
         try:
             import agenta as ag
             ag.init(
@@ -48,20 +48,20 @@ class AgentaSDKConfiguration:
             print("📦 Install with: pip install -U agenta")
         except Exception as e:
             print(f"⚠️ Agenta SDK initialization failed: {e}")
-
+    
     def configure_observability(self) -> bool:
         """Configure observability and tracing"""
         if not self.sdk_available:
             print("❌ SDK not available for observability configuration")
             return False
-
+        
         print("\n📊 Configuring Observability...")
-
+        
         try:
             # Enable tracing for the application
             self.ag.tracing.enable()
             print("   ✅ Tracing enabled")
-
+            
             # Configure logging
             self.ag.logging.configure(
                 level="INFO",
@@ -69,21 +69,21 @@ class AgentaSDKConfiguration:
                 include_responses=True
             )
             print("   ✅ Logging configured")
-
+            
             return True
-
+            
         except Exception as e:
             print(f"   ❌ Observability configuration failed: {e}")
             return False
-
+    
     def create_evaluation_configs(self) -> bool:
         """Create evaluation configurations using SDK"""
         if not self.sdk_available:
             print("❌ SDK not available for evaluation configuration")
             return False
-
+        
         print("\n🧪 Creating Evaluation Configurations...")
-
+        
         try:
             # Define evaluation configurations
             eval_configs = [
@@ -107,7 +107,7 @@ class AgentaSDKConfiguration:
                     }
                 }
             ]
-
+            
             success_count = 0
             for config in eval_configs:
                 try:
@@ -117,22 +117,22 @@ class AgentaSDKConfiguration:
                     success_count += 1
                 except Exception as e:
                     print(f"   ❌ {config['name']} failed: {e}")
-
+            
             print(f"📊 Evaluation Configs: {success_count}/{len(eval_configs)}")
             return success_count > 0
-
+            
         except Exception as e:
             print(f"   ❌ Evaluation configuration failed: {e}")
             return False
-
+    
     def setup_prompt_management(self) -> bool:
         """Set up prompt management and versioning"""
         if not self.sdk_available:
             print("❌ SDK not available for prompt management")
             return False
-
+        
         print("\n📝 Setting Up Prompt Management...")
-
+        
         try:
             # Load template prompts
             try:
@@ -141,7 +141,7 @@ class AgentaSDKConfiguration:
             except FileNotFoundError:
                 print("   ⚠️ agenta_template_prompts.json not found")
                 return False
-
+            
             success_count = 0
             for prompt_id, prompt_config in template_prompts.items():
                 try:
@@ -154,29 +154,29 @@ class AgentaSDKConfiguration:
                         "max_tokens": prompt_config.get("max_tokens", 1500),
                         "use_case": prompt_config.get("use_case", "")
                     }
-
+                    
                     result = self.ag.prompts.register(prompt_id, prompt_data)
                     print(f"   ✅ {prompt_config.get('name', prompt_id)} registered")
                     success_count += 1
-
+                    
                 except Exception as e:
                     print(f"   ❌ {prompt_id} failed: {e}")
-
+            
             print(f"📊 Prompts Registered: {success_count}/{len(template_prompts)}")
             return success_count > 0
-
+            
         except Exception as e:
             print(f"   ❌ Prompt management setup failed: {e}")
             return False
-
+    
     def configure_deployment_environments(self) -> bool:
         """Configure deployment environments"""
         if not self.sdk_available:
             print("❌ SDK not available for deployment configuration")
             return False
-
+        
         print("\n🚀 Configuring Deployment Environments...")
-
+        
         try:
             environments = [
                 {
@@ -198,7 +198,7 @@ class AgentaSDKConfiguration:
                     }
                 }
             ]
-
+            
             success_count = 0
             for env in environments:
                 try:
@@ -207,22 +207,22 @@ class AgentaSDKConfiguration:
                     success_count += 1
                 except Exception as e:
                     print(f"   ❌ {env['name']} failed: {e}")
-
+            
             print(f"📊 Environments Configured: {success_count}/{len(environments)}")
             return success_count > 0
-
+            
         except Exception as e:
             print(f"   ❌ Deployment configuration failed: {e}")
             return False
-
+    
     def run_test_evaluation(self) -> bool:
         """Run a test evaluation to verify setup"""
         if not self.sdk_available:
             print("❌ SDK not available for test evaluation")
             return False
-
+        
         print("\n🧪 Running Test Evaluation...")
-
+        
         try:
             # Create a simple test case
             test_case = {
@@ -233,57 +233,57 @@ class AgentaSDKConfiguration:
                     "priority": "high"
                 }
             }
-
+            
             # Run evaluation
             result = self.ag.evaluations.run_test(test_case)
             print(f"   ✅ Test evaluation completed")
             print(f"   📊 Result: {result}")
-
+            
             return True
-
+            
         except Exception as e:
             print(f"   ❌ Test evaluation failed: {e}")
             return False
-
+    
     def configure_all_features(self) -> Dict[str, bool]:
         """Configure all available SDK features"""
         print("🚀 Configuring Agenta.ai Features via SDK...")
         print("=" * 60)
-
+        
         if not self.sdk_available:
             print("❌ Agenta SDK not available. Cannot configure features.")
             return {}
-
+        
         results = {}
-
+        
         # 1. Configure Observability
         results['observability'] = self.configure_observability()
-
+        
         # 2. Set up Prompt Management
         results['prompt_management'] = self.setup_prompt_management()
-
+        
         # 3. Create Evaluation Configurations
         results['evaluations'] = self.create_evaluation_configs()
-
+        
         # 4. Configure Deployment Environments
         results['deployments'] = self.configure_deployment_environments()
-
+        
         # 5. Run Test Evaluation
         results['test_evaluation'] = self.run_test_evaluation()
-
+        
         # Summary
         print(f"\n📊 SDK FEATURES CONFIGURATION SUMMARY:")
         print("=" * 50)
-
+        
         successful = sum(1 for success in results.values() if success)
         total = len(results)
-
+        
         for feature, success in results.items():
             status = "✅" if success else "❌"
             print(f"  {status} {feature.replace('_', ' ').title()}")
-
+        
         print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
-
+        
         if successful > 0:
             print(f"\n🎉 {successful} features configured successfully!")
             print("\n🚀 Your Agenta.ai SDK integration now includes:")
@@ -299,25 +299,25 @@ class AgentaSDKConfiguration:
                 print("  ✅ Test evaluation capabilities")
         else:
             print("⚠️ No features could be configured. Check SDK installation and API key.")
-
+        
         return results
 
 def main():
     """Main function"""
     print("🔧 Agenta.ai SDK Configuration")
     print("=" * 50)
-
+    
     # Check API key
     api_key = os.getenv("AGENTA_API_KEY")
     if not api_key or api_key == "your_api_key_here":
         print("❌ AGENTA_API_KEY not found")
         print("🔧 Set AGENTA_API_KEY environment variable first")
         return False
-
+    
     # Configure SDK features
     configurator = AgentaSDKConfiguration()
     results = configurator.configure_all_features()
-
+    
     return len(results) > 0 and any(results.values())
 
 if __name__ == "__main__":
