@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "extraction_timestamp": "2025-09-02T17:36:14.126094",
+    "source_file": "MASTER_COMPLETE_DATA_WITH_FULL_PHONE_20250902_155645.json",
+    "total_fields": 31
+  },
+  "ground_truth": {
+    "customer_email": "e.j.price1986@gmail.com",
+    "customer_name": "Esteban Price",
+    "first_name": "Esteban",
+    "last_name": "Price",
+    "client_id": "1747598",
+    "entity_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+    "total_credit_reports": 7,
+    "has_credit_data": true,
+    "credit_bureau": "Equifax",
+    "latest_credit_score": 618,
+    "credit_score_range": "618-689",
+    "credit_report_date_range": "2025-04-10 to 2025-08-18",
+    "total_transactions": 6,
+    "has_transaction_data": true,
+    "total_transaction_amount": null,
+    "average_transaction_amount": null,
+    "transaction_methods": [],
+    "has_phone_data": true,
+    "contact_records_count": 3,
+    "phone_number_records_count": 1,
+    "zoho_integration_records_count": 2,
+    "has_card_data": true,
+    "total_cards": 2,
+    "has_ticket_data": true,
+    "total_tickets": 1,
+    "risk_level": "high",
+    "account_status": "active",
+    "data_completeness": 1.0,
+    "customer_found": true,
+    "data_available": true,
+    "multiple_data_sources": true
+  },
+  "customer_context": {
+    "customer_email": "e.j.price1986@gmail.com",
+    "customer_name": "Esteban Price",
+    "client_id": "1747598",
+    "entity_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3"
+  }
+}

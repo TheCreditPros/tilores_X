@@ -1,0 +1,52 @@
+{
+  "field_weights": {
+    "customer_name": 3.0,
+    "customer_email": 3.0,
+    "client_id": 3.0,
+    "entity_id": 3.0,
+    "total_credit_reports": 3.0,
+    "total_transactions": 3.0,
+    "latest_credit_score": 2.0,
+    "total_transaction_amount": 2.0,
+    "average_transaction_amount": 2.0,
+    "contact_records_count": 2.0,
+    "total_cards": 2.0,
+    "has_credit_data": 2.0,
+    "has_transaction_data": 2.0,
+    "has_phone_data": 2.0,
+    "has_card_data": 2.0,
+    "customer_found": 2.0,
+    "data_available": 2.0,
+    "risk_level": 2.0,
+    "credit_bureau": 2.0,
+    "account_status": 2.0,
+    "explanation": 1.0,
+    "risk_assessment": 1.0,
+    "analysis_summary": 1.0
+  },
+  "tolerance_settings": {
+    "numeric_percent": 0.02,
+    "numeric_absolute": 5.0,
+    "similarity_threshold": 0.85
+  },
+  "promotion_rules": {
+    "min_score_improvement": 0.03,
+    "max_latency_increase": 0.1,
+    "min_test_cases": 5,
+    "min_success_rate": 0.9
+  },
+  "evaluation_settings": {
+    "timeout_seconds": 120,
+    "max_retries": 2,
+    "judge_model": "gpt-4o-mini",
+    "judge_temperature": 0.0
+  },
+  "reporting": {
+    "generate_markdown": true,
+    "include_detailed_breakdown": true,
+    "include_field_analysis": true,
+    "include_category_analysis": true
+  }
+}
+
+

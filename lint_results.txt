@@ -1,0 +1,1656 @@
+./agenta_basic_setup.py:11:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Optional
+^
+./agenta_basic_setup.py:26:15: F541 f-string is missing placeholders
+        print(f"🔧 Agenta Basic Setup:")
+              ^
+./agenta_basic_setup.py:33:15: F541 f-string is missing placeholders
+        print(f"\n🔍 Validating API Connection...")
+              ^
+./agenta_basic_setup.py:41:23: F541 f-string is missing placeholders
+                print(f"   ✅ API connection successful")
+                      ^
+./agenta_basic_setup.py:44:23: F541 f-string is missing placeholders
+                print(f"   ❌ Authentication failed - check API key")
+                      ^
+./agenta_basic_setup.py:56:15: F541 f-string is missing placeholders
+        print(f"\n📋 Listing Existing Test Sets...")
+              ^
+./agenta_basic_setup.py:82:15: F541 f-string is missing placeholders
+        print(f"\n🔧 Validating SDK Integration...")
+              ^
+./agenta_basic_setup.py:93:19: F541 f-string is missing placeholders
+            print(f"   ✅ SDK initialized successfully")
+                  ^
+./agenta_basic_setup.py:100:13: E722 do not use bare 'except'
+            except:
+            ^
+./agenta_basic_setup.py:101:23: F541 f-string is missing placeholders
+                print(f"   📦 SDK Version: Unknown")
+                      ^
+./agenta_basic_setup.py:106:19: F541 f-string is missing placeholders
+            print(f"   ❌ SDK not available: No module named 'agenta'")
+                  ^
+./agenta_basic_setup.py:114:15: F541 f-string is missing placeholders
+        print(f"\n🧪 Creating Simple Evaluation Test...")
+              ^
+./agenta_basic_setup.py:139:23: F541 f-string is missing placeholders
+                print(f"   ✅ Simple evaluation created successfully")
+                      ^
+./agenta_basic_setup.py:152:15: F541 f-string is missing placeholders
+        print(f"\n📊 Setting Up Basic Observability...")
+              ^
+./agenta_basic_setup.py:155:13: F401 'agenta as ag' imported but unused
+            import agenta as ag
+            ^
+./agenta_basic_setup.py:159:19: F541 f-string is missing placeholders
+            print(f"   ✅ Observability setup attempted")
+                  ^
+./agenta_basic_setup.py:190:15: F541 f-string is missing placeholders
+        print(f"\n📊 AGENTA VALIDATION SUMMARY:")
+              ^
+./agenta_basic_setup.py:201:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./agenta_basic_setup.py:201:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./agenta_basic_setup.py:204:19: F541 f-string is missing placeholders
+            print(f"\n🎉 Agenta.ai integration is functional!")
+                  ^
+./agenta_basic_setup.py:205:19: F541 f-string is missing placeholders
+            print(f"\n✅ Working Features:")
+                  ^
+./agenta_basic_setup.py:207:23: F541 f-string is missing placeholders
+                print(f"  - API Connection and Authentication")
+                      ^
+./agenta_basic_setup.py:209:23: F541 f-string is missing placeholders
+                print(f"  - Test Sets Management (6 test sets created)")
+                      ^
+./agenta_basic_setup.py:211:23: F541 f-string is missing placeholders
+                print(f"  - SDK Integration")
+                      ^
+./agenta_basic_setup.py:213:23: F541 f-string is missing placeholders
+                print(f"  - Basic Observability")
+                      ^
+./agenta_basic_setup.py:215:23: F541 f-string is missing placeholders
+                print(f"  - Evaluation Creation")
+                      ^
+./agenta_basic_setup.py:217:19: F541 f-string is missing placeholders
+            print(f"\n🚀 Next Steps:")
+                  ^
+./agenta_basic_setup.py:218:19: F541 f-string is missing placeholders
+            print(f"  1. Use Agenta UI to run tests against your variants")
+                  ^
+./agenta_basic_setup.py:219:19: F541 f-string is missing placeholders
+            print(f"  2. Create additional prompt variants in the UI")
+                  ^
+./agenta_basic_setup.py:220:19: F541 f-string is missing placeholders
+            print(f"  3. Set up A/B testing experiments")
+                  ^
+./agenta_basic_setup.py:221:19: F541 f-string is missing placeholders
+            print(f"  4. Monitor performance metrics")
+                  ^
+./agenta_basic_setup.py:223:19: F541 f-string is missing placeholders
+            print(f"⚠️ Limited functionality. Check API key and permissions.")
+                  ^
+./agenta_prompt_manager.py:12:1: F401 'typing.List' imported but unused
+from typing import Dict, Optional, List
+^
+./agenta_prompt_manager.py:34:15: F541 f-string is missing placeholders
+        print(f"🎯 Agenta.ai Prompt Manager initialized:")
+              ^
+./agenta_sdk_configuration.py:10:1: F401 'asyncio' imported but unused
+import asyncio
+^
+./agenta_sdk_configuration.py:11:1: F401 'typing.List' imported but unused
+from typing import Dict, List, Optional, Any
+^
+./agenta_sdk_configuration.py:11:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Optional, Any
+^
+./agenta_sdk_configuration.py:11:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Optional, Any
+^
+./agenta_sdk_configuration.py:12:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime
+^
+./agenta_sdk_configuration.py:25:15: F541 f-string is missing placeholders
+        print(f"🔧 Agenta SDK Configuration:")
+              ^
+./agenta_sdk_configuration.py:115:21: F841 local variable 'result' is assigned to but never used
+                    result = self.ag.evaluations.create_config(config)
+                    ^
+./agenta_sdk_configuration.py:158:21: F841 local variable 'result' is assigned to but never used
+                    result = self.ag.prompts.register(prompt_id, prompt_data)
+                    ^
+./agenta_sdk_configuration.py:205:21: F841 local variable 'result' is assigned to but never used
+                    result = self.ag.deployments.create_environment(env)
+                    ^
+./agenta_sdk_configuration.py:239:19: F541 f-string is missing placeholders
+            print(f"   ✅ Test evaluation completed")
+                  ^
+./agenta_sdk_configuration.py:275:15: F541 f-string is missing placeholders
+        print(f"\n📊 SDK FEATURES CONFIGURATION SUMMARY:")
+              ^
+./agenta_sdk_configuration.py:285:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./agenta_sdk_configuration.py:285:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./agenta_sdk_evaluations.py:10:1: F401 'asyncio' imported but unused
+import asyncio
+^
+./agenta_sdk_evaluations.py:11:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Optional, Any
+^
+./agenta_sdk_evaluations.py:25:15: F541 f-string is missing placeholders
+        print(f"🧪 Agenta SDK Evaluations & A/B Testing")
+              ^
+./agenta_sdk_evaluations.py:26:15: F541 f-string is missing placeholders
+        print(f"=" * 50)
+              ^
+./agenta_sdk_evaluations.py:59:13: F841 local variable 'api_client' is assigned to but never used
+            api_client = self.ag.api
+            ^
+./agenta_sdk_evaluations.py:114:15: F541 f-string is missing placeholders
+        print(f"\n🔧 Creating Evaluation Config...")
+              ^
+./agenta_sdk_evaluations.py:144:15: F541 f-string is missing placeholders
+        print(f"\n🧪 Running Evaluation...")
+              ^
+./agenta_sdk_evaluations.py:150:13: F841 local variable 'config' is assigned to but never used
+            config = self.create_evaluation_config(test_set_id, variant_names)
+            ^
+./agenta_sdk_evaluations.py:174:19: F541 f-string is missing placeholders
+            print(f"\n📊 EVALUATION RESULTS:")
+                  ^
+./agenta_sdk_evaluations.py:195:15: F541 f-string is missing placeholders
+        print(f"\n🔄 Creating A/B Test...")
+              ^
+./agenta_sdk_evaluations.py:228:15: F541 f-string is missing placeholders
+        print(f"   🔄 Running A/B test simulation...")
+              ^
+./agenta_sdk_evaluations.py:262:15: F541 f-string is missing placeholders
+        print(f"   📊 A/B Test Results:")
+              ^
+./agenta_sdk_evaluations.py:332:15: F541 f-string is missing placeholders
+        print(f"\n📊 COMPREHENSIVE EVALUATION SUMMARY:")
+              ^
+./agenta_sdk_evaluations.py:361:11: F541 f-string is missing placeholders
+    print(f"\n💾 Results saved to: agenta_evaluation_results.json")
+          ^
+./autonomous_integration.py:26:1: F401 'autonomous_ai_platform_production_safe.ProductionSafeAutonomousAI' imported but unused
+from autonomous_ai_platform_production_safe import ProductionSafeAutonomousAI, create_production_safe_autonomous_ai
+^
+./complete_master_data_consolidator.py:9:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./complete_master_data_consolidator.py:314:37: E226 missing whitespace around arithmetic operator
+                report.append(f"  {i+1}. {cr.get('CreditReportFirstIssuedDate')} - {cr.get('CREDIT_BUREAU')} (Report {cr.get('Report_ID')})")
+                                    ^
+./complete_master_data_consolidator.py:395:11: F541 f-string is missing placeholders
+    print(f"\\n🎯 MASTER CONSOLIDATION COMPLETE!")
+          ^
+./complete_master_data_consolidator.py:398:11: F541 f-string is missing placeholders
+    print(f"\\n✅ ALL DATA CONSOLIDATED INTO ONE CONTIGUOUS FILE!")
+          ^
+./complete_schema_deep_dive.py:8:1: F401 'os' imported but unused
+import os
+^
+./complete_schema_deep_dive.py:10:1: F401 'typing.List' imported but unused
+from typing import Dict, List, Any, Set, Tuple
+^
+./complete_schema_deep_dive.py:10:1: F401 'typing.Tuple' imported but unused
+from typing import Dict, List, Any, Set, Tuple
+^
+./complete_schema_deep_dive.py:11:1: F401 'collections.deque' imported but unused
+from collections import defaultdict, deque
+^
+./complete_schema_deep_dive.py:269:31: E226 missing whitespace around arithmetic operator
+            report.append(f"{i+1:2d}. {type_name}: {field_count} direct fields")
+                              ^
+./complete_schema_deep_dive.py:277:31: E226 missing whitespace around arithmetic operator
+            report.append(f"{i+1:2d}. {field_name}: appears {count} times")
+                              ^
+./complete_schema_deep_dive.py:285:31: E226 missing whitespace around arithmetic operator
+            report.append(f"{i+1:2d}. {type_name}: {count} fields")
+                              ^
+./complete_schema_deep_dive.py:368:11: F541 f-string is missing placeholders
+    print(f"\n🎯 ANALYSIS COMPLETE!")
+          ^
+./complete_transaction_extractor.py:18:5: F841 local variable 'payment_schedule' is assigned to but never used
+    payment_schedule = {}
+    ^
+./complete_transaction_extractor.py:19:5: F841 local variable 'financial_summary' is assigned to but never used
+    financial_summary = {}
+    ^
+./complete_transaction_extractor.py:89:60: E712 comparison to False should be 'if cond is not False:' or 'if cond:'
+            if value is not None and value != '' and value != False:
+                                                           ^
+./complete_transaction_extractor.py:167:11: F541 f-string is missing placeholders
+    print(f"\n📋 DETAILED TRANSACTION BREAKDOWN")
+          ^
+./comprehensive_live_data_mapper.py:9:1: F401 'os' imported but unused
+import os
+^
+./comprehensive_live_data_mapper.py:519:9: F841 local variable 'credit_records' is assigned to but never used
+        credit_records = self.extract_detailed_credit_data(entity_id)
+        ^
+./comprehensive_live_data_mapper.py:699:9: F841 local variable 'field_coverage' is assigned to but never used
+        field_coverage = data_map.get('field_coverage_analysis', {})
+        ^
+./comprehensive_live_data_mapper.py:725:9: F841 local variable 'financial' is assigned to but never used
+        financial = summary.get('financial', {})
+        ^
+./comprehensive_live_data_mapper.py:803:11: F541 f-string is missing placeholders
+    print(f"\n🎯 COMPREHENSIVE DATA MAP COMPLETE!")
+          ^
+./comprehensive_live_data_mapper.py:806:11: F541 f-string is missing placeholders
+    print(f"\n✅ Master map with ALL fields and elements ready!")
+          ^
+./comprehensive_phone_call_extractor.py:145:15: F541 f-string is missing placeholders
+        print(f"📞 Trying Record Insights approach for phone data...")
+              ^
+./comprehensive_phone_call_extractor.py:200:23: F541 f-string is missing placeholders
+                print(f"✅ Retrieved phone insights")
+                      ^
+./comprehensive_phone_call_extractor.py:391:11: F541 f-string is missing placeholders
+    print(f"\nData Availability:")
+          ^
+./comprehensive_phone_call_extractor.py:398:11: F541 f-string is missing placeholders
+    print(f"\nField Coverage:")
+          ^
+./comprehensive_phone_call_extractor.py:403:15: F541 f-string is missing placeholders
+        print(f"\nInsights Summary:")
+              ^
+./comprehensive_stress_test.py:12:1: F401 'typing.Any' imported but unused
+from typing import List, Dict, Any
+^
+./comprehensive_stress_test.py:286:23: F541 f-string is missing placeholders
+                print(f"   ✅ Contains customer data")
+                      ^
+./comprehensive_stress_test.py:290:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*80)
+                        ^
+./comprehensive_stress_test.py:292:18: E226 missing whitespace around arithmetic operator
+        print("="*80)
+                 ^
+./comprehensive_stress_test.py:301:51: E226 missing whitespace around arithmetic operator
+        print(f"📈 Success Rate: {(successful_tests/total_tests*100):.1f}%")
+                                                  ^
+./comprehensive_stress_test.py:301:63: E226 missing whitespace around arithmetic operator
+        print(f"📈 Success Rate: {(successful_tests/total_tests*100):.1f}%")
+                                                              ^
+./comprehensive_stress_test.py:304:19: F541 f-string is missing placeholders
+            print(f"\n🚨 FAILED TESTS:")
+                  ^
+./comprehensive_stress_test.py:314:19: F541 f-string is missing placeholders
+            print(f"\n⏱️  PERFORMANCE:")
+                  ^
+./comprehensive_stress_test.py:318:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*80)
+                        ^
+./comprehensive_stress_test.py:323:18: E226 missing whitespace around arithmetic operator
+        print("="*60)
+                 ^
+./configure_agenta_features.py:11:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime
+^
+./configure_agenta_features.py:12:1: F401 'typing.List' imported but unused
+from typing import Dict, List, Optional
+^
+./configure_agenta_features.py:12:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Optional
+^
+./configure_agenta_features.py:25:15: F541 f-string is missing placeholders
+        print(f"🔧 Advanced Agenta Configuration:")
+              ^
+./configure_agenta_features.py:32:15: F541 f-string is missing placeholders
+        print(f"\n🧪 Creating Custom Evaluators...")
+              ^
+./configure_agenta_features.py:116:15: F541 f-string is missing placeholders
+        print(f"\n📝 Creating Prompt Variants...")
+              ^
+./configure_agenta_features.py:163:15: F541 f-string is missing placeholders
+        print(f"\n🚀 Setting Up Deployments...")
+              ^
+./configure_agenta_features.py:232:15: F541 f-string is missing placeholders
+        print(f"\n📊 Configuring Observability...")
+              ^
+./configure_agenta_features.py:277:23: F541 f-string is missing placeholders
+                print(f"   ✅ Observability configured successfully")
+                      ^
+./configure_agenta_features.py:278:23: F541 f-string is missing placeholders
+                print(f"   📈 Logging: Enabled (30-day retention)")
+                      ^
+./configure_agenta_features.py:279:23: F541 f-string is missing placeholders
+                print(f"   📊 Monitoring: 5 key metrics tracked")
+                      ^
+./configure_agenta_features.py:280:23: F541 f-string is missing placeholders
+                print(f"   🔔 Alerts: Response time, error rate, token usage")
+                      ^
+./configure_agenta_features.py:281:23: F541 f-string is missing placeholders
+                print(f"   📋 Analytics: Daily reports enabled")
+                      ^
+./configure_agenta_features.py:293:15: F541 f-string is missing placeholders
+        print(f"\n🔗 Setting Up Webhooks...")
+              ^
+./configure_agenta_features.py:356:15: F541 f-string is missing placeholders
+        print(f"\n🧪 Creating A/B Test Experiments...")
+              ^
+./configure_agenta_features.py:437:15: F541 f-string is missing placeholders
+        print(f"\n📊 ADVANCED FEATURES CONFIGURATION SUMMARY:")
+              ^
+./configure_agenta_features.py:447:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./configure_agenta_features.py:447:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./consolidated_data_extractor.py:9:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./consolidated_data_extractor.py:282:11: F541 f-string is missing placeholders
+    print(f"\nData Completeness:")
+          ^
+./create_agenta_test_sets.py:11:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime
+^
+./create_agenta_test_sets.py:23:15: F541 f-string is missing placeholders
+        print(f"🔧 Agenta API Configuration:")
+              ^
+./create_agenta_test_sets.py:50:17: F841 local variable 'result' is assigned to but never used
+                result = response.json()
+                ^
+./create_agenta_test_sets.py:303:15: F541 f-string is missing placeholders
+        print(f"\n📊 TEST SET CREATION SUMMARY:")
+              ^
+./create_agenta_test_sets.py:311:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./create_agenta_test_sets.py:311:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./create_agenta_test_sets.py:364:15: F541 f-string is missing placeholders
+        print(f"\n💡 To create test sets:")
+              ^
+./create_agenta_test_sets.py:365:15: F541 f-string is missing placeholders
+        print(f"1. Set AGENTA_API_KEY environment variable")
+              ^
+./create_agenta_test_sets.py:366:15: F541 f-string is missing placeholders
+        print(f"2. Run: python3 create_agenta_test_sets.py")
+              ^
+./credit_expert_qa_test.py:9:1: F401 'json' imported but unused
+import json
+^
+./credit_expert_qa_test.py:13:1: F401 'typing.Any' imported but unused
+from typing import List, Dict, Any, Tuple
+^
+./credit_expert_qa_test.py:13:1: F401 'typing.Tuple' imported but unused
+from typing import List, Dict, Any, Tuple
+^
+./credit_expert_qa_test.py:475:75: E226 missing whitespace around arithmetic operator
+                f"Quick credit check for {self.test_customer} - request {i+1}",
+                                                                          ^
+./credit_expert_qa_test.py:476:38: E226 missing whitespace around arithmetic operator
+                f"Rapid Sequential {i+1}",
+                                     ^
+./credit_expert_qa_test.py:515:13: F841 local variable 'status_color' is assigned to but never used
+            status_color = ""
+            ^
+./credit_expert_qa_test.py:571:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*100)
+                        ^
+./credit_expert_qa_test.py:573:18: E226 missing whitespace around arithmetic operator
+        print("="*100)
+                 ^
+./credit_expert_qa_test.py:578:41: E226 missing whitespace around arithmetic operator
+        success_rate = (successful_tests/total_tests*100) if total_tests > 0 else 0
+                                        ^
+./credit_expert_qa_test.py:578:53: E226 missing whitespace around arithmetic operator
+        success_rate = (successful_tests/total_tests*100) if total_tests > 0 else 0
+                                                    ^
+./credit_expert_qa_test.py:580:15: F541 f-string is missing placeholders
+        print(f"📊 OVERALL RESULTS:")
+              ^
+./credit_expert_qa_test.py:591:19: F541 f-string is missing placeholders
+            print(f"\n⏱️  PERFORMANCE ANALYSIS:")
+                  ^
+./credit_expert_qa_test.py:601:19: F541 f-string is missing placeholders
+            print(f"\n🎯 QUALITY ANALYSIS:")
+                  ^
+./credit_expert_qa_test.py:609:15: F541 f-string is missing placeholders
+        print(f"\n💡 RECOMMENDATIONS:")
+              ^
+./credit_expert_qa_test.py:617:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*100)
+                        ^
+./credit_expert_qa_test.py:624:18: E226 missing whitespace around arithmetic operator
+        print("="*80)
+                 ^
+./credit_expert_qa_test.py:627:18: E226 missing whitespace around arithmetic operator
+        print("="*80)
+                 ^
+./debug_call_data.py:8:1: F401 'json' imported but unused
+import json
+^
+./debug_call_data.py:105:40: E226 missing whitespace around arithmetic operator
+                    print(f"  Record {i+1}:")
+                                       ^
+./debug_call_data.py:256:27: F541 f-string is missing placeholders
+                    print(f"    ❌ No call nodes in this edge type")
+                          ^
+./debug_data_fetch.py:7:1: F401 'json' imported but unused
+import json
+^
+./debug_data_fetch.py:9:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime, timedelta
+^
+./debug_data_fetch.py:9:1: F401 'datetime.timedelta' imported but unused
+from datetime import datetime, timedelta
+^
+./debug_records_detailed.py:7:1: F401 'json' imported but unused
+import json
+^
+./debug_records_detailed.py:138:34: E226 missing whitespace around arithmetic operator
+            print(f"\n📋 Record {i+1}: {record_id}")
+                                 ^
+./deep_credit_data_extractor.py:251:23: F541 f-string is missing placeholders
+                print(f"✅ Retrieved record insights")
+                      ^
+./deep_credit_data_extractor.py:376:11: F541 f-string is missing placeholders
+    print(f"\nNested Data Breakdown:")
+          ^
+./deep_credit_data_extractor.py:382:15: F541 f-string is missing placeholders
+        print(f"\nRecord Insights Summary:")
+              ^
+./deep_credit_data_extractor.py:388:15: F541 f-string is missing placeholders
+        print(f"\nSample Nested Structures Found:")
+              ^
+./direct_credit_api_multi_provider.py:11:1: F401 'typing.Dict' imported but unused
+from typing import List, Optional, Dict, Any
+^
+./direct_credit_api_multi_provider.py:11:1: F401 'typing.Any' imported but unused
+from typing import List, Optional, Dict, Any
+^
+./direct_credit_api_with_agenta.py:15:1: F401 'typing.Any' imported but unused
+from typing import List, Optional, Dict, Any
+^
+./discover_phone_fields.py:156:11: F541 f-string is missing placeholders
+    print(f"\n🎯 Discovered call field mapping:")
+          ^
+./discover_phone_fields.py:174:11: F541 f-string is missing placeholders
+    print(f"\n💾 Results saved to phone_field_discovery_results.json")
+          ^
+./find_any_call_data.py:7:1: F401 'json' imported but unused
+import json
+^
+./find_any_call_data.py:292:15: F541 f-string is missing placeholders
+        print(f"\n📈 SUMMARY:")
+              ^
+./find_multi_bureau_entity.py:7:1: F401 'json' imported but unused
+import json
+^
+./find_multi_bureau_entity.py:154:30: E226 missing whitespace around arithmetic operator
+        print(f"\n📋 Entity {i+1}: {entity_id}")
+                             ^
+./find_multi_bureau_entity.py:161:19: F541 f-string is missing placeholders
+            print(f"   ✅ MULTI-BUREAU ENTITY FOUND!")
+                  ^
+./live_data_ground_truth_builder.py:8:1: F401 'os' imported but unused
+import os
+^
+./live_data_ground_truth_builder.py:471:11: F541 f-string is missing placeholders
+    print(f"\n🎯 GROUND TRUTH DATASET COMPLETE!")
+          ^
+./live_data_ground_truth_builder.py:475:11: F541 f-string is missing placeholders
+    print(f"\n✅ Ready for Agenta evaluation testing!")
+          ^
+./master_schema_mapper.py:8:1: F401 'os' imported but unused
+import os
+^
+./master_schema_mapper.py:10:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any, Optional, Set, Tuple
+^
+./master_schema_mapper.py:10:1: F401 'typing.Set' imported but unused
+from typing import Dict, List, Any, Optional, Set, Tuple
+^
+./master_schema_mapper.py:439:15: F541 f-string is missing placeholders
+        print(f"✅ Schema map built successfully!")
+              ^
+./monitor_railway_deployment.py:7:1: F401 'time' imported but unused
+import time
+^
+./monitor_railway_deployment.py:8:1: F401 'requests' imported but unused
+import requests
+^
+./monitor_railway_deployment.py:9:1: F401 'json' imported but unused
+import json
+^
+./monitor_railway_deployment.py:21:5: F841 local variable 'expected_config' is assigned to but never used
+    expected_config = {
+    ^
+./monitor_railway_deployment.py:91:13: F401 'fastapi' imported but unused
+            import fastapi
+            ^
+./monitor_railway_deployment.py:92:13: F401 'uvicorn' imported but unused
+            import uvicorn
+            ^
+./monitor_railway_deployment.py:93:13: F401 'requests' imported but unused
+            import requests
+            ^
+./monitor_railway_deployment.py:93:13: F811 redefinition of unused 'requests' from line 8
+            import requests
+            ^
+./monitor_railway_deployment.py:94:13: F401 'pydantic' imported but unused
+            import pydantic
+            ^
+./production_endpoint_config.py:8:1: F401 'os' imported but unused
+import os
+^
+./production_endpoint_config.py:10:1: F401 'typing.List' imported but unused
+from typing import Dict, List
+^
+./production_endpoint_config.py:18:15: F541 f-string is missing placeholders
+        print(f"🚀 Production Endpoint Configuration")
+              ^
+./production_endpoint_config.py:36:15: F541 f-string is missing placeholders
+        print(f"\n🔍 Validating Production Endpoints...")
+              ^
+./production_endpoint_config.py:66:15: F541 f-string is missing placeholders
+        print(f"\n📝 Creating Production Test Script...")
+              ^
+./production_endpoint_config.py:201:19: F541 f-string is missing placeholders
+            print(f"   ✅ Production test script created: test_production_endpoints.py")
+                  ^
+./production_endpoint_config.py:209:15: F541 f-string is missing placeholders
+        print(f"\n🔗 Updating Agenta Webhook Configuration...")
+              ^
+./production_endpoint_config.py:237:19: F541 f-string is missing placeholders
+            print(f"   ✅ Webhook configuration saved: agenta_production_webhooks.json")
+                  ^
+./production_endpoint_config.py:245:15: F541 f-string is missing placeholders
+        print(f"\n⚙️ Creating Environment Configuration...")
+              ^
+./production_endpoint_config.py:267:19: F541 f-string is missing placeholders
+            print(f"   ✅ Environment config saved: environment_config.json")
+                  ^
+./production_endpoint_config.py:294:15: F541 f-string is missing placeholders
+        print(f"\n📊 PRODUCTION SETUP SUMMARY:")
+              ^
+./production_endpoint_config.py:305:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./production_endpoint_config.py:305:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./production_endpoint_config.py:308:19: F541 f-string is missing placeholders
+            print(f"\n🎉 Production setup complete!")
+                  ^
+./production_endpoint_config.py:309:19: F541 f-string is missing placeholders
+            print(f"\n🚀 Production Endpoints:")
+                  ^
+./production_endpoint_config.py:315:19: F541 f-string is missing placeholders
+            print(f"\n📋 Next Steps:")
+                  ^
+./production_endpoint_config.py:316:19: F541 f-string is missing placeholders
+            print(f"  1. Run: python3 test_production_endpoints.py")
+                  ^
+./production_endpoint_config.py:317:19: F541 f-string is missing placeholders
+            print(f"  2. Update Agenta.ai webhook URLs in the UI")
+                  ^
+./production_endpoint_config.py:318:19: F541 f-string is missing placeholders
+            print(f"  3. Test webhook integrations")
+                  ^
+./production_endpoint_config.py:319:19: F541 f-string is missing placeholders
+            print(f"  4. Monitor production performance")
+                  ^
+./production_endpoint_config.py:321:19: F541 f-string is missing placeholders
+            print(f"⚠️ Some configuration failed. Check deployment status.")
+                  ^
+./query_dataset_values.py:113:37: F841 local variable 'param_id' is assigned to but never used
+                                    param_id = param.get('ID')
+                                    ^
+./query_working_summary.py:194:25: F841 local variable 'e' is assigned to but never used
+                        except Exception as e:
+                        ^
+./railway_deployment_troubleshooting.py:9:1: F401 'json' imported but unused
+import json
+^
+./railway_deployment_troubleshooting.py:64:19: F541 f-string is missing placeholders
+            print(f"  ❌ CONNECTION TIMEOUT: Server not responding")
+                  ^
+./railway_deployment_troubleshooting.py:67:19: F541 f-string is missing placeholders
+            print(f"  ❌ READ TIMEOUT: Server too slow to respond")
+                  ^
+./railway_deployment_troubleshooting.py:173:11: F541 f-string is missing placeholders
+    print(f"Check interval: 30 seconds")
+          ^
+./record_insights_field_discovery.py:24:5: F841 local variable 'entity_id' is assigned to but never used
+    entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+    ^
+./schema_introspection_reinvestigation.py:24:5: F841 local variable 'entity_id' is assigned to but never used
+    entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+    ^
+./search_by_name.py:7:1: F401 'json' imported but unused
+import json
+^
+./search_by_name.py:176:5: F841 local variable 'e' is assigned to but never used
+    except Exception as e:
+    ^
+./search_by_name.py:214:19: F541 f-string is missing placeholders
+            print(f"   ✅ MULTI-BUREAU ENTITY!")
+                  ^
+./search_by_name.py:217:19: F541 f-string is missing placeholders
+            print(f"   ✅ ALL THREE BUREAUS!")
+                  ^
+./set_agenta_key.py:69:15: F541 f-string is missing placeholders
+        print(f"\n💾 Saved to .env file for persistence")
+              ^
+./set_agenta_key.py:70:15: F541 f-string is missing placeholders
+        print(f"⚠️ Make sure to add .env to your .gitignore file!")
+              ^
+./set_agenta_key.py:74:15: F541 f-string is missing placeholders
+        print(f"💡 You may need to set the environment variable manually")
+              ^
+./set_agenta_key.py:76:11: F541 f-string is missing placeholders
+    print(f"\n🎯 Next steps:")
+          ^
+./set_agenta_key.py:77:11: F541 f-string is missing placeholders
+    print(f"  1. Run: python test_agenta_ui_integration.py")
+          ^
+./set_agenta_key.py:78:11: F541 f-string is missing placeholders
+    print(f"  2. Check Agenta.ai dashboard for your app")
+          ^
+./set_agenta_key.py:79:11: F541 f-string is missing placeholders
+    print(f"  3. Configure prompt variants in Agenta.ai UI")
+          ^
+./set_agenta_key.py:88:19: F541 f-string is missing placeholders
+            print(f"\n🎉 Agenta.ai API key setup complete!")
+                  ^
+./set_agenta_key.py:90:19: F541 f-string is missing placeholders
+            print(f"\n❌ API key setup failed")
+                  ^
+./set_agenta_key.py:93:15: F541 f-string is missing placeholders
+        print(f"\n\n⚠️ Setup cancelled by user")
+              ^
+./setup_agenta_environment.py:9:1: F401 'requests' imported but unused
+import requests
+^
+./setup_agenta_environment.py:11:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime
+^
+./setup_agenta_environment.py:46:9: F401 'agenta' imported but unused
+        import agenta
+        ^
+./setup_agenta_environment.py:247:11: F541 f-string is missing placeholders
+    print(f"  - Environment: ✅ Configured")
+          ^
+./setup_agenta_environment.py:248:11: F541 f-string is missing placeholders
+    print(f"  - SDK: ✅ Installed")
+          ^
+./setup_agenta_environment.py:252:11: F541 f-string is missing placeholders
+    print(f"\n🎯 NEXT STEPS:")
+          ^
+./setup_agenta_environment.py:253:11: F541 f-string is missing placeholders
+    print(f"  1. Update AGENTA_API_KEY with your actual key")
+          ^
+./setup_agenta_environment.py:254:11: F541 f-string is missing placeholders
+    print(f"  2. Run: python test_agenta_integration.py")
+          ^
+./setup_agenta_environment.py:255:11: F541 f-string is missing placeholders
+    print(f"  3. Test Agenta.ai UI with template prompts")
+          ^
+./setup_agenta_environment.py:256:11: F541 f-string is missing placeholders
+    print(f"  4. Configure variants in Agenta.ai dashboard")
+          ^
+./setup_agenta_test_sets.py:42:11: F541 f-string is missing placeholders
+    print(f"\n✅ API key set for this session")
+          ^
+./setup_agenta_test_sets.py:97:15: F541 f-string is missing placeholders
+        print(f"\n🎯 Next steps:")
+              ^
+./setup_agenta_test_sets.py:98:15: F541 f-string is missing placeholders
+        print(f"  1. Go to Agenta.ai Test Sets section")
+              ^
+./setup_agenta_test_sets.py:99:15: F541 f-string is missing placeholders
+        print(f"  2. Run tests against your variants")
+              ^
+./setup_agenta_test_sets.py:100:15: F541 f-string is missing placeholders
+        print(f"  3. Compare performance across variants")
+              ^
+./setup_agenta_test_sets.py:101:15: F541 f-string is missing placeholders
+        print(f"  4. Use results to optimize prompts")
+              ^
+./setup_agenta_variants.py:147:15: F541 f-string is missing placeholders
+        print(f"✅ Saved setup guide to AGENTA_UI_SETUP_GUIDE.md")
+              ^
+./setup_agenta_variants.py:155:15: F541 f-string is missing placeholders
+        print(f"\n🎯 QUICK SETUP SUMMARY")
+              ^
+./setup_agenta_variants.py:158:15: F541 f-string is missing placeholders
+        print(f"🔗 Webhooks to Configure: 3")
+              ^
+./setup_agenta_variants.py:159:15: F541 f-string is missing placeholders
+        print(f"🧪 Test Sets Available: 6")
+              ^
+./setup_agenta_variants.py:160:15: F541 f-string is missing placeholders
+        print(f"📋 Total Test Cases: 25")
+              ^
+./setup_agenta_variants.py:162:15: F541 f-string is missing placeholders
+        print(f"\n📝 VARIANT OVERVIEW:")
+              ^
+./setup_agenta_variants.py:169:15: F541 f-string is missing placeholders
+        print(f"\n🔗 WEBHOOK URLS:")
+              ^
+./setup_agenta_variants.py:179:15: F541 f-string is missing placeholders
+        print(f"\n🚀 NEXT ACTION:")
+              ^
+./setup_agenta_variants.py:180:15: F541 f-string is missing placeholders
+        print(f"  1. Open https://cloud.agenta.ai")
+              ^
+./setup_agenta_variants.py:181:15: F541 f-string is missing placeholders
+        print(f"  2. Go to your 'tilores-x' app")
+              ^
+./setup_agenta_variants.py:182:15: F541 f-string is missing placeholders
+        print(f"  3. Follow the setup guide in AGENTA_UI_SETUP_GUIDE.md")
+              ^
+./simple_credit_investigation.py:21:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./simple_credit_investigation.py:141:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./start_server_clean.py:9:1: F401 'os' imported but unused
+import os
+^
+./start_server_clean.py:53:13: E722 do not use bare 'except'
+            except:
+            ^
+./targeted_system_breaker.py:26:5: F841 local variable 'entity_id' is assigned to but never used
+    entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+    ^
+./temporal_analysis_quick_fix.py:24:5: F841 local variable 'entity_id' is assigned to but never used
+    entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+    ^
+./test_agenta_integration.py:8:1: F401 'os' imported but unused
+import os
+^
+./test_agenta_integration.py:10:1: F401 'json' imported but unused
+import json
+^
+./test_agenta_ui_integration.py:368:11: F541 f-string is missing placeholders
+    print(f"\n🎯 SUCCESS RATES:")
+          ^
+./test_agenta_ui_integration.py:369:95: E226 missing whitespace around arithmetic operator
+    print(f"  - Fallback System: {fallback_success}/{len(fallback_results)} ({fallback_success/len(fallback_results)*100:.1f}%)")
+                                                                                              ^
+./test_agenta_ui_integration.py:369:117: E226 missing whitespace around arithmetic operator
+    print(f"  - Fallback System: {fallback_success}/{len(fallback_results)} ({fallback_success/len(fallback_results)*100:.1f}%)")
+                                                                                                                    ^
+./test_agenta_ui_integration.py:370:91: E226 missing whitespace around arithmetic operator
+    print(f"  - Prompt Parameters: {prompt_success}/{len(prompt_results)} ({prompt_success/len(prompt_results)*100:.1f}%)")
+                                                                                          ^
+./test_agenta_ui_integration.py:370:111: E226 missing whitespace around arithmetic operator
+    print(f"  - Prompt Parameters: {prompt_success}/{len(prompt_results)} ({prompt_success/len(prompt_results)*100:.1f}%)")
+                                                                                                              ^
+./test_agenta_ui_integration.py:371:78: E226 missing whitespace around arithmetic operator
+    print(f"  - UI Compatibility: {ui_success}/{len(ui_results)} ({ui_success/len(ui_results)*100:.1f}%)")
+                                                                             ^
+./test_agenta_ui_integration.py:371:94: E226 missing whitespace around arithmetic operator
+    print(f"  - UI Compatibility: {ui_success}/{len(ui_results)} ({ui_success/len(ui_results)*100:.1f}%)")
+                                                                                             ^
+./test_agenta_ui_integration.py:385:11: F541 f-string is missing placeholders
+    print(f"\n📋 DETAILED RESULTS:")
+          ^
+./test_agenta_ui_integration.py:387:11: F541 f-string is missing placeholders
+    print(f"\n  🔄 Fallback System Tests:")
+          ^
+./test_agenta_ui_integration.py:392:11: F541 f-string is missing placeholders
+    print(f"\n  🎯 Prompt Parameter Tests:")
+          ^
+./test_agenta_ui_integration.py:397:11: F541 f-string is missing placeholders
+    print(f"\n  🖥️ UI Compatibility Tests:")
+          ^
+./test_agenta_ui_integration.py:402:11: F541 f-string is missing placeholders
+    print(f"\n  📋 Template System:")
+          ^
+./test_agenta_ui_integration.py:409:11: F541 f-string is missing placeholders
+    print(f"\n💡 RECOMMENDATIONS:")
+          ^
+./test_agenta_ui_integration.py:411:15: F541 f-string is missing placeholders
+        print(f"  ✅ System is ready for Agenta.ai UI integration")
+              ^
+./test_agenta_ui_integration.py:412:15: F541 f-string is missing placeholders
+        print(f"  ✅ All fallback mechanisms are working correctly")
+              ^
+./test_agenta_ui_integration.py:413:15: F541 f-string is missing placeholders
+        print(f"  ✅ Template prompts are properly configured")
+              ^
+./test_agenta_ui_integration.py:414:15: F541 f-string is missing placeholders
+        print(f"  🚀 Proceed with Agenta.ai dashboard configuration")
+              ^
+./test_agenta_ui_integration.py:416:15: F541 f-string is missing placeholders
+        print(f"  ⚠️ Address failing tests before production deployment")
+              ^
+./test_agenta_ui_integration.py:417:15: F541 f-string is missing placeholders
+        print(f"  🔧 Check server logs for detailed error information")
+              ^
+./test_agenta_ui_integration.py:418:15: F541 f-string is missing placeholders
+        print(f"  📋 Verify template prompt configurations")
+              ^
+./test_agenta_ui_integration.py:471:15: F541 f-string is missing placeholders
+        print(f"\n🧹 Cleaning up...")
+              ^
+./test_agenta_validation_simple.py:344:11: F541 f-string is missing placeholders
+    print(f"\n🎯 SUCCESS RATES:")
+          ^
+./test_agenta_validation_simple.py:346:95: E226 missing whitespace around arithmetic operator
+    print(f"  - Fallback System: {fallback_success}/{len(fallback_results)} ({fallback_success/len(fallback_results)*100:.1f}%)")
+                                                                                              ^
+./test_agenta_validation_simple.py:346:117: E226 missing whitespace around arithmetic operator
+    print(f"  - Fallback System: {fallback_success}/{len(fallback_results)} ({fallback_success/len(fallback_results)*100:.1f}%)")
+                                                                                                                    ^
+./test_agenta_validation_simple.py:347:91: E226 missing whitespace around arithmetic operator
+    print(f"  - Prompt Parameters: {prompt_success}/{len(prompt_results)} ({prompt_success/len(prompt_results)*100:.1f}%)")
+                                                                                          ^
+./test_agenta_validation_simple.py:347:111: E226 missing whitespace around arithmetic operator
+    print(f"  - Prompt Parameters: {prompt_success}/{len(prompt_results)} ({prompt_success/len(prompt_results)*100:.1f}%)")
+                                                                                                              ^
+./test_agenta_validation_simple.py:348:78: E226 missing whitespace around arithmetic operator
+    print(f"  - UI Compatibility: {ui_success}/{len(ui_results)} ({ui_success/len(ui_results)*100:.1f}%)")
+                                                                             ^
+./test_agenta_validation_simple.py:348:94: E226 missing whitespace around arithmetic operator
+    print(f"  - UI Compatibility: {ui_success}/{len(ui_results)} ({ui_success/len(ui_results)*100:.1f}%)")
+                                                                                             ^
+./test_agenta_validation_simple.py:361:11: F541 f-string is missing placeholders
+    print(f"\n📋 DETAILED RESULTS:")
+          ^
+./test_agenta_validation_simple.py:363:11: F541 f-string is missing placeholders
+    print(f"\n  📋 Template System:")
+          ^
+./test_agenta_validation_simple.py:369:11: F541 f-string is missing placeholders
+    print(f"\n  🔄 Fallback System Tests:")
+          ^
+./test_agenta_validation_simple.py:374:11: F541 f-string is missing placeholders
+    print(f"\n  🎯 Prompt Parameter Tests:")
+          ^
+./test_agenta_validation_simple.py:379:11: F541 f-string is missing placeholders
+    print(f"\n  🖥️ UI Compatibility Tests:")
+          ^
+./test_agenta_validation_simple.py:385:11: F541 f-string is missing placeholders
+    print(f"\n🔍 KEY FINDINGS:")
+          ^
+./test_agenta_validation_simple.py:386:11: F541 f-string is missing placeholders
+    print(f"  ✅ Template prompts created and validated")
+          ^
+./test_agenta_validation_simple.py:387:11: F541 f-string is missing placeholders
+    print(f"  ✅ Fallback system working (no Agenta SDK required)")
+          ^
+./test_agenta_validation_simple.py:388:11: F541 f-string is missing placeholders
+    print(f"  ✅ OpenAI API compatibility maintained")
+          ^
+./test_agenta_validation_simple.py:389:11: F541 f-string is missing placeholders
+    print(f"  ✅ Salesforce status bug fix validated")
+          ^
+./test_agenta_validation_simple.py:392:11: F541 f-string is missing placeholders
+    print(f"\n💡 RECOMMENDATIONS:")
+          ^
+./test_agenta_validation_simple.py:394:15: F541 f-string is missing placeholders
+        print(f"  ✅ System is ready for Agenta.ai UI integration")
+              ^
+./test_agenta_validation_simple.py:395:15: F541 f-string is missing placeholders
+        print(f"  ✅ Template prompts are properly configured")
+              ^
+./test_agenta_validation_simple.py:396:15: F541 f-string is missing placeholders
+        print(f"  ✅ Fallback mechanisms ensure reliability")
+              ^
+./test_agenta_validation_simple.py:397:15: F541 f-string is missing placeholders
+        print(f"  🚀 Proceed with Agenta.ai dashboard configuration")
+              ^
+./test_agenta_validation_simple.py:398:15: F541 f-string is missing placeholders
+        print(f"  📝 Use template prompts as starting points in Agenta.ai")
+              ^
+./test_agenta_validation_simple.py:400:15: F541 f-string is missing placeholders
+        print(f"  ⚠️ Address failing tests before production deployment")
+              ^
+./test_agenta_validation_simple.py:401:15: F541 f-string is missing placeholders
+        print(f"  🔧 Check server logs for detailed error information")
+              ^
+./test_agenta_validation_simple.py:402:15: F541 f-string is missing placeholders
+        print(f"  📋 Verify template prompt configurations")
+              ^
+./test_agenta_validation_simple.py:450:15: F541 f-string is missing placeholders
+        print(f"\n🧹 Cleaning up...")
+              ^
+./test_analysis.py:11:1: F401 'importlib.util' imported but unused
+import importlib.util
+^
+./test_analysis.py:119:23: E226 missing whitespace around arithmetic operator
+        print(f"\n{'='*60}")
+                      ^
+./test_analysis.py:121:21: E226 missing whitespace around arithmetic operator
+        print(f"{'='*60}")
+                    ^
+./test_call_rows.py:3:1: F401 'json' imported but unused
+import json
+^
+./test_call_rows.py:53:19: F541 f-string is missing placeholders
+            print(f'\n📋 RECORD INSIGHTS:')
+                  ^
+./test_call_rows.py:65:38: E226 missing whitespace around arithmetic operator
+                    print(f'  Call {i+1}:')
+                                     ^
+./test_call_rows.py:81:40: E226 missing whitespace around arithmetic operator
+                    print(f'  Record {i+1}:')
+                                       ^
+./test_comprehensive_query.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_corrected_records_access.py:119:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_critical_fixes.py:8:1: F401 'json' imported but unused
+import json
+^
+./test_critical_fixes.py:136:19: F541 f-string is missing placeholders
+            print(f"   ✅ Proper company response")
+                  ^
+./test_critical_fixes.py:138:19: F541 f-string is missing placeholders
+            print(f"   ⚠️  Still treating as customer search")
+                  ^
+./test_critical_fixes.py:152:90: E226 missing whitespace around arithmetic operator
+            {"role": "user", "content": [{"type": "text", "text": f"Quick credit check {i+1} for {customer_email}"}]}
+                                                                                         ^
+./test_critical_fixes.py:155:76: E226 missing whitespace around arithmetic operator
+        success, duration, _ = make_request(messages, f"Rapid Sequential {i+1}")
+                                                                           ^
+./test_critical_fixes.py:165:14: E226 missing whitespace around arithmetic operator
+    print("="*60)
+             ^
+./test_critical_fixes.py:177:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*60)
+                        ^
+./test_critical_fixes.py:179:18: E226 missing whitespace around arithmetic operator
+        print("="*60)
+                 ^
+./test_critical_fixes.py:205:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*60)
+                        ^
+./test_direct_fix.py:8:1: F401 'typing.List' imported but unused
+from typing import List, Dict, Any
+^
+./test_direct_fix.py:8:1: F401 'typing.Dict' imported but unused
+from typing import List, Dict, Any
+^
+./test_direct_fix.py:8:1: F401 'typing.Any' imported but unused
+from typing import List, Dict, Any
+^
+./test_full_response.py:8:1: F401 'typing.List' imported but unused
+from typing import List, Dict, Any
+^
+./test_full_response.py:8:1: F401 'typing.Dict' imported but unused
+from typing import List, Dict, Any
+^
+./test_full_response.py:8:1: F401 'typing.Any' imported but unused
+from typing import List, Dict, Any
+^
+./test_golden_peek_query.py:116:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_golden_peek_query.py:201:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_local_agenta.py:10:1: F401 'os' imported but unused
+import os
+^
+./test_local_agenta.py:11:1: F401 'signal' imported but unused
+import signal
+^
+./test_multi_providers.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_multi_providers.py:33:15: F541 f-string is missing placeholders
+        print(f"✅ Claude 3.5 Sonnet Response:")
+              ^
+./test_multi_providers.py:64:15: F541 f-string is missing placeholders
+        print(f"✅ Gemini 1.5 Flash Response:")
+              ^
+./test_performance_improvements.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_performance_improvements.py:51:13: F841 local variable 'content' is assigned to but never used
+            content = response.json()["choices"][0]["message"]["content"]
+            ^
+./test_performance_improvements.py:97:11: F541 f-string is missing placeholders
+    print(f"\n📊 Concurrent Test Results:")
+          ^
+./test_performance_improvements.py:98:57: E226 missing whitespace around arithmetic operator
+    print(f"   ✅ Success Rate: {successes}/5 ({successes/5*100:.0f}%)")
+                                                        ^
+./test_performance_improvements.py:98:59: E226 missing whitespace around arithmetic operator
+    print(f"   ✅ Success Rate: {successes}/5 ({successes/5*100:.0f}%)")
+                                                          ^
+./test_performance_improvements.py:100:53: E226 missing whitespace around arithmetic operator
+    print(f"   ⏱️  Average Duration: {sum(durations)/len(durations):.1f}s")
+                                                    ^
+./test_performance_improvements.py:116:11: F541 f-string is missing placeholders
+    print(f"📊 Parallel Fetch Results:")
+          ^
+./test_performance_improvements.py:144:19: F541 f-string is missing placeholders
+            print(f"📊 Cache Performance:")
+                  ^
+./test_performance_improvements.py:146:70: E226 missing whitespace around arithmetic operator
+            print(f"   💾 Time Saved: {improvement:.1f}s ({improvement/duration1*100:.0f}%)")
+                                                                     ^
+./test_performance_improvements.py:146:80: E226 missing whitespace around arithmetic operator
+            print(f"   💾 Time Saved: {improvement:.1f}s ({improvement/duration1*100:.0f}%)")
+                                                                               ^
+./test_performance_improvements.py:155:14: E226 missing whitespace around arithmetic operator
+    print("="*60)
+             ^
+./test_performance_improvements.py:170:25: E226 missing whitespace around arithmetic operator
+        print("\n" + "="*60)
+                        ^
+./test_performance_improvements.py:172:18: E226 missing whitespace around arithmetic operator
+        print("="*60)
+                 ^
+./test_performance_improvements.py:181:15: F541 f-string is missing placeholders
+        print(f"\n⏱️  TIMING ANALYSIS:")
+              ^
+./test_production_endpoints.py:9:1: F401 'json' imported but unused
+import json
+^
+./test_production_endpoints.py:10:1: F401 'time' imported but unused
+import time
+^
+./test_production_endpoints.py:106:15: F541 f-string is missing placeholders
+        print(f"\n📊 PRODUCTION TEST SUMMARY:")
+              ^
+./test_production_endpoints.py:116:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./test_production_endpoints.py:116:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./test_providers_simple.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_records_array_credit_data.py:102:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_records_array_credit_data.py:188:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_status_fix.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_tool_fix.py:7:1: F401 'json' imported but unused
+import json
+^
+./test_tool_fix.py:8:1: F401 'os' imported but unused
+import os
+^
+./test_tool_fix.py:20:1: F401 'core_app.get_available_models' imported but unused
+from core_app import get_available_models, initialize_engine, run_chain
+^
+./test_tool_fix.py:20:1: F401 'core_app.run_chain' imported but unused
+from core_app import get_available_models, initialize_engine, run_chain
+^
+./test_webhook_integration.py:9:1: F401 'json' imported but unused
+import json
+^
+./test_webhook_integration.py:10:1: F401 'time' imported but unused
+import time
+^
+./test_webhook_integration.py:35:23: F541 f-string is missing placeholders
+                print(f"   ✅ Health check passed")
+                      ^
+./test_webhook_integration.py:74:23: F541 f-string is missing placeholders
+                print(f"   ✅ Evaluation webhook working")
+                      ^
+./test_webhook_integration.py:109:23: F541 f-string is missing placeholders
+                print(f"   ✅ Deployment webhook working")
+                      ^
+./test_webhook_integration.py:143:23: F541 f-string is missing placeholders
+                print(f"   ✅ Performance webhook working")
+                      ^
+./test_webhook_integration.py:172:15: F541 f-string is missing placeholders
+        print(f"\n📊 WEBHOOK INTEGRATION TEST SUMMARY:")
+              ^
+./test_webhook_integration.py:182:68: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                   ^
+./test_webhook_integration.py:182:74: E226 missing whitespace around arithmetic operator
+        print(f"\n🎯 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                         ^
+./test_working_query.py:6:1: F401 'json' imported but unused
+import json
+^
+./test_working_query.py:23:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./test_working_query.py:142:9: F841 local variable 'entity_id' is assigned to but never used
+        entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+        ^
+./tests/agenta/agenta_evaluation_framework.py:14:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Any, Optional, Tuple
+^
+./tests/agenta/agenta_evaluation_framework.py:189:60: E226 missing whitespace around arithmetic operator
+                judge_result = json.loads(content[start:end+1])
+                                                           ^
+./tests/agenta/agenta_evaluation_framework.py:218:49: E226 missing whitespace around arithmetic operator
+                return json.loads(text[start:end+1])
+                                                ^
+./tests/agenta/agenta_evaluation_framework.py:227:9: F841 local variable 'weight' is assigned to but never used
+        weight = self.field_weights.get(field_name, 1.0)
+        ^
+./tests/agenta/agenta_evaluation_framework.py:407:32: E741 ambiguous variable name 'l'
+            latencies = [l for l in data["latencies"] if l is not None]
+                               ^
+./tests/agenta/agenta_test_runner.py:14:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./tests/agenta/agenta_test_runner.py:14:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./tests/agenta/agenta_test_runner.py:35:15: F541 f-string is missing placeholders
+        print(f"🚀 Agenta Test Runner Initialized")
+              ^
+./tests/agenta/agenta_test_runner.py:226:13: F841 local variable 'analysis' is assigned to but never used
+            analysis = analyzer.analyze_results()
+            ^
+./tests/agenta/agenta_test_runner.py:297:13: F841 local variable 'extractor' is assigned to but never used
+            extractor = GroundTruthExtractor()
+            ^
+./tests/agenta/demo_framework.py:9:1: F401 'os' imported but unused
+import os
+^
+./tests/agenta/demo_framework.py:10:1: F401 'json' imported but unused
+import json
+^
+./tests/agenta/demo_framework.py:105:15: F541 f-string is missing placeholders
+        print(f"\n📈 Demo Scoring:")
+              ^
+./tests/agenta/demo_framework.py:159:15: F541 f-string is missing placeholders
+        print(f"\n🎯 Promotion Recommendation:")
+              ^
+./tests/agenta/demo_framework.py:168:19: F541 f-string is missing placeholders
+            print(f"\n📈 Performance Comparison:")
+                  ^
+./tests/agenta/demo_framework.py:191:15: F541 f-string is missing placeholders
+        print(f"✅ Validation completed")
+              ^
+./tests/agenta/demo_framework.py:239:64: E226 missing whitespace around arithmetic operator
+    print(f"\n📊 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                               ^
+./tests/agenta/demo_framework.py:239:70: E226 missing whitespace around arithmetic operator
+    print(f"\n📊 Success Rate: {successful}/{total} ({successful/total*100:.1f}%)")
+                                                                     ^
+./tests/agenta/deploy_test_set.py:12:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/deploy_test_set.py:27:15: F541 f-string is missing placeholders
+        print(f"🚀 Agenta Test Set Deployer Initialized")
+              ^
+./tests/agenta/deploy_test_set.py:96:23: F541 f-string is missing placeholders
+                print(f"✅ Test set created successfully")
+                      ^
+./tests/agenta/deploy_test_set.py:167:23: F541 f-string is missing placeholders
+                print(f"✅ Test set validation successful")
+                      ^
+./tests/agenta/deploy_test_set.py:186:15: F541 f-string is missing placeholders
+        print(f"\n🚀 DEPLOYING TEST SET TO AGENTA")
+              ^
+./tests/agenta/deploy_test_set.py:251:15: F541 f-string is missing placeholders
+        print(f"\n🎯 DEPLOYMENT RESULTS")
+              ^
+./tests/agenta/deploy_test_set.py:261:19: F541 f-string is missing placeholders
+            print(f"\n🔗 Next steps:")
+                  ^
+./tests/agenta/deploy_test_set.py:262:19: F541 f-string is missing placeholders
+            print(f"  1. Go to Agenta.ai dashboard")
+                  ^
+./tests/agenta/deploy_test_set.py:264:19: F541 f-string is missing placeholders
+            print(f"  3. Run evaluations against your variants")
+                  ^
+./tests/agenta/deploy_test_set_api.py:27:15: F541 f-string is missing placeholders
+        print(f"🚀 Agenta API Uploader Initialized")
+              ^
+./tests/agenta/deploy_test_set_api.py:61:27: F541 f-string is missing placeholders
+                    print(f"✅ Upload successful!")
+                          ^
+./tests/agenta/deploy_test_set_api.py:75:21: E722 do not use bare 'except'
+                    except:
+                    ^
+./tests/agenta/deploy_test_set_api.py:134:15: F541 f-string is missing placeholders
+        print(f"\n🚀 DEPLOYING TEST SET VIA API")
+              ^
+./tests/agenta/deploy_test_set_api.py:178:15: F541 f-string is missing placeholders
+        print(f"\n🎯 DEPLOYMENT RESULTS")
+              ^
+./tests/agenta/deploy_test_set_api.py:187:19: F541 f-string is missing placeholders
+            print(f"\n🔗 NEXT STEPS:")
+                  ^
+./tests/agenta/deploy_test_set_api.py:188:19: F541 f-string is missing placeholders
+            print(f"1. Go to: https://cloud.agenta.ai")
+                  ^
+./tests/agenta/deploy_test_set_api.py:189:19: F541 f-string is missing placeholders
+            print(f"2. Navigate to your app's Test Sets")
+                  ^
+./tests/agenta/deploy_test_set_api.py:191:19: F541 f-string is missing placeholders
+            print(f"4. Run evaluations against your variants")
+                  ^
+./tests/agenta/deploy_test_set_api.py:198:23: F541 f-string is missing placeholders
+                print(f"\n💡 TROUBLESHOOTING:")
+                      ^
+./tests/agenta/deploy_test_set_api.py:199:23: F541 f-string is missing placeholders
+                print(f"  - Check your AGENTA_API_KEY")
+                      ^
+./tests/agenta/deploy_test_set_api.py:200:23: F541 f-string is missing placeholders
+                print(f"  - Ensure API key has upload permissions")
+                      ^
+./tests/agenta/deploy_test_set_api.py:201:23: F541 f-string is missing placeholders
+                print(f"  - Verify you have access to the app")
+                      ^
+./tests/agenta/deploy_test_set_api.py:203:23: F541 f-string is missing placeholders
+                print(f"\n💡 TROUBLESHOOTING:")
+                      ^
+./tests/agenta/deploy_test_set_api.py:204:23: F541 f-string is missing placeholders
+                print(f"  - Check CSV format")
+                      ^
+./tests/agenta/deploy_test_set_api.py:205:23: F541 f-string is missing placeholders
+                print(f"  - Ensure testset name is valid")
+                      ^
+./tests/agenta/deploy_test_set_api.py:206:23: F541 f-string is missing placeholders
+                print(f"  - Verify file is not corrupted")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:29:15: F541 f-string is missing placeholders
+        print(f"🚀 Agenta JSON API Uploader Initialized")
+              ^
+./tests/agenta/deploy_test_set_json_api.py:84:27: F541 f-string is missing placeholders
+                    print(f"✅ Test set created successfully!")
+                          ^
+./tests/agenta/deploy_test_set_json_api.py:96:27: F541 f-string is missing placeholders
+                    print(f"✅ Test set created (non-JSON response)")
+                          ^
+./tests/agenta/deploy_test_set_json_api.py:108:17: E722 do not use bare 'except'
+                except:
+                ^
+./tests/agenta/deploy_test_set_json_api.py:151:17: E722 do not use bare 'except'
+                except:
+                ^
+./tests/agenta/deploy_test_set_json_api.py:175:15: F541 f-string is missing placeholders
+        print(f"\n🚀 DEPLOYING TEST SET VIA JSON API")
+              ^
+./tests/agenta/deploy_test_set_json_api.py:223:15: F541 f-string is missing placeholders
+        print(f"\n🎯 DEPLOYMENT RESULTS")
+              ^
+./tests/agenta/deploy_test_set_json_api.py:234:19: F541 f-string is missing placeholders
+            print(f"\n🔗 NEXT STEPS:")
+                  ^
+./tests/agenta/deploy_test_set_json_api.py:235:19: F541 f-string is missing placeholders
+            print(f"1. Go to: https://cloud.agenta.ai")
+                  ^
+./tests/agenta/deploy_test_set_json_api.py:236:19: F541 f-string is missing placeholders
+            print(f"2. Navigate to your app's Test Sets")
+                  ^
+./tests/agenta/deploy_test_set_json_api.py:238:19: F541 f-string is missing placeholders
+            print(f"4. Run evaluations against your variants")
+                  ^
+./tests/agenta/deploy_test_set_json_api.py:245:23: F541 f-string is missing placeholders
+                print(f"\n💡 TROUBLESHOOTING:")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:246:23: F541 f-string is missing placeholders
+                print(f"  - API Key format might be incorrect")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:247:23: F541 f-string is missing placeholders
+                print(f"  - Try different authentication header format")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:248:23: F541 f-string is missing placeholders
+                print(f"  - Check if API key is active and has permissions")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:250:23: F541 f-string is missing placeholders
+                print(f"\n💡 TROUBLESHOOTING:")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:251:23: F541 f-string is missing placeholders
+                print(f"  - Check JSON payload format")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:252:23: F541 f-string is missing placeholders
+                print(f"  - Verify testset name is valid")
+                      ^
+./tests/agenta/deploy_test_set_json_api.py:253:23: F541 f-string is missing placeholders
+                print(f"  - Ensure CSV data is properly formatted")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:12:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/deploy_test_set_sdk.py:41:15: F541 f-string is missing placeholders
+        print(f"🚀 Agenta SDK Test Set Deployer Initialized")
+              ^
+./tests/agenta/deploy_test_set_sdk.py:99:19: F541 f-string is missing placeholders
+            print(f"🔄 Initializing Agenta SDK...")
+                  ^
+./tests/agenta/deploy_test_set_sdk.py:113:23: F541 f-string is missing placeholders
+                print(f"✅ Test set created using create_test_set method")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:122:23: F541 f-string is missing placeholders
+                print(f"✅ Test set created using TestSet class")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:130:17: F841 local variable 'result' is assigned to but never used
+                result = client.create_testset(name=name, csvdata=df.to_dict('records'))
+                ^
+./tests/agenta/deploy_test_set_sdk.py:131:23: F541 f-string is missing placeholders
+                print(f"✅ Test set created using AgentaApi client")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:152:19: F541 f-string is missing placeholders
+            print(f"📁 You can manually upload this file to Agenta.ai dashboard")
+                  ^
+./tests/agenta/deploy_test_set_sdk.py:168:15: F541 f-string is missing placeholders
+        print(f"✅ Test set format validation passed")
+              ^
+./tests/agenta/deploy_test_set_sdk.py:177:15: F541 f-string is missing placeholders
+        print(f"\n🚀 DEPLOYING TEST SET TO AGENTA (SDK)")
+              ^
+./tests/agenta/deploy_test_set_sdk.py:236:15: F541 f-string is missing placeholders
+        print(f"\n🎯 DEPLOYMENT RESULTS")
+              ^
+./tests/agenta/deploy_test_set_sdk.py:247:23: F541 f-string is missing placeholders
+                print(f"\n🎉 SUCCESS: Test set deployed via SDK!")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:250:23: F541 f-string is missing placeholders
+                print(f"\n📁 MANUAL UPLOAD REQUIRED:")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:251:23: F541 f-string is missing placeholders
+                print(f"  1. Go to Agenta.ai dashboard")
+                      ^
+./tests/agenta/deploy_test_set_sdk.py:252:23: F541 f-string is missing placeholders
+                print(f"  2. Navigate to Test Sets")
+                      ^
+./tests/agenta/deploy_test_set_simple.py:13:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/deploy_test_set_simple.py:31:15: F541 f-string is missing placeholders
+        print(f"🚀 Simple Agenta Deployer Initialized")
+              ^
+./tests/agenta/deploy_test_set_simple.py:155:17: F841 local variable 'result' is assigned to but never used
+                result = client.create_testset(name=test_set_name, csvdata=csv_data)
+                ^
+./tests/agenta/deploy_test_set_simple.py:205:15: F541 f-string is missing placeholders
+        print(f"\n📋 MANUAL UPLOAD INSTRUCTIONS")
+              ^
+./tests/agenta/deploy_test_set_simple.py:209:15: F541 f-string is missing placeholders
+        print(f"3. 🔧 Go to 'Test Sets' section")
+              ^
+./tests/agenta/deploy_test_set_simple.py:210:15: F541 f-string is missing placeholders
+        print(f"4. ➕ Click 'Create New Test Set'")
+              ^
+./tests/agenta/deploy_test_set_simple.py:213:15: F541 f-string is missing placeholders
+        print(f"7. ✅ Save and run evaluations")
+              ^
+./tests/agenta/deploy_test_set_simple.py:215:15: F541 f-string is missing placeholders
+        print(f"\n📊 Test Set Details:")
+              ^
+./tests/agenta/deploy_test_set_simple.py:227:23: F541 f-string is missing placeholders
+                print(f"✅ CSV Validation:")
+                      ^
+./tests/agenta/deploy_test_set_simple.py:228:23: F541 f-string is missing placeholders
+                print(f"  - File exists: ✅")
+                      ^
+./tests/agenta/deploy_test_set_simple.py:266:15: F541 f-string is missing placeholders
+        print(f"\n🎯 DEPLOYMENT RESULTS")
+              ^
+./tests/agenta/deploy_test_set_simple.py:273:13: F841 local variable 'csv_valid' is assigned to but never used
+            csv_valid = deployer.validate_deployment(result['csv_file'])
+            ^
+./tests/agenta/fix_data_quality_issue.py:30:17: F841 local variable 'category' is assigned to but never used
+                category = row.get('category', '')
+                ^
+./tests/agenta/fix_data_quality_issue.py:35:27: F541 f-string is missing placeholders
+                    print(f"✅ Fixed: Added generic query for edge case")
+                          ^
+./tests/agenta/fix_data_quality_issue.py:38:27: F541 f-string is missing placeholders
+                    print(f"✅ Fixed: Added customer-specific query")
+                          ^
+./tests/agenta/fix_data_quality_issue.py:41:27: F541 f-string is missing placeholders
+                    print(f"✅ Fixed: Added default query")
+                          ^
+./tests/agenta/fix_data_quality_issue.py:104:27: F541 f-string is missing placeholders
+                    print(f"✅ SUCCESS: Fixed test set uploaded!")
+                          ^
+./tests/agenta/fix_data_quality_issue.py:132:15: F541 f-string is missing placeholders
+        print(f"\n🎉 FIXED TEST SET DEPLOYED!")
+              ^
+./tests/agenta/fix_data_quality_issue.py:134:15: F541 f-string is missing placeholders
+        print(f"🔗 Go to Agenta dashboard to use the fixed version")
+              ^
+./tests/agenta/fix_data_quality_issue.py:137:15: F541 f-string is missing placeholders
+        print(f"\n❌ Failed to upload fixed version")
+              ^
+./tests/agenta/ground_truth_extractor.py:13:1: F401 'pathlib.Path' imported but unused
+from pathlib import Path
+^
+./tests/agenta/ground_truth_extractor.py:349:15: F541 f-string is missing placeholders
+        print(f"\n✅ Ground truth extraction complete!")
+              ^
+./tests/agenta/results_analyzer.py:12:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./tests/agenta/results_analyzer.py:12:1: F401 'typing.Optional' imported but unused
+from typing import Dict, List, Any, Optional
+^
+./tests/agenta/results_analyzer.py:28:15: F541 f-string is missing placeholders
+        print(f"📊 Results Analyzer initialized")
+              ^
+./tests/agenta/results_analyzer.py:318:112: E226 missing whitespace around arithmetic operator
+            recommendation["benefits"].append(f"Score improvement: +{score_improvement:.4f} ({score_improvement/baseline_stats.get('avg_score', 1)*100:.1f}%)")
+                                                                                                               ^
+./tests/agenta/results_analyzer.py:318:147: E226 missing whitespace around arithmetic operator
+            recommendation["benefits"].append(f"Score improvement: +{score_improvement:.4f} ({score_improvement/baseline_stats.get('avg_score', 1)*100:.1f}%)")
+                                                                                                                                                  ^
+./tests/agenta/results_analyzer.py:667:15: F541 f-string is missing placeholders
+        print(f"\n🎯 PROMOTION RECOMMENDATION:")
+              ^
+./tests/agenta/results_analyzer.py:674:15: F541 f-string is missing placeholders
+        print(f"\n📈 PERFORMANCE SUMMARY:")
+              ^
+./tests/agenta/results_analyzer.py:681:19: F541 f-string is missing placeholders
+            print(f"\n💡 TOP SUGGESTIONS:")
+                  ^
+./tests/agenta/stress_test_agenta_api.py:9:1: F401 'os' imported but unused
+import os
+^
+./tests/agenta/stress_test_agenta_api.py:13:1: F401 'asyncio' imported but unused
+import asyncio
+^
+./tests/agenta/stress_test_agenta_api.py:14:1: F401 'aiohttp' imported but unused
+import aiohttp
+^
+./tests/agenta/stress_test_agenta_api.py:17:1: F401 'typing.List' imported but unused
+from typing import Dict, List, Tuple, Any
+^
+./tests/agenta/stress_test_agenta_api.py:17:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Tuple, Any
+^
+./tests/agenta/stress_test_agenta_api.py:36:15: F541 f-string is missing placeholders
+        print(f"🧪 Agenta API Stress Tester Initialized")
+              ^
+./tests/agenta/stress_test_agenta_api.py:75:23: F541 f-string is missing placeholders
+                print(f"✅ Authentication: PASS")
+                      ^
+./tests/agenta/stress_test_agenta_api.py:101:23: F541 f-string is missing placeholders
+                print(f"✅ Test Set Retrieved Successfully")
+                      ^
+./tests/agenta/stress_test_agenta_api.py:185:15: F541 f-string is missing placeholders
+        print(f"\n📊 STRESS TEST RESULTS:")
+              ^
+./tests/agenta/stress_test_agenta_api.py:188:67: E226 missing whitespace around arithmetic operator
+        print(f"  📈 Success Rate: {(results['successful_requests']/num_requests)*100:.1f}%")
+                                                                  ^
+./tests/agenta/stress_test_agenta_api.py:188:81: E226 missing whitespace around arithmetic operator
+        print(f"  📈 Success Rate: {(results['successful_requests']/num_requests)*100:.1f}%")
+                                                                                ^
+./tests/agenta/stress_test_agenta_api.py:197:19: F541 f-string is missing placeholders
+            print(f"  ⚠️ Sample Errors:")
+                  ^
+./tests/agenta/stress_test_agenta_api.py:227:9: F841 local variable 'expected_fields' is assigned to but never used
+        expected_fields = [
+        ^
+./tests/agenta/stress_test_agenta_api.py:239:73: E226 missing whitespace around arithmetic operator
+                    results["data_quality_issues"].append(f"Test case {i+1}: Missing {field}")
+                                                                        ^
+./tests/agenta/stress_test_agenta_api.py:261:15: F541 f-string is missing placeholders
+        print(f"📊 DATA INTEGRITY RESULTS:")
+              ^
+./tests/agenta/stress_test_agenta_api.py:267:15: F541 f-string is missing placeholders
+        print(f"\n📈 FIELD COVERAGE:")
+              ^
+./tests/agenta/stress_test_agenta_api.py:273:19: F541 f-string is missing placeholders
+            print(f"\n⚠️ DATA QUALITY ISSUES:")
+                  ^
+./tests/agenta/stress_test_agenta_api.py:295:9: F841 local variable 'mock_evaluation_data' is assigned to but never used
+        mock_evaluation_data = {
+        ^
+./tests/agenta/stress_test_agenta_api.py:348:15: F541 f-string is missing placeholders
+        print(f"\n📊 EVALUATION LOAD TEST RESULTS:")
+              ^
+./tests/agenta/stress_test_agenta_api.py:351:70: E226 missing whitespace around arithmetic operator
+        print(f"  📈 Success Rate: {(results['successful_evaluations']/num_evaluations)*100:.1f}%")
+                                                                     ^
+./tests/agenta/stress_test_agenta_api.py:351:87: E226 missing whitespace around arithmetic operator
+        print(f"  📈 Success Rate: {(results['successful_evaluations']/num_evaluations)*100:.1f}%")
+                                                                                      ^
+./tests/agenta/stress_test_agenta_api.py:437:15: F541 f-string is missing placeholders
+        print(f"\n📊 KEY METRICS:")
+              ^
+./tests/agenta/stress_test_agenta_api.py:458:15: F541 f-string is missing placeholders
+        print(f"\n🎉 STRESS TEST COMPLETE!")
+              ^
+./tests/agenta/stress_test_agenta_api.py:462:19: F541 f-string is missing placeholders
+            print(f"✅ Your Agenta setup is ready for production use!")
+                  ^
+./tests/agenta/stress_test_agenta_api.py:464:19: F541 f-string is missing placeholders
+            print(f"⚠️ Your setup works but could be optimized")
+                  ^
+./tests/agenta/stress_test_agenta_api.py:466:19: F541 f-string is missing placeholders
+            print(f"❌ Issues found that should be addressed before production")
+                  ^
+./tests/agenta/test_case_generator.py:12:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/test_case_generator.py:505:9: F841 local variable 'test_cases' is assigned to but never used
+        test_cases = generator.generate_all_test_cases()
+        ^
+./tests/agenta/test_case_generator.py:514:15: F541 f-string is missing placeholders
+        print(f"\n✅ Test case generation complete!")
+              ^
+./tests/agenta/upload_via_curl.py:70:27: F541 f-string is missing placeholders
+                    print(f"✅ SUCCESS: Test set uploaded!")
+                          ^
+./tests/agenta/upload_via_curl.py:113:15: F541 f-string is missing placeholders
+        print(f"\n🎉 DEPLOYMENT COMPLETE!")
+              ^
+./tests/agenta/upload_via_curl.py:114:15: F541 f-string is missing placeholders
+        print(f"🔗 Go to: https://cloud.agenta.ai")
+              ^
+./tests/agenta/upload_via_curl.py:116:15: F541 f-string is missing placeholders
+        print(f"🚀 Run evaluations against your variants")
+              ^
+./tests/agenta/upload_via_curl.py:119:15: F541 f-string is missing placeholders
+        print(f"\n❌ Upload failed")
+              ^
+./tests/agenta/validate_deployment.py:10:1: F401 'json' imported but unused
+import json
+^
+./tests/agenta/validate_deployment.py:12:1: F401 'typing.List' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/validate_deployment.py:12:1: F401 'typing.Any' imported but unused
+from typing import Dict, List, Any
+^
+./tests/agenta/validate_deployment.py:161:15: F541 f-string is missing placeholders
+        print(f"\n❌ ISSUES FOUND:")
+              ^
+./tests/agenta/validate_deployment.py:166:15: F541 f-string is missing placeholders
+        print(f"\n💡 RECOMMENDATIONS:")
+              ^
+./tests/agenta/validate_deployment.py:172:15: F541 f-string is missing placeholders
+        print(f"\n📊 TEST COVERAGE ANALYSIS")
+              ^
+./tests/agenta/validate_deployment.py:190:15: F541 f-string is missing placeholders
+        print(f"\n📈 Expected Field Coverage:")
+              ^
+./tests/agenta/validate_deployment.py:196:19: F541 f-string is missing placeholders
+            print(f"\n💡 COVERAGE RECOMMENDATIONS:")
+                  ^
+./tests/agenta/validate_deployment.py:202:15: F541 f-string is missing placeholders
+        print(f"\n📝 SAMPLE TEST CASE:")
+              ^
+./tests/agenta/validate_deployment.py:212:11: F541 f-string is missing placeholders
+    print(f"\n🚀 DEPLOYMENT STATUS")
+          ^
+./tests/agenta/validate_deployment.py:217:15: F541 f-string is missing placeholders
+        print(f"\n📋 NEXT STEPS:")
+              ^
+./tests/agenta/validate_deployment.py:218:15: F541 f-string is missing placeholders
+        print(f"1. Go to: https://cloud.agenta.ai")
+              ^
+./tests/agenta/validate_deployment.py:219:15: F541 f-string is missing placeholders
+        print(f"2. Navigate to your 'tilores-x' app")
+              ^
+./tests/agenta/validate_deployment.py:220:15: F541 f-string is missing placeholders
+        print(f"3. Go to 'Test Sets' section")
+              ^
+./tests/agenta/validate_deployment.py:221:15: F541 f-string is missing placeholders
+        print(f"4. Click 'Create New Test Set'")
+              ^
+./tests/agenta/validate_deployment.py:224:15: F541 f-string is missing placeholders
+        print(f"7. Run evaluations against your variants")
+              ^
+./tests/agenta/verify_fixed_testset.py:9:1: F401 'json' imported but unused
+import json
+^
+./tests/agenta/verify_fixed_testset.py:58:23: F541 f-string is missing placeholders
+                print(f"❌ Remaining Issues:")
+                      ^
+./tests/agenta/verify_fixed_testset.py:62:23: F541 f-string is missing placeholders
+                print(f"🎉 Perfect Data Integrity - No Issues Found!")
+                      ^
+./tests/agenta/verify_fixed_testset.py:80:15: F541 f-string is missing placeholders
+        print(f"\n✅ VERIFICATION COMPLETE - TEST SET IS PERFECT!")
+              ^
+./tests/agenta/verify_fixed_testset.py:82:15: F541 f-string is missing placeholders
+        print(f"\n❌ VERIFICATION FAILED - ISSUES REMAIN")
+              ^
+./tests/unit/test_rollback_functionality.py:8:1: F401 'unittest.mock.Mock' imported but unused
+from unittest.mock import Mock, MagicMock, patch, AsyncMock
+^
+./tests/unit/test_rollback_functionality.py:8:1: F401 'unittest.mock.MagicMock' imported but unused
+from unittest.mock import Mock, MagicMock, patch, AsyncMock
+^
+./tests/unit/test_rollback_functionality.py:9:1: F401 'datetime.datetime' imported but unused
+from datetime import datetime, timedelta
+^
+./tests/unit/test_rollback_functionality.py:9:1: F401 'datetime.timedelta' imported but unused
+from datetime import datetime, timedelta
+^
+./tests/unit/test_rollback_functionality.py:10:1: F401 'json' imported but unused
+import json
+^
+./tests/unit/test_rollback_functionality.py:11:1: F401 'asyncio' imported but unused
+import asyncio
+^
+./transunion_data_investigation.py:24:5: F841 local variable 'entity_id' is assigned to but never used
+    entity_id = "dc93a2cd-de0a - 444f-ad47 - 3003ba998cd3"
+    ^
+77    E226 missing whitespace around arithmetic operator
+1     E712 comparison to False should be 'if cond is not False:' or 'if cond:'
+5     E722 do not use bare 'except'
+1     E741 ambiguous variable name 'l'
+109   F401 'typing.Optional' imported but unused
+314   F541 f-string is missing placeholders
+1     F811 redefinition of unused 'requests' from line 8
+41    F841 local variable 'result' is assigned to but never used
+549

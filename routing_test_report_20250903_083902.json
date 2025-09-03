@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-09-03T08:39:02.512473",
+  "test_type": "routing_functionality_validation",
+  "summary": {
+    "total_tests": 5,
+    "passed_tests": 0,
+    "failed_tests": 5,
+    "success_rate": 0.0,
+    "routing_accuracy": 0.0
+  },
+  "detailed_results": [
+    {
+      "scenario_name": "Credit Analysis Routing Test",
+      "success": false,
+      "error": "name 'get_routing_aware_prompt' is not defined"
+    },
+    {
+      "scenario_name": "Multi-Data Analysis Routing Test",
+      "success": false,
+      "error": "name 'get_routing_aware_prompt' is not defined"
+    },
+    {
+      "scenario_name": "Account Status Routing Test",
+      "success": false,
+      "error": "name 'get_routing_aware_prompt' is not defined"
+    },
+    {
+      "scenario_name": "Transaction Analysis Routing Test",
+      "success": false,
+      "error": "name 'get_routing_aware_prompt' is not defined"
+    },
+    {
+      "scenario_name": "Phone Analysis Routing Test",
+      "success": false,
+      "error": "name 'get_routing_aware_prompt' is not defined"
+    }
+  ]
+}

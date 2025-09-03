@@ -1,0 +1,198 @@
+📊 TILORES GRAPHQL SCHEMA ANALYSIS REPORT
+============================================================
+Generated: 2025-09-02T15:12:29.527992
+
+🎯 SCHEMA OVERVIEW
+------------------------------
+Total Types: 132
+Total Fields: 1220
+Query Root Fields: 5
+Mutation Root Fields: 4
+Subscription Root Fields: 0
+
+🎯 CATEGORIZED TYPES
+------------------------------
+Credit-Related Types (87):
+  • CreditResponse (22 fields)
+  • CreditResponseBorrower (8 fields)
+  • CreditResponseBorrowerInput (0 fields)
+  • CreditResponseBorrowerResidence (5 fields)
+  • CreditResponseBorrowerResidenceInput (0 fields)
+  • CreditResponseBorrowerResidenceSearchInput (0 fields)
+  • CreditResponseBorrowerSearchInput (0 fields)
+  • CreditResponseCreditFile (9 fields)
+  • CreditResponseCreditFileAlertMessage (5 fields)
+  • CreditResponseCreditFileAlertMessageInput (0 fields)
+  • CreditResponseCreditFileAlertMessageSearchInput (0 fields)
+  • CreditResponseCreditFileBorrower (8 fields)
+  • CreditResponseCreditFileBorrowerAlias (3 fields)
+  • CreditResponseCreditFileBorrowerAliasInput (0 fields)
+  • CreditResponseCreditFileBorrowerAliasSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerEmployer (4 fields)
+  • CreditResponseCreditFileBorrowerEmployerInput (0 fields)
+  • CreditResponseCreditFileBorrowerEmployerSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerInput (0 fields)
+  • CreditResponseCreditFileBorrowerResidence (9 fields)
+  • CreditResponseCreditFileBorrowerResidenceInput (0 fields)
+  • CreditResponseCreditFileBorrowerResidenceSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerSearchInput (0 fields)
+  • CreditResponseCreditFileInput (0 fields)
+  • CreditResponseCreditFileSearchInput (0 fields)
+  • CreditResponseCreditFileVariation (1 fields)
+  • CreditResponseCreditFileVariationInput (0 fields)
+  • CreditResponseCreditFileVariationSearchInput (0 fields)
+  • CreditResponseCreditFrozenStatus (3 fields)
+  • CreditResponseCreditFrozenStatusInput (0 fields)
+  • CreditResponseCreditFrozenStatusSearchInput (0 fields)
+  • CreditResponseCreditInquiry (16 fields)
+  • CreditResponseCreditInquiryInput (0 fields)
+  • CreditResponseCreditInquirySearchInput (0 fields)
+  • CreditResponseCreditLiability (54 fields)
+  • CreditResponseCreditLiabilityCreditComment (5 fields)
+  • CreditResponseCreditLiabilityCreditCommentInput (0 fields)
+  • CreditResponseCreditLiabilityCreditCommentSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCreditor (7 fields)
+  • CreditResponseCreditLiabilityCreditorContactDetail (2 fields)
+  • CreditResponseCreditLiabilityCreditorContactDetailInput (0 fields)
+  • CreditResponseCreditLiabilityCreditorContactDetailSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCreditorInput (0 fields)
+  • CreditResponseCreditLiabilityCreditorSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCurrentRating (2 fields)
+  • CreditResponseCreditLiabilityCurrentRatingInput (0 fields)
+  • CreditResponseCreditLiabilityCurrentRatingSearchInput (0 fields)
+  • CreditResponseCreditLiabilityHighestAdverseRating (2 fields)
+  • CreditResponseCreditLiabilityHighestAdverseRatingInput (0 fields)
+  • CreditResponseCreditLiabilityHighestAdverseRatingSearchInput (0 fields)
+  • CreditResponseCreditLiabilityInput (0 fields)
+  • CreditResponseCreditLiabilityLateCount (3 fields)
+  • CreditResponseCreditLiabilityLateCountInput (0 fields)
+  • CreditResponseCreditLiabilityLateCountSearchInput (0 fields)
+  • CreditResponseCreditLiabilityPaymentPattern (2 fields)
+  • CreditResponseCreditLiabilityPaymentPatternInput (0 fields)
+  • CreditResponseCreditLiabilityPaymentPatternSearchInput (0 fields)
+  • CreditResponseCreditLiabilitySearchInput (0 fields)
+  • CreditResponseCreditRepositoryIncluded (3 fields)
+  • CreditResponseCreditRepositoryIncludedInput (0 fields)
+  • CreditResponseCreditRepositoryIncludedSearchInput (0 fields)
+  • CreditResponseCreditRequestData (2 fields)
+  • CreditResponseCreditRequestDataCreditRepositoryIncluded (3 fields)
+  • CreditResponseCreditRequestDataCreditRepositoryIncludedInput (0 fields)
+  • CreditResponseCreditRequestDataCreditRepositoryIncludedSearchInput (0 fields)
+  • CreditResponseCreditRequestDataInput (0 fields)
+  • CreditResponseCreditRequestDataSearchInput (0 fields)
+  • CreditResponseCreditScore (14 fields)
+  • CreditResponseCreditScoreFactor (3 fields)
+  • CreditResponseCreditScoreFactorInput (0 fields)
+  • CreditResponseCreditScoreFactorSearchInput (0 fields)
+  • CreditResponseCreditScoreInput (0 fields)
+  • CreditResponseCreditScoreSearchInput (0 fields)
+  • CreditResponseCreditSummary (3 fields)
+  • CreditResponseCreditSummaryDataSet (3 fields)
+  • CreditResponseCreditSummaryDataSetInput (0 fields)
+  • CreditResponseCreditSummaryDataSetSearchInput (0 fields)
+  • CreditResponseCreditSummaryInput (0 fields)
+  • CreditResponseCreditSummarySearchInput (0 fields)
+  • CreditResponseCreditSummaryTui (3 fields)
+  • CreditResponseCreditSummaryTuiDataSet (3 fields)
+  • CreditResponseCreditSummaryTuiDataSetInput (0 fields)
+  • CreditResponseCreditSummaryTuiDataSetSearchInput (0 fields)
+  • CreditResponseCreditSummaryTuiInput (0 fields)
+  • CreditResponseCreditSummaryTuiSearchInput (0 fields)
+  • CreditResponseInput (0 fields)
+  • CreditResponseSearchInput (0 fields)
+
+Entity-Related Types (38):
+  • CreditResponseBorrowerResidenceSearchInput (0 fields)
+  • CreditResponseBorrowerSearchInput (0 fields)
+  • CreditResponseCreditFileAlertMessageSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerAliasSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerEmployerSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerResidenceSearchInput (0 fields)
+  • CreditResponseCreditFileBorrowerSearchInput (0 fields)
+  • CreditResponseCreditFileSearchInput (0 fields)
+  • CreditResponseCreditFileVariationSearchInput (0 fields)
+  • CreditResponseCreditFrozenStatusSearchInput (0 fields)
+  • CreditResponseCreditInquirySearchInput (0 fields)
+  • CreditResponseCreditLiabilityCreditCommentSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCreditorContactDetailSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCreditorSearchInput (0 fields)
+  • CreditResponseCreditLiabilityCurrentRatingSearchInput (0 fields)
+  • CreditResponseCreditLiabilityHighestAdverseRatingSearchInput (0 fields)
+  • CreditResponseCreditLiabilityLateCountSearchInput (0 fields)
+  • CreditResponseCreditLiabilityPaymentPatternSearchInput (0 fields)
+  • CreditResponseCreditLiabilitySearchInput (0 fields)
+  • CreditResponseCreditRepositoryIncludedSearchInput (0 fields)
+  • CreditResponseCreditRequestDataCreditRepositoryIncludedSearchInput (0 fields)
+  • CreditResponseCreditRequestDataSearchInput (0 fields)
+  • CreditResponseCreditScoreFactorSearchInput (0 fields)
+  • CreditResponseCreditScoreSearchInput (0 fields)
+  • CreditResponseCreditSummaryDataSetSearchInput (0 fields)
+  • CreditResponseCreditSummarySearchInput (0 fields)
+  • CreditResponseCreditSummaryTuiDataSetSearchInput (0 fields)
+  • CreditResponseCreditSummaryTuiSearchInput (0 fields)
+  • CreditResponseSearchInput (0 fields)
+  • Entity (10 fields)
+  • EntityByRecordInput (0 fields)
+  • EntityInput (0 fields)
+  • EntityOutput (1 fields)
+  • SearchByTextInput (0 fields)
+  • SearchByTextOutput (2 fields)
+  • SearchInput (0 fields)
+  • SearchOutput (1 fields)
+  • SearchParams (0 fields)
+
+Record-Related Types (5):
+  • EdgeInsights (3 fields)
+  • EntityByRecordInput (0 fields)
+  • Record (163 fields)
+  • RecordInput (0 fields)
+  • RecordInsights (23 fields)
+
+🎯 TOP TYPES BY FIELD COUNT
+------------------------------
+  • Record: 163 fields
+  • CreditResponseCreditLiability: 54 fields
+  • RecordInsights: 23 fields
+  • CreditResponse: 22 fields
+  • CreditResponseCreditInquiry: 16 fields
+  • CreditResponseCreditScore: 14 fields
+  • Entity: 10 fields
+  • CreditResponseCreditFile: 9 fields
+  • CreditResponseCreditFileBorrowerResidence: 9 fields
+  • CreditResponseBorrower: 8 fields
+  • CreditResponseCreditFileBorrower: 8 fields
+  • CreditResponseCreditLiabilityCreditor: 7 fields
+  • CreditResponseBorrowerResidence: 5 fields
+  • CreditResponseCreditFileAlertMessage: 5 fields
+  • CreditResponseCreditLiabilityCreditComment: 5 fields
+
+🎯 MOST COMMON FIELD NAMES
+------------------------------
+  • BorrowerID: appears in 9 types
+  • Name: appears in 7 types
+  • Type: appears in 6 types
+  • Code: appears in 5 types
+  • City: appears in 4 types
+  • PostalCode: appears in 4 types
+  • State: appears in 4 types
+  • StreetAddress: appears in 4 types
+  • CreditFileID: appears in 4 types
+  • Value: appears in 4 types
+  • FirstName: appears in 3 types
+  • LastName: appears in 3 types
+  • Text: appears in 3 types
+  • EquifaxIndicator: appears in 3 types
+  • ExperianIndicator: appears in 3 types
+  • TransUnionIndicator: appears in 3 types
+  • entities: appears in 3 types
+  • BORROWER: appears in 2 types
+  • CREDIT_REPOSITORY_INCLUDED: appears in 2 types
+  • CreditReportIdentifier: appears in 2 types
+
+🎯 QUERY ROOT OPERATIONS
+------------------------------
+  • entity -> EntityOutput
+  • entityByRecord -> EntityOutput
+  • metrics -> Metrics
+  • search -> SearchOutput
+  • searchByText -> SearchByTextOutput
