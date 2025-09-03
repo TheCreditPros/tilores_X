@@ -143,3 +143,4 @@ pre-deploy-build.sh
 
 # Railway monitoring configs
 .env.railway-monitoring
+openwebui_data/
