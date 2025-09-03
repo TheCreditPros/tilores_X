@@ -796,10 +796,10 @@ async def _get_models_list():
     Helper function to generate the models list
     """
     models = []
-    
+
     # Get current timestamp
     created_timestamp = int(time.time())
-    
+
     # Add OpenAI models
     openai_models = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
     for model_id in openai_models:
@@ -809,17 +809,17 @@ async def _get_models_list():
             "created": created_timestamp,
             "owned_by": "tilores-openai"
         })
-    
+
     # Add Google Gemini models
     gemini_models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.5-flash"]
     for model_id in gemini_models:
         models.append({
             "id": model_id,
-            "object": "model", 
+            "object": "model",
             "created": created_timestamp,
             "owned_by": "tilores-google"
         })
-    
+
     # Add Groq models
     groq_models = ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
     for model_id in groq_models:
@@ -829,7 +829,7 @@ async def _get_models_list():
             "created": created_timestamp,
             "owned_by": "tilores-groq"
         })
-    
+
     return {
         "object": "list",
         "data": models
