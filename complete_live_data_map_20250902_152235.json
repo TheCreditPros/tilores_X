@@ -1,0 +1,6370 @@
+{
+  "metadata": {
+    "customer_email": "e.j.price1986@gmail.com",
+    "entity_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+    "extraction_timestamp": "2025-09-02T15:22:35.556028",
+    "total_records": 12,
+    "total_fields_found": 160,
+    "fields_with_data": 101
+  },
+  "customer_summary": {
+    "identity": {
+      "email": null,
+      "first_name": null,
+      "last_name": null,
+      "phone": null,
+      "client_id": null
+    },
+    "account": {
+      "status": null,
+      "active": null,
+      "enrollment_date": null,
+      "created_date": null,
+      "current_product": "Success PLUS Individual $149, $149 Monthly"
+    },
+    "financial": {
+      "enrollment_fee": false,
+      "transaction_amount": "149.0",
+      "payment_method": "Credit Card",
+      "last_transaction": null
+    },
+    "aggregated_insights": {}
+  },
+  "raw_records": [
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": "a2AUx000004oEzxMAE",
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": "Transaction",
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": false,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": "149.0",
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": "Credit Card",
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": false,
+      "REFUND_CONFIRMATION_SENT": false,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": "1306",
+      "CARD_FIRST_6_DIGIT": "474488",
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": false,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>",
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": "Success PLUS Individual $149, $149 Monthly",
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": false,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "a17Ux00004tQVGUIA4",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": true,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": "Transaction Approved",
+      "RESPONSE_STATUS": "Approved",
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": "2025-07-10 14:10:57.000",
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": "Charge",
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": null,
+      "CHARGEBACK_CREDITED": false
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": "a2AUx000004oEzxMAE",
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": "Transaction",
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": false,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": "54.75",
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": "Credit",
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": false,
+      "REFUND_CONFIRMATION_SENT": false,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": "5753",
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": false,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>",
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": "Downsell Credit Repair Monthly $54.75",
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": false,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "a17Ux000054BVlzIAG",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": false,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": "month waived.",
+      "RESPONSE_STATUS": "Approved",
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": "2025-08-01 13:43:56.000",
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": "Credit",
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": null,
+      "CHARGEBACK_CREDITED": false
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": "zoho_tickets",
+      "SOURCE_TYPE": "SYSTEM",
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": "2025-08-01 13:31:33.000",
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": "2025-08-01T13:46:12.000Z",
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": "5019768",
+      "ZOHO_ID": "664115001617812296",
+      "ZOHO_EMAIL": "e.j.price1986@gmail.com",
+      "ZOHO_STATUS": "Closed",
+      "CATEGORY": "Cancel Request",
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": "5019768 - Esteban Price - Cancel Request - 8/1/2025",
+      "COMMENTCOUNT": "2",
+      "THREADCOUNT": "1",
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": "2025-08-04T17:39:00.000Z",
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": "English",
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "664115001617812296",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": "Closed",
+      "CREDIT_RESPONSE": null,
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "A786",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-04-10",
+        "CreditReportIdentifier": "1111-3196489",
+        "Report_ID": "786",
+        "Report_Type": null,
+        "Vendor": "array"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "A787",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-04-10",
+        "CreditReportIdentifier": "99M191141",
+        "Report_ID": "787",
+        "Report_Type": null,
+        "Vendor": "array"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "A838",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-06-19",
+        "CreditReportIdentifier": "1111-3196489",
+        "Report_ID": "838",
+        "Report_Type": null,
+        "Vendor": "array"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "S876",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-08-01",
+        "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+        "Report_ID": "876",
+        "Report_Type": null,
+        "Vendor": "spinwheel"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "S877",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-08-01",
+        "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+        "Report_ID": "877",
+        "Report_Type": null,
+        "Vendor": "spinwheel"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "A881",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-08-01",
+        "CreditReportIdentifier": "212M134526",
+        "Report_ID": "881",
+        "Report_Type": null,
+        "Vendor": "array"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": null,
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": null,
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "A964",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": null,
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": {
+        "CREDIT_BUREAU": "Equifax",
+        "CreditReportFirstIssuedDate": "2025-08-18",
+        "CreditReportIdentifier": "1111-3196489",
+        "Report_ID": "964",
+        "Report_Type": null,
+        "Vendor": "array"
+      },
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": "e.j.price1986@gmail.com",
+      "FIRST_NAME": "Esteban",
+      "LAST_NAME": "Price",
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": "Downsell Credit Repair Monthly $54.75",
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": null,
+      "CLIENT_ID": "1747598",
+      "STATUS": "Active",
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": "a2AUx000004oEzxMAE",
+      "OPPORTUNITY_ID": "a2AUx000004oEzxMAE",
+      "OPPORTUNITY_OWNER": "005Ux000000tOHp",
+      "SOURCE": "Contact",
+      "SOURCE_TYPE": null,
+      "PRIMARY": true,
+      "CREATED_DATE": "2025-04-10 18:30:50.000",
+      "CREATEDTIME": null,
+      "ENROLL_DATE": "2025-04-10",
+      "ENROLLMENT_CAPTURE_COMPLETED": null,
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": null,
+      "CLOSEDTIME": null,
+      "AMOUNT": null,
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": "0",
+      "NET_BALANCE_DUE": "0",
+      "SETUP_FEE2_AMOUNT": null,
+      "RECURRING_MONTHLY_FEE": null,
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": null,
+      "LAST_APPROVED_TRANSACTION_AMOUNT": "149",
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": null,
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": "27",
+      "UPCOMING_SCHEDULED_PAYMENT": null,
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": null,
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": "Visa",
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": "Monthly Unlimited",
+      "PHONE_EXTERNAL": "5209549414",
+      "ZOHO_CONTACT_ID": "664115001424518351",
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": true,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": false,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": false,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": "1986-08-27",
+      "CUSTOMER_AGE": "39",
+      "SPANISH_SPEAKER": false,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": null,
+      "TCPA": null,
+      "MAILING_STREET": "238 E Norma  lane",
+      "MAILING_CITY": "Tucson",
+      "MAILING_STATE": "Arizona",
+      "MAILING_STATE_CODE": "AZ",
+      "MAILING_POSTAL_CODE": "85705",
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "003Ux00000RgELbIAN",
+      "ORIGINAL_LEAD_ID": "a2FUx000009imesMAA",
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": false,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": "2025-04-10",
+      "VERIFY_IDENTITY": "Birthdate: 1986-08-27 - LAST SSN 4: 9552",
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": "10",
+      "DAYS_SINCE_ENROLLED": "140",
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": "140",
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": "2025-09-10",
+      "NEXT_TRANSACTION_DATE": null,
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": "2025-04-10 19:10:44.000",
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": "Yes",
+      "CAP_COMPLETED_DATE": null,
+      "CAP_MISSED": "No",
+      "ACE_CAP": null,
+      "DEAL_CLOSE_DATE": "2025-04-10",
+      "DEAL_CLOSE_TIME": "2025-04-10 19:10:40.000",
+      "COLD_LEAD_CREATED_DATE": "2025-04-10",
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": "0",
+      "CP_PORTAL_LINK": "https://portal.thecreditpros.com/salesforce-client/client-list?client_id=1747598&api=1",
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": "003Ux00000RgELbIAN",
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": null,
+      "CHARGEBACK_CREDITED": null
+    },
+    {
+      "EMAIL": null,
+      "FIRST_NAME": null,
+      "LAST_NAME": null,
+      "MIDDLE_NAME": null,
+      "PHONE_NUMBER": null,
+      "AGENT_USERNAME": null,
+      "CAMPAIGN_NAME": null,
+      "PRODUCT_NAME": null,
+      "SPOUSE_FULL_NAME": null,
+      "STAGE_NAME": "Active",
+      "CLIENT_ID": null,
+      "STATUS": null,
+      "ACTIVE": null,
+      "GATHRR_CUSTOMER_ID": null,
+      "OPPORTUNITY": null,
+      "OPPORTUNITY_ID": "a2AUx000004oEzxMAE",
+      "OPPORTUNITY_OWNER": null,
+      "SOURCE": "Opportunity",
+      "SOURCE_TYPE": null,
+      "PRIMARY": null,
+      "CREATED_DATE": null,
+      "CREATEDTIME": null,
+      "ENROLL_DATE": null,
+      "ENROLLMENT_CAPTURE_COMPLETED": "2025-04-10",
+      "CANCELLATION_DATE": null,
+      "CLOSE_DATE": "2025-04-10",
+      "CLOSEDTIME": null,
+      "AMOUNT": "1.0",
+      "CREDIT_AMOUNT": null,
+      "ENROLLMENT_FEE": null,
+      "ENROLLMENT_BALANCE": null,
+      "NET_BALANCE_DUE": null,
+      "SETUP_FEE2_AMOUNT": "0.0",
+      "RECURRING_MONTHLY_FEE": "54.75",
+      "DISCOUNT_AMOUNT": null,
+      "COUPON_AMOUNT": null,
+      "TRANSACTION_AMOUNT": null,
+      "LAST_APPROVED_TRANSACTION": "2025-08-01 13:43:56.000",
+      "LAST_APPROVED_TRANSACTION_AMOUNT": null,
+      "LAST_FAILED_TRANSACTION": null,
+      "PAYMENT_METHOD": null,
+      "PAYMENT_START_DATE": "2025-05-10",
+      "PAYMENT_END_DATE": null,
+      "DAYS_SINCE_LAST_APPROVED_TRANSACTION": null,
+      "UPCOMING_SCHEDULED_PAYMENT": "2025-09-10",
+      "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": "54.75",
+      "CHARGEBACK": null,
+      "REFUND_CONFIRMATION_SENT": null,
+      "DEBT_PAYMENT": null,
+      "DEBT_PAYMENT_DATE": null,
+      "CARD_NUMBER": null,
+      "CARD_LAST_4": null,
+      "CARD_FIRST_6_DIGIT": null,
+      "CARD_TYPE": null,
+      "EXPIRATION_MONTH": null,
+      "EXPIRATION_YEAR": null,
+      "CARD_EXPIRED": null,
+      "INVALID_CARD": null,
+      "BIN": null,
+      "CVV": null,
+      "CALL_ID": null,
+      "CALL_START_TIME": null,
+      "CALL_HANGUP_TIME": null,
+      "CALL_DURATION": null,
+      "CALL_TYPE": null,
+      "CONTACT_TYPE": null,
+      "PHONE_EXTERNAL": null,
+      "ZOHO_CONTACT_ID": null,
+      "ZOHO_PHONE": null,
+      "CONTACT_NEW": null,
+      "TICKETNUMBER": null,
+      "ZOHO_ID": null,
+      "ZOHO_EMAIL": null,
+      "ZOHO_STATUS": null,
+      "CATEGORY": null,
+      "SUBCATEGORY": null,
+      "PRIORITY": null,
+      "SUBJECT": null,
+      "COMMENTCOUNT": null,
+      "THREADCOUNT": null,
+      "RESPONSEDUEDATE": null,
+      "DUEDATE": null,
+      "CURRENT_PRODUCT": null,
+      "CURRENT_PRODUCT_TYPE": null,
+      "CONTRACT_SIGNED": null,
+      "SUCCESS_PLUS_CONTRACT_SIGNED": null,
+      "CANCEL_REASON": null,
+      "CANCEL_REASONS": null,
+      "CANCELLED_BY": null,
+      "REENROLL_CLIENT": null,
+      "RE_ENROLLMENT": null,
+      "RE_ENROLL_DATE": null,
+      "DATE_OF_BIRTH": null,
+      "CUSTOMER_AGE": null,
+      "SPANISH_SPEAKER": null,
+      "SPOUSE": null,
+      "LANGUAGE": null,
+      "SMS_OPT_OUT": false,
+      "TCPA": null,
+      "MAILING_STREET": null,
+      "MAILING_CITY": null,
+      "MAILING_STATE": null,
+      "MAILING_STATE_CODE": null,
+      "MAILING_POSTAL_CODE": null,
+      "DRIVING_LICENSE_NUMBER": null,
+      "DRIVING_LICENSE_ISSUED_BY": null,
+      "DRIVING_LICENSE_EXPIRY_DATE": null,
+      "id": "a2AUx000004oEzxMAE",
+      "ORIGINAL_LEAD_ID": null,
+      "REFERRED_BY_CLIENT": null,
+      "GENERATE_REFERRAL_BY": null,
+      "HOW_DID_YOU_HEAR_ABOUT_US": null,
+      "WEB_ENROLLMENT": null,
+      "WEB_ENROLLMENT_STATUS": null,
+      "TCP_WEBSITE_ENROLLMENT": null,
+      "KYC_STATUS": null,
+      "TU_AUTHENTICATED": null,
+      "VERIFY_IDENTITY": null,
+      "ID_DOC_UPLOADED": null,
+      "EMAIL_CONFIRMATION_DATE": null,
+      "DAYS_SINCE_ENROLL": null,
+      "DAYS_SINCE_ENROLLED": null,
+      "MONTHS_SINCE_ENROLL": null,
+      "DAYS_SINCE_CREATED": null,
+      "DAYS_SINCE_LAST_FAILED": null,
+      "PREPAID": null,
+      "RECURRING": null,
+      "NEXT_SUBSCRIPTION_DATE": null,
+      "NEXT_TRANSACTION_DATE": "2025-09-10",
+      "PAST_DUE_DATE": null,
+      "IS_EB0_DATE": null,
+      "RESPONSE_MESSAGE": null,
+      "RESPONSE_STATUS": null,
+      "GATEWAY_RESPONSE": null,
+      "GATEWAY_DATE": null,
+      "CAP_COMPLETED": null,
+      "CAP_COMPLETED_DATE": "2025-04-10 19:20:51.000",
+      "CAP_MISSED": null,
+      "ACE_CAP": true,
+      "DEAL_CLOSE_DATE": null,
+      "DEAL_CLOSE_TIME": null,
+      "COLD_LEAD_CREATED_DATE": null,
+      "SETUP_FEE2_DATE": null,
+      "CLAWBACK_DATE": null,
+      "CLAWBACK_REASONS": null,
+      "AGE_OF_CANCELLATION": null,
+      "CP_PORTAL_LINK": null,
+      "X18_CHAR_ID": null,
+      "ID_18_CHAR": null,
+      "SENTIMENT": null,
+      "TYPE": null,
+      "STATUSTYPE": null,
+      "CREDIT_RESPONSE": null,
+      "CHARGEBACK_CREDITED": null
+    }
+  ],
+  "record_insights": null,
+  "field_coverage_analysis": {
+    "EMAIL": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "e.j.price1986@gmail.com"
+      ]
+    },
+    "FIRST_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Esteban"
+      ]
+    },
+    "LAST_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Price"
+      ]
+    },
+    "MIDDLE_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "PHONE_NUMBER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "AGENT_USERNAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CAMPAIGN_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "PRODUCT_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Downsell Credit Repair Monthly $54.75"
+      ]
+    },
+    "SPOUSE_FULL_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "STAGE_NAME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Active"
+      ]
+    },
+    "CLIENT_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "1747598"
+      ]
+    },
+    "STATUS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Active"
+      ]
+    },
+    "ACTIVE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "GATHRR_CUSTOMER_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "OPPORTUNITY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "a2AUx000004oEzxMAE"
+      ]
+    },
+    "OPPORTUNITY_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 4,
+      "coverage_percentage": 33.33,
+      "unique_values": 1,
+      "sample_values": [
+        "a2AUx000004oEzxMAE",
+        "a2AUx000004oEzxMAE",
+        "a2AUx000004oEzxMAE",
+        "a2AUx000004oEzxMAE"
+      ]
+    },
+    "OPPORTUNITY_OWNER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "005Ux000000tOHp"
+      ]
+    },
+    "SOURCE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 5,
+      "coverage_percentage": 41.67,
+      "unique_values": 4,
+      "sample_values": [
+        "Transaction",
+        "Transaction",
+        "zoho_tickets",
+        "Contact",
+        "Opportunity"
+      ]
+    },
+    "SOURCE_TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "SYSTEM"
+      ]
+    },
+    "PRIMARY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        true
+      ]
+    },
+    "CREATED_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10 18:30:50.000"
+      ]
+    },
+    "CREATEDTIME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-08-01 13:31:33.000"
+      ]
+    },
+    "ENROLL_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "ENROLLMENT_CAPTURE_COMPLETED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "CANCELLATION_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CLOSE_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "CLOSEDTIME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-08-01T13:46:12.000Z"
+      ]
+    },
+    "AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "1.0"
+      ]
+    },
+    "CREDIT_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "ENROLLMENT_FEE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "ENROLLMENT_BALANCE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "0"
+      ]
+    },
+    "NET_BALANCE_DUE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "0"
+      ]
+    },
+    "SETUP_FEE2_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "0.0"
+      ]
+    },
+    "RECURRING_MONTHLY_FEE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "54.75"
+      ]
+    },
+    "DISCOUNT_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "COUPON_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "TRANSACTION_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "149.0",
+        "54.75"
+      ]
+    },
+    "LAST_APPROVED_TRANSACTION": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-08-01 13:43:56.000"
+      ]
+    },
+    "LAST_APPROVED_TRANSACTION_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "149"
+      ]
+    },
+    "LAST_FAILED_TRANSACTION": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "PAYMENT_METHOD": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "Credit Card",
+        "Credit"
+      ]
+    },
+    "PAYMENT_START_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-05-10"
+      ]
+    },
+    "PAYMENT_END_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DAYS_SINCE_LAST_APPROVED_TRANSACTION": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "27"
+      ]
+    },
+    "UPCOMING_SCHEDULED_PAYMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-09-10"
+      ]
+    },
+    "UPCOMING_SCHEDULED_PAYMENT_AMOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "54.75"
+      ]
+    },
+    "CHARGEBACK": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "REFUND_CONFIRMATION_SENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "DEBT_PAYMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DEBT_PAYMENT_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CARD_NUMBER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CARD_LAST_4": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "1306",
+        "5753"
+      ]
+    },
+    "CARD_FIRST_6_DIGIT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "474488"
+      ]
+    },
+    "CARD_TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Visa"
+      ]
+    },
+    "EXPIRATION_MONTH": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "EXPIRATION_YEAR": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CARD_EXPIRED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "INVALID_CARD": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "BIN": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CVV": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CALL_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CALL_START_TIME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CALL_HANGUP_TIME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CALL_DURATION": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CALL_TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CONTACT_TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Monthly Unlimited"
+      ]
+    },
+    "PHONE_EXTERNAL": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "5209549414"
+      ]
+    },
+    "ZOHO_CONTACT_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "664115001424518351"
+      ]
+    },
+    "ZOHO_PHONE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CONTACT_NEW": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>",
+        "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>"
+      ]
+    },
+    "TICKETNUMBER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "5019768"
+      ]
+    },
+    "ZOHO_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "664115001617812296"
+      ]
+    },
+    "ZOHO_EMAIL": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "e.j.price1986@gmail.com"
+      ]
+    },
+    "ZOHO_STATUS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Closed"
+      ]
+    },
+    "CATEGORY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Cancel Request"
+      ]
+    },
+    "SUBCATEGORY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "PRIORITY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "SUBJECT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "5019768 - Esteban Price - Cancel Request - 8/1/2025"
+      ]
+    },
+    "COMMENTCOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2"
+      ]
+    },
+    "THREADCOUNT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "1"
+      ]
+    },
+    "RESPONSEDUEDATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DUEDATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-08-04T17:39:00.000Z"
+      ]
+    },
+    "CURRENT_PRODUCT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "Success PLUS Individual $149, $149 Monthly",
+        "Downsell Credit Repair Monthly $54.75"
+      ]
+    },
+    "CURRENT_PRODUCT_TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CONTRACT_SIGNED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        true
+      ]
+    },
+    "SUCCESS_PLUS_CONTRACT_SIGNED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        false
+      ]
+    },
+    "CANCEL_REASON": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CANCEL_REASONS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CANCELLED_BY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "REENROLL_CLIENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        false
+      ]
+    },
+    "RE_ENROLLMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "RE_ENROLL_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DATE_OF_BIRTH": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "1986-08-27"
+      ]
+    },
+    "CUSTOMER_AGE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "39"
+      ]
+    },
+    "SPANISH_SPEAKER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        false
+      ]
+    },
+    "SPOUSE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "LANGUAGE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "English"
+      ]
+    },
+    "SMS_OPT_OUT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        false
+      ]
+    },
+    "TCPA": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "MAILING_STREET": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "238 E Norma  lane"
+      ]
+    },
+    "MAILING_CITY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Tucson"
+      ]
+    },
+    "MAILING_STATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Arizona"
+      ]
+    },
+    "MAILING_STATE_CODE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "AZ"
+      ]
+    },
+    "MAILING_POSTAL_CODE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "85705"
+      ]
+    },
+    "DRIVING_LICENSE_NUMBER": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DRIVING_LICENSE_ISSUED_BY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DRIVING_LICENSE_EXPIRY_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "id": {
+      "appears_in_records": 12,
+      "has_non_null_values": 12,
+      "coverage_percentage": 100.0,
+      "unique_values": 12,
+      "sample_values": [
+        "a17Ux00004tQVGUIA4",
+        "a17Ux000054BVlzIAG",
+        "664115001617812296",
+        "A786",
+        "A787"
+      ]
+    },
+    "ORIGINAL_LEAD_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "a2FUx000009imesMAA"
+      ]
+    },
+    "REFERRED_BY_CLIENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "GENERATE_REFERRAL_BY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "HOW_DID_YOU_HEAR_ABOUT_US": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "WEB_ENROLLMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "WEB_ENROLLMENT_STATUS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "TCP_WEBSITE_ENROLLMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        false
+      ]
+    },
+    "KYC_STATUS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "TU_AUTHENTICATED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "VERIFY_IDENTITY": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Birthdate: 1986-08-27 - LAST SSN 4: 9552"
+      ]
+    },
+    "ID_DOC_UPLOADED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "EMAIL_CONFIRMATION_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DAYS_SINCE_ENROLL": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "10"
+      ]
+    },
+    "DAYS_SINCE_ENROLLED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "140"
+      ]
+    },
+    "MONTHS_SINCE_ENROLL": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "DAYS_SINCE_CREATED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "140"
+      ]
+    },
+    "DAYS_SINCE_LAST_FAILED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "PREPAID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "RECURRING": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        true,
+        false
+      ]
+    },
+    "NEXT_SUBSCRIPTION_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-09-10"
+      ]
+    },
+    "NEXT_TRANSACTION_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-09-10"
+      ]
+    },
+    "PAST_DUE_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "IS_EB0_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10 19:10:44.000"
+      ]
+    },
+    "RESPONSE_MESSAGE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "Transaction Approved",
+        "month waived."
+      ]
+    },
+    "RESPONSE_STATUS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        "Approved",
+        "Approved"
+      ]
+    },
+    "GATEWAY_RESPONSE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "GATEWAY_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "2025-07-10 14:10:57.000",
+        "2025-08-01 13:43:56.000"
+      ]
+    },
+    "CAP_COMPLETED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Yes"
+      ]
+    },
+    "CAP_COMPLETED_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10 19:20:51.000"
+      ]
+    },
+    "CAP_MISSED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "No"
+      ]
+    },
+    "ACE_CAP": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        true
+      ]
+    },
+    "DEAL_CLOSE_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "DEAL_CLOSE_TIME": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10 19:10:40.000"
+      ]
+    },
+    "COLD_LEAD_CREATED_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "2025-04-10"
+      ]
+    },
+    "SETUP_FEE2_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CLAWBACK_DATE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CLAWBACK_REASONS": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "AGE_OF_CANCELLATION": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "0"
+      ]
+    },
+    "CP_PORTAL_LINK": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "https://portal.thecreditpros.com/salesforce-client/client-list?client_id=1747598&api=1"
+      ]
+    },
+    "X18_CHAR_ID": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "ID_18_CHAR": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "003Ux00000RgELbIAN"
+      ]
+    },
+    "SENTIMENT": {
+      "appears_in_records": 12,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "TYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 2,
+      "sample_values": [
+        "Charge",
+        "Credit"
+      ]
+    },
+    "STATUSTYPE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 1,
+      "coverage_percentage": 8.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Closed"
+      ]
+    },
+    "CREDIT_RESPONSE": {
+      "appears_in_records": 12,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 4,
+      "sample_values": [
+        {
+          "CREDIT_BUREAU": "Equifax",
+          "CreditReportFirstIssuedDate": "2025-04-10",
+          "CreditReportIdentifier": "1111-3196489",
+          "Report_ID": "786",
+          "Report_Type": null,
+          "Vendor": "array"
+        },
+        {
+          "CREDIT_BUREAU": "Equifax",
+          "CreditReportFirstIssuedDate": "2025-04-10",
+          "CreditReportIdentifier": "99M191141",
+          "Report_ID": "787",
+          "Report_Type": null,
+          "Vendor": "array"
+        },
+        {
+          "CREDIT_BUREAU": "Equifax",
+          "CreditReportFirstIssuedDate": "2025-06-19",
+          "CreditReportIdentifier": "1111-3196489",
+          "Report_ID": "838",
+          "Report_Type": null,
+          "Vendor": "array"
+        },
+        {
+          "CREDIT_BUREAU": "Equifax",
+          "CreditReportFirstIssuedDate": "2025-08-01",
+          "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+          "Report_ID": "876",
+          "Report_Type": null,
+          "Vendor": "spinwheel"
+        },
+        {
+          "CREDIT_BUREAU": "Equifax",
+          "CreditReportFirstIssuedDate": "2025-08-01",
+          "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+          "Report_ID": "877",
+          "Report_Type": null,
+          "Vendor": "spinwheel"
+        }
+      ]
+    },
+    "CHARGEBACK_CREDITED": {
+      "appears_in_records": 12,
+      "has_non_null_values": 2,
+      "coverage_percentage": 16.67,
+      "unique_values": 1,
+      "sample_values": [
+        false,
+        false
+      ]
+    },
+    "CREDIT_RESPONSE.CREDIT_BUREAU": {
+      "appears_in_records": 7,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 1,
+      "sample_values": [
+        "Equifax",
+        "Equifax",
+        "Equifax",
+        "Equifax",
+        "Equifax"
+      ]
+    },
+    "CREDIT_RESPONSE.CreditReportFirstIssuedDate": {
+      "appears_in_records": 7,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 4,
+      "sample_values": [
+        "2025-04-10",
+        "2025-04-10",
+        "2025-06-19",
+        "2025-08-01",
+        "2025-08-01"
+      ]
+    },
+    "CREDIT_RESPONSE.CreditReportIdentifier": {
+      "appears_in_records": 7,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 4,
+      "sample_values": [
+        "1111-3196489",
+        "99M191141",
+        "1111-3196489",
+        "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+        "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3"
+      ]
+    },
+    "CREDIT_RESPONSE.Report_ID": {
+      "appears_in_records": 7,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 7,
+      "sample_values": [
+        "786",
+        "787",
+        "838",
+        "876",
+        "877"
+      ]
+    },
+    "CREDIT_RESPONSE.Report_Type": {
+      "appears_in_records": 7,
+      "has_non_null_values": 0,
+      "coverage_percentage": 0.0,
+      "unique_values": 0,
+      "sample_values": []
+    },
+    "CREDIT_RESPONSE.Vendor": {
+      "appears_in_records": 7,
+      "has_non_null_values": 7,
+      "coverage_percentage": 58.33,
+      "unique_values": 2,
+      "sample_values": [
+        "array",
+        "array",
+        "array",
+        "spinwheel",
+        "spinwheel"
+      ]
+    }
+  },
+  "data_source_breakdown": {
+    "identity": [
+      {
+        "field": "EMAIL",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "e.j.price1986@gmail.com"
+          ]
+        }
+      },
+      {
+        "field": "FIRST_NAME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Esteban"
+          ]
+        }
+      },
+      {
+        "field": "LAST_NAME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Price"
+          ]
+        }
+      },
+      {
+        "field": "PRODUCT_NAME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Downsell Credit Repair Monthly $54.75"
+          ]
+        }
+      },
+      {
+        "field": "STAGE_NAME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Active"
+          ]
+        }
+      },
+      {
+        "field": "PHONE_EXTERNAL",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "5209549414"
+          ]
+        }
+      },
+      {
+        "field": "ZOHO_EMAIL",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "e.j.price1986@gmail.com"
+          ]
+        }
+      }
+    ],
+    "credit": [
+      {
+        "field": "CREDIT_RESPONSE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 4,
+          "sample_values": [
+            {
+              "CREDIT_BUREAU": "Equifax",
+              "CreditReportFirstIssuedDate": "2025-04-10",
+              "CreditReportIdentifier": "1111-3196489",
+              "Report_ID": "786",
+              "Report_Type": null,
+              "Vendor": "array"
+            },
+            {
+              "CREDIT_BUREAU": "Equifax",
+              "CreditReportFirstIssuedDate": "2025-04-10",
+              "CreditReportIdentifier": "99M191141",
+              "Report_ID": "787",
+              "Report_Type": null,
+              "Vendor": "array"
+            },
+            {
+              "CREDIT_BUREAU": "Equifax",
+              "CreditReportFirstIssuedDate": "2025-06-19",
+              "CreditReportIdentifier": "1111-3196489",
+              "Report_ID": "838",
+              "Report_Type": null,
+              "Vendor": "array"
+            },
+            {
+              "CREDIT_BUREAU": "Equifax",
+              "CreditReportFirstIssuedDate": "2025-08-01",
+              "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+              "Report_ID": "876",
+              "Report_Type": null,
+              "Vendor": "spinwheel"
+            },
+            {
+              "CREDIT_BUREAU": "Equifax",
+              "CreditReportFirstIssuedDate": "2025-08-01",
+              "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+              "Report_ID": "877",
+              "Report_Type": null,
+              "Vendor": "spinwheel"
+            }
+          ]
+        }
+      },
+      {
+        "field": "CHARGEBACK_CREDITED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "field": "CREDIT_RESPONSE.CREDIT_BUREAU",
+        "stats": {
+          "appears_in_records": 7,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Equifax",
+            "Equifax",
+            "Equifax",
+            "Equifax",
+            "Equifax"
+          ]
+        }
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportFirstIssuedDate",
+        "stats": {
+          "appears_in_records": 7,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 4,
+          "sample_values": [
+            "2025-04-10",
+            "2025-04-10",
+            "2025-06-19",
+            "2025-08-01",
+            "2025-08-01"
+          ]
+        }
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportIdentifier",
+        "stats": {
+          "appears_in_records": 7,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 4,
+          "sample_values": [
+            "1111-3196489",
+            "99M191141",
+            "1111-3196489",
+            "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+            "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3"
+          ]
+        }
+      },
+      {
+        "field": "CREDIT_RESPONSE.Report_ID",
+        "stats": {
+          "appears_in_records": 7,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 7,
+          "sample_values": [
+            "786",
+            "787",
+            "838",
+            "876",
+            "877"
+          ]
+        }
+      },
+      {
+        "field": "CREDIT_RESPONSE.Vendor",
+        "stats": {
+          "appears_in_records": 7,
+          "has_non_null_values": 7,
+          "coverage_percentage": 58.33,
+          "unique_values": 2,
+          "sample_values": [
+            "array",
+            "array",
+            "array",
+            "spinwheel",
+            "spinwheel"
+          ]
+        }
+      }
+    ],
+    "transaction": [
+      {
+        "field": "TRANSACTION_AMOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "149.0",
+            "54.75"
+          ]
+        }
+      },
+      {
+        "field": "LAST_APPROVED_TRANSACTION",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-08-01 13:43:56.000"
+          ]
+        }
+      },
+      {
+        "field": "LAST_APPROVED_TRANSACTION_AMOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "149"
+          ]
+        }
+      },
+      {
+        "field": "PAYMENT_METHOD",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "Credit Card",
+            "Credit"
+          ]
+        }
+      },
+      {
+        "field": "PAYMENT_START_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-05-10"
+          ]
+        }
+      },
+      {
+        "field": "DAYS_SINCE_LAST_APPROVED_TRANSACTION",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "27"
+          ]
+        }
+      },
+      {
+        "field": "UPCOMING_SCHEDULED_PAYMENT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-09-10"
+          ]
+        }
+      },
+      {
+        "field": "UPCOMING_SCHEDULED_PAYMENT_AMOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "54.75"
+          ]
+        }
+      },
+      {
+        "field": "CHARGEBACK",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "field": "REFUND_CONFIRMATION_SENT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "field": "NEXT_TRANSACTION_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-09-10"
+          ]
+        }
+      }
+    ],
+    "card": [
+      {
+        "field": "CARD_LAST_4",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "1306",
+            "5753"
+          ]
+        }
+      },
+      {
+        "field": "CARD_FIRST_6_DIGIT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "474488"
+          ]
+        }
+      },
+      {
+        "field": "CARD_TYPE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Visa"
+          ]
+        }
+      },
+      {
+        "field": "CARD_EXPIRED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      }
+    ],
+    "phone": [
+      {
+        "field": "CONTACT_TYPE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Monthly Unlimited"
+          ]
+        }
+      },
+      {
+        "field": "ZOHO_CONTACT_ID",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "664115001424518351"
+          ]
+        }
+      },
+      {
+        "field": "CONTACT_NEW",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>",
+            "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>"
+          ]
+        }
+      }
+    ],
+    "ticket": [
+      {
+        "field": "TICKETNUMBER",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "5019768"
+          ]
+        }
+      },
+      {
+        "field": "ZOHO_ID",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "664115001617812296"
+          ]
+        }
+      },
+      {
+        "field": "ZOHO_STATUS",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Closed"
+          ]
+        }
+      },
+      {
+        "field": "CATEGORY",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Cancel Request"
+          ]
+        }
+      }
+    ],
+    "business": [
+      {
+        "field": "ENROLLMENT_CAPTURE_COMPLETED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "ENROLLMENT_FEE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "field": "ENROLLMENT_BALANCE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "0"
+          ]
+        }
+      },
+      {
+        "field": "CURRENT_PRODUCT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "Success PLUS Individual $149, $149 Monthly",
+            "Downsell Credit Repair Monthly $54.75"
+          ]
+        }
+      },
+      {
+        "field": "CONTRACT_SIGNED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            true
+          ]
+        }
+      },
+      {
+        "field": "SUCCESS_PLUS_CONTRACT_SIGNED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            false
+          ]
+        }
+      },
+      {
+        "field": "RE_ENROLLMENT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "field": "TCP_WEBSITE_ENROLLMENT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            false
+          ]
+        }
+      }
+    ],
+    "system": [
+      {
+        "field": "CLIENT_ID",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "1747598"
+          ]
+        }
+      },
+      {
+        "field": "STATUS",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Active"
+          ]
+        }
+      },
+      {
+        "field": "OPPORTUNITY",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "a2AUx000004oEzxMAE"
+          ]
+        }
+      },
+      {
+        "field": "OPPORTUNITY_ID",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 4,
+          "coverage_percentage": 33.33,
+          "unique_values": 1,
+          "sample_values": [
+            "a2AUx000004oEzxMAE",
+            "a2AUx000004oEzxMAE",
+            "a2AUx000004oEzxMAE",
+            "a2AUx000004oEzxMAE"
+          ]
+        }
+      },
+      {
+        "field": "OPPORTUNITY_OWNER",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "005Ux000000tOHp"
+          ]
+        }
+      },
+      {
+        "field": "SOURCE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 5,
+          "coverage_percentage": 41.67,
+          "unique_values": 4,
+          "sample_values": [
+            "Transaction",
+            "Transaction",
+            "zoho_tickets",
+            "Contact",
+            "Opportunity"
+          ]
+        }
+      },
+      {
+        "field": "SOURCE_TYPE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "SYSTEM"
+          ]
+        }
+      },
+      {
+        "field": "PRIMARY",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            true
+          ]
+        }
+      },
+      {
+        "field": "CREATED_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10 18:30:50.000"
+          ]
+        }
+      },
+      {
+        "field": "CREATEDTIME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-08-01 13:31:33.000"
+          ]
+        }
+      },
+      {
+        "field": "ENROLL_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "CLOSE_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "CLOSEDTIME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-08-01T13:46:12.000Z"
+          ]
+        }
+      },
+      {
+        "field": "AMOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "1.0"
+          ]
+        }
+      },
+      {
+        "field": "NET_BALANCE_DUE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "0"
+          ]
+        }
+      },
+      {
+        "field": "SETUP_FEE2_AMOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "0.0"
+          ]
+        }
+      },
+      {
+        "field": "RECURRING_MONTHLY_FEE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "54.75"
+          ]
+        }
+      },
+      {
+        "field": "SUBJECT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "5019768 - Esteban Price - Cancel Request - 8/1/2025"
+          ]
+        }
+      },
+      {
+        "field": "COMMENTCOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2"
+          ]
+        }
+      },
+      {
+        "field": "THREADCOUNT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "1"
+          ]
+        }
+      },
+      {
+        "field": "DUEDATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-08-04T17:39:00.000Z"
+          ]
+        }
+      },
+      {
+        "field": "REENROLL_CLIENT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            false
+          ]
+        }
+      },
+      {
+        "field": "DATE_OF_BIRTH",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "1986-08-27"
+          ]
+        }
+      },
+      {
+        "field": "CUSTOMER_AGE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "39"
+          ]
+        }
+      },
+      {
+        "field": "SPANISH_SPEAKER",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            false
+          ]
+        }
+      },
+      {
+        "field": "LANGUAGE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "English"
+          ]
+        }
+      },
+      {
+        "field": "SMS_OPT_OUT",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            false
+          ]
+        }
+      },
+      {
+        "field": "MAILING_STREET",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "238 E Norma  lane"
+          ]
+        }
+      },
+      {
+        "field": "MAILING_CITY",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Tucson"
+          ]
+        }
+      },
+      {
+        "field": "MAILING_STATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Arizona"
+          ]
+        }
+      },
+      {
+        "field": "MAILING_STATE_CODE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "AZ"
+          ]
+        }
+      },
+      {
+        "field": "MAILING_POSTAL_CODE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "85705"
+          ]
+        }
+      },
+      {
+        "field": "id",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 12,
+          "coverage_percentage": 100.0,
+          "unique_values": 12,
+          "sample_values": [
+            "a17Ux00004tQVGUIA4",
+            "a17Ux000054BVlzIAG",
+            "664115001617812296",
+            "A786",
+            "A787"
+          ]
+        }
+      },
+      {
+        "field": "ORIGINAL_LEAD_ID",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "a2FUx000009imesMAA"
+          ]
+        }
+      },
+      {
+        "field": "TU_AUTHENTICATED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "VERIFY_IDENTITY",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Birthdate: 1986-08-27 - LAST SSN 4: 9552"
+          ]
+        }
+      },
+      {
+        "field": "DAYS_SINCE_ENROLL",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "10"
+          ]
+        }
+      },
+      {
+        "field": "DAYS_SINCE_ENROLLED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "140"
+          ]
+        }
+      },
+      {
+        "field": "DAYS_SINCE_CREATED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "140"
+          ]
+        }
+      },
+      {
+        "field": "RECURRING",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            true,
+            false
+          ]
+        }
+      },
+      {
+        "field": "NEXT_SUBSCRIPTION_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-09-10"
+          ]
+        }
+      },
+      {
+        "field": "IS_EB0_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10 19:10:44.000"
+          ]
+        }
+      },
+      {
+        "field": "RESPONSE_MESSAGE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "Transaction Approved",
+            "month waived."
+          ]
+        }
+      },
+      {
+        "field": "RESPONSE_STATUS",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 1,
+          "sample_values": [
+            "Approved",
+            "Approved"
+          ]
+        }
+      },
+      {
+        "field": "GATEWAY_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "2025-07-10 14:10:57.000",
+            "2025-08-01 13:43:56.000"
+          ]
+        }
+      },
+      {
+        "field": "CAP_COMPLETED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Yes"
+          ]
+        }
+      },
+      {
+        "field": "CAP_COMPLETED_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10 19:20:51.000"
+          ]
+        }
+      },
+      {
+        "field": "CAP_MISSED",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "No"
+          ]
+        }
+      },
+      {
+        "field": "ACE_CAP",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            true
+          ]
+        }
+      },
+      {
+        "field": "DEAL_CLOSE_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "DEAL_CLOSE_TIME",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10 19:10:40.000"
+          ]
+        }
+      },
+      {
+        "field": "COLD_LEAD_CREATED_DATE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "2025-04-10"
+          ]
+        }
+      },
+      {
+        "field": "AGE_OF_CANCELLATION",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "0"
+          ]
+        }
+      },
+      {
+        "field": "CP_PORTAL_LINK",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "https://portal.thecreditpros.com/salesforce-client/client-list?client_id=1747598&api=1"
+          ]
+        }
+      },
+      {
+        "field": "ID_18_CHAR",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "003Ux00000RgELbIAN"
+          ]
+        }
+      },
+      {
+        "field": "TYPE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 2,
+          "coverage_percentage": 16.67,
+          "unique_values": 2,
+          "sample_values": [
+            "Charge",
+            "Credit"
+          ]
+        }
+      },
+      {
+        "field": "STATUSTYPE",
+        "stats": {
+          "appears_in_records": 12,
+          "has_non_null_values": 1,
+          "coverage_percentage": 8.33,
+          "unique_values": 1,
+          "sample_values": [
+            "Closed"
+          ]
+        }
+      }
+    ]
+  },
+  "complete_field_inventory": {
+    "total_fields": 160,
+    "fields_with_data": 101,
+    "fields_by_coverage": {
+      "high_coverage": [
+        "id"
+      ],
+      "medium_coverage": [
+        "OPPORTUNITY_ID",
+        "SOURCE",
+        "CREDIT_RESPONSE",
+        "CREDIT_RESPONSE.CREDIT_BUREAU",
+        "CREDIT_RESPONSE.CreditReportFirstIssuedDate",
+        "CREDIT_RESPONSE.CreditReportIdentifier",
+        "CREDIT_RESPONSE.Report_ID",
+        "CREDIT_RESPONSE.Vendor"
+      ],
+      "low_coverage": [
+        "EMAIL",
+        "FIRST_NAME",
+        "LAST_NAME",
+        "PRODUCT_NAME",
+        "STAGE_NAME",
+        "CLIENT_ID",
+        "STATUS",
+        "OPPORTUNITY",
+        "OPPORTUNITY_OWNER",
+        "SOURCE_TYPE",
+        "PRIMARY",
+        "CREATED_DATE",
+        "CREATEDTIME",
+        "ENROLL_DATE",
+        "ENROLLMENT_CAPTURE_COMPLETED",
+        "CLOSE_DATE",
+        "CLOSEDTIME",
+        "AMOUNT",
+        "ENROLLMENT_FEE",
+        "ENROLLMENT_BALANCE",
+        "NET_BALANCE_DUE",
+        "SETUP_FEE2_AMOUNT",
+        "RECURRING_MONTHLY_FEE",
+        "TRANSACTION_AMOUNT",
+        "LAST_APPROVED_TRANSACTION",
+        "LAST_APPROVED_TRANSACTION_AMOUNT",
+        "PAYMENT_METHOD",
+        "PAYMENT_START_DATE",
+        "DAYS_SINCE_LAST_APPROVED_TRANSACTION",
+        "UPCOMING_SCHEDULED_PAYMENT",
+        "UPCOMING_SCHEDULED_PAYMENT_AMOUNT",
+        "CHARGEBACK",
+        "REFUND_CONFIRMATION_SENT",
+        "CARD_LAST_4",
+        "CARD_FIRST_6_DIGIT",
+        "CARD_TYPE",
+        "CARD_EXPIRED",
+        "CONTACT_TYPE",
+        "PHONE_EXTERNAL",
+        "ZOHO_CONTACT_ID",
+        "CONTACT_NEW",
+        "TICKETNUMBER",
+        "ZOHO_ID",
+        "ZOHO_EMAIL",
+        "ZOHO_STATUS",
+        "CATEGORY",
+        "SUBJECT",
+        "COMMENTCOUNT",
+        "THREADCOUNT",
+        "DUEDATE",
+        "CURRENT_PRODUCT",
+        "CONTRACT_SIGNED",
+        "SUCCESS_PLUS_CONTRACT_SIGNED",
+        "REENROLL_CLIENT",
+        "RE_ENROLLMENT",
+        "DATE_OF_BIRTH",
+        "CUSTOMER_AGE",
+        "SPANISH_SPEAKER",
+        "LANGUAGE",
+        "SMS_OPT_OUT",
+        "MAILING_STREET",
+        "MAILING_CITY",
+        "MAILING_STATE",
+        "MAILING_STATE_CODE",
+        "MAILING_POSTAL_CODE",
+        "ORIGINAL_LEAD_ID",
+        "TCP_WEBSITE_ENROLLMENT",
+        "TU_AUTHENTICATED",
+        "VERIFY_IDENTITY",
+        "DAYS_SINCE_ENROLL",
+        "DAYS_SINCE_ENROLLED",
+        "DAYS_SINCE_CREATED",
+        "RECURRING",
+        "NEXT_SUBSCRIPTION_DATE",
+        "NEXT_TRANSACTION_DATE",
+        "IS_EB0_DATE",
+        "RESPONSE_MESSAGE",
+        "RESPONSE_STATUS",
+        "GATEWAY_DATE",
+        "CAP_COMPLETED",
+        "CAP_COMPLETED_DATE",
+        "CAP_MISSED",
+        "ACE_CAP",
+        "DEAL_CLOSE_DATE",
+        "DEAL_CLOSE_TIME",
+        "COLD_LEAD_CREATED_DATE",
+        "AGE_OF_CANCELLATION",
+        "CP_PORTAL_LINK",
+        "ID_18_CHAR",
+        "TYPE",
+        "STATUSTYPE",
+        "CHARGEBACK_CREDITED"
+      ],
+      "no_data": [
+        "MIDDLE_NAME",
+        "PHONE_NUMBER",
+        "AGENT_USERNAME",
+        "CAMPAIGN_NAME",
+        "SPOUSE_FULL_NAME",
+        "ACTIVE",
+        "GATHRR_CUSTOMER_ID",
+        "CANCELLATION_DATE",
+        "CREDIT_AMOUNT",
+        "DISCOUNT_AMOUNT",
+        "COUPON_AMOUNT",
+        "LAST_FAILED_TRANSACTION",
+        "PAYMENT_END_DATE",
+        "DEBT_PAYMENT",
+        "DEBT_PAYMENT_DATE",
+        "CARD_NUMBER",
+        "EXPIRATION_MONTH",
+        "EXPIRATION_YEAR",
+        "INVALID_CARD",
+        "BIN",
+        "CVV",
+        "CALL_ID",
+        "CALL_START_TIME",
+        "CALL_HANGUP_TIME",
+        "CALL_DURATION",
+        "CALL_TYPE",
+        "ZOHO_PHONE",
+        "SUBCATEGORY",
+        "PRIORITY",
+        "RESPONSEDUEDATE",
+        "CURRENT_PRODUCT_TYPE",
+        "CANCEL_REASON",
+        "CANCEL_REASONS",
+        "CANCELLED_BY",
+        "RE_ENROLL_DATE",
+        "SPOUSE",
+        "TCPA",
+        "DRIVING_LICENSE_NUMBER",
+        "DRIVING_LICENSE_ISSUED_BY",
+        "DRIVING_LICENSE_EXPIRY_DATE",
+        "REFERRED_BY_CLIENT",
+        "GENERATE_REFERRAL_BY",
+        "HOW_DID_YOU_HEAR_ABOUT_US",
+        "WEB_ENROLLMENT",
+        "WEB_ENROLLMENT_STATUS",
+        "KYC_STATUS",
+        "ID_DOC_UPLOADED",
+        "EMAIL_CONFIRMATION_DATE",
+        "MONTHS_SINCE_ENROLL",
+        "DAYS_SINCE_LAST_FAILED",
+        "PREPAID",
+        "PAST_DUE_DATE",
+        "GATEWAY_RESPONSE",
+        "SETUP_FEE2_DATE",
+        "CLAWBACK_DATE",
+        "CLAWBACK_REASONS",
+        "X18_CHAR_ID",
+        "SENTIMENT",
+        "CREDIT_RESPONSE.Report_Type"
+      ]
+    },
+    "most_populated_fields": [
+      {
+        "field": "id",
+        "coverage": 100.0,
+        "unique_values": 12
+      },
+      {
+        "field": "CREDIT_RESPONSE",
+        "coverage": 58.33,
+        "unique_values": 4
+      },
+      {
+        "field": "CREDIT_RESPONSE.CREDIT_BUREAU",
+        "coverage": 58.33,
+        "unique_values": 1
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportFirstIssuedDate",
+        "coverage": 58.33,
+        "unique_values": 4
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportIdentifier",
+        "coverage": 58.33,
+        "unique_values": 4
+      },
+      {
+        "field": "CREDIT_RESPONSE.Report_ID",
+        "coverage": 58.33,
+        "unique_values": 7
+      },
+      {
+        "field": "CREDIT_RESPONSE.Vendor",
+        "coverage": 58.33,
+        "unique_values": 2
+      },
+      {
+        "field": "SOURCE",
+        "coverage": 41.67,
+        "unique_values": 4
+      },
+      {
+        "field": "OPPORTUNITY_ID",
+        "coverage": 33.33,
+        "unique_values": 1
+      },
+      {
+        "field": "ENROLLMENT_FEE",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "TRANSACTION_AMOUNT",
+        "coverage": 16.67,
+        "unique_values": 2
+      },
+      {
+        "field": "PAYMENT_METHOD",
+        "coverage": 16.67,
+        "unique_values": 2
+      },
+      {
+        "field": "CHARGEBACK",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "REFUND_CONFIRMATION_SENT",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "CARD_LAST_4",
+        "coverage": 16.67,
+        "unique_values": 2
+      },
+      {
+        "field": "CARD_EXPIRED",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "CONTACT_NEW",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "CURRENT_PRODUCT",
+        "coverage": 16.67,
+        "unique_values": 2
+      },
+      {
+        "field": "RE_ENROLLMENT",
+        "coverage": 16.67,
+        "unique_values": 1
+      },
+      {
+        "field": "RECURRING",
+        "coverage": 16.67,
+        "unique_values": 2
+      }
+    ],
+    "unique_value_fields": [],
+    "complete_field_list": [
+      {
+        "field": "EMAIL",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "e.j.price1986@gmail.com"
+        ]
+      },
+      {
+        "field": "FIRST_NAME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Esteban"
+        ]
+      },
+      {
+        "field": "LAST_NAME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Price"
+        ]
+      },
+      {
+        "field": "MIDDLE_NAME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "PHONE_NUMBER",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "AGENT_USERNAME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CAMPAIGN_NAME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "PRODUCT_NAME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Downsell Credit Repair Monthly $54.75"
+        ]
+      },
+      {
+        "field": "SPOUSE_FULL_NAME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "STAGE_NAME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Active"
+        ]
+      },
+      {
+        "field": "CLIENT_ID",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "1747598"
+        ]
+      },
+      {
+        "field": "STATUS",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Active"
+        ]
+      },
+      {
+        "field": "ACTIVE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "GATHRR_CUSTOMER_ID",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "OPPORTUNITY",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "a2AUx000004oEzxMAE"
+        ]
+      },
+      {
+        "field": "OPPORTUNITY_ID",
+        "coverage_percentage": 33.33,
+        "non_null_count": 4,
+        "unique_values": 1,
+        "sample_values": [
+          "a2AUx000004oEzxMAE",
+          "a2AUx000004oEzxMAE",
+          "a2AUx000004oEzxMAE",
+          "a2AUx000004oEzxMAE"
+        ]
+      },
+      {
+        "field": "OPPORTUNITY_OWNER",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "005Ux000000tOHp"
+        ]
+      },
+      {
+        "field": "SOURCE",
+        "coverage_percentage": 41.67,
+        "non_null_count": 5,
+        "unique_values": 4,
+        "sample_values": [
+          "Transaction",
+          "Transaction",
+          "zoho_tickets",
+          "Contact",
+          "Opportunity"
+        ]
+      },
+      {
+        "field": "SOURCE_TYPE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "SYSTEM"
+        ]
+      },
+      {
+        "field": "PRIMARY",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          true
+        ]
+      },
+      {
+        "field": "CREATED_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10 18:30:50.000"
+        ]
+      },
+      {
+        "field": "CREATEDTIME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-08-01 13:31:33.000"
+        ]
+      },
+      {
+        "field": "ENROLL_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "ENROLLMENT_CAPTURE_COMPLETED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "CANCELLATION_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CLOSE_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "CLOSEDTIME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-08-01T13:46:12.000Z"
+        ]
+      },
+      {
+        "field": "AMOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "1.0"
+        ]
+      },
+      {
+        "field": "CREDIT_AMOUNT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "ENROLLMENT_FEE",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "ENROLLMENT_BALANCE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "0"
+        ]
+      },
+      {
+        "field": "NET_BALANCE_DUE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "0"
+        ]
+      },
+      {
+        "field": "SETUP_FEE2_AMOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "0.0"
+        ]
+      },
+      {
+        "field": "RECURRING_MONTHLY_FEE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "54.75"
+        ]
+      },
+      {
+        "field": "DISCOUNT_AMOUNT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "COUPON_AMOUNT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "TRANSACTION_AMOUNT",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "149.0",
+          "54.75"
+        ]
+      },
+      {
+        "field": "LAST_APPROVED_TRANSACTION",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-08-01 13:43:56.000"
+        ]
+      },
+      {
+        "field": "LAST_APPROVED_TRANSACTION_AMOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "149"
+        ]
+      },
+      {
+        "field": "LAST_FAILED_TRANSACTION",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "PAYMENT_METHOD",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "Credit Card",
+          "Credit"
+        ]
+      },
+      {
+        "field": "PAYMENT_START_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-05-10"
+        ]
+      },
+      {
+        "field": "PAYMENT_END_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DAYS_SINCE_LAST_APPROVED_TRANSACTION",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "27"
+        ]
+      },
+      {
+        "field": "UPCOMING_SCHEDULED_PAYMENT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-09-10"
+        ]
+      },
+      {
+        "field": "UPCOMING_SCHEDULED_PAYMENT_AMOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "54.75"
+        ]
+      },
+      {
+        "field": "CHARGEBACK",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "REFUND_CONFIRMATION_SENT",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "DEBT_PAYMENT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DEBT_PAYMENT_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CARD_NUMBER",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CARD_LAST_4",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "1306",
+          "5753"
+        ]
+      },
+      {
+        "field": "CARD_FIRST_6_DIGIT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "474488"
+        ]
+      },
+      {
+        "field": "CARD_TYPE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Visa"
+        ]
+      },
+      {
+        "field": "EXPIRATION_MONTH",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "EXPIRATION_YEAR",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CARD_EXPIRED",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "INVALID_CARD",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "BIN",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CVV",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CALL_ID",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CALL_START_TIME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CALL_HANGUP_TIME",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CALL_DURATION",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CALL_TYPE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CONTACT_TYPE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Monthly Unlimited"
+        ]
+      },
+      {
+        "field": "PHONE_EXTERNAL",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "5209549414"
+        ]
+      },
+      {
+        "field": "ZOHO_CONTACT_ID",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "664115001424518351"
+        ]
+      },
+      {
+        "field": "ZOHO_PHONE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CONTACT_NEW",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>",
+          "<a href=\"/003Ux00000RgELb\" target=\"_blank\">Esteban Price</a>"
+        ]
+      },
+      {
+        "field": "TICKETNUMBER",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "5019768"
+        ]
+      },
+      {
+        "field": "ZOHO_ID",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "664115001617812296"
+        ]
+      },
+      {
+        "field": "ZOHO_EMAIL",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "e.j.price1986@gmail.com"
+        ]
+      },
+      {
+        "field": "ZOHO_STATUS",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Closed"
+        ]
+      },
+      {
+        "field": "CATEGORY",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Cancel Request"
+        ]
+      },
+      {
+        "field": "SUBCATEGORY",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "PRIORITY",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "SUBJECT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "5019768 - Esteban Price - Cancel Request - 8/1/2025"
+        ]
+      },
+      {
+        "field": "COMMENTCOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2"
+        ]
+      },
+      {
+        "field": "THREADCOUNT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "1"
+        ]
+      },
+      {
+        "field": "RESPONSEDUEDATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DUEDATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-08-04T17:39:00.000Z"
+        ]
+      },
+      {
+        "field": "CURRENT_PRODUCT",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "Success PLUS Individual $149, $149 Monthly",
+          "Downsell Credit Repair Monthly $54.75"
+        ]
+      },
+      {
+        "field": "CURRENT_PRODUCT_TYPE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CONTRACT_SIGNED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          true
+        ]
+      },
+      {
+        "field": "SUCCESS_PLUS_CONTRACT_SIGNED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          false
+        ]
+      },
+      {
+        "field": "CANCEL_REASON",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CANCEL_REASONS",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CANCELLED_BY",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "REENROLL_CLIENT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          false
+        ]
+      },
+      {
+        "field": "RE_ENROLLMENT",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "RE_ENROLL_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DATE_OF_BIRTH",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "1986-08-27"
+        ]
+      },
+      {
+        "field": "CUSTOMER_AGE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "39"
+        ]
+      },
+      {
+        "field": "SPANISH_SPEAKER",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          false
+        ]
+      },
+      {
+        "field": "SPOUSE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "LANGUAGE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "English"
+        ]
+      },
+      {
+        "field": "SMS_OPT_OUT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          false
+        ]
+      },
+      {
+        "field": "TCPA",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "MAILING_STREET",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "238 E Norma  lane"
+        ]
+      },
+      {
+        "field": "MAILING_CITY",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Tucson"
+        ]
+      },
+      {
+        "field": "MAILING_STATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Arizona"
+        ]
+      },
+      {
+        "field": "MAILING_STATE_CODE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "AZ"
+        ]
+      },
+      {
+        "field": "MAILING_POSTAL_CODE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "85705"
+        ]
+      },
+      {
+        "field": "DRIVING_LICENSE_NUMBER",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DRIVING_LICENSE_ISSUED_BY",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DRIVING_LICENSE_EXPIRY_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "id",
+        "coverage_percentage": 100.0,
+        "non_null_count": 12,
+        "unique_values": 12,
+        "sample_values": [
+          "a17Ux00004tQVGUIA4",
+          "a17Ux000054BVlzIAG",
+          "664115001617812296",
+          "A786",
+          "A787"
+        ]
+      },
+      {
+        "field": "ORIGINAL_LEAD_ID",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "a2FUx000009imesMAA"
+        ]
+      },
+      {
+        "field": "REFERRED_BY_CLIENT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "GENERATE_REFERRAL_BY",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "HOW_DID_YOU_HEAR_ABOUT_US",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "WEB_ENROLLMENT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "WEB_ENROLLMENT_STATUS",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "TCP_WEBSITE_ENROLLMENT",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          false
+        ]
+      },
+      {
+        "field": "KYC_STATUS",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "TU_AUTHENTICATED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "VERIFY_IDENTITY",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Birthdate: 1986-08-27 - LAST SSN 4: 9552"
+        ]
+      },
+      {
+        "field": "ID_DOC_UPLOADED",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "EMAIL_CONFIRMATION_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DAYS_SINCE_ENROLL",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "10"
+        ]
+      },
+      {
+        "field": "DAYS_SINCE_ENROLLED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "140"
+        ]
+      },
+      {
+        "field": "MONTHS_SINCE_ENROLL",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "DAYS_SINCE_CREATED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "140"
+        ]
+      },
+      {
+        "field": "DAYS_SINCE_LAST_FAILED",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "PREPAID",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "RECURRING",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          true,
+          false
+        ]
+      },
+      {
+        "field": "NEXT_SUBSCRIPTION_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-09-10"
+        ]
+      },
+      {
+        "field": "NEXT_TRANSACTION_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-09-10"
+        ]
+      },
+      {
+        "field": "PAST_DUE_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "IS_EB0_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10 19:10:44.000"
+        ]
+      },
+      {
+        "field": "RESPONSE_MESSAGE",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "Transaction Approved",
+          "month waived."
+        ]
+      },
+      {
+        "field": "RESPONSE_STATUS",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          "Approved",
+          "Approved"
+        ]
+      },
+      {
+        "field": "GATEWAY_RESPONSE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "GATEWAY_DATE",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "2025-07-10 14:10:57.000",
+          "2025-08-01 13:43:56.000"
+        ]
+      },
+      {
+        "field": "CAP_COMPLETED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Yes"
+        ]
+      },
+      {
+        "field": "CAP_COMPLETED_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10 19:20:51.000"
+        ]
+      },
+      {
+        "field": "CAP_MISSED",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "No"
+        ]
+      },
+      {
+        "field": "ACE_CAP",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          true
+        ]
+      },
+      {
+        "field": "DEAL_CLOSE_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "DEAL_CLOSE_TIME",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10 19:10:40.000"
+        ]
+      },
+      {
+        "field": "COLD_LEAD_CREATED_DATE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "2025-04-10"
+        ]
+      },
+      {
+        "field": "SETUP_FEE2_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CLAWBACK_DATE",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CLAWBACK_REASONS",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "AGE_OF_CANCELLATION",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "0"
+        ]
+      },
+      {
+        "field": "CP_PORTAL_LINK",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "https://portal.thecreditpros.com/salesforce-client/client-list?client_id=1747598&api=1"
+        ]
+      },
+      {
+        "field": "X18_CHAR_ID",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "ID_18_CHAR",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "003Ux00000RgELbIAN"
+        ]
+      },
+      {
+        "field": "SENTIMENT",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "TYPE",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 2,
+        "sample_values": [
+          "Charge",
+          "Credit"
+        ]
+      },
+      {
+        "field": "STATUSTYPE",
+        "coverage_percentage": 8.33,
+        "non_null_count": 1,
+        "unique_values": 1,
+        "sample_values": [
+          "Closed"
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 4,
+        "sample_values": [
+          {
+            "CREDIT_BUREAU": "Equifax",
+            "CreditReportFirstIssuedDate": "2025-04-10",
+            "CreditReportIdentifier": "1111-3196489",
+            "Report_ID": "786",
+            "Report_Type": null,
+            "Vendor": "array"
+          },
+          {
+            "CREDIT_BUREAU": "Equifax",
+            "CreditReportFirstIssuedDate": "2025-04-10",
+            "CreditReportIdentifier": "99M191141",
+            "Report_ID": "787",
+            "Report_Type": null,
+            "Vendor": "array"
+          },
+          {
+            "CREDIT_BUREAU": "Equifax",
+            "CreditReportFirstIssuedDate": "2025-06-19",
+            "CreditReportIdentifier": "1111-3196489",
+            "Report_ID": "838",
+            "Report_Type": null,
+            "Vendor": "array"
+          },
+          {
+            "CREDIT_BUREAU": "Equifax",
+            "CreditReportFirstIssuedDate": "2025-08-01",
+            "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+            "Report_ID": "876",
+            "Report_Type": null,
+            "Vendor": "spinwheel"
+          },
+          {
+            "CREDIT_BUREAU": "Equifax",
+            "CreditReportFirstIssuedDate": "2025-08-01",
+            "CreditReportIdentifier": "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+            "Report_ID": "877",
+            "Report_Type": null,
+            "Vendor": "spinwheel"
+          }
+        ]
+      },
+      {
+        "field": "CHARGEBACK_CREDITED",
+        "coverage_percentage": 16.67,
+        "non_null_count": 2,
+        "unique_values": 1,
+        "sample_values": [
+          false,
+          false
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE.CREDIT_BUREAU",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 1,
+        "sample_values": [
+          "Equifax",
+          "Equifax",
+          "Equifax",
+          "Equifax",
+          "Equifax"
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportFirstIssuedDate",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 4,
+        "sample_values": [
+          "2025-04-10",
+          "2025-04-10",
+          "2025-06-19",
+          "2025-08-01",
+          "2025-08-01"
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE.CreditReportIdentifier",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 4,
+        "sample_values": [
+          "1111-3196489",
+          "99M191141",
+          "1111-3196489",
+          "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3",
+          "7409e5c0-3a5a-48b3-adca-0a2148cc7ca3"
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE.Report_ID",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 7,
+        "sample_values": [
+          "786",
+          "787",
+          "838",
+          "876",
+          "877"
+        ]
+      },
+      {
+        "field": "CREDIT_RESPONSE.Report_Type",
+        "coverage_percentage": 0.0,
+        "non_null_count": 0,
+        "unique_values": 0,
+        "sample_values": []
+      },
+      {
+        "field": "CREDIT_RESPONSE.Vendor",
+        "coverage_percentage": 58.33,
+        "non_null_count": 7,
+        "unique_values": 2,
+        "sample_values": [
+          "array",
+          "array",
+          "array",
+          "spinwheel",
+          "spinwheel"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "timestamp": "2025-09-03T08:37:19.994370",
+  "test_type": "live_agenta_variant_testing",
+  "summary": {
+    "total_tests": 5,
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "agenta_sources": 0,
+    "template_sources": 5
+  },
+  "routing_distribution": {
+    "credit": 1,
+    "multi_data": 1,
+    "account_status": 1,
+    "transaction": 1,
+    "phone": 1
+  },
+  "detailed_results": [
+    {
+      "scenario_name": "Credit Analysis Test",
+      "query": "What's the credit score for e.j.price1986@gmail.com?",
+      "expected_route": "credit",
+      "actual_route": "credit",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "has_routing_instructions": false,
+      "prompt_source": "template_mapped_routing_aware",
+      "is_agenta_source": false,
+      "simulated_response_length": 155,
+      "success": true,
+      "routing_metadata": {
+        "query": "What's the credit score for e.j.price1986@gmail.com?",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "credit"
+        ],
+        "data_types_requested": [
+          "credit"
+        ],
+        "routing_decision": "credit",
+        "fallback_reason": "no_specific_keywords_detected",
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": false
+        }
+      }
+    },
+    {
+      "scenario_name": "Multi-Data Analysis Test",
+      "query": "Give me comprehensive analysis for e.j.price1986@gmail.com",
+      "expected_route": "multi_data",
+      "actual_route": "multi_data",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "has_routing_instructions": false,
+      "prompt_source": "template_mapped_routing_aware",
+      "is_agenta_source": false,
+      "simulated_response_length": 159,
+      "success": true,
+      "routing_metadata": {
+        "query": "Give me comprehensive analysis for e.j.price1986@gmail.com",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "combined"
+        ],
+        "data_types_requested": [],
+        "routing_decision": "multi_data",
+        "fallback_reason": null,
+        "is_multi_data": true,
+        "complexity_score": 3,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": true
+        }
+      }
+    },
+    {
+      "scenario_name": "Account Status Test",
+      "query": "What's the account status for john.doe@email.com?",
+      "expected_route": "account_status",
+      "actual_route": "account_status",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "has_routing_instructions": false,
+      "prompt_source": "fallback_template_routing_aware",
+      "is_agenta_source": false,
+      "simulated_response_length": 120,
+      "success": true,
+      "routing_metadata": {
+        "query": "What's the account status for john.doe@email.com?",
+        "customer_id": "test-customer-123",
+        "keywords_detected": [
+          "account_status"
+        ],
+        "data_types_requested": [],
+        "routing_decision": "account_status",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": true,
+          "transaction_data": true,
+          "card_data": false,
+          "ticket_data": true
+        }
+      }
+    },
+    {
+      "scenario_name": "Transaction Analysis Test",
+      "query": "Show me payment patterns for e.j.price1986@gmail.com",
+      "expected_route": "transaction",
+      "actual_route": "transaction",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "has_routing_instructions": false,
+      "prompt_source": "template_mapped_routing_aware",
+      "is_agenta_source": false,
+      "simulated_response_length": 142,
+      "success": true,
+      "routing_metadata": {
+        "query": "Show me payment patterns for e.j.price1986@gmail.com",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "transaction"
+        ],
+        "data_types_requested": [
+          "transaction"
+        ],
+        "routing_decision": "transaction",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": false
+        }
+      }
+    },
+    {
+      "scenario_name": "Phone Analysis Test",
+      "query": "Show me call history for customer@email.com",
+      "expected_route": "phone",
+      "actual_route": "phone",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "has_routing_instructions": false,
+      "prompt_source": "template_mapped_routing_aware",
+      "is_agenta_source": false,
+      "simulated_response_length": 118,
+      "success": true,
+      "routing_metadata": {
+        "query": "Show me call history for customer@email.com",
+        "customer_id": "test-customer-456",
+        "keywords_detected": [
+          "phone"
+        ],
+        "data_types_requested": [
+          "phone"
+        ],
+        "routing_decision": "phone",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": false,
+          "ticket_data": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "total_transaction_records": 6,
+  "transactions_by_type": {
+    "direct_transactions": [
+      {
+        "record_index": 0,
+        "record_id": "a17Ux00004tQVGUIA4",
+        "type": "direct_transaction",
+        "amount": "149.0",
+        "payment_method": "Credit Card",
+        "transaction_type": "Charge",
+        "status": "Approved",
+        "message": "Transaction Approved",
+        "gateway_date": "2025-07-10 14:10:57.000",
+        "recurring": true,
+        "chargeback": false,
+        "refund_sent": false
+      },
+      {
+        "record_index": 1,
+        "record_id": "a17Ux000054BVlzIAG",
+        "type": "direct_transaction",
+        "amount": "54.75",
+        "payment_method": "Credit",
+        "transaction_type": "Credit",
+        "status": "Approved",
+        "message": "month waived.",
+        "gateway_date": "2025-08-01 13:43:56.000",
+        "recurring": false,
+        "chargeback": false,
+        "refund_sent": false
+      }
+    ],
+    "payment_history": [
+      {
+        "record_index": 10,
+        "record_id": "003Ux00000RgELbIAN",
+        "type": "payment_history",
+        "last_transaction_date": null,
+        "last_transaction_amount": "149",
+        "days_since_last_transaction": "27",
+        "enrollment_balance": "0",
+        "net_balance_due": "0"
+      },
+      {
+        "record_index": 11,
+        "record_id": "a2AUx000004oEzxMAE",
+        "type": "payment_history",
+        "last_transaction_date": "2025-08-01 13:43:56.000",
+        "last_transaction_amount": null,
+        "days_since_last_transaction": null,
+        "enrollment_balance": null,
+        "net_balance_due": null
+      }
+    ],
+    "payment_schedule": [
+      {
+        "record_index": 11,
+        "record_id": "a2AUx000004oEzxMAE",
+        "type": "payment_schedule",
+        "payment_start_date": "2025-05-10",
+        "next_payment_date": "2025-09-10",
+        "next_payment_amount": "54.75",
+        "recurring_monthly_fee": "54.75",
+        "setup_fee": "0.0",
+        "next_transaction_date": "2025-09-10"
+      }
+    ],
+    "other_financial": [
+      {
+        "record_index": 10,
+        "record_id": "003Ux00000RgELbIAN",
+        "type": "other_financial",
+        "data": {
+          "LAST_APPROVED_TRANSACTION_AMOUNT": "149",
+          "ENROLLMENT_BALANCE": "0",
+          "NET_BALANCE_DUE": "0"
+        }
+      }
+    ]
+  },
+  "all_transactions": [
+    {
+      "record_index": 0,
+      "record_id": "a17Ux00004tQVGUIA4",
+      "type": "direct_transaction",
+      "amount": "149.0",
+      "payment_method": "Credit Card",
+      "transaction_type": "Charge",
+      "status": "Approved",
+      "message": "Transaction Approved",
+      "gateway_date": "2025-07-10 14:10:57.000",
+      "recurring": true,
+      "chargeback": false,
+      "refund_sent": false
+    },
+    {
+      "record_index": 1,
+      "record_id": "a17Ux000054BVlzIAG",
+      "type": "direct_transaction",
+      "amount": "54.75",
+      "payment_method": "Credit",
+      "transaction_type": "Credit",
+      "status": "Approved",
+      "message": "month waived.",
+      "gateway_date": "2025-08-01 13:43:56.000",
+      "recurring": false,
+      "chargeback": false,
+      "refund_sent": false
+    },
+    {
+      "record_index": 10,
+      "record_id": "003Ux00000RgELbIAN",
+      "type": "payment_history",
+      "last_transaction_date": null,
+      "last_transaction_amount": "149",
+      "days_since_last_transaction": "27",
+      "enrollment_balance": "0",
+      "net_balance_due": "0"
+    },
+    {
+      "record_index": 10,
+      "record_id": "003Ux00000RgELbIAN",
+      "type": "other_financial",
+      "data": {
+        "LAST_APPROVED_TRANSACTION_AMOUNT": "149",
+        "ENROLLMENT_BALANCE": "0",
+        "NET_BALANCE_DUE": "0"
+      }
+    },
+    {
+      "record_index": 11,
+      "record_id": "a2AUx000004oEzxMAE",
+      "type": "payment_history",
+      "last_transaction_date": "2025-08-01 13:43:56.000",
+      "last_transaction_amount": null,
+      "days_since_last_transaction": null,
+      "enrollment_balance": null,
+      "net_balance_due": null
+    },
+    {
+      "record_index": 11,
+      "record_id": "a2AUx000004oEzxMAE",
+      "type": "payment_schedule",
+      "payment_start_date": "2025-05-10",
+      "next_payment_date": "2025-09-10",
+      "next_payment_amount": "54.75",
+      "recurring_monthly_fee": "54.75",
+      "setup_fee": "0.0",
+      "next_transaction_date": "2025-09-10"
+    }
+  ],
+  "financial_summary": {
+    "direct_charges": [
+      149.0,
+      54.75
+    ],
+    "monthly_recurring": [
+      54.75
+    ],
+    "upcoming_payments": [
+      54.75
+    ],
+    "balances": {
+      "enrollment_balance": [
+        0.0
+      ],
+      "net_balance_due": [
+        0.0
+      ]
+    }
+  }
+}

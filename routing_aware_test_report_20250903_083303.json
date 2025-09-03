@@ -1,0 +1,408 @@
+{
+  "timestamp": "2025-09-03T08:33:03.943213",
+  "summary": {
+    "total_tests": 20,
+    "passed_tests": 20,
+    "failed_tests": 0,
+    "success_rate": 100.0
+  },
+  "test_types": {
+    "routing_context": {
+      "passed": 7,
+      "failed": 0,
+      "total": 7
+    },
+    "prompt_generation": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "data_availability": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "edge_case": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "integration": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    }
+  },
+  "detailed_results": [
+    {
+      "test_name": "Credit Analysis Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "What's the credit score for e.j.price1986@gmail.com?",
+        "expected_route": "credit",
+        "actual_route": "credit",
+        "route_match": true,
+        "expected_keywords": [
+          "credit"
+        ],
+        "actual_keywords": [
+          "credit"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [
+          "credit"
+        ],
+        "actual_data_types": [
+          "credit"
+        ],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 1
+      }
+    },
+    {
+      "test_name": "Account Status Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "What's the account status for john.doe@email.com?",
+        "expected_route": "account_status",
+        "actual_route": "account_status",
+        "route_match": true,
+        "expected_keywords": [
+          "account_status"
+        ],
+        "actual_keywords": [
+          "account_status"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [],
+        "actual_data_types": [],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 1
+      }
+    },
+    {
+      "test_name": "Multi - Data Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "Give me comprehensive analysis for customer@email.com",
+        "expected_route": "multi_data",
+        "actual_route": "multi_data",
+        "route_match": true,
+        "expected_keywords": [
+          "combined"
+        ],
+        "actual_keywords": [
+          "combined"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [],
+        "actual_data_types": [],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 3
+      }
+    },
+    {
+      "test_name": "Phone Analysis Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "Show me call history for customer@email.com",
+        "expected_route": "phone",
+        "actual_route": "phone",
+        "route_match": true,
+        "expected_keywords": [
+          "phone"
+        ],
+        "actual_keywords": [
+          "phone"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [
+          "phone"
+        ],
+        "actual_data_types": [
+          "phone"
+        ],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 1
+      }
+    },
+    {
+      "test_name": "Transaction Analysis Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "What are the payment patterns for customer@email.com?",
+        "expected_route": "transaction",
+        "actual_route": "transaction",
+        "route_match": true,
+        "expected_keywords": [
+          "transaction"
+        ],
+        "actual_keywords": [
+          "transaction"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [
+          "transaction"
+        ],
+        "actual_data_types": [
+          "transaction"
+        ],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 1
+      }
+    },
+    {
+      "test_name": "Mixed Keywords Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "Show me credit score and transaction history for customer@email.com",
+        "expected_route": "multi_data",
+        "actual_route": "multi_data",
+        "route_match": true,
+        "expected_keywords": [
+          "credit",
+          "transaction"
+        ],
+        "actual_keywords": [
+          "credit",
+          "transaction"
+        ],
+        "keywords_match": true,
+        "expected_data_types": [
+          "credit",
+          "transaction"
+        ],
+        "actual_data_types": [
+          "credit",
+          "transaction"
+        ],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 4
+      }
+    },
+    {
+      "test_name": "Fallback Query",
+      "test_type": "routing_context",
+      "success": true,
+      "details": {
+        "query": "Tell me about customer@email.com",
+        "expected_route": "credit",
+        "actual_route": "credit",
+        "route_match": true,
+        "expected_keywords": [],
+        "actual_keywords": [],
+        "keywords_match": true,
+        "expected_data_types": [],
+        "actual_data_types": [],
+        "data_types_match": true,
+        "multi_data_match": true,
+        "fallback_match": true,
+        "complexity_score": 0
+      }
+    },
+    {
+      "test_name": "Prompt Generation: What's the credit score for e.j.price1986@gmail.co...",
+      "test_type": "prompt_generation",
+      "success": true,
+      "details": {
+        "query": "What's the credit score for e.j.price1986@gmail.com?",
+        "routing_decision": "credit",
+        "keywords_detected": [
+          "credit"
+        ],
+        "has_required_fields": true,
+        "has_routing_context": true,
+        "prompt_source": "template_mapped_routing_aware",
+        "routing_aware": true
+      }
+    },
+    {
+      "test_name": "Prompt Generation: Show me comprehensive analysis for customer@email....",
+      "test_type": "prompt_generation",
+      "success": true,
+      "details": {
+        "query": "Show me comprehensive analysis for customer@email.com",
+        "routing_decision": "multi_data",
+        "keywords_detected": [
+          "combined"
+        ],
+        "has_required_fields": true,
+        "has_routing_context": true,
+        "prompt_source": "template_mapped_routing_aware",
+        "routing_aware": true
+      }
+    },
+    {
+      "test_name": "Prompt Generation: What's the account status for john.doe@email.com?...",
+      "test_type": "prompt_generation",
+      "success": true,
+      "details": {
+        "query": "What's the account status for john.doe@email.com?",
+        "routing_decision": "account_status",
+        "keywords_detected": [
+          "account_status"
+        ],
+        "has_required_fields": true,
+        "has_routing_context": true,
+        "prompt_source": "fallback_template_routing_aware",
+        "routing_aware": true
+      }
+    },
+    {
+      "test_name": "Prompt Generation: Show me call history and transactions for customer...",
+      "test_type": "prompt_generation",
+      "success": true,
+      "details": {
+        "query": "Show me call history and transactions for customer@email.com",
+        "routing_decision": "multi_data",
+        "keywords_detected": [
+          "phone",
+          "transaction",
+          "combined"
+        ],
+        "has_required_fields": true,
+        "has_routing_context": true,
+        "prompt_source": "template_mapped_routing_aware",
+        "routing_aware": true
+      }
+    },
+    {
+      "test_name": "All Data Available",
+      "test_type": "data_availability",
+      "success": true,
+      "details": {
+        "query": "Give me comprehensive analysis for customer@email.com",
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": true,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": true
+        },
+        "has_data_availability_context": true,
+        "has_availability_metadata": true,
+        "routing_decision": "multi_data"
+      }
+    },
+    {
+      "test_name": "Phone Data Unavailable",
+      "test_type": "data_availability",
+      "success": true,
+      "details": {
+        "query": "Show me call history for customer@email.com",
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": true
+        },
+        "has_data_availability_context": true,
+        "has_availability_metadata": true,
+        "routing_decision": "phone"
+      }
+    },
+    {
+      "test_name": "Limited Data Available",
+      "test_type": "data_availability",
+      "success": true,
+      "details": {
+        "query": "Give me comprehensive analysis for customer@email.com",
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": false,
+          "card_data": false,
+          "ticket_data": false
+        },
+        "has_data_availability_context": true,
+        "has_availability_metadata": true,
+        "routing_decision": "multi_data"
+      }
+    },
+    {
+      "test_name": "Empty Query",
+      "test_type": "edge_case",
+      "success": true,
+      "details": {
+        "query": "",
+        "handled_gracefully": true,
+        "has_system_prompt": true,
+        "has_routing_metadata": true
+      }
+    },
+    {
+      "test_name": "Very Long Query",
+      "test_type": "edge_case",
+      "success": true,
+      "details": {
+        "query": "What is the credit score and transaction history and phone call data and support tickets and credit ...",
+        "handled_gracefully": true,
+        "has_system_prompt": true,
+        "has_routing_metadata": true
+      }
+    },
+    {
+      "test_name": "Special Characters",
+      "test_type": "edge_case",
+      "success": true,
+      "details": {
+        "query": "What's the credit score for user@domain.com with special chars: !@#$%^&*()",
+        "handled_gracefully": true,
+        "has_system_prompt": true,
+        "has_routing_metadata": true
+      }
+    },
+    {
+      "test_name": "No Customer ID",
+      "test_type": "edge_case",
+      "success": true,
+      "details": {
+        "query": "What's the credit score?",
+        "handled_gracefully": true,
+        "has_system_prompt": true,
+        "has_routing_metadata": true
+      }
+    },
+    {
+      "test_name": "Test Case Creation",
+      "test_type": "integration",
+      "success": true,
+      "details": {
+        "has_required_structure": true,
+        "test_case_keys": [
+          "input",
+          "expected",
+          "metadata"
+        ]
+      }
+    },
+    {
+      "test_name": "Convenience Function",
+      "test_type": "integration",
+      "success": true,
+      "details": {
+        "function_works": true,
+        "routing_aware": true
+      }
+    }
+  ]
+}

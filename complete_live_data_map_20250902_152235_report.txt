@@ -1,0 +1,107 @@
+🎯 COMPREHENSIVE LIVE DATA MAP REPORT
+======================================================================
+Customer: e.j.price1986@gmail.com
+Entity ID: dc93a2cd-de0a-444f-ad47-3003ba998cd3
+Generated: 2025-09-02T15:22:35.556028
+
+📊 DATA OVERVIEW
+----------------------------------------
+Total Records: 12
+Total Fields Found: 160
+Fields with Data: 101
+Data Coverage: 63.1%
+
+👤 CUSTOMER SUMMARY
+----------------------------------------
+Name: None None
+Email: None
+Client ID: None
+Phone: None
+Status: None
+Active: None
+Product: Success PLUS Individual $149, $149 Monthly
+Enrollment Date: None
+
+🗂️ DATA SOURCE BREAKDOWN
+----------------------------------------
+IDENTITY: 7 fields with data
+  • EMAIL: 8.33% coverage
+  • FIRST_NAME: 8.33% coverage
+  • LAST_NAME: 8.33% coverage
+  • PRODUCT_NAME: 8.33% coverage
+  • STAGE_NAME: 8.33% coverage
+  ... and 2 more fields
+
+CREDIT: 7 fields with data
+  • CREDIT_RESPONSE: 58.33% coverage
+  • CHARGEBACK_CREDITED: 16.67% coverage
+  • CREDIT_RESPONSE.CREDIT_BUREAU: 58.33% coverage
+  • CREDIT_RESPONSE.CreditReportFirstIssuedDate: 58.33% coverage
+  • CREDIT_RESPONSE.CreditReportIdentifier: 58.33% coverage
+  ... and 2 more fields
+
+TRANSACTION: 11 fields with data
+  • TRANSACTION_AMOUNT: 16.67% coverage
+  • LAST_APPROVED_TRANSACTION: 8.33% coverage
+  • LAST_APPROVED_TRANSACTION_AMOUNT: 8.33% coverage
+  • PAYMENT_METHOD: 16.67% coverage
+  • PAYMENT_START_DATE: 8.33% coverage
+  ... and 6 more fields
+
+CARD: 4 fields with data
+  • CARD_LAST_4: 16.67% coverage
+  • CARD_FIRST_6_DIGIT: 8.33% coverage
+  • CARD_TYPE: 8.33% coverage
+  • CARD_EXPIRED: 16.67% coverage
+
+PHONE: 3 fields with data
+  • CONTACT_TYPE: 8.33% coverage
+  • ZOHO_CONTACT_ID: 8.33% coverage
+  • CONTACT_NEW: 16.67% coverage
+
+TICKET: 4 fields with data
+  • TICKETNUMBER: 8.33% coverage
+  • ZOHO_ID: 8.33% coverage
+  • ZOHO_STATUS: 8.33% coverage
+  • CATEGORY: 8.33% coverage
+
+BUSINESS: 8 fields with data
+  • ENROLLMENT_CAPTURE_COMPLETED: 8.33% coverage
+  • ENROLLMENT_FEE: 16.67% coverage
+  • ENROLLMENT_BALANCE: 8.33% coverage
+  • CURRENT_PRODUCT: 16.67% coverage
+  • CONTRACT_SIGNED: 8.33% coverage
+  ... and 3 more fields
+
+SYSTEM: 57 fields with data
+  • CLIENT_ID: 8.33% coverage
+  • STATUS: 8.33% coverage
+  • OPPORTUNITY: 8.33% coverage
+  • OPPORTUNITY_ID: 33.33% coverage
+  • OPPORTUNITY_OWNER: 8.33% coverage
+  ... and 52 more fields
+
+📈 FIELD COVERAGE ANALYSIS
+----------------------------------------
+High Coverage (>80%): 1 fields
+Medium Coverage (20-80%): 8 fields
+Low Coverage (<20%): 92 fields
+No Data (0%): 59 fields
+
+🔥 MOST POPULATED FIELDS
+----------------------------------------
+ 1. id: 100.0% coverage, 12 unique values
+ 2. CREDIT_RESPONSE: 58.33% coverage, 4 unique values
+ 3. CREDIT_RESPONSE.CREDIT_BUREAU: 58.33% coverage, 1 unique values
+ 4. CREDIT_RESPONSE.CreditReportFirstIssuedDate: 58.33% coverage, 4 unique values
+ 5. CREDIT_RESPONSE.CreditReportIdentifier: 58.33% coverage, 4 unique values
+ 6. CREDIT_RESPONSE.Report_ID: 58.33% coverage, 7 unique values
+ 7. CREDIT_RESPONSE.Vendor: 58.33% coverage, 2 unique values
+ 8. SOURCE: 41.67% coverage, 4 unique values
+ 9. OPPORTUNITY_ID: 33.33% coverage, 1 unique values
+10. ENROLLMENT_FEE: 16.67% coverage, 1 unique values
+11. TRANSACTION_AMOUNT: 16.67% coverage, 2 unique values
+12. PAYMENT_METHOD: 16.67% coverage, 2 unique values
+13. CHARGEBACK: 16.67% coverage, 1 unique values
+14. REFUND_CONFIRMATION_SENT: 16.67% coverage, 1 unique values
+15. CARD_LAST_4: 16.67% coverage, 2 unique values
