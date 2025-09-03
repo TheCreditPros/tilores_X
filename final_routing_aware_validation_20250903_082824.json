@@ -1,0 +1,229 @@
+{
+  "timestamp": "2025-09-03T08:28:24.757485",
+  "validation_type": "final_routing_aware_validation",
+  "summary": {
+    "total_scenarios": 5,
+    "successful_scenarios": 5,
+    "success_rate": 100.0,
+    "routing_distribution": {
+      "credit": 1,
+      "account_status": 1,
+      "multi_data": 1,
+      "phone": 1,
+      "transaction": 1
+    }
+  },
+  "scenarios": [
+    {
+      "name": "Credit Score Inquiry",
+      "query": "What's the current credit score for e.j.price1986@gmail.com?",
+      "expected_route": "credit",
+      "actual_route": "credit",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "available_data_types": [
+        "credit_data",
+        "transaction_data",
+        "card_data"
+      ],
+      "unavailable_data_types": [
+        "phone_data",
+        "ticket_data"
+      ],
+      "success": true,
+      "routing_metadata": {
+        "query": "What's the current credit score for e.j.price1986@gmail.com?",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "credit"
+        ],
+        "data_types_requested": [
+          "credit"
+        ],
+        "routing_decision": "credit",
+        "fallback_reason": "no_specific_keywords_detected",
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": false
+        }
+      }
+    },
+    {
+      "name": "Account Status Check",
+      "query": "What's the account status for john.doe@email.com?",
+      "expected_route": "account_status",
+      "actual_route": "account_status",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "available_data_types": [
+        "credit_data",
+        "phone_data",
+        "transaction_data",
+        "ticket_data"
+      ],
+      "unavailable_data_types": [
+        "card_data"
+      ],
+      "success": true,
+      "routing_metadata": {
+        "query": "What's the account status for john.doe@email.com?",
+        "customer_id": "test-customer-123",
+        "keywords_detected": [
+          "account_status"
+        ],
+        "data_types_requested": [],
+        "routing_decision": "account_status",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": true,
+          "transaction_data": true,
+          "card_data": false,
+          "ticket_data": true
+        }
+      }
+    },
+    {
+      "name": "Comprehensive Analysis",
+      "query": "Give me a comprehensive analysis of customer e.j.price1986@gmail.com including credit, transactions, and support history",
+      "expected_route": "multi_data",
+      "actual_route": "multi_data",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "available_data_types": [
+        "credit_data",
+        "transaction_data",
+        "card_data",
+        "ticket_data"
+      ],
+      "unavailable_data_types": [
+        "phone_data"
+      ],
+      "success": true,
+      "routing_metadata": {
+        "query": "Give me a comprehensive analysis of customer e.j.price1986@gmail.com including credit, transactions, and support history",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "credit",
+          "transaction",
+          "zoho",
+          "combined"
+        ],
+        "data_types_requested": [
+          "credit",
+          "transaction",
+          "zoho"
+        ],
+        "routing_decision": "multi_data",
+        "fallback_reason": null,
+        "is_multi_data": true,
+        "complexity_score": 6,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": true
+        }
+      }
+    },
+    {
+      "name": "Phone Data Request (Unavailable)",
+      "query": "Show me the call history for customer@email.com",
+      "expected_route": "phone",
+      "actual_route": "phone",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "available_data_types": [
+        "credit_data",
+        "transaction_data"
+      ],
+      "unavailable_data_types": [
+        "phone_data",
+        "card_data",
+        "ticket_data"
+      ],
+      "success": true,
+      "routing_metadata": {
+        "query": "Show me the call history for customer@email.com",
+        "customer_id": "test-customer-456",
+        "keywords_detected": [
+          "phone"
+        ],
+        "data_types_requested": [
+          "phone"
+        ],
+        "routing_decision": "phone",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": false,
+          "ticket_data": false
+        }
+      }
+    },
+    {
+      "name": "Transaction Analysis",
+      "query": "What are the payment patterns and transaction trends for e.j.price1986@gmail.com?",
+      "expected_route": "transaction",
+      "actual_route": "transaction",
+      "route_correct": true,
+      "has_routing_context": true,
+      "has_data_availability": true,
+      "available_data_types": [
+        "credit_data",
+        "transaction_data",
+        "card_data"
+      ],
+      "unavailable_data_types": [
+        "phone_data",
+        "ticket_data"
+      ],
+      "success": true,
+      "routing_metadata": {
+        "query": "What are the payment patterns and transaction trends for e.j.price1986@gmail.com?",
+        "customer_id": "dc93a2cd-de0a-444f-ad47-3003ba998cd3",
+        "keywords_detected": [
+          "transaction"
+        ],
+        "data_types_requested": [
+          "transaction"
+        ],
+        "routing_decision": "transaction",
+        "fallback_reason": null,
+        "is_multi_data": false,
+        "complexity_score": 1,
+        "data_availability": {
+          "credit_data": true,
+          "phone_data": false,
+          "transaction_data": true,
+          "card_data": true,
+          "ticket_data": false
+        }
+      }
+    }
+  ],
+  "implementation_status": {
+    "routing_context_analysis": "\u2705 Complete",
+    "routing_aware_prompts": "\u2705 Complete",
+    "data_availability_handling": "\u2705 Complete",
+    "production_integration": "\u2705 Complete",
+    "agenta_compatibility": "\u2705 Complete",
+    "comprehensive_testing": "\u2705 Complete"
+  }
+}
