@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL=${BASE_URL:-"http://localhost:8080"}
+BASE_URL=${BASE_URL:-"http://localhost:3000"}
 ADMIN_EMAIL=${ADMIN_EMAIL:-"admin@example.com"}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-"ChangeMe123!"}
-RATING_WEBHOOK=${RATING_WEBHOOK:-"https://tilores-x.up.railway.app/webhooks/openwebui-rating"}
+# Point ratings to your local FastAPI instance for local testing
+RATING_WEBHOOK=${RATING_WEBHOOK:-"http://host.docker.internal:8080/webhooks/openwebui-rating"}
 
 echo "Waiting for Open WebUI to be ready at ${BASE_URL}..."
 for i in {1..60}; do
@@ -37,13 +38,14 @@ add_model() {
     -d "{\"name\":\"${name}\",\"provider\":\"openai\",\"base_url\":\"https://tilores-x.up.railway.app\",\"api_key\":\"dummy\"}" >/dev/null || true
 }
 
-add_model "Tilores/custom/gpt-4o-mini"
-add_model "Tilores/custom/gpt-4o"
+# Register two example models pointing to your local OpenAI-compatible API
+add_model "Tilores/local/gpt-4o-mini"
+add_model "Tilores/local/gpt-4o"
 
 echo "Setting default model"
 curl -sS -m 10 -X POST "${BASE_URL}/api/admin/settings" \
   -H 'Content-Type: application/json' $(auth) \
-  -d '{"default_model":"Tilores/custom/gpt-4o-mini"}' >/dev/null || true
+  -d '{"default_model":"Tilores/local/gpt-4o-mini"}' >/dev/null || true
 
 echo "Registering rating webhook"
 curl -sS -m 10 -X POST "${BASE_URL}/api/admin/webhooks" \
@@ -51,4 +53,3 @@ curl -sS -m 10 -X POST "${BASE_URL}/api/admin/webhooks" \
   -d "{\"event\":\"rating.created\",\"url\":\"${RATING_WEBHOOK}\"}" >/dev/null || true
 
 echo "Bootstrap complete."
-
