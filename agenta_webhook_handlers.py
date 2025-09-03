@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional
 import json
 import logging
 from datetime import datetime
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,6 +53,21 @@ class PerformanceAlertPayload(BaseModel):
     threshold_value: float
     variant_name: str
     timestamp: str
+
+class OpenWebUIRatingPayload(BaseModel):
+    """Incoming rating payload from Open WebUI (configurable)."""
+    chat_id: Optional[str] = None
+    message_id: Optional[str] = None
+    model: Optional[str] = None
+    rating: str  # "up" | "down"
+    tags: Optional[list] = None
+    user_id: Optional[str] = None
+    timestamp: Optional[str] = None
+
+def _append_jsonl(filepath: str, obj: Dict[str, Any]) -> None:
+    os.makedirs(os.path.dirname(filepath) or ".", exist_ok=True)
+    with open(filepath, "a", encoding="utf-8") as f:
+        f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
 @webhook_router.post("/evaluation-complete")
 async def handle_evaluation_complete(
@@ -149,6 +165,36 @@ async def handle_performance_alert(
         
     except Exception as e:
         logger.error(f"❌ Error processing performance alert webhook: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@webhook_router.post("/openwebui-rating")
+async def handle_openwebui_rating(
+    payload: OpenWebUIRatingPayload,
+    request: Request
+):
+    """Capture thumbs up/down rating events from Open WebUI.
+
+    Stores a JSONL line in openwebui_ratings.jsonl for later analysis.
+    This endpoint is idempotent and safe for repeated posts.
+    """
+    try:
+        event = {
+            "source": "openwebui",
+            "received_at": datetime.utcnow().isoformat() + "Z",
+            "ip": request.client.host if request and request.client else None,
+            "chat_id": payload.chat_id,
+            "message_id": payload.message_id,
+            "model": payload.model,
+            "rating": payload.rating,
+            "tags": payload.tags or [],
+            "user_id": payload.user_id,
+            "timestamp": payload.timestamp,
+        }
+        logger.info(f"⭐ OpenWebUI rating: {event['rating']} for model={event['model']} chat={event['chat_id']}")
+        _append_jsonl("openwebui_ratings.jsonl", event)
+        return {"status": "received", "rating": payload.rating}
+    except Exception as e:
+        logger.error(f"❌ Error processing OpenWebUI rating: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @webhook_router.get("/health")
