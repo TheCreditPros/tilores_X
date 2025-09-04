@@ -348,6 +348,17 @@ class MultiProviderCreditAPI:
 
         print(f"🔄 Processing request #{request_id} started at {datetime.now().strftime('%H:%M:%S')}")
 
+        # Critical fix: Validate input query
+        if not query or not query.strip():
+            print(f"⚠️ Empty query received for request #{request_id}")
+            return json.dumps({
+                "choices": [{
+                    "message": {
+                        "content": "Please provide a question or query about customer data. For example: 'who is customer@email.com' or 'credit analysis for John Smith'."
+                    }
+                }]
+            })
+
         try:
             # Detect query type for prompt routing
             query_type = self.detect_query_type(query)
@@ -386,7 +397,7 @@ class MultiProviderCreditAPI:
                 "temperature": 0.3,
                 "max_tokens": 300
             })
-            
+
             prompt_config["source"] = "optimized"
             print(f"📝 Using optimized prompt for {query_type}")
 
@@ -841,7 +852,26 @@ async def chat_completions(request: Request):
             query = last_message.get("content", "")
 
         if not query.strip():
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
+            # Return helpful message instead of error
+            return {
+                "id": f"chatcmpl-{int(time.time())}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": model,
+                "choices": [{
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": "Please provide a question or query about customer data. For example: 'who is customer@email.com' or 'credit analysis for John Smith'."
+                    },
+                    "finish_reason": "stop"
+                }],
+                "usage": {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 20,
+                    "total_tokens": 20
+                }
+            }
 
         # Process the request with optimized routing
         response_content = api.process_chat_request(
