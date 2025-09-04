@@ -31,15 +31,6 @@ try:
 except ImportError as e:
     print(f"⚠️ Agenta SDK manager not available: {e}")
     AGENTA_INTEGRATION = False
-
-# Import enhanced chat webhook
-try:
-    from enhanced_chat_webhook import chat_webhook_router
-    ENHANCED_CHAT_LOGGING = True
-    print("✅ Enhanced chat webhook imported")
-except ImportError as e:
-    print(f"⚠️ Enhanced chat webhook not available: {e}")
-    ENHANCED_CHAT_LOGGING = False
     agenta_manager = None
 
 # Import webhook handlers
@@ -123,16 +114,6 @@ class MultiProviderCreditAPI:
                 "api_key": os.getenv("OPENAI_API_KEY"),
                 "base_url": "https://api.openai.com/v1",
                 "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
-            },
-            "google": {
-                "api_key": os.getenv("GOOGLE_API_KEY"),
-                "base_url": "https://generativelanguage.googleapis.com/v1beta",
-                "models": ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.5-flash"]
-            },
-            "groq": {
-                "api_key": os.getenv("GROQ_API_KEY"),
-                "base_url": "https://api.groq.com/openai/v1",
-                "models": ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
             }
         }
 
@@ -562,7 +543,7 @@ class MultiProviderCreditAPI:
 
     def _process_data_analysis_query(self, query: str, query_type: str, prompt_config: Dict,
                                    model: str, temperature: float, max_tokens: int) -> str:
-        """Process data analysis queries with dynamic prompts and REAL customer data"""
+        """Process data analysis queries with dynamic prompts"""
 
         # Parse customer information from query
         customer_info = self._parse_query_for_customer(query)
@@ -574,12 +555,6 @@ class MultiProviderCreditAPI:
         if not entity_id:
             return "No customer records found for the provided information."
 
-        # CRITICAL FIX: Fetch REAL customer data based on query type
-        data_context = self._fetch_comprehensive_customer_data(entity_id, query_type)
-        
-        if not data_context or "No data found" in data_context:
-            return f"No {query_type} data found for this customer."
-
         # Use dynamic prompt from Agenta
         system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
 
@@ -589,286 +564,46 @@ class MultiProviderCreditAPI:
         if max_tokens is None:
             max_tokens = prompt_config.get('max_tokens', 1000)
 
-        # Create the full prompt with REAL data context
+        # Create a simple response for demo
+        data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
+
+        # Create the full prompt with data context
         full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
 
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
 
-    def _fetch_comprehensive_customer_data(self, entity_id: str, query_type: str) -> str:
-        """Fetch comprehensive customer data from Tilores API - CRITICAL FIX"""
+    def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
+        """Call OpenAI API"""
         try:
-            # Build comprehensive GraphQL query using WORKING format
-            query_gql = """
-            query($id: ID!) {
-              entity(input: { id: $id }) {
-                entity {
-                  id
-                  records {
-                    id
-                    EMAIL
-                    FIRST_NAME
-                    LAST_NAME
-                    CLIENT_ID
-                    PHONE_EXTERNAL
-                    STATUS
-                    ACTIVE
-                    ENROLL_DATE
-                    CREATED_DATE
-                    CURRENT_PRODUCT
-                    PRODUCT_NAME
-                    TRANSACTION_AMOUNT
-                    PAYMENT_METHOD
-                    LAST_APPROVED_TRANSACTION
-                    LAST_APPROVED_TRANSACTION_AMOUNT
-                    CARD_LAST_4
-                    CARD_TYPE
-                    CALL_ID
-                    CALL_DURATION
-                    TICKETNUMBER
-                    ZOHO_STATUS
-                    CREDIT_RESPONSE {
-                      CREDIT_BUREAU
-                      CreditReportFirstIssuedDate
-                      CREDIT_SCORE {
-                        Value
-                        ModelNameType
-                        CreditRepositorySourceType
-                      }
-                    }
-                  }
-                  recordInsights {
-                    totalRecords: count
-                    creditScores: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_SCORE.Value")
-                    creditBureaus: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_BUREAU")
-                  }
-                }
-              }
+            headers = {
+                "Authorization": f"Bearer {self.providers['openai']['api_key']}",
+                "Content-Type": "application/json"
             }
-            """
 
-            token = self.get_tilores_token()
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": prompt}
+                ],
+                "temperature": temperature,
+                "max_tokens": max_tokens
+            }
+
             response = requests.post(
-                self.tilores_api_url,
-                json={"query": query_gql, "variables": {"id": entity_id}},
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json"
-                },
+                f"{self.providers['openai']['base_url']}/chat/completions",
+                json=payload,
+                headers=headers,
                 timeout=30
             )
+
             response.raise_for_status()
-
             result = response.json()
-            if "errors" in result:
-                print(f"GraphQL errors: {result['errors']}")
-                return "Error fetching customer data from Tilores API."
 
-            entity = result.get("data", {}).get("entity", {}).get("entity")
-            if not entity:
-                return "No customer data found for this entity ID."
-
-            records = entity.get("records", [])
-            insights = entity.get("recordInsights", {})
-
-            if not records:
-                return "No customer records found."
-
-            # Format comprehensive customer data
-            data_summary = self._format_customer_data_summary(records, insights, query_type)
-            return data_summary
+            return result["choices"][0]["message"]["content"]
 
         except Exception as e:
-            print(f"❌ Error fetching comprehensive customer data: {e}")
-            return f"Error retrieving customer data: {str(e)}"
-
-    def _format_customer_data_summary(self, records: list, insights: dict, query_type: str) -> str:
-        """Format customer data into comprehensive summary"""
-        
-        # Extract key customer information
-        customer_info = {}
-        credit_data = []
-        transaction_data = []
-        contact_data = []
-        
-        for record in records:
-            # Basic customer info
-            if record.get("EMAIL"):
-                customer_info["email"] = record["EMAIL"]
-            if record.get("FIRST_NAME"):
-                customer_info["first_name"] = record["FIRST_NAME"]
-            if record.get("LAST_NAME"):
-                customer_info["last_name"] = record["LAST_NAME"]
-            if record.get("CLIENT_ID"):
-                customer_info["client_id"] = record["CLIENT_ID"]
-            if record.get("STATUS"):
-                customer_info["status"] = record["STATUS"]
-            if record.get("CURRENT_PRODUCT"):
-                customer_info["current_product"] = record["CURRENT_PRODUCT"]
-            if record.get("ENROLL_DATE"):
-                customer_info["enroll_date"] = record["ENROLL_DATE"]
-                
-            # Credit information
-            if record.get("CREDIT_RESPONSE"):
-                credit_data.append(record["CREDIT_RESPONSE"])
-                
-            # Transaction information
-            if record.get("TRANSACTION_AMOUNT"):
-                transaction_data.append({
-                    "amount": record.get("TRANSACTION_AMOUNT"),
-                    "method": record.get("PAYMENT_METHOD"),
-                    "date": record.get("CREATED_DATE")
-                })
-                
-            # Contact information
-            if record.get("PHONE_NUMBER"):
-                contact_data.append({
-                    "phone": record["PHONE_NUMBER"],
-                    "call_id": record.get("CALL_ID"),
-                    "call_duration": record.get("CALL_DURATION")
-                })
-
-        # Build comprehensive data summary
-        summary = f"""
-CUSTOMER PROFILE:
-- Name: {customer_info.get('first_name', 'N/A')} {customer_info.get('last_name', 'N/A')}
-- Email: {customer_info.get('email', 'N/A')}
-- Client ID: {customer_info.get('client_id', 'N/A')}
-- Status: {customer_info.get('status', 'N/A')}
-- Product: {customer_info.get('current_product', 'N/A')}
-- Enrolled: {customer_info.get('enroll_date', 'N/A')}
-
-ACCOUNT INFORMATION:
-- Total Records: {insights.get('totalRecords', len(records))}
-- Entity ID: {records[0].get('id', 'N/A') if records else 'N/A'}
-
-CREDIT ANALYSIS:
-"""
-        
-        if credit_data:
-            summary += f"- Credit Bureaus: {insights.get('creditBureaus', 'N/A')}\n"
-            summary += f"- Credit Scores Available: {insights.get('creditScores', 'N/A')}\n"
-            
-            for i, credit in enumerate(credit_data[:3]):  # Show first 3 credit records
-                bureau = credit.get('CREDIT_BUREAU', 'Unknown')
-                score_info = credit.get('CREDIT_SCORE', {})
-                score = score_info.get('Value') if isinstance(score_info, dict) else 'N/A'
-                date = score_info.get('Date') if isinstance(score_info, dict) else 'N/A'
-                
-                summary += f"- {bureau} Credit Score: {score} (Date: {date})\n"
-                
-                if credit.get('CREDIT_UTILIZATION_RATE'):
-                    summary += f"- {bureau} Utilization: {credit['CREDIT_UTILIZATION_RATE']}\n"
-        else:
-            summary += "- No credit data available\n"
-
-        summary += f"\nTRANSACTION ANALYSIS:\n"
-        if transaction_data:
-            summary += f"- Transaction Methods: {insights.get('paymentMethods', 'N/A')}\n"
-            summary += f"- Transaction Amounts: {insights.get('transactionAmounts', 'N/A')}\n"
-            
-            for i, trans in enumerate(transaction_data[:5]):  # Show first 5 transactions
-                summary += f"- Transaction {i+1}: ${trans.get('amount', 'N/A')} via {trans.get('method', 'N/A')} on {trans.get('date', 'N/A')}\n"
-        else:
-            summary += "- No transaction data available\n"
-
-        summary += f"\nCONTACT HISTORY:\n"
-        if contact_data:
-            for i, contact in enumerate(contact_data[:3]):  # Show first 3 contacts
-                summary += f"- Contact {i+1}: {contact.get('phone', 'N/A')}"
-                if contact.get('call_duration'):
-                    summary += f" (Call Duration: {contact['call_duration']})"
-                summary += "\n"
-        else:
-            summary += "- No contact history available\n"
-
-        return summary.strip()
-
-    def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
-        """Call appropriate LLM API based on model"""
-        try:
-            # Convert prompt to messages format
-            ai_messages = [{"role": "system", "content": prompt}]
-
-            # Determine provider and call appropriate API
-            if model.startswith("gpt-") or model in self.providers["openai"]["models"]:
-                return self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
-            elif model.startswith("gemini-") or model in self.providers["google"]["models"]:
-                return self._call_google_with_context(ai_messages, model, temperature, max_tokens)
-            elif model in self.providers["groq"]["models"]:
-                return self._call_groq_with_context(ai_messages, model, temperature, max_tokens)
-            else:
-                # Default to OpenAI
-                return self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
-
-        except Exception as e:
-            return f"Error calling LLM: {str(e)}"
-
-    def _call_openai_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
-        """Call OpenAI API with context"""
-        try:
-            import openai
-            client = openai.OpenAI(api_key=self.providers["openai"]["api_key"])
-
-            response = client.chat.completions.create(
-                model=model,
-                messages=ai_messages,
-                temperature=temperature,
-                max_tokens=max_tokens or 1000
-            )
-
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"OpenAI API error: {str(e)}"
-
-    def _call_groq_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
-        """Call Groq API with context"""
-        try:
-            import openai
-            client = openai.OpenAI(
-                api_key=self.providers["groq"]["api_key"],
-                base_url=self.providers["groq"]["base_url"]
-            )
-
-            response = client.chat.completions.create(
-                model=model,
-                messages=ai_messages,
-                temperature=temperature,
-                max_tokens=max_tokens or 1000
-            )
-
-            return response.choices[0].message.content
-        except Exception as e:
-            return f"Groq API error: {str(e)}"
-
-    def _call_google_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
-        """Call Google Gemini API with context"""
-        try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.providers["google"]["api_key"])
-
-            # Convert messages to single prompt
-            prompt = ""
-            for msg in ai_messages:
-                if msg["role"] == "system":
-                    prompt += f"System: {msg['content']}\n"
-                elif msg["role"] == "user":
-                    prompt += f"User: {msg['content']}\n"
-                elif msg["role"] == "assistant":
-                    prompt += f"Assistant: {msg['content']}\n"
-
-            model_instance = genai.GenerativeModel(model)
-            response = model_instance.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=temperature,
-                    max_output_tokens=max_tokens or 1000
-                )
-            )
-
-            return response.text
-        except Exception as e:
-            return f"Google API error: {str(e)}"
+            return f"Error calling OpenAI: {str(e)}"
 
     async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
         """Generate streaming response chunks"""
@@ -953,11 +688,6 @@ if WEBHOOK_INTEGRATION and webhook_router:
     app.include_router(webhook_router)
     print("✅ Agenta webhook endpoints registered")
 
-# Include enhanced chat webhook router if available
-if ENHANCED_CHAT_LOGGING and chat_webhook_router:
-    app.include_router(chat_webhook_router)
-    print("✅ Enhanced chat logging endpoints registered")
-
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle Pydantic validation errors with detailed logging"""
@@ -996,66 +726,6 @@ async def v1_root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-
-async def _get_models_list():
-    """
-    Helper function to generate the models list
-    """
-    models = []
-
-    # Get current timestamp
-    created_timestamp = int(time.time())
-
-    # Add OpenAI models
-    openai_models = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
-    for model_id in openai_models:
-        models.append({
-            "id": model_id,
-            "object": "model",
-            "created": created_timestamp,
-            "owned_by": "tilores-openai"
-        })
-
-    # Add Google Gemini models
-    gemini_models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.5-flash"]
-    for model_id in gemini_models:
-        models.append({
-            "id": model_id,
-            "object": "model",
-            "created": created_timestamp,
-            "owned_by": "tilores-google"
-        })
-
-    # Add Groq models
-    groq_models = ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
-    for model_id in groq_models:
-        models.append({
-            "id": model_id,
-            "object": "model",
-            "created": created_timestamp,
-            "owned_by": "tilores-groq"
-        })
-
-    return {
-        "object": "list",
-        "data": models
-    }
-
-@app.get("/api/models")
-async def list_models():
-    """
-    OpenAI-compatible models endpoint for Open WebUI integration
-    Returns all available Tilores models across providers
-    """
-    return await _get_models_list()
-
-@app.get("/v1/models")
-async def list_models_v1():
-    """
-    OpenAI v1 models endpoint - standard OpenAI API endpoint
-    Returns all available Tilores models across providers
-    """
-    return await _get_models_list()
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
