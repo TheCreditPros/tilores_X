@@ -314,6 +314,50 @@ class MultiProviderCreditAPI:
 
         return query
 
+    def get_recent_customer_context(self) -> Dict[str, Any]:
+        """Get the most recent customer context from cache"""
+        try:
+            context_data = self.redis_client.get("recent_customer_context")
+            if context_data:
+                return json.loads(context_data)
+        except Exception as e:
+            print(f"⚠️ Error getting recent customer context: {e}")
+        
+        # Return empty context if none found
+        return {
+            'customer_email': None,
+            'customer_name': None, 
+            'client_id': None,
+            'entity_id': None,
+            'has_customer_context': False
+        }
+    
+    def update_recent_customer_context(self, context: Dict[str, Any]):
+        """Update the recent customer context cache"""
+        try:
+            # Store context for 30 minutes
+            self.redis_client.setex("recent_customer_context", 1800, json.dumps(context))
+            print(f"💾 Updated recent customer context: {context}")
+        except Exception as e:
+            print(f"⚠️ Error updating recent customer context: {e}")
+    
+    def is_ambiguous_query(self, query: str) -> bool:
+        """Check if query is ambiguous and could benefit from customer context"""
+        query_lower = query.lower().strip()
+        
+        # Queries that are ambiguous without customer context
+        ambiguous_patterns = [
+            'credit score', 'experian', 'transunion', 'equifax', 'utilization',
+            'payment history', 'transaction', 'billing', 'recent', 'latest',
+            'what is', 'show me', 'their', 'his', 'her'
+        ]
+        
+        # Check if query contains ambiguous patterns but no customer identifiers
+        has_ambiguous = any(pattern in query_lower for pattern in ambiguous_patterns)
+        has_customer_id = '@' in query_lower or any(word.isdigit() and len(word) >= 6 for word in query_lower.split())
+        
+        return has_ambiguous and not has_customer_id
+
     def get_session_context(self, client_ip: str) -> Dict[str, Any]:
         """Get stored session context for a client IP"""
         try:
@@ -1175,26 +1219,20 @@ async def chat_completions(request: Request):
         conversation_context = api.extract_conversation_context(messages)
         print(f"🔍 DEBUG: Conversation context: {conversation_context}")
 
-        # Get client IP for session tracking
-        client_ip = request.client.host if hasattr(request, 'client') and request.client else 'unknown'
-
-        # Get session context for continuity across requests
-        session_context = api.get_session_context(client_ip)
-        print(f"🔍 DEBUG: Session context: {session_context}")
-
-        # Enhance query with context (prioritize conversation context, fallback to session)
+        # Simple recent customer cache approach (more reliable than IP-based sessions)
+        recent_customer_context = api.get_recent_customer_context()
+        print(f"🔍 DEBUG: Recent customer context: {recent_customer_context}")
+        
+        # Enhance query with context (prioritize conversation context, fallback to recent customer)
         if conversation_context['has_customer_context']:
             enhanced_query = api.enhance_query_with_context(query, conversation_context)
-            # Update session with new context
-            api.update_session_context(client_ip, conversation_context)
-        elif session_context['has_customer_context']:
-            enhanced_query = api.enhance_query_with_context(query, session_context)
-            print(f"🔍 DEBUG: Using session context for enhancement")
+            # Update recent customer cache
+            api.update_recent_customer_context(conversation_context)
+        elif recent_customer_context['has_customer_context'] and api.is_ambiguous_query(query):
+            enhanced_query = api.enhance_query_with_context(query, recent_customer_context)
+            print(f"🔍 DEBUG: Using recent customer context for ambiguous query")
         else:
             enhanced_query = api.enhance_query_with_context(query, conversation_context)
-
-        # Store query in session for debugging
-        api.store_query_in_session(client_ip, query, enhanced_query)
 
         # Use enhanced query for processing
         if enhanced_query != query:
@@ -1261,9 +1299,9 @@ async def chat_completions(request: Request):
 
         # Track processing time and query type for monitoring
         start_time = time.time()
-        # Detect query type for routing (consider session context)
-        has_any_context = conversation_context['has_customer_context'] or session_context['has_customer_context']
-        print(f"🔍 DEBUG: has_any_context = {has_any_context} (conversation: {conversation_context['has_customer_context']}, session: {session_context['has_customer_context']})")
+        # Detect query type for routing (consider recent customer context)
+        has_any_context = conversation_context['has_customer_context'] or (recent_customer_context['has_customer_context'] and api.is_ambiguous_query(query))
+        print(f"🔍 DEBUG: has_any_context = {has_any_context} (conversation: {conversation_context['has_customer_context']}, recent: {recent_customer_context['has_customer_context']}, ambiguous: {api.is_ambiguous_query(query)})")
         query_type = api.detect_query_type(query, has_session_context=has_any_context)
         print(f"🎯 DEBUG: Final query type with context: {query_type}")
 
