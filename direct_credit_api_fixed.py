@@ -562,7 +562,7 @@ class MultiProviderCreditAPI:
 
     def _process_data_analysis_query(self, query: str, query_type: str, prompt_config: Dict,
                                    model: str, temperature: float, max_tokens: int) -> str:
-        """Process data analysis queries with dynamic prompts"""
+        """Process data analysis queries with dynamic prompts and REAL customer data"""
 
         # Parse customer information from query
         customer_info = self._parse_query_for_customer(query)
@@ -574,6 +574,12 @@ class MultiProviderCreditAPI:
         if not entity_id:
             return "No customer records found for the provided information."
 
+        # CRITICAL FIX: Fetch REAL customer data based on query type
+        data_context = self._fetch_comprehensive_customer_data(entity_id, query_type)
+        
+        if not data_context or "No data found" in data_context:
+            return f"No {query_type} data found for this customer."
+
         # Use dynamic prompt from Agenta
         system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
 
@@ -583,14 +589,207 @@ class MultiProviderCreditAPI:
         if max_tokens is None:
             max_tokens = prompt_config.get('max_tokens', 1000)
 
-        # Create a simple response for demo
-        data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
-
-        # Create the full prompt with data context
+        # Create the full prompt with REAL data context
         full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
 
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
+
+    def _fetch_comprehensive_customer_data(self, entity_id: str, query_type: str) -> str:
+        """Fetch comprehensive customer data from Tilores API - CRITICAL FIX"""
+        try:
+            # Build comprehensive GraphQL query for all customer data
+            query_gql = """
+            query ComprehensiveCustomerData($id: ID!) {
+              entity(input: { id: $id }) {
+                entity {
+                  id
+                  records {
+                    id
+                    EMAIL
+                    FIRST_NAME
+                    LAST_NAME
+                    MIDDLE_NAME
+                    CLIENT_ID
+                    PHONE_NUMBER
+                    STATUS
+                    ACTIVE
+                    ENROLL_DATE
+                    CREATED_DATE
+                    CURRENT_PRODUCT
+                    PRODUCT_NAME
+                    ENROLLMENT_FEE
+                    TRANSACTION_AMOUNT
+                    PAYMENT_METHOD
+                    LAST_APPROVED_TRANSACTION
+                    LAST_APPROVED_TRANSACTION_AMOUNT
+                    CARD_LAST_4
+                    CARD_TYPE
+                    CALL_ID
+                    CALL_DURATION
+                    TICKETNUMBER
+                    ZOHO_STATUS
+                    CREDIT_RESPONSE {
+                      CREDIT_BUREAU
+                      CREDIT_SCORE {
+                        Value
+                        Date
+                      }
+                      CreditReportFirstIssuedDate
+                      CREDIT_UTILIZATION_RATE
+                      PAYMENT_HISTORY
+                      ACCOUNT_BALANCES
+                      CREDIT_INQUIRIES
+                    }
+                  }
+                  recordInsights {
+                    totalRecords: count
+                    creditScores: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_SCORE.Value")
+                    creditBureaus: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_BUREAU")
+                    transactionAmounts: valuesDistinct(field: "TRANSACTION_AMOUNT")
+                    paymentMethods: valuesDistinct(field: "PAYMENT_METHOD")
+                  }
+                }
+              }
+            }
+            """
+
+            token = self.get_tilores_token()
+            response = requests.post(
+                self.tilores_api_url,
+                json={"query": query_gql, "variables": {"id": entity_id}},
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json"
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+
+            result = response.json()
+            if "errors" in result:
+                print(f"GraphQL errors: {result['errors']}")
+                return "Error fetching customer data from Tilores API."
+
+            entity = result.get("data", {}).get("entity", {}).get("entity")
+            if not entity:
+                return "No customer data found for this entity ID."
+
+            records = entity.get("records", [])
+            insights = entity.get("recordInsights", {})
+
+            if not records:
+                return "No customer records found."
+
+            # Format comprehensive customer data
+            data_summary = self._format_customer_data_summary(records, insights, query_type)
+            return data_summary
+
+        except Exception as e:
+            print(f"❌ Error fetching comprehensive customer data: {e}")
+            return f"Error retrieving customer data: {str(e)}"
+
+    def _format_customer_data_summary(self, records: list, insights: dict, query_type: str) -> str:
+        """Format customer data into comprehensive summary"""
+        
+        # Extract key customer information
+        customer_info = {}
+        credit_data = []
+        transaction_data = []
+        contact_data = []
+        
+        for record in records:
+            # Basic customer info
+            if record.get("EMAIL"):
+                customer_info["email"] = record["EMAIL"]
+            if record.get("FIRST_NAME"):
+                customer_info["first_name"] = record["FIRST_NAME"]
+            if record.get("LAST_NAME"):
+                customer_info["last_name"] = record["LAST_NAME"]
+            if record.get("CLIENT_ID"):
+                customer_info["client_id"] = record["CLIENT_ID"]
+            if record.get("STATUS"):
+                customer_info["status"] = record["STATUS"]
+            if record.get("CURRENT_PRODUCT"):
+                customer_info["current_product"] = record["CURRENT_PRODUCT"]
+            if record.get("ENROLL_DATE"):
+                customer_info["enroll_date"] = record["ENROLL_DATE"]
+                
+            # Credit information
+            if record.get("CREDIT_RESPONSE"):
+                credit_data.append(record["CREDIT_RESPONSE"])
+                
+            # Transaction information
+            if record.get("TRANSACTION_AMOUNT"):
+                transaction_data.append({
+                    "amount": record.get("TRANSACTION_AMOUNT"),
+                    "method": record.get("PAYMENT_METHOD"),
+                    "date": record.get("CREATED_DATE")
+                })
+                
+            # Contact information
+            if record.get("PHONE_NUMBER"):
+                contact_data.append({
+                    "phone": record["PHONE_NUMBER"],
+                    "call_id": record.get("CALL_ID"),
+                    "call_duration": record.get("CALL_DURATION")
+                })
+
+        # Build comprehensive data summary
+        summary = f"""
+CUSTOMER PROFILE:
+- Name: {customer_info.get('first_name', 'N/A')} {customer_info.get('last_name', 'N/A')}
+- Email: {customer_info.get('email', 'N/A')}
+- Client ID: {customer_info.get('client_id', 'N/A')}
+- Status: {customer_info.get('status', 'N/A')}
+- Product: {customer_info.get('current_product', 'N/A')}
+- Enrolled: {customer_info.get('enroll_date', 'N/A')}
+
+ACCOUNT INFORMATION:
+- Total Records: {insights.get('totalRecords', len(records))}
+- Entity ID: {records[0].get('id', 'N/A') if records else 'N/A'}
+
+CREDIT ANALYSIS:
+"""
+        
+        if credit_data:
+            summary += f"- Credit Bureaus: {insights.get('creditBureaus', 'N/A')}\n"
+            summary += f"- Credit Scores Available: {insights.get('creditScores', 'N/A')}\n"
+            
+            for i, credit in enumerate(credit_data[:3]):  # Show first 3 credit records
+                bureau = credit.get('CREDIT_BUREAU', 'Unknown')
+                score_info = credit.get('CREDIT_SCORE', {})
+                score = score_info.get('Value') if isinstance(score_info, dict) else 'N/A'
+                date = score_info.get('Date') if isinstance(score_info, dict) else 'N/A'
+                
+                summary += f"- {bureau} Credit Score: {score} (Date: {date})\n"
+                
+                if credit.get('CREDIT_UTILIZATION_RATE'):
+                    summary += f"- {bureau} Utilization: {credit['CREDIT_UTILIZATION_RATE']}\n"
+        else:
+            summary += "- No credit data available\n"
+
+        summary += f"\nTRANSACTION ANALYSIS:\n"
+        if transaction_data:
+            summary += f"- Transaction Methods: {insights.get('paymentMethods', 'N/A')}\n"
+            summary += f"- Transaction Amounts: {insights.get('transactionAmounts', 'N/A')}\n"
+            
+            for i, trans in enumerate(transaction_data[:5]):  # Show first 5 transactions
+                summary += f"- Transaction {i+1}: ${trans.get('amount', 'N/A')} via {trans.get('method', 'N/A')} on {trans.get('date', 'N/A')}\n"
+        else:
+            summary += "- No transaction data available\n"
+
+        summary += f"\nCONTACT HISTORY:\n"
+        if contact_data:
+            for i, contact in enumerate(contact_data[:3]):  # Show first 3 contacts
+                summary += f"- Contact {i+1}: {contact.get('phone', 'N/A')}"
+                if contact.get('call_duration'):
+                    summary += f" (Call Duration: {contact['call_duration']})"
+                summary += "\n"
+        else:
+            summary += "- No contact history available\n"
+
+        return summary.strip()
 
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
         """Call appropriate LLM API based on model"""
