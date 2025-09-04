@@ -31,6 +31,15 @@ try:
 except ImportError as e:
     print(f"⚠️ Agenta SDK manager not available: {e}")
     AGENTA_INTEGRATION = False
+
+# Import enhanced chat webhook
+try:
+    from enhanced_chat_webhook import chat_webhook_router
+    ENHANCED_CHAT_LOGGING = True
+    print("✅ Enhanced chat webhook imported")
+except ImportError as e:
+    print(f"⚠️ Enhanced chat webhook not available: {e}")
+    ENHANCED_CHAT_LOGGING = False
     agenta_manager = None
 
 # Import webhook handlers
@@ -751,6 +760,11 @@ api = MultiProviderCreditAPI()
 if WEBHOOK_INTEGRATION and webhook_router:
     app.include_router(webhook_router)
     print("✅ Agenta webhook endpoints registered")
+
+# Include enhanced chat webhook router if available
+if ENHANCED_CHAT_LOGGING and chat_webhook_router:
+    app.include_router(chat_webhook_router)
+    print("✅ Enhanced chat logging endpoints registered")
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
