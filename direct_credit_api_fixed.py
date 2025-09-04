@@ -268,11 +268,14 @@ class MultiProviderCreditAPI:
 
         query_lower = query.lower()
 
-        # Check for contextual pronouns that need customer info
+        # Check for contextual pronouns OR ambiguous queries that need customer info
         contextual_indicators = ['their', 'them', 'his', 'her', 'this customer', 'the customer']
         has_contextual_reference = any(indicator in query_lower for indicator in contextual_indicators)
+        
+        # Also enhance ambiguous queries that would benefit from customer context
+        is_ambiguous = self.is_ambiguous_query(query)
 
-        if has_contextual_reference:
+        if has_contextual_reference or is_ambiguous:
             # Add customer identifier to the query for proper routing
             if context["customer_email"]:
                 enhanced_query = f"{query} for {context['customer_email']}"
