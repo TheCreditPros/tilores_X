@@ -357,18 +357,43 @@ class MultiProviderCreditAPI:
             print(f"🎯 Detected query type: {query_type}")
 
             # Get appropriate prompt from Agenta SDK or local store
-            if AGENTA_INTEGRATION and agenta_manager:
+            # TEMPORARILY DISABLED FOR QA TESTING - Use fallback system
+            if False and AGENTA_INTEGRATION and agenta_manager:
                 prompt_config = agenta_manager.get_prompt_config(query_type, query)
                 print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
             else:
-                # Fallback prompt configuration
-                prompt_config = {
-                    "source": "fallback",
-                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
+                # Query-type-specific fallback prompts (Perfect Steady State)
+                fallback_prompts = {
+                    "status": {
+                        "system_prompt": "You are a customer service AI assistant. Provide concise account status information using bullet points.",
+                        "temperature": 0.3,
+                        "max_tokens": 200
+                    },
+                    "general": {
+                        "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
+                        "temperature": 0.3,
+                        "max_tokens": 300
+                    },
+                    "credit": {
+                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                        "temperature": 0.7,
+                        "max_tokens": 1000
+                    },
+                    "transaction": {
+                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                        "temperature": 0.7,
+                        "max_tokens": 1000
+                    },
+                    "multi_data": {
+                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                        "temperature": 0.7,
+                        "max_tokens": 1500
+                    }
                 }
-                print("📝 Using fallback prompt configuration")
+                
+                prompt_config = fallback_prompts.get(query_type, fallback_prompts["general"])
+                prompt_config["source"] = "fallback"
+                print(f"📝 Using fallback prompt for {query_type}")
 
             # Create cache key
             cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()

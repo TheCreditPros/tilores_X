@@ -198,9 +198,10 @@ class AgentaPromptManager:
             "credit": "credit_analysis",
             "transaction": "transaction_analysis",
             "multi_data": "multi_data_analysis",
-            "combined": "multi_data_analysis"
+            "combined": "multi_data_analysis",
+            "general": "customer_profile"
         }
-        return mapping.get(query_type, "multi_data_analysis")
+        return mapping.get(query_type, "customer_profile")
 
     def _get_agenta_prompt(self, query_type: str, query: str) -> Optional[Dict]:
         """Get prompt from Agenta.ai API"""
