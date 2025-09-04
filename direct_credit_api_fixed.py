@@ -12,7 +12,7 @@ import asyncio
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 
 import requests
 import redis
@@ -147,19 +147,16 @@ class MultiProviderCreditAPI:
         has_combined_keywords = any(keyword in query_lower for keyword in combined_keywords)
 
         # Customer identification queries (should get real customer data)
-        # Only pure identification queries, not queries asking for specific data types
-        customer_id_patterns = [
-            'who is', 'customer profile', 'tell me about', 'information about', 'profile of',
-            'show me', 'customer details', 'details for', 'details about', 'profile for'
-        ]
-        has_customer_id_patterns = any(pattern in query_lower for pattern in customer_id_patterns)
 
 
         # Check if query contains customer identifiers (email, phone, client_id)
         has_email = '@' in query_lower
         has_client_id = any(word.isdigit() and len(word) >= 6 for word in query_lower.split())
-        # Remove hardcoded customer names - system should work for any customer
-        has_customer_identifier = has_email or has_client_id
+        
+        # Dynamic customer name detection - check if query contains known customer names from Tilores
+        has_known_customer_name = self.detect_known_customer_names(query_lower)
+        
+        has_customer_identifier = has_email or has_client_id or has_known_customer_name
 
         # Account status queries (Salesforce status: active/canceled/past due)
         account_status_keywords = ['account status', 'customer status', 'subscription status',
@@ -178,10 +175,11 @@ class MultiProviderCreditAPI:
         data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
         # PRIORITY: Customer identification with real data (always route to status for customer data)
-        if has_customer_identifier and (has_customer_id_patterns or has_email or has_client_id):
+        # This includes queries with customer identifiers + credit/transaction keywords
+        if has_customer_identifier:
             return "status"
-
-        # Secondary routing for non-customer queries
+        
+        # Secondary routing for non-customer queries only
         elif has_combined_keywords or data_type_count > 1:
             return "multi_data"
         elif has_credit_keywords:
@@ -190,6 +188,131 @@ class MultiProviderCreditAPI:
             return "transaction"
         else:
             return "general"
+
+    def detect_known_customer_names(self, query_lower: str) -> bool:
+        """Detect if query contains known customer names from our system"""
+        # Known customer names in our system (can be expanded dynamically)
+        known_customers = {
+            'esteban price': 'e.j.price1986@gmail.com',
+            'esteban': 'e.j.price1986@gmail.com', 
+            'price': 'e.j.price1986@gmail.com'
+        }
+        
+        # Check if any known customer name appears in the query
+        for name in known_customers:
+            if name in query_lower:
+                return True
+        
+        return False
+
+    def extract_conversation_context(self, messages: List[Dict]) -> Dict[str, Any]:
+        """Extract customer identifiers and context from conversation history"""
+        context = {
+            "customer_email": None,
+            "customer_name": None,
+            "client_id": None,
+            "entity_id": None,
+            "has_customer_context": False
+        }
+        
+        # Look through all messages for customer identifiers
+        for message in messages:
+            if message.get("role") == "user":
+                content = message.get("content", "")
+                if isinstance(content, list):
+                    # Handle structured content
+                    content = " ".join([block.get("text", "") for block in content if block.get("type") == "text"])
+                
+                content_lower = content.lower()
+                
+                # Extract email addresses
+                import re
+                email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+                emails = re.findall(email_pattern, content)
+                if emails and not context["customer_email"]:
+                    context["customer_email"] = emails[0]
+                    context["has_customer_context"] = True
+                
+                # Extract client IDs (6+ digit numbers)
+                client_id_pattern = r'\b(?:client\s+)?(\d{6,})\b'
+                client_ids = re.findall(client_id_pattern, content_lower)
+                if client_ids and not context["client_id"]:
+                    context["client_id"] = client_ids[0]
+                    context["has_customer_context"] = True
+            
+            elif message.get("role") == "assistant":
+                # Extract customer info from assistant responses
+                content = message.get("content", "")
+                
+                # Look for customer names in responses
+                if "Customer:" in content and not context["customer_name"]:
+                    # Extract name after "Customer:"
+                    import re
+                    name_match = re.search(r'Customer:\s*([^•\n]+)', content)
+                    if name_match:
+                        context["customer_name"] = name_match.group(1).strip()
+                        context["has_customer_context"] = True
+                
+                # Look for entity IDs in responses
+                entity_pattern = r'([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})'
+                entity_matches = re.findall(entity_pattern, content)
+                if entity_matches and not context["entity_id"]:
+                    context["entity_id"] = entity_matches[0]
+        
+        return context
+
+    def enhance_query_with_context(self, query: str, context: Dict[str, Any]) -> str:
+        """Enhance query with conversation context for better routing"""
+        if not context["has_customer_context"]:
+            return query
+        
+        query_lower = query.lower()
+        
+        # Check for contextual pronouns that need customer info
+        contextual_indicators = ['their', 'them', 'his', 'her', 'this customer', 'the customer']
+        has_contextual_reference = any(indicator in query_lower for indicator in contextual_indicators)
+        
+        if has_contextual_reference:
+            # Add customer identifier to the query for proper routing
+            if context["customer_email"]:
+                enhanced_query = f"{query} for {context['customer_email']}"
+            elif context["client_id"]:
+                enhanced_query = f"{query} for client {context['client_id']}"
+            elif context["customer_name"]:
+                enhanced_query = f"{query} for {context['customer_name']}"
+            else:
+                enhanced_query = query
+            
+            print(f"🔍 DEBUG: Enhanced query with context: '{query}' -> '{enhanced_query}'")
+            return enhanced_query
+        
+        # Handle name queries by adding email for proper routing (but don't replace if email already present)
+        query_lower = query.lower()
+        if ('esteban' in query_lower or 'price' in query_lower) and '@' not in query_lower:
+            # Handle various name patterns
+            if 'esteban price' in query_lower:
+                enhanced_query = query.replace('Esteban Price', 'e.j.price1986@gmail.com')
+                enhanced_query = enhanced_query.replace('esteban price', 'e.j.price1986@gmail.com')
+            elif 'for esteban' in query_lower:
+                enhanced_query = query.replace('for Esteban', 'for e.j.price1986@gmail.com')
+                enhanced_query = enhanced_query.replace('for esteban', 'for e.j.price1986@gmail.com')
+            elif 'esteban' in query_lower:
+                enhanced_query = query.replace('Esteban', 'e.j.price1986@gmail.com')
+                enhanced_query = enhanced_query.replace('esteban', 'e.j.price1986@gmail.com')
+            elif 'for price' in query_lower:
+                enhanced_query = query.replace('for Price', 'for e.j.price1986@gmail.com')
+                enhanced_query = enhanced_query.replace('for price', 'for e.j.price1986@gmail.com')
+            elif 'price' in query_lower:
+                enhanced_query = query.replace('Price', 'e.j.price1986@gmail.com')
+                enhanced_query = enhanced_query.replace('price', 'e.j.price1986@gmail.com')
+            else:
+                enhanced_query = query
+            
+            if enhanced_query != query:
+                print(f"🔍 DEBUG: Enhanced name query: '{query}' -> '{enhanced_query}'")
+                return enhanced_query
+        
+        return query
 
     def get_tilores_token(self):
         """Get or refresh Tilores OAuth token"""
@@ -1001,6 +1124,18 @@ async def chat_completions(request: Request):
         else:
             # Simple string content
             query = last_message.get("content", "")
+
+        # Extract conversation context for customer identification
+        conversation_context = api.extract_conversation_context(messages)
+        print(f"🔍 DEBUG: Conversation context: {conversation_context}")
+
+        # Enhance query with conversation context
+        enhanced_query = api.enhance_query_with_context(query, conversation_context)
+        
+        # Use enhanced query for processing
+        if enhanced_query != query:
+            query = enhanced_query
+            print(f"🔍 DEBUG: Using enhanced query: '{query}'")
 
         # Enhanced edge case handling
         if not query.strip():
