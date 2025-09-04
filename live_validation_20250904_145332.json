@@ -1,0 +1,161 @@
+{
+  "overall_success": true,
+  "success_rate": 100.0,
+  "health_check": {
+    "endpoint": "/health",
+    "status_code": 200,
+    "response_time": 0.281805,
+    "success": true,
+    "response": {
+      "status": "healthy",
+      "timestamp": "2025-09-04T18:53:22.398303"
+    }
+  },
+  "chat_results": [
+    {
+      "test_name": "Known Customer - Email Query",
+      "query": "who is e.j.price1986@gmail.com",
+      "category": "customer_identification",
+      "status_code": 200,
+      "response_time": 3.6902530193328857,
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 163
+      },
+      "success": true,
+      "request_id": "chatcmpl-47e23fa82c8f4865a1e765100292b"
+    },
+    {
+      "test_name": "Known Customer - Client ID Query",
+      "query": "account status for client 1747598",
+      "category": "account_status",
+      "status_code": 200,
+      "response_time": 1.1260809898376465,
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 163
+      },
+      "success": true,
+      "request_id": "chatcmpl-4d081cd21a8647da8d283fa503909"
+    },
+    {
+      "test_name": "Non-existent Customer - Email",
+      "query": "who is john.doe@example.com",
+      "category": "edge_case",
+      "status_code": 200,
+      "response_time": 0.6142857074737549,
+      "response": "No customer records found for the provided information.",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 55
+      },
+      "success": true,
+      "request_id": "chatcmpl-776fc3bb751947ac8a7ee6898c865"
+    },
+    {
+      "test_name": "Non-existent Customer - Client ID",
+      "query": "account status for client 999888",
+      "category": "edge_case",
+      "status_code": 200,
+      "response_time": 0.6142332553863525,
+      "response": "No customer records found for the provided information.",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 55
+      },
+      "success": true,
+      "request_id": "chatcmpl-f518f2da557c473cba8a318d4eda4"
+    },
+    {
+      "test_name": "Credit Analysis Query",
+      "query": "credit score for e.j.price1986@gmail.com",
+      "category": "credit_analysis",
+      "status_code": 200,
+      "response_time": 1.0476570129394531,
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 163
+      },
+      "success": true,
+      "request_id": "chatcmpl-e656dc27111c41c4989bb300381e2"
+    },
+    {
+      "test_name": "Transaction Analysis Query",
+      "query": "billing information e.j.price1986@gmail.com",
+      "category": "transaction_analysis",
+      "status_code": 200,
+      "response_time": 1.0007963180541992,
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 163
+      },
+      "success": true,
+      "request_id": "chatcmpl-a5b9687125ab4fe99c5682dd5af04"
+    },
+    {
+      "test_name": "Empty Query Handling",
+      "query": "",
+      "category": "edge_case",
+      "status_code": 200,
+      "response_time": 0.12351417541503906,
+      "response": "Please provide a question or query about customer data. For example: 'who is customer@email.com' or 'account status for John Smith'.",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 132
+      },
+      "success": true,
+      "request_id": "chatcmpl-9eca2f58a95447e0a0e612d18c631"
+    },
+    {
+      "test_name": "Typo Correction Test",
+      "query": "accont status e.j.price1986@gmail.com",
+      "category": "typo_handling",
+      "status_code": 200,
+      "response_time": 1.0013649463653564,
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "validation": {
+        "passed": true,
+        "issues": [],
+        "response_length": 163
+      },
+      "success": true,
+      "request_id": "chatcmpl-6b4f1bf4e5f24fe2bf24b01438378"
+    }
+  ],
+  "webhook_monitoring": {
+    "endpoint": "/v1/monitoring/webhook-logs",
+    "status_code": 200,
+    "success": true,
+    "logs_count": 5,
+    "summary": {
+      "total_requests": 5,
+      "query_type_distribution": {
+        "status": 5
+      },
+      "avg_processing_time": 0.619,
+      "customer_data_responses": 3,
+      "customer_data_percentage": 60.0
+    },
+    "response_time": 0.138894
+  },
+  "conversation_logs": {
+    "endpoint": "/v1/conversations/recent",
+    "status_code": 200,
+    "success": true,
+    "conversations_count": 3,
+    "total_count": 3,
+    "response_time": 0.248528
+  },
+  "timestamp": "2025-09-04T18:53:32.027809Z"
+}

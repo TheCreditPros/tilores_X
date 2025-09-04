@@ -117,7 +117,7 @@ class MultiProviderCreditAPI:
         # Request counter for logging
         self.request_counter = 0
 
-    def detect_query_type(self, query: str) -> str:
+    def detect_query_type(self, query: str, has_session_context: bool = False) -> str:
         """Detect the type of query to route to appropriate prompt"""
         query_lower = query.lower().strip()
 
@@ -152,10 +152,10 @@ class MultiProviderCreditAPI:
         # Check if query contains customer identifiers (email, phone, client_id)
         has_email = '@' in query_lower
         has_client_id = any(word.isdigit() and len(word) >= 6 for word in query_lower.split())
-        
+
         # Dynamic customer name detection - check if query contains known customer names from Tilores
         has_known_customer_name = self.detect_known_customer_names(query_lower)
-        
+
         has_customer_identifier = has_email or has_client_id or has_known_customer_name
 
         # Account status queries (Salesforce status: active/canceled/past due)
@@ -175,10 +175,10 @@ class MultiProviderCreditAPI:
         data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
         # PRIORITY: Customer identification with real data (always route to status for customer data)
-        # This includes queries with customer identifiers + credit/transaction keywords
-        if has_customer_identifier:
+        # This includes queries with customer identifiers + credit/transaction keywords + session context
+        if has_customer_identifier or has_known_customer_name or has_session_context:
             return "status"
-        
+
         # Secondary routing for non-customer queries only
         elif has_combined_keywords or data_type_count > 1:
             return "multi_data"
@@ -194,15 +194,15 @@ class MultiProviderCreditAPI:
         # Known customer names in our system (can be expanded dynamically)
         known_customers = {
             'esteban price': 'e.j.price1986@gmail.com',
-            'esteban': 'e.j.price1986@gmail.com', 
+            'esteban': 'e.j.price1986@gmail.com',
             'price': 'e.j.price1986@gmail.com'
         }
-        
+
         # Check if any known customer name appears in the query
         for name in known_customers:
             if name in query_lower:
                 return True
-        
+
         return False
 
     def extract_conversation_context(self, messages: List[Dict]) -> Dict[str, Any]:
@@ -214,7 +214,7 @@ class MultiProviderCreditAPI:
             "entity_id": None,
             "has_customer_context": False
         }
-        
+
         # Look through all messages for customer identifiers
         for message in messages:
             if message.get("role") == "user":
@@ -222,9 +222,9 @@ class MultiProviderCreditAPI:
                 if isinstance(content, list):
                     # Handle structured content
                     content = " ".join([block.get("text", "") for block in content if block.get("type") == "text"])
-                
+
                 content_lower = content.lower()
-                
+
                 # Extract email addresses
                 import re
                 email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -232,18 +232,18 @@ class MultiProviderCreditAPI:
                 if emails and not context["customer_email"]:
                     context["customer_email"] = emails[0]
                     context["has_customer_context"] = True
-                
+
                 # Extract client IDs (6+ digit numbers)
                 client_id_pattern = r'\b(?:client\s+)?(\d{6,})\b'
                 client_ids = re.findall(client_id_pattern, content_lower)
                 if client_ids and not context["client_id"]:
                     context["client_id"] = client_ids[0]
                     context["has_customer_context"] = True
-            
+
             elif message.get("role") == "assistant":
                 # Extract customer info from assistant responses
                 content = message.get("content", "")
-                
+
                 # Look for customer names in responses
                 if "Customer:" in content and not context["customer_name"]:
                     # Extract name after "Customer:"
@@ -252,26 +252,26 @@ class MultiProviderCreditAPI:
                     if name_match:
                         context["customer_name"] = name_match.group(1).strip()
                         context["has_customer_context"] = True
-                
+
                 # Look for entity IDs in responses
                 entity_pattern = r'([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})'
                 entity_matches = re.findall(entity_pattern, content)
                 if entity_matches and not context["entity_id"]:
                     context["entity_id"] = entity_matches[0]
-        
+
         return context
 
     def enhance_query_with_context(self, query: str, context: Dict[str, Any]) -> str:
         """Enhance query with conversation context for better routing"""
         if not context["has_customer_context"]:
             return query
-        
+
         query_lower = query.lower()
-        
+
         # Check for contextual pronouns that need customer info
         contextual_indicators = ['their', 'them', 'his', 'her', 'this customer', 'the customer']
         has_contextual_reference = any(indicator in query_lower for indicator in contextual_indicators)
-        
+
         if has_contextual_reference:
             # Add customer identifier to the query for proper routing
             if context["customer_email"]:
@@ -282,10 +282,10 @@ class MultiProviderCreditAPI:
                 enhanced_query = f"{query} for {context['customer_name']}"
             else:
                 enhanced_query = query
-            
+
             print(f"🔍 DEBUG: Enhanced query with context: '{query}' -> '{enhanced_query}'")
             return enhanced_query
-        
+
         # Handle name queries by adding email for proper routing (but don't replace if email already present)
         query_lower = query.lower()
         if ('esteban' in query_lower or 'price' in query_lower) and '@' not in query_lower:
@@ -307,12 +307,57 @@ class MultiProviderCreditAPI:
                 enhanced_query = enhanced_query.replace('price', 'e.j.price1986@gmail.com')
             else:
                 enhanced_query = query
-            
+
             if enhanced_query != query:
                 print(f"🔍 DEBUG: Enhanced name query: '{query}' -> '{enhanced_query}'")
                 return enhanced_query
-        
+
         return query
+
+    def get_session_context(self, client_ip: str) -> Dict[str, Any]:
+        """Get stored session context for a client IP"""
+        try:
+            session_key = f"session_context:{client_ip}"
+            context_data = self.redis_client.get(session_key)
+            if context_data:
+                return json.loads(context_data)
+        except Exception as e:
+            print(f"⚠️ Error getting session context: {e}")
+
+        # Return empty context if none found
+        return {
+            'customer_email': None,
+            'customer_name': None,
+            'client_id': None,
+            'entity_id': None,
+            'has_customer_context': False
+        }
+
+    def update_session_context(self, client_ip: str, context: Dict[str, Any]):
+        """Update session context for a client IP"""
+        try:
+            session_key = f"session_context:{client_ip}"
+            # Store context for 1 hour
+            self.redis_client.setex(session_key, 3600, json.dumps(context))
+            print(f"💾 Updated session context for {client_ip}: {context}")
+        except Exception as e:
+            print(f"⚠️ Error updating session context: {e}")
+
+    def store_query_in_session(self, client_ip: str, original_query: str, enhanced_query: str):
+        """Store query information in session for debugging"""
+        try:
+            session_key = f"session_queries:{client_ip}"
+            query_data = {
+                'timestamp': datetime.utcnow().isoformat(),
+                'original_query': original_query,
+                'enhanced_query': enhanced_query
+            }
+            # Keep last 10 queries
+            self.redis_client.lpush(session_key, json.dumps(query_data))
+            self.redis_client.ltrim(session_key, 0, 9)
+            self.redis_client.expire(session_key, 3600)
+        except Exception as e:
+            print(f"⚠️ Error storing query in session: {e}")
 
     def get_tilores_token(self):
         """Get or refresh Tilores OAuth token"""
@@ -495,7 +540,7 @@ class MultiProviderCreditAPI:
 
     def process_chat_request(self, query: str, model: str = "gpt-4o-mini",
                            temperature: float = 0.7, max_tokens: int = None,
-                           prompt_id: str = None, prompt_version: str = None) -> str:
+                           prompt_id: str = None, prompt_version: str = None, query_type: str = None) -> str:
         """Process chat request with dynamic prompt selection and fixed Salesforce status"""
         start_time = time.time()
         self.request_counter += 1
@@ -504,8 +549,9 @@ class MultiProviderCreditAPI:
         print(f"🔄 Processing request #{request_id} started at {datetime.now().strftime('%H:%M:%S')}")
 
         try:
-            # Detect query type for prompt routing
-            query_type = self.detect_query_type(query)
+            # Use provided query type or detect it
+            if query_type is None:
+                query_type = self.detect_query_type(query)
             print(f"🎯 Detected query type: {query_type}")
 
             # Use optimized query-type-specific prompts (Agenta.ai deprecated)
@@ -1129,9 +1175,27 @@ async def chat_completions(request: Request):
         conversation_context = api.extract_conversation_context(messages)
         print(f"🔍 DEBUG: Conversation context: {conversation_context}")
 
-        # Enhance query with conversation context
-        enhanced_query = api.enhance_query_with_context(query, conversation_context)
-        
+        # Get client IP for session tracking
+        client_ip = request.client.host if hasattr(request, 'client') and request.client else 'unknown'
+
+        # Get session context for continuity across requests
+        session_context = api.get_session_context(client_ip)
+        print(f"🔍 DEBUG: Session context: {session_context}")
+
+        # Enhance query with context (prioritize conversation context, fallback to session)
+        if conversation_context['has_customer_context']:
+            enhanced_query = api.enhance_query_with_context(query, conversation_context)
+            # Update session with new context
+            api.update_session_context(client_ip, conversation_context)
+        elif session_context['has_customer_context']:
+            enhanced_query = api.enhance_query_with_context(query, session_context)
+            print(f"🔍 DEBUG: Using session context for enhancement")
+        else:
+            enhanced_query = api.enhance_query_with_context(query, conversation_context)
+
+        # Store query in session for debugging
+        api.store_query_in_session(client_ip, query, enhanced_query)
+
         # Use enhanced query for processing
         if enhanced_query != query:
             query = enhanced_query
@@ -1197,7 +1261,11 @@ async def chat_completions(request: Request):
 
         # Track processing time and query type for monitoring
         start_time = time.time()
-        query_type = api.detect_query_type(query)
+        # Detect query type for routing (consider session context)
+        has_any_context = conversation_context['has_customer_context'] or session_context['has_customer_context']
+        print(f"🔍 DEBUG: has_any_context = {has_any_context} (conversation: {conversation_context['has_customer_context']}, session: {session_context['has_customer_context']})")
+        query_type = api.detect_query_type(query, has_session_context=has_any_context)
+        print(f"🎯 DEBUG: Final query type with context: {query_type}")
 
         # Process the request with optimized routing
         response_content = api.process_chat_request(
@@ -1206,7 +1274,8 @@ async def chat_completions(request: Request):
             temperature=temperature,
             max_tokens=max_tokens,
             prompt_id=prompt_id,
-            prompt_version=prompt_version
+            prompt_version=prompt_version,
+            query_type=query_type
         )
 
         # Calculate processing time
