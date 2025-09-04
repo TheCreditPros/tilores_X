@@ -1,0 +1,43 @@
+{
+  "name": "tilores-x-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Virtuous Cycle AI Dashboard for tilores_X project",
+  "scripts": {
+    "dev": "vite --port 3000 --host",
+    "build": "vite build",
+    "preview": "vite preview --port 3001",
+    "lint": "eslint src --ext js,jsx --fix",
+    "test": "vitest --exclude=e2e-tests/**",
+    "test:coverage": "vitest --coverage --exclude=e2e-tests/**",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "test:all": "npm run test && npm run test:e2e"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.20",
+    "@mui/material": "^5.15.20",
+    "axios": "^1.6.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "jsdom": "^23.0.1",
+    "vite": "^5.4.0",
+    "vitest": "^1.0.4"
+  },
+  "proxy": "http://localhost:8000"
+}
