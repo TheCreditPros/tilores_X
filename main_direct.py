@@ -19,7 +19,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+
 from pydantic import BaseModel
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -368,56 +368,8 @@ async def rate_limit_handler(request: Request, exc):
         headers={"Retry-After": "60"},
     )
 
-# Mount static files for dashboard (check multiple possible paths)
-dashboard_paths = [
-    "dashboard-static",
-    "./dashboard-static",
-    "dashboard/dist",
-    "./dashboard/dist",
-    "/app/dashboard/dist",
-    "/tmp/dashboard-backup",
-    "/tmp/dashboard-static-backup",
-    "dist",
-    "./dist",
-]
-dashboard_mounted = False
-
-print("🔍 Searching for dashboard static files...")
-for path in dashboard_paths:
-    print(f"  Checking path: {path}")
-    if os.path.exists(path):
-        print(f"  ✅ Found directory: {path}")
-        try:
-            # List contents to verify it has the expected files
-            contents = os.listdir(path)
-            print(f"  📁 Contents: {contents}")
-
-            # Check for index.html and assets
-            has_index = "index.html" in contents
-            has_assets = "assets" in contents or any("index-" in f and f.endswith(".js") for f in contents)
-
-            if has_index or has_assets:
-                # Mount dashboard with proper asset handling
-                app.mount("/dashboard", StaticFiles(directory=path, html=True), name="dashboard")
-                # Also mount assets directly for proper asset serving
-                assets_path = os.path.join(path, "assets")
-                if os.path.exists(assets_path):
-                    app.mount("/assets", StaticFiles(directory=assets_path), name="dashboard_assets")
-                    print(f"📦 Dashboard assets also mounted at /assets from {assets_path}")
-                print(f"📊 Dashboard static files mounted at /dashboard from {path}")
-                print(f"  📄 Has index.html: {has_index}")
-                print(f"  📦 Has assets: {has_assets}")
-                dashboard_mounted = True
-                break
-            else:
-                print("  ⚠️ Directory exists but missing expected files (index.html or assets)")
-        except Exception as e:
-            print(f"  ❌ Failed to mount dashboard from {path}: {e}")
-    else:
-        print(f"  ❌ Path does not exist: {path}")
-
-if not dashboard_mounted:
-    print("⚠️ Dashboard static files not found - dashboard will not be available")
+# Dashboard mounting removed - using OpenWebUI instead
+print("ℹ️ Dashboard mounting skipped - using OpenWebUI for frontend interface")
 
 # Token counting utilities for OpenAI compliance
 def count_tokens(text: str, model: str = "gpt - 4") -> int:

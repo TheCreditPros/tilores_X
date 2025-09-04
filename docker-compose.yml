@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    ports:
+      - "3000:8080"
+    environment:
+      OPENAI_API_BASE_URL: "${OPENAI_API_BASE_URL:-http://host.docker.internal:8080}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-dummy}"
+      WEBUI_AUTH: "${WEBUI_AUTH:-true}"
+      # Team Evaluation Features
+      ENABLE_COMMUNITY_SHARING: "${ENABLE_COMMUNITY_SHARING:-true}"
+      ENABLE_MESSAGE_RATING: "${ENABLE_MESSAGE_RATING:-true}"
+      ENABLE_MODEL_FILTER: "${ENABLE_MODEL_FILTER:-true}"
+      ENABLE_EVALUATION_ARENA: "${ENABLE_EVALUATION_ARENA:-true}"
+      # Enhanced Features
+      ENABLE_ADMIN_EXPORT: "${ENABLE_ADMIN_EXPORT:-true}"
+      ENABLE_ADMIN_CHAT_ACCESS: "${ENABLE_ADMIN_CHAT_ACCESS:-true}"
+      TASK_MODEL: "${TASK_MODEL:-gpt-4o-mini}"
+      TITLE_GENERATION_PROMPT_TEMPLATE: "${TITLE_GENERATION_PROMPT_TEMPLATE:-Generate a concise title for this conversation}"
+      # Webhook Integration (already configured)
+      WEBHOOK_URL: "${WEBHOOK_URL:-http://host.docker.internal:8080/webhooks/openwebui-rating}"
+    volumes:
+      - ./openwebui_data:/app/backend/data
+    restart: unless-stopped

@@ -1,0 +1,132 @@
+{
+  "summary": {
+    "total_tests": 17,
+    "passed": 15,
+    "failed": 1,
+    "warnings": 1,
+    "success_rate": 88.23529411764706,
+    "total_duration": 10.730253,
+    "timestamp": "2025-09-03T19:19:48.301542"
+  },
+  "detailed_results": [
+    {
+      "test": "Health Endpoint",
+      "status": "PASS",
+      "details": "API is healthy",
+      "duration": "0.040s",
+      "timestamp": "2025-09-03T19:19:37.611469"
+    },
+    {
+      "test": "API Models Endpoint",
+      "status": "PASS",
+      "details": "Found 9 models",
+      "duration": "0.004s",
+      "timestamp": "2025-09-03T19:19:37.616147"
+    },
+    {
+      "test": "V1 Models Endpoint",
+      "status": "PASS",
+      "details": "OpenAI: 3, Google: 4, Groq: 2",
+      "duration": "0.089s",
+      "timestamp": "2025-09-03T19:19:37.704960"
+    },
+    {
+      "test": "Webhook Health",
+      "status": "PASS",
+      "details": "All webhook endpoints available",
+      "duration": "0.132s",
+      "timestamp": "2025-09-03T19:19:37.837280"
+    },
+    {
+      "test": "Rating Webhook",
+      "status": "PASS",
+      "details": "Rating webhook processed successfully",
+      "duration": "0.017s",
+      "timestamp": "2025-09-03T19:19:37.854580"
+    },
+    {
+      "test": "Chat - gpt-4o-mini",
+      "status": "PASS",
+      "details": "OpenAI model responded (85 chars)",
+      "duration": "0.007s",
+      "timestamp": "2025-09-03T19:19:37.862185"
+    },
+    {
+      "test": "Chat - gpt-4o",
+      "status": "PASS",
+      "details": "OpenAI model responded (85 chars)",
+      "duration": "0.006s",
+      "timestamp": "2025-09-03T19:19:37.868051"
+    },
+    {
+      "test": "Chat - gpt-3.5-turbo",
+      "status": "PASS",
+      "details": "OpenAI model responded (85 chars)",
+      "duration": "0.005s",
+      "timestamp": "2025-09-03T19:19:37.872678"
+    },
+    {
+      "test": "Chat - gemini-1.5-flash",
+      "status": "PASS",
+      "details": "Google model responded (85 chars)",
+      "duration": "0.026s",
+      "timestamp": "2025-09-03T19:19:37.898307"
+    },
+    {
+      "test": "Chat - gemini-1.5-pro",
+      "status": "PASS",
+      "details": "Google model responded (85 chars)",
+      "duration": "0.015s",
+      "timestamp": "2025-09-03T19:19:37.913655"
+    },
+    {
+      "test": "Chat - gemini-2.0-flash-exp",
+      "status": "PASS",
+      "details": "Google model responded (85 chars)",
+      "duration": "0.152s",
+      "timestamp": "2025-09-03T19:19:38.065287"
+    },
+    {
+      "test": "Chat - gemini-2.5-flash",
+      "status": "PASS",
+      "details": "Google model responded (85 chars)",
+      "duration": "0.009s",
+      "timestamp": "2025-09-03T19:19:38.074050"
+    },
+    {
+      "test": "Chat - llama-3.3-70b-versatile",
+      "status": "PASS",
+      "details": "Groq model responded (85 chars)",
+      "duration": "0.005s",
+      "timestamp": "2025-09-03T19:19:38.078708"
+    },
+    {
+      "test": "Chat - deepseek-r1-distill-llama-70b",
+      "status": "PASS",
+      "details": "Groq model responded (85 chars)",
+      "duration": "0.004s",
+      "timestamp": "2025-09-03T19:19:38.083125"
+    },
+    {
+      "test": "Customer Analysis",
+      "status": "FAIL",
+      "details": "Only found 0/5 analysis components: []",
+      "duration": "10.212s",
+      "timestamp": "2025-09-03T19:19:48.296265"
+    },
+    {
+      "test": "Invalid Model Handling",
+      "status": "PASS",
+      "details": "Graceful fallback to default model",
+      "duration": "0.003s",
+      "timestamp": "2025-09-03T19:19:48.299361"
+    },
+    {
+      "test": "Malformed Request Handling",
+      "status": "WARN",
+      "details": "Unexpected status: 500",
+      "duration": "0.002s",
+      "timestamp": "2025-09-03T19:19:48.301293"
+    }
+  ]
+}

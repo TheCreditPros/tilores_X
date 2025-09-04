@@ -114,6 +114,16 @@ class MultiProviderCreditAPI:
                 "api_key": os.getenv("OPENAI_API_KEY"),
                 "base_url": "https://api.openai.com/v1",
                 "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
+            },
+            "google": {
+                "api_key": os.getenv("GOOGLE_API_KEY"),
+                "base_url": "https://generativelanguage.googleapis.com/v1beta",
+                "models": ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.5-flash"]
+            },
+            "groq": {
+                "api_key": os.getenv("GROQ_API_KEY"),
+                "base_url": "https://api.groq.com/openai/v1",
+                "models": ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
             }
         }
 
@@ -574,36 +584,90 @@ class MultiProviderCreditAPI:
         return self._call_llm(full_prompt, model, temperature, max_tokens)
 
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
-        """Call OpenAI API"""
+        """Call appropriate LLM API based on model"""
         try:
-            headers = {
-                "Authorization": f"Bearer {self.providers['openai']['api_key']}",
-                "Content-Type": "application/json"
-            }
+            # Convert prompt to messages format
+            ai_messages = [{"role": "system", "content": prompt}]
 
-            payload = {
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": prompt}
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens
-            }
-
-            response = requests.post(
-                f"{self.providers['openai']['base_url']}/chat/completions",
-                json=payload,
-                headers=headers,
-                timeout=30
-            )
-
-            response.raise_for_status()
-            result = response.json()
-
-            return result["choices"][0]["message"]["content"]
+            # Determine provider and call appropriate API
+            if model.startswith("gpt-") or model in self.providers["openai"]["models"]:
+                return self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
+            elif model.startswith("gemini-") or model in self.providers["google"]["models"]:
+                return self._call_google_with_context(ai_messages, model, temperature, max_tokens)
+            elif model in self.providers["groq"]["models"]:
+                return self._call_groq_with_context(ai_messages, model, temperature, max_tokens)
+            else:
+                # Default to OpenAI
+                return self._call_openai_with_context(ai_messages, model, temperature, max_tokens)
 
         except Exception as e:
-            return f"Error calling OpenAI: {str(e)}"
+            return f"Error calling LLM: {str(e)}"
+
+    def _call_openai_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
+        """Call OpenAI API with context"""
+        try:
+            import openai
+            client = openai.OpenAI(api_key=self.providers["openai"]["api_key"])
+
+            response = client.chat.completions.create(
+                model=model,
+                messages=ai_messages,
+                temperature=temperature,
+                max_tokens=max_tokens or 1000
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"OpenAI API error: {str(e)}"
+
+    def _call_groq_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
+        """Call Groq API with context"""
+        try:
+            import openai
+            client = openai.OpenAI(
+                api_key=self.providers["groq"]["api_key"],
+                base_url=self.providers["groq"]["base_url"]
+            )
+
+            response = client.chat.completions.create(
+                model=model,
+                messages=ai_messages,
+                temperature=temperature,
+                max_tokens=max_tokens or 1000
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"Groq API error: {str(e)}"
+
+    def _call_google_with_context(self, ai_messages, model, temperature=0.7, max_tokens=None):
+        """Call Google Gemini API with context"""
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=self.providers["google"]["api_key"])
+
+            # Convert messages to single prompt
+            prompt = ""
+            for msg in ai_messages:
+                if msg["role"] == "system":
+                    prompt += f"System: {msg['content']}\n"
+                elif msg["role"] == "user":
+                    prompt += f"User: {msg['content']}\n"
+                elif msg["role"] == "assistant":
+                    prompt += f"Assistant: {msg['content']}\n"
+
+            model_instance = genai.GenerativeModel(model)
+            response = model_instance.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=temperature,
+                    max_output_tokens=max_tokens or 1000
+                )
+            )
+
+            return response.text
+        except Exception as e:
+            return f"Google API error: {str(e)}"
 
     async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
         """Generate streaming response chunks"""
@@ -726,6 +790,66 @@ async def v1_root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+
+async def _get_models_list():
+    """
+    Helper function to generate the models list
+    """
+    models = []
+
+    # Get current timestamp
+    created_timestamp = int(time.time())
+
+    # Add OpenAI models
+    openai_models = ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
+    for model_id in openai_models:
+        models.append({
+            "id": model_id,
+            "object": "model",
+            "created": created_timestamp,
+            "owned_by": "tilores-openai"
+        })
+
+    # Add Google Gemini models
+    gemini_models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-exp", "gemini-2.5-flash"]
+    for model_id in gemini_models:
+        models.append({
+            "id": model_id,
+            "object": "model",
+            "created": created_timestamp,
+            "owned_by": "tilores-google"
+        })
+
+    # Add Groq models
+    groq_models = ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
+    for model_id in groq_models:
+        models.append({
+            "id": model_id,
+            "object": "model",
+            "created": created_timestamp,
+            "owned_by": "tilores-groq"
+        })
+
+    return {
+        "object": "list",
+        "data": models
+    }
+
+@app.get("/api/models")
+async def list_models():
+    """
+    OpenAI-compatible models endpoint for Open WebUI integration
+    Returns all available Tilores models across providers
+    """
+    return await _get_models_list()
+
+@app.get("/v1/models")
+async def list_models_v1():
+    """
+    OpenAI v1 models endpoint - standard OpenAI API endpoint
+    Returns all available Tilores models across providers
+    """
+    return await _get_models_list()
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
