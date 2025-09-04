@@ -1,0 +1,692 @@
+{
+  "test_summary": {
+    "total_queries": 116,
+    "successful_queries": 0,
+    "success_rate": 0.0,
+    "total_conversations": 66,
+    "test_duration": "Multi-threaded execution",
+    "timestamp": "2025-09-04T13:30:21.125670"
+  },
+  "performance_metrics": {
+    "avg_response_time": 0,
+    "median_response_time": 0,
+    "max_response_time": 0,
+    "min_response_time": 0,
+    "avg_quality_score": 0
+  },
+  "category_breakdown": {
+    "edge_cases": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 12
+    },
+    "transaction_analysis": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "credit_analysis": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "customer_profile": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "account_status": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "multi_data_analysis": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "data_source_jumping": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 26
+    },
+    "conversation_restart": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 8
+    },
+    "performance_stress": {
+      "success_rate": 0.0,
+      "avg_quality": 0,
+      "total_queries": 30
+    }
+  },
+  "quality_issues": {
+    "API_ERROR": 116
+  },
+  "detailed_results": [
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146150>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.003912925720214844,
+      "status_code": 0,
+      "conversation_id": "performance_stress_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.591777",
+      "query_index": 5,
+      "category": "performance_stress",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111339d50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.004393100738525391,
+      "status_code": 0,
+      "conversation_id": "performance_stress_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.698691",
+      "query_index": 6,
+      "category": "performance_stress",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111145f50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.002591371536254883,
+      "status_code": 0,
+      "conversation_id": "performance_stress_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.805021",
+      "query_index": 7,
+      "category": "performance_stress",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147850>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0017039775848388672,
+      "status_code": 0,
+      "conversation_id": "performance_stress_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.911778",
+      "query_index": 8,
+      "category": "performance_stress",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147c50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0032529830932617188,
+      "status_code": 0,
+      "conversation_id": "performance_stress_6_1757007020",
+      "timestamp": "2025-09-04T13:30:21.017437",
+      "query_index": 9,
+      "category": "performance_stress",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "who is e.j.price1986@gmail.com",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111338b50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0010938644409179688,
+      "status_code": 0,
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.600308",
+      "query_index": 0,
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "what is their credit score",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146450>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0013589859008789062,
+      "status_code": 0,
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.705225",
+      "query_index": 1,
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "show me their transactions",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147950>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0013511180877685547,
+      "status_code": 0,
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.810277",
+      "query_index": 2,
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "any support tickets",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147750>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0014672279357910156,
+      "status_code": 0,
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "timestamp": "2025-09-04T13:30:20.915255",
+      "query_index": 3,
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    },
+    {
+      "success": false,
+      "query": "account status",
+      "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11133a550>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+      "response_time": 0.0014052391052246094,
+      "status_code": 0,
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "timestamp": "2025-09-04T13:30:21.021680",
+      "query_index": 4,
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "quality_analysis": {
+        "quality_score": 0,
+        "issues": [
+          "API_ERROR"
+        ]
+      }
+    }
+  ],
+  "conversation_samples": [
+    {
+      "conversation_id": "customer_profile_0_1757007020",
+      "category": "customer_profile",
+      "thread_id": 0,
+      "results": [
+        {
+          "success": false,
+          "query": "customer profile for e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111339650>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.004804134368896484,
+          "status_code": 0,
+          "conversation_id": "customer_profile_0_1757007020",
+          "timestamp": "2025-09-04T13:30:20.699384",
+          "query_index": 0,
+          "category": "customer_profile",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        }
+      ],
+      "total_queries": 1,
+      "success_rate": 0.0
+    },
+    {
+      "conversation_id": "edge_cases_1_1757007020",
+      "category": "edge_cases",
+      "thread_id": 1,
+      "results": [
+        {
+          "success": false,
+          "query": "e.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.come.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11133a450>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0034999847412109375,
+          "status_code": 0,
+          "conversation_id": "edge_cases_1_1757007020",
+          "timestamp": "2025-09-04T13:30:20.699615",
+          "query_index": 0,
+          "category": "edge_cases",
+          "thread_id": 1,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        }
+      ],
+      "total_queries": 1,
+      "success_rate": 0.0
+    },
+    {
+      "conversation_id": "data_source_jumping_4_1757007020",
+      "category": "data_source_jumping",
+      "thread_id": 4,
+      "results": [
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111339c50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0015561580657958984,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_4_1757007020",
+          "timestamp": "2025-09-04T13:30:20.389635",
+          "query_index": 0,
+          "category": "data_source_jumping",
+          "thread_id": 4,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "what is their credit score",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147650>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0019948482513427734,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_4_1757007020",
+          "timestamp": "2025-09-04T13:30:20.496648",
+          "query_index": 1,
+          "category": "data_source_jumping",
+          "thread_id": 4,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "show me their transactions",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111339b50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0009291172027587891,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_4_1757007020",
+          "timestamp": "2025-09-04T13:30:20.601596",
+          "query_index": 2,
+          "category": "data_source_jumping",
+          "thread_id": 4,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "any support tickets",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146050>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0012128353118896484,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_4_1757007020",
+          "timestamp": "2025-09-04T13:30:20.707618",
+          "query_index": 3,
+          "category": "data_source_jumping",
+          "thread_id": 4,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "account status",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146a50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0008950233459472656,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_4_1757007020",
+          "timestamp": "2025-09-04T13:30:20.810482",
+          "query_index": 4,
+          "category": "data_source_jumping",
+          "thread_id": 4,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        }
+      ],
+      "total_queries": 5,
+      "success_rate": 0.0
+    },
+    {
+      "conversation_id": "performance_stress_6_1757007020",
+      "category": "performance_stress",
+      "thread_id": 6,
+      "results": [
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11133a250>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0014579296112060547,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.068696",
+          "query_index": 0,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146d50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.002626180648803711,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.174479",
+          "query_index": 1,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111338650>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0018880367279052734,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.276685",
+          "query_index": 2,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147750>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0012967586517333984,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.380716",
+          "query_index": 3,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11133a250>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0020079612731933594,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.482811",
+          "query_index": 4,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146150>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.003912925720214844,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.591777",
+          "query_index": 5,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111339d50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.004393100738525391,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.698691",
+          "query_index": 6,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111145f50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.002591371536254883,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.805021",
+          "query_index": 7,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147850>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0017039775848388672,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.911778",
+          "query_index": 8,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147c50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0032529830932617188,
+          "status_code": 0,
+          "conversation_id": "performance_stress_6_1757007020",
+          "timestamp": "2025-09-04T13:30:21.017437",
+          "query_index": 9,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        }
+      ],
+      "total_queries": 10,
+      "success_rate": 0.0
+    },
+    {
+      "conversation_id": "data_source_jumping_6_1757007020",
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "results": [
+        {
+          "success": false,
+          "query": "who is e.j.price1986@gmail.com",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111338b50>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0010938644409179688,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.600308",
+          "query_index": 0,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "what is their credit score",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111146450>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0013589859008789062,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.705225",
+          "query_index": 1,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "show me their transactions",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147950>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0013511180877685547,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.810277",
+          "query_index": 2,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "any support tickets",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111147750>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0014672279357910156,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_6_1757007020",
+          "timestamp": "2025-09-04T13:30:20.915255",
+          "query_index": 3,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        },
+        {
+          "success": false,
+          "query": "account status",
+          "error": "HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11133a550>: Failed to establish a new connection: [Errno 61] Connection refused'))",
+          "response_time": 0.0014052391052246094,
+          "status_code": 0,
+          "conversation_id": "data_source_jumping_6_1757007020",
+          "timestamp": "2025-09-04T13:30:21.021680",
+          "query_index": 4,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 0,
+            "issues": [
+              "API_ERROR"
+            ]
+          }
+        }
+      ],
+      "total_queries": 5,
+      "success_rate": 0.0
+    }
+  ]
+}

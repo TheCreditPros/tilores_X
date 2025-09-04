@@ -1,0 +1,921 @@
+{
+  "overall_success_rate": 94.87179487179486,
+  "existing_customer_success_rate": 84.61538461538461,
+  "nonexistent_customer_success_rate": 100.0,
+  "category_results": {
+    "customer_identification": {
+      "queries": [
+        {
+          "query": "who is e.j.price1986@gmail.com",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 1.177934169769287,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer profile for e.j.price1986@gmail.com",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.5966010093688965,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "tell me about e.j.price1986@gmail.com",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4947938919067383,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "information about client 1747598",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4999980926513672,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "who is client ID 1747598",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.48521876335144043,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer details for e.j.price1986@gmail.com",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4746859073638916,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "show me e.j.price1986@gmail.com profile",
+          "category": "customer_identification",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4814939498901367,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "who is john.doe@example.com",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.004579067230224609,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer profile for john.doe@example.com",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13895606994628906,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "tell me about john.doe@example.com",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11143994331359863,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "information about client 999888",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13973188400268555,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "who is client ID 999888",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1462240219116211,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer details for john.doe@example.com",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12648701667785645,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "show me john.doe@example.com profile",
+          "category": "customer_identification",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13829684257507324,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "who is jane.smith@company.org",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12951922416687012,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer profile for jane.smith@company.org",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12282109260559082,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "tell me about jane.smith@company.org",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1328592300415039,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "information about client 555444",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12639784812927246,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "who is client ID 555444",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1142721176147461,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer details for jane.smith@company.org",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13494515419006348,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "show me jane.smith@company.org profile",
+          "category": "customer_identification",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1263737678527832,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        }
+      ],
+      "success_count": 21,
+      "total_count": 21,
+      "avg_score": 1.0,
+      "avg_time": 0.28112519355047316,
+      "success_rate": 100.0
+    },
+    "account_status": {
+      "queries": [
+        {
+          "query": "account status for e.j.price1986@gmail.com",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.46538805961608887,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is e.j.price1986@gmail.com active",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4381701946258545,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer status e.j.price1986@gmail.com",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.5029900074005127,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "subscription status for client 1747598",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.46439695358276367,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "what is the status of e.j.price1986@gmail.com",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.5212199687957764,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "check account status e.j.price1986@gmail.com",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.45557594299316406,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is client 1747598 canceled",
+          "category": "account_status",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4793379306793213,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "account status for john.doe@example.com",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12970304489135742,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is john.doe@example.com active",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11258387565612793,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer status john.doe@example.com",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.10208010673522949,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "subscription status for client 999888",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11271286010742188,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "what is the status of john.doe@example.com",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11645102500915527,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "check account status john.doe@example.com",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12062382698059082,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is client 999888 canceled",
+          "category": "account_status",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11216282844543457,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "account status for jane.smith@company.org",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13191795349121094,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is jane.smith@company.org active",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.09206724166870117,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "customer status jane.smith@company.org",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11827516555786133,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "subscription status for client 555444",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11325788497924805,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "what is the status of jane.smith@company.org",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12232708930969238,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "check account status jane.smith@company.org",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1226050853729248,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "is client 555444 canceled",
+          "category": "account_status",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11289405822753906,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        }
+      ],
+      "success_count": 21,
+      "total_count": 21,
+      "avg_score": 1.0,
+      "avg_time": 0.23555910019647508,
+      "success_rate": 100.0
+    },
+    "credit_analysis": {
+      "queries": [
+        {
+          "query": "credit score for e.j.price1986@gmail.com",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.5413529872894287,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "experian score e.j.price1986@gmail.com",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.45274901390075684,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "credit report for client 1747598",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "It seems there was a misunderstanding. The customer data you've provided relates to a specific entity with the identifier dc93a2cd-de0a-444f-ad47-3003ba998cd3, but you've inquired about a credit report for a different client with the identifier 1747598. \n\nTo assist you effectively, I would need more specific information about the credit report you are looking for. Please clarify if you would like to analyze the credit data for the entity you provided or if you have any specific details about client 1747598 that I can help with.",
+          "response_time": 2.813330888748169,
+          "validation_score": 0.09999999999999992,
+          "issues": [
+            "MISSING_STATUS_STRUCTURE",
+            "MISSING_CUSTOMER_DATA",
+            "MISSING_CUSTOMER_NAME_Esteban_Price"
+          ],
+          "success": false
+        },
+        {
+          "query": "utilization rate e.j.price1986@gmail.com",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.46598005294799805,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "transunion report e.j.price1986@gmail.com",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4163479804992676,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "equifax data for client 1747598",
+          "category": "credit_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "I'm sorry, but I don't have access to specific Equifax data or individual credit reports. However, I can provide general information about how credit analysis works or the types of data typically included in a credit report. Let me know how I can assist you further!",
+          "response_time": 2.501538038253784,
+          "validation_score": 0.09999999999999992,
+          "issues": [
+            "MISSING_STATUS_STRUCTURE",
+            "MISSING_CUSTOMER_DATA",
+            "MISSING_CUSTOMER_NAME_Esteban_Price"
+          ],
+          "success": false
+        },
+        {
+          "query": "credit score for john.doe@example.com",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.08253788948059082,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "experian score john.doe@example.com",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12058234214782715,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "credit report for client 999888",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12512588500976562,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "utilization rate john.doe@example.com",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11437511444091797,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "transunion report john.doe@example.com",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.12201285362243652,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "equifax data for client 999888",
+          "category": "credit_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.08836793899536133,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "credit score for jane.smith@company.org",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.09282469749450684,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "experian score jane.smith@company.org",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11293697357177734,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "credit report for client 555444",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.10369181632995605,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "utilization rate jane.smith@company.org",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.08237099647521973,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "transunion report jane.smith@company.org",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.0905909538269043,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "equifax data for client 555444",
+          "category": "credit_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.13056302070617676,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        }
+      ],
+      "success_count": 16,
+      "total_count": 18,
+      "avg_score": 0.8999999999999999,
+      "avg_time": 0.4698488579856025,
+      "success_rate": 88.88888888888889
+    },
+    "transaction_analysis": {
+      "queries": [
+        {
+          "query": "transaction history e.j.price1986@gmail.com",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4792656898498535,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "payment history for client 1747598",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "It seems that I currently do not have access to specific customer payment histories or transaction details, including those for client 1747598. For accurate payment history, please refer to your internal records, databases, or financial systems. If you have any other questions or need assistance with analysis, feel free to ask!",
+          "response_time": 1.8038582801818848,
+          "validation_score": 0.09999999999999992,
+          "issues": [
+            "MISSING_STATUS_STRUCTURE",
+            "MISSING_CUSTOMER_DATA",
+            "MISSING_CUSTOMER_NAME_Esteban_Price"
+          ],
+          "success": false
+        },
+        {
+          "query": "billing information e.j.price1986@gmail.com",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.47586774826049805,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "invoice details for e.j.price1986@gmail.com",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.43567395210266113,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "charge history client 1747598",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "I currently do not have direct access to the specific transaction history or charge details for client 1747598. However, I can guide you on how to analyze the charge history if you have access to the data.\n\nTo analyze the charge history for a client, you can follow these steps:\n\n1. **Gather Transaction Data:**\n   - Collect all transaction records for the client, including dates, amounts, and transaction types.\n\n2. **Categorize Transactions:**\n   - Sort the transactions into categories (e.g., purchases, refunds, fees) to better understand spending patterns.\n\n3. **Identify Trends:**\n   - Look for trends in spending over time. Are there certain times of the month or year when spending increases?\n\n4. **Calculate Totals:**\n   - Compute the total charges, total refunds, and net spending for the client.\n\n5. **Frequency Analysis:**\n   - Determine how often the client makes transactions. Are they regular or sporadic?\n\n6. **High-Value Transactions:**\n   - Identify any high-value transactions that stand out and may require further investigation.\n\n7. **Customer Behavior Insight:**\n   - Analyze if there are any patterns in the types of purchases made that could inform marketing strategies or customer engagement efforts.\n\nIf you have specific data points or a dataset, feel free to share, and I can help you interpret it!",
+          "response_time": 5.285244941711426,
+          "validation_score": 0.09999999999999992,
+          "issues": [
+            "MISSING_STATUS_STRUCTURE",
+            "MISSING_CUSTOMER_DATA",
+            "MISSING_CUSTOMER_NAME_Esteban_Price"
+          ],
+          "success": false
+        },
+        {
+          "query": "payment patterns e.j.price1986@gmail.com",
+          "category": "transaction_analysis",
+          "customer": "Known test customer",
+          "expected_found": true,
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.4739651679992676,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "transaction history john.doe@example.com",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11687302589416504,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "payment history for client 999888",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.09277701377868652,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "billing information john.doe@example.com",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.0883030891418457,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "invoice details for john.doe@example.com",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.10997986793518066,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "charge history client 999888",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.15333795547485352,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "payment patterns john.doe@example.com",
+          "category": "transaction_analysis",
+          "customer": "Non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11254119873046875,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "transaction history jane.smith@company.org",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.1126408576965332,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "payment history for client 555444",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.10457706451416016,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "billing information jane.smith@company.org",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.08540201187133789,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "invoice details for jane.smith@company.org",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.0836789608001709,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "charge history client 555444",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11436820030212402,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        },
+        {
+          "query": "payment patterns jane.smith@company.org",
+          "category": "transaction_analysis",
+          "customer": "Different non-existent customer",
+          "expected_found": false,
+          "response": "No customer records found for the provided information.",
+          "response_time": 0.11020183563232422,
+          "validation_score": 1.0,
+          "issues": [],
+          "success": true
+        }
+      ],
+      "success_count": 16,
+      "total_count": 18,
+      "avg_score": 0.8999999999999999,
+      "avg_time": 0.5688087145487467,
+      "success_rate": 88.88888888888889
+    }
+  },
+  "total_queries": 78,
+  "total_successful": 74,
+  "hardcoding_issues": [],
+  "timestamp": "2025-09-04T18:08:44.667079Z"
+}

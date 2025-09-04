@@ -1,0 +1,1453 @@
+{
+  "analysis": {
+    "summary": {
+      "total_tests": 64,
+      "successful_tests": 19,
+      "overall_success_rate": 29.6875,
+      "avg_response_time": 4.588623750954866
+    },
+    "category_performance": {
+      "customer_identification": {
+        "total": 8,
+        "successful": 8,
+        "avg_score": 0.7999999999999999,
+        "avg_time": 1.8926076292991638,
+        "success_rate": 100.0
+      },
+      "account_status": {
+        "total": 8,
+        "successful": 8,
+        "avg_score": 0.7999999999999999,
+        "avg_time": 4.2633611261844635,
+        "success_rate": 100.0
+      },
+      "credit_analysis": {
+        "total": 8,
+        "successful": 0,
+        "avg_score": 0.15000000000000002,
+        "avg_time": 5.718657940626144,
+        "success_rate": 0.0
+      },
+      "transaction_analysis": {
+        "total": 8,
+        "successful": 1,
+        "avg_score": 0.17500000000000002,
+        "avg_time": 9.043879806995392,
+        "success_rate": 12.5
+      },
+      "multi_data_analysis": {
+        "total": 8,
+        "successful": 2,
+        "avg_score": 0.6499999999999999,
+        "avg_time": 8.591765701770782,
+        "success_rate": 25.0
+      },
+      "edge_cases": {
+        "total": 8,
+        "successful": 0,
+        "avg_score": 0.20000000000000004,
+        "avg_time": 4.560467332601547,
+        "success_rate": 0.0
+      },
+      "conversational_context": {
+        "total": 8,
+        "successful": 0,
+        "avg_score": 0.5,
+        "avg_time": 0.5070405006408691,
+        "success_rate": 0.0
+      },
+      "complex_queries": {
+        "total": 8,
+        "successful": 0,
+        "avg_score": 0.5,
+        "avg_time": 2.131209969520569,
+        "success_rate": 0.0
+      }
+    },
+    "common_issues": {
+      "MISSING_ENTITY_ID": 16,
+      "UNKNOWN_CATEGORY": 16,
+      "CONTAINS_PROHIBITED: Active": 14,
+      "CONTAINS_PROHIBITED: Status:": 12,
+      "MISSING_REQUIRED: score": 8,
+      "MISSING_REQUIRED: bureau": 8,
+      "MISSING_REQUIRED: billing": 8,
+      "MISSING_REQUIRED: comprehensive": 8,
+      "MISSING_REQUIRED: No records found": 8,
+      "MISSING_REQUIRED: not found": 8,
+      "MISSING_REQUIRED: invalid": 8,
+      "MISSING_REQUIRED: payment": 7,
+      "MISSING_REQUIRED: credit": 6,
+      "MISSING_REQUIRED: transaction": 6,
+      "MISSING_REQUIRED: analysis": 6,
+      "INVALID_CUSTOMER_NOT_HANDLED": 2,
+      "CONTAINS_PROHIBITED: Esteban Price": 2
+    },
+    "worst_performing_queries": [
+      {
+        "timestamp": "2025-09-04T17:51:18.661229Z",
+        "query": "credit score for e.j.price1986@gmail.com",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 4.058637857437134,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-754aa9a3aa8948128bdb83bc896c7",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:19.209635Z",
+        "query": "experian score e.j.price1986@gmail.com",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 4.081703186035156,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-8a577fd6715846e9937f4c06d4042",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:21.808879Z",
+        "query": "bureau information for Esteban Price",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 5.639634847640991,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-f922b791197045b9beea4e4e45ef5",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:22.437687Z",
+        "query": "utilization rate e.j.price1986@gmail.com",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 5.756019830703735,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-0b3a6b76a5004aa8badaae18c1415",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:22.964578Z",
+        "query": "transunion report e.j.price1986@gmail.com",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 5.700531959533691,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-cb471d5f62d84235b1c1a613799b7",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:25.706623Z",
+        "query": "credit analysis Esteban Price",
+        "category": "credit_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 7.4795777797698975,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: credit",
+            "MISSING_REQUIRED: score",
+            "MISSING_REQUIRED: bureau",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-591bb35f6e4a4dd39ecd811db8266",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:26.257781Z",
+        "query": "transaction history e.j.price1986@gmail.com",
+        "category": "transaction_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 7.596447944641113,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: payment",
+            "MISSING_REQUIRED: transaction",
+            "MISSING_REQUIRED: billing",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-222008e5435b4e26ae2798eacd306",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:30.112032Z",
+        "query": "billing information e.j.price1986@gmail.com",
+        "category": "transaction_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 8.858542919158936,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: payment",
+            "MISSING_REQUIRED: transaction",
+            "MISSING_REQUIRED: billing",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-59f963acee494246965b990912984",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:31.077586Z",
+        "query": "recent payments Esteban Price",
+        "category": "transaction_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 9.268318891525269,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: payment",
+            "MISSING_REQUIRED: transaction",
+            "MISSING_REQUIRED: billing",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-66edeccb71ca48bda2190c6d84161",
+        "success": false
+      },
+      {
+        "timestamp": "2025-09-04T17:51:31.651800Z",
+        "query": "invoice details for e.j.price1986@gmail.com",
+        "category": "transaction_analysis",
+        "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+        "response_time": 9.213928937911987,
+        "status_code": 200,
+        "validation": {
+          "overall_score": 0,
+          "issues": [
+            "MISSING_REQUIRED: payment",
+            "MISSING_REQUIRED: transaction",
+            "MISSING_REQUIRED: billing",
+            "CONTAINS_PROHIBITED: Status:",
+            "CONTAINS_PROHIBITED: Active"
+          ],
+          "response_length": 163
+        },
+        "request_id": "chatcmpl-d5bdcd449139460ebc5212a438b9c",
+        "success": false
+      }
+    ],
+    "timestamp": "2025-09-04T17:51:48.341942Z"
+  },
+  "detailed_results": [
+    {
+      "timestamp": "2025-09-04T17:51:10.293990Z",
+      "query": "show me e.j.price1986@gmail.com profile",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 0.017038822174072266,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-fd85b2429ee149dab24e37da2b9f9",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:10.867685Z",
+      "query": "information about client 1747598",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 0.5917987823486328,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-00d43043ffe44f29a999b6f47ee46",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:11.369694Z",
+      "query": "customer details for e.j.price1986@gmail.com",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.0934503078460693,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-740a916d32984ef59eb98c6c93bcd",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:11.881805Z",
+      "query": "customer profile for e.j.price1986@gmail.com",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.6061880588531494,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-b2669ee99a7a4979a1c689f5497fb",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:12.405451Z",
+      "query": "profile of Esteban Price",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 2.1293959617614746,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-70d24762334a426eb6ac913594fbb",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:12.929065Z",
+      "query": "who is client ID 1747598",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 2.652899980545044,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-2f5b4bb7ece74403bd091459a0734",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:13.577973Z",
+      "query": "tell me about e.j.price1986@gmail.com",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 3.302206039428711,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-c4ddd92729d84046b0b3eddee1e84",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:14.023212Z",
+      "query": "who is e.j.price1986@gmail.com",
+      "category": "customer_identification",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 3.7478830814361572,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-4f5c4314e6ad49649249905da50f9",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:14.602496Z",
+      "query": "account status for e.j.price1986@gmail.com",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.3077781200408936,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-351312ef5dce47328bd501e78339d",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:15.127837Z",
+      "query": "is e.j.price1986@gmail.com active",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.260040044784546,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-eb9296bbfe5e47978ff1dd614a07d",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:15.603298Z",
+      "query": "customer status e.j.price1986@gmail.com",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.233520984649658,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-f7ce1dd866204ef888d11c7f5d993",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:16.169119Z",
+      "query": "subscription status for client 1747598",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.287220001220703,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-61375c07fdf344a396b9089d8f8a9",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:16.681572Z",
+      "query": "enrollment status Esteban Price",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.276036024093628,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-1e6165a66b1b40428d52156bba7dc",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:17.263960Z",
+      "query": "what is the status of e.j.price1986@gmail.com",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.334802865982056,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-ad22ead19c79494299cc5fc3412d4",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:17.781955Z",
+      "query": "check account status e.j.price1986@gmail.com",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.2038469314575195,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-9295f6e0f4cf457f9e0927f8bed62",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:18.226945Z",
+      "query": "is client 1747598 canceled",
+      "category": "account_status",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.203644037246704,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_ENTITY_ID"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-c588b0f101cd46b98e5822c532e58",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:18.661229Z",
+      "query": "credit score for e.j.price1986@gmail.com",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.058637857437134,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-754aa9a3aa8948128bdb83bc896c7",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:19.209635Z",
+      "query": "experian score e.j.price1986@gmail.com",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 4.081703186035156,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-8a577fd6715846e9937f4c06d4042",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:21.253272Z",
+      "query": "credit report for client 1747598",
+      "category": "credit_analysis",
+      "response": "It seems that you've provided a customer data entity ID and a user query for a credit report related to a specific client (1747598). However, I don't have direct access to credit reports or any specific customer data. \n\nTo assist you, I can provide some general information or guidelines on how to analyze a credit report, or if you have specific data points or metrics you'd like analyzed, please provide those details, and I'll be happy to assist you further!",
+      "response_time": 5.649882078170776,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau"
+        ],
+        "response_length": 461
+      },
+      "request_id": "chatcmpl-2b95badc7fff43e2839b1b92fd518",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:21.808879Z",
+      "query": "bureau information for Esteban Price",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 5.639634847640991,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-f922b791197045b9beea4e4e45ef5",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:22.437687Z",
+      "query": "utilization rate e.j.price1986@gmail.com",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 5.756019830703735,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-0b3a6b76a5004aa8badaae18c1415",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:22.964578Z",
+      "query": "transunion report e.j.price1986@gmail.com",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 5.700531959533691,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-cb471d5f62d84235b1c1a613799b7",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:25.165725Z",
+      "query": "equifax data for client 1747598",
+      "category": "credit_analysis",
+      "response": "I'm unable to access specific external data sources like Equifax or any client-specific information. However, I can help guide you on how to perform a credit analysis or interpret customer data if you provide more details. If you have specific data points or metrics you'd like to analyze, please share them!",
+      "response_time": 7.383275985717773,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau"
+        ],
+        "response_length": 308
+      },
+      "request_id": "chatcmpl-e1889565a7d64ca2964fbfd8c9f18",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:25.706623Z",
+      "query": "credit analysis Esteban Price",
+      "category": "credit_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 7.4795777797698975,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: credit",
+          "MISSING_REQUIRED: score",
+          "MISSING_REQUIRED: bureau",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-591bb35f6e4a4dd39ecd811db8266",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:26.257781Z",
+      "query": "transaction history e.j.price1986@gmail.com",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 7.596447944641113,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-222008e5435b4e26ae2798eacd306",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:29.205256Z",
+      "query": "payment history for client 1747598",
+      "category": "transaction_analysis",
+      "response": "It seems that you are looking for the payment history for client 1747598. Unfortunately, I do not have access to specific customer payment history or transaction details. If you have any specific questions or need assistance with a different type of analysis, feel free to ask!",
+      "response_time": 9.995527982711792,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_REQUIRED: billing"
+        ],
+        "response_length": 277
+      },
+      "request_id": "chatcmpl-a7ed3c1eefb44fa4840dea3c33729",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:30.112032Z",
+      "query": "billing information e.j.price1986@gmail.com",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.858542919158936,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-59f963acee494246965b990912984",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:31.077586Z",
+      "query": "recent payments Esteban Price",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 9.268318891525269,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-66edeccb71ca48bda2190c6d84161",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:31.651800Z",
+      "query": "invoice details for e.j.price1986@gmail.com",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 9.213928937911987,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-d5bdcd449139460ebc5212a438b9c",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:33.287255Z",
+      "query": "charge history client 1747598",
+      "category": "transaction_analysis",
+      "response": "I'm sorry, but I cannot access or retrieve specific customer transaction histories or personal data. However, I can help you understand how to analyze transaction data or provide general insights on customer transaction analysis if you have any specific questions or need guidance on a particular aspect. Let me know how I can assist you!",
+      "response_time": 10.322568893432617,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: billing"
+        ],
+        "response_length": 338
+      },
+      "request_id": "chatcmpl-22ff143bc69e4e10b94800bd5a9dc",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:33.726894Z",
+      "query": "payment patterns e.j.price1986@gmail.com",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.559770107269287,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-b31d952e07844688937673a0aa253",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:34.242730Z",
+      "query": "billing summary Esteban Price",
+      "category": "transaction_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.535932779312134,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: payment",
+          "MISSING_REQUIRED: transaction",
+          "MISSING_REQUIRED: billing",
+          "CONTAINS_PROHIBITED: Status:",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-6457dea5df7d4e6c915446049919a",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:34.797475Z",
+      "query": "comprehensive analysis e.j.price1986@gmail.com",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.539560794830322,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-e87fe061b8dd44da84f694ff50002",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:35.264174Z",
+      "query": "complete profile Esteban Price",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 6.058759927749634,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-f927faf505074c26be5fb960a6c2a",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:38.522483Z",
+      "query": "full analysis client 1747598",
+      "category": "multi_data_analysis",
+      "response": "It appears that you've provided a unique identifier (dc93a2cd-de0a-444f-ad47-3003ba998cd3) and a client number (1747598) for analysis. However, I don't have access to external databases or specific customer data to perform a detailed analysis on the client or entity mentioned.\n\nIf you can provide specific data points or metrics related to client 1747598, I can help analyze that information. For example, you might include details such as:\n\n- Purchase history\n- Customer demographics\n- Engagement metrics (e.g., website visits, email opens)\n- Feedback or survey results\n- Any other relevant data\n\nWith this information, I can assist you in identifying trends, behaviors, and potential strategies for engagement. Please share the relevant data you'd like me to analyze!",
+      "response_time": 8.410114765167236,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive"
+        ],
+        "response_length": 770
+      },
+      "request_id": "chatcmpl-8982fcb6d4fc42329aa897fcba4d5",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:39.425685Z",
+      "query": "credit and transaction data e.j.price1986@gmail.com",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.347611904144287,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-c818adea7c454b13bda2862e65fda",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:40.379396Z",
+      "query": "everything about e.j.price1986@gmail.com",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 8.727423191070557,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-322e9fa5a5644b5e80a9f930dd99c",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:42.777834Z",
+      "query": "all data for client 1747598",
+      "category": "multi_data_analysis",
+      "response": "It seems like there is a misunderstanding. The customer data you provided refers to a specific entity (dc93a2cd-de0a-444f-ad47-3003ba998cd3), but your query is asking for data related to a different client (1747598).\n\nUnfortunately, I do not have access to the specific data for client 1747598. If you have any other questions related to the available data or need assistance with a different aspect of the analysis, please let me know!",
+      "response_time": 9.490401029586792,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.8,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive"
+        ],
+        "response_length": 436
+      },
+      "request_id": "chatcmpl-efcbd4453b4e4294bb795c32b9585",
+      "success": true
+    },
+    {
+      "timestamp": "2025-09-04T17:51:43.328992Z",
+      "query": "overview of Esteban Price",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 9.601876974105835,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-09dcd2bac3d34576b73405d0d1236",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:43.801397Z",
+      "query": "detailed report e.j.price1986@gmail.com",
+      "category": "multi_data_analysis",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 9.558377027511597,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.6000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: comprehensive",
+          "MISSING_REQUIRED: analysis"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-9cb71b5b6ed4418ebe493a742a4ae",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:43.944339Z",
+      "query": "who is invalid@email.com",
+      "category": "edge_cases",
+      "response": "No customer records found for the provided information.",
+      "response_time": 9.146691799163818,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid",
+          "INVALID_CUSTOMER_NOT_HANDLED"
+        ],
+        "response_length": 55
+      },
+      "request_id": "chatcmpl-1a06f21c5d134cc5a3d6cd339ae90",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.073037Z",
+      "query": "account status for nonexistent@test.com",
+      "category": "edge_cases",
+      "response": "No customer records found for the provided information.",
+      "response_time": 8.808749198913574,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid",
+          "INVALID_CUSTOMER_NOT_HANDLED"
+        ],
+        "response_length": 55
+      },
+      "request_id": "chatcmpl-4a65ca65aa6a4d34b88147e490430",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.178396Z",
+      "query": "credit score for client 999999",
+      "category": "edge_cases",
+      "response": "No customer records found for the provided information.",
+      "response_time": 5.65576696395874,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.4000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid"
+        ],
+        "response_length": 55
+      },
+      "request_id": "chatcmpl-3fc8cd314b014a39b316218661f2e",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.301271Z",
+      "query": "who is e.j.price1986@gmai.com",
+      "category": "edge_cases",
+      "response": "No customer records found for the provided information.",
+      "response_time": 4.8753578662872314,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.4000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid"
+        ],
+        "response_length": 55
+      },
+      "request_id": "chatcmpl-0b36d62774f642f6b02af812ca4fc",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.301769Z",
+      "query": "",
+      "category": "edge_cases",
+      "response": "Please provide a question or query about customer data. For example: 'who is customer@email.com' or 'account status for John Smith'.",
+      "response_time": 3.921478748321533,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.4000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid"
+        ],
+        "response_length": 132
+      },
+      "request_id": "chatcmpl-ef531c0eea2c473f84b49c219ff47",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.304799Z",
+      "query": "random text query",
+      "category": "edge_cases",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 1.5268161296844482,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.4000000000000001,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid"
+        ],
+        "response_length": 85
+      },
+      "request_id": "chatcmpl-b3154d56b21541c28841ab4153a21",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.838905Z",
+      "query": "WHO IS E.J.PRICE1986@GMAIL.COM",
+      "category": "edge_cases",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.5097970962524414,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid",
+          "CONTAINS_PROHIBITED: Esteban Price",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-fe1be0efdfb34811995b21f2f0e20",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.841369Z",
+      "query": "accont status e.j.price1986@gmail.com",
+      "category": "edge_cases",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.0390808582305908,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0,
+        "issues": [
+          "MISSING_REQUIRED: No records found",
+          "MISSING_REQUIRED: not found",
+          "MISSING_REQUIRED: invalid",
+          "CONTAINS_PROHIBITED: Esteban Price",
+          "CONTAINS_PROHIBITED: Active"
+        ],
+        "response_length": 163
+      },
+      "request_id": "chatcmpl-21e6ebc5c6c34c19a256ce10bd496",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.843587Z",
+      "query": "what about their credit score",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.8990979194641113,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-dfd6b2e3e29e4805b38013076462b",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.846885Z",
+      "query": "and their transaction history",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.7736668586730957,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-e7568d368b1d41a09deb62bcf7094",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.850979Z",
+      "query": "how about the status",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.6724019050598145,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-88efec101575423eb3760ed513df4",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.853086Z",
+      "query": "show me their credit score",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.5511751174926758,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-141969a027fd49cf99ee7546cbff3",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.855792Z",
+      "query": "what is their account status",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to check account status.",
+      "response_time": 0.5537509918212891,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-50c37bdb04e04201862cb9f364063",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.858274Z",
+      "query": "tell me more about this customer",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.553286075592041,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-3dd41b758f7b4b1fb83e97e11837d",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.861841Z",
+      "query": "can you provide additional details",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.022758960723876953,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-c2676758b2e949d3bbd46b7f7b188",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:44.871669Z",
+      "query": "what else do you know",
+      "category": "conversational_context",
+      "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+      "response_time": 0.030186176300048828,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-21f86f9f129040a1978886fe6e620",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:45.348553Z",
+      "query": "status and credit for e.j.price1986@gmail.com",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 0.5047953128814697,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-eaf5b6767d8e4819a70d86bf526d6",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:45.822552Z",
+      "query": "e.j.price1986@gmail.com status credit",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 0.9755446910858154,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-f36b0cf2606a4006a8ceb9c74b08f",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:46.307633Z",
+      "query": "quick status e.j.price1986@gmail.com",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.456441879272461,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-68cf605312544946b835435cd20fa",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:46.762600Z",
+      "query": "CREDIT SCORE e.j.price1986@gmail.com",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 1.90932297706604,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-90a632d3018d472ca6614d33b7fe7",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:47.208025Z",
+      "query": "credt score e.j.price1986@gmail.com",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 2.352102041244507,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-7fe2044239bb42f5b56c837f97d4e",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:47.809381Z",
+      "query": "e.j.price1986@gmail.com?",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 2.950878858566284,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-fda6495712ac433a95c409aa187bf",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:48.313790Z",
+      "query": "1747598",
+      "category": "complex_queries",
+      "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+      "response_time": 3.4516849517822266,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-a135cdfb9e3047b2ad30da36e212c",
+      "success": false
+    },
+    {
+      "timestamp": "2025-09-04T17:51:48.320810Z",
+      "query": "Esteban",
+      "category": "complex_queries",
+      "response": "I need customer information (email, phone, name, or client ID) to check account status.",
+      "response_time": 3.448909044265747,
+      "status_code": 200,
+      "validation": {
+        "overall_score": 0.5,
+        "issues": [
+          "UNKNOWN_CATEGORY"
+        ]
+      },
+      "request_id": "chatcmpl-404c9968ccf744f1bee9f6ca1f300",
+      "success": false
+    }
+  ]
+}

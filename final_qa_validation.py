@@ -184,7 +184,7 @@ def main():
     print(f"  • Success Rate: {summary['overall_results']['success_rate']}")
     print(f"  • Average Quality: {summary['overall_results']['avg_quality_score']}")
     print(f"  • Average Response Time: {summary['overall_results']['avg_response_time']}")
-    
+
     print("\n🎯 Critical Issues:")
     for issue, details in summary['critical_issues_identified'].items():
         status_emoji = "✅" if details['status'] == "FIXED" else "⚠️"
