@@ -1,0 +1,902 @@
+{
+  "test_summary": {
+    "total_queries": 116,
+    "successful_queries": 99,
+    "success_rate": 0.853448275862069,
+    "total_conversations": 66,
+    "test_duration": "Multi-threaded execution",
+    "timestamp": "2025-09-04T08:55:13.041270"
+  },
+  "performance_metrics": {
+    "avg_response_time": 5.393021157293608,
+    "median_response_time": 2.3978588581085205,
+    "max_response_time": 26.87481713294983,
+    "min_response_time": 0.002077817916870117,
+    "avg_quality_score": 94.64646464646465
+  },
+  "category_breakdown": {
+    "transaction_analysis": {
+      "success_rate": 0.625,
+      "avg_quality": 84,
+      "total_queries": 8
+    },
+    "edge_cases": {
+      "success_rate": 0.5,
+      "avg_quality": 80,
+      "total_queries": 12
+    },
+    "customer_profile": {
+      "success_rate": 0.75,
+      "avg_quality": 95,
+      "total_queries": 8
+    },
+    "credit_analysis": {
+      "success_rate": 1.0,
+      "avg_quality": 90,
+      "total_queries": 8
+    },
+    "multi_data_analysis": {
+      "success_rate": 0.75,
+      "avg_quality": 83.33333333333333,
+      "total_queries": 8
+    },
+    "account_status": {
+      "success_rate": 0.875,
+      "avg_quality": 98.57142857142857,
+      "total_queries": 8
+    },
+    "conversation_restart": {
+      "success_rate": 1.0,
+      "avg_quality": 98.75,
+      "total_queries": 8
+    },
+    "data_source_jumping": {
+      "success_rate": 0.8846153846153846,
+      "avg_quality": 97.3913043478261,
+      "total_queries": 26
+    },
+    "performance_stress": {
+      "success_rate": 1.0,
+      "avg_quality": 98.66666666666667,
+      "total_queries": 30
+    }
+  },
+  "quality_issues": {
+    "MISSING_CUSTOMER_DATA": 8,
+    "API_ERROR": 17,
+    "SLOW_RESPONSE": 23,
+    "POOR_ERROR_HANDLING": 2
+  },
+  "detailed_results": [
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.3903229236602783,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:04.947295",
+      "query_index": 0,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.3903229236602783,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 2.4971771240234375,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:07.549234",
+      "query_index": 1,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 2.4971771240234375,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 4.007193088531494,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:11.656938",
+      "query_index": 2,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 4.007193088531494,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.5156991481781006,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.276744",
+      "query_index": 3,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.5156991481781006,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.007203102111816406,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.387937",
+      "query_index": 4,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.007203102111816406,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.0032303333282470703,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.492446",
+      "query_index": 5,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.0032303333282470703,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.003039121627807617,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.596850",
+      "query_index": 6,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.003039121627807617,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.003996849060058594,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.705922",
+      "query_index": 7,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.003996849060058594,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.010387897491455078,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.818144",
+      "query_index": 8,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.010387897491455078,
+        "contains_customer_data": true
+      }
+    },
+    {
+      "success": true,
+      "query": "who is e.j.price1986@gmail.com",
+      "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+      "response_time": 0.013696908950805664,
+      "status_code": 200,
+      "conversation_id": "performance_stress_5_1756990504",
+      "timestamp": "2025-09-04T08:55:12.936947",
+      "query_index": 9,
+      "category": "performance_stress",
+      "thread_id": 5,
+      "quality_analysis": {
+        "quality_score": 100,
+        "issues": [],
+        "response_length": 346,
+        "response_time": 0.013696908950805664,
+        "contains_customer_data": true
+      }
+    }
+  ],
+  "conversation_samples": [
+    {
+      "conversation_id": "account_status_7_1756990512",
+      "category": "account_status",
+      "thread_id": 7,
+      "results": [
+        {
+          "success": true,
+          "query": "customer status e.j.price1986@gmail.com",
+          "response": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n",
+          "response_time": 0.005827188491821289,
+          "status_code": 200,
+          "conversation_id": "account_status_7_1756990512",
+          "timestamp": "2025-09-04T08:55:12.495954",
+          "query_index": 0,
+          "category": "account_status",
+          "thread_id": 7,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 163,
+            "response_time": 0.005827188491821289,
+            "contains_customer_data": true
+          }
+        }
+      ],
+      "total_queries": 1,
+      "success_rate": 1.0
+    },
+    {
+      "conversation_id": "performance_stress_6_1756990475",
+      "category": "performance_stress",
+      "thread_id": 6,
+      "results": [
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.0031969547271728516,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:54:35.305448",
+          "query_index": 0,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.0031969547271728516,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 13.797325134277344,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:54:49.206742",
+          "query_index": 1,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 90,
+            "issues": [
+              "SLOW_RESPONSE"
+            ],
+            "response_length": 346,
+            "response_time": 13.797325134277344,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 10.554131269454956,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:54:59.864381",
+          "query_index": 2,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 90,
+            "issues": [
+              "SLOW_RESPONSE"
+            ],
+            "response_length": 346,
+            "response_time": 10.554131269454956,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 4.977185010910034,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:04.945951",
+          "query_index": 3,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 4.977185010910034,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 2.4985547065734863,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:07.548840",
+          "query_index": 4,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 2.4985547065734863,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 4.006865978240967,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:11.656552",
+          "query_index": 5,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 4.006865978240967,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.5172920227050781,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:12.274840",
+          "query_index": 6,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.5172920227050781,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.007047176361083984,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:12.387023",
+          "query_index": 7,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.007047176361083984,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.00677490234375,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:12.495333",
+          "query_index": 8,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.00677490234375,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.0023469924926757812,
+          "status_code": 200,
+          "conversation_id": "performance_stress_6_1756990475",
+          "timestamp": "2025-09-04T08:55:12.598197",
+          "query_index": 9,
+          "category": "performance_stress",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.0023469924926757812,
+            "contains_customer_data": true
+          }
+        }
+      ],
+      "total_queries": 10,
+      "success_rate": 1.0
+    },
+    {
+      "conversation_id": "data_source_jumping_6_1756990511",
+      "category": "data_source_jumping",
+      "thread_id": 6,
+      "results": [
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.5165162086486816,
+          "status_code": 200,
+          "conversation_id": "data_source_jumping_6_1756990511",
+          "timestamp": "2025-09-04T08:55:12.273963",
+          "query_index": 0,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.5165162086486816,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "what is their credit score",
+          "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+          "response_time": 0.00793600082397461,
+          "status_code": 200,
+          "conversation_id": "data_source_jumping_6_1756990511",
+          "timestamp": "2025-09-04T08:55:12.384752",
+          "query_index": 1,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 85,
+            "response_time": 0.00793600082397461,
+            "contains_customer_data": false
+          }
+        },
+        {
+          "success": true,
+          "query": "show me their transactions",
+          "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+          "response_time": 0.005560159683227539,
+          "status_code": 200,
+          "conversation_id": "data_source_jumping_6_1756990511",
+          "timestamp": "2025-09-04T08:55:12.490774",
+          "query_index": 2,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 85,
+            "response_time": 0.005560159683227539,
+            "contains_customer_data": false
+          }
+        },
+        {
+          "success": true,
+          "query": "any support tickets",
+          "response": "I need customer information (email, phone, name, or client ID) to analyze their data.",
+          "response_time": 0.0025937557220458984,
+          "status_code": 200,
+          "conversation_id": "data_source_jumping_6_1756990511",
+          "timestamp": "2025-09-04T08:55:12.597500",
+          "query_index": 3,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 85,
+            "response_time": 0.0025937557220458984,
+            "contains_customer_data": false
+          }
+        },
+        {
+          "success": true,
+          "query": "account status",
+          "response": "I need customer information (email, phone, name, or client ID) to check account status.",
+          "response_time": 0.0036389827728271484,
+          "status_code": 200,
+          "conversation_id": "data_source_jumping_6_1756990511",
+          "timestamp": "2025-09-04T08:55:12.706296",
+          "query_index": 4,
+          "category": "data_source_jumping",
+          "thread_id": 6,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 87,
+            "response_time": 0.0036389827728271484,
+            "contains_customer_data": false
+          }
+        }
+      ],
+      "total_queries": 5,
+      "success_rate": 1.0
+    },
+    {
+      "conversation_id": "performance_stress_0_1756990512",
+      "category": "performance_stress",
+      "thread_id": 0,
+      "results": [
+        {
+          "success": true,
+          "query": "comprehensive analysis for e.j.price1986@gmail.com",
+          "response": "To perform a comprehensive analysis for the customer associated with the email **e.j.price1986@gmail.com**, I would typically consider several factors such as purchase history, customer demographics, engagement metrics, and other relevant data points. However, as I do not have direct access to databases or personal data, I'll outline a general approach to conducting this analysis.\n\n### Customer Profile Analysis\n\n1. **Demographics**:\n   - Age: Based on the email, the customer was likely born in 1986, making them approximately 37 years old.\n   - Gender: If available, analyze if there is any gender-specific behavior in purchasing.\n   - Location: If location data is available, this can provide insights into regional preferences.\n\n2. **Purchase History**:\n   - Frequency: How often does this customer make purchases?\n   - Average Order Value: What is the average spend per transaction?\n   - Product Categories: What types of products does this customer typically buy? Are there specific preferences?\n   - Seasonal Trends: Does the customer buy more during certain seasons or promotional events?\n\n3. **Engagement Metrics**:\n   - Email Engagement: How often does the customer open emails or click on links? Are there specific campaigns that lead to higher engagement?\n   - Social Media Interaction: If applicable, analyze the customer's interaction with social media channels.\n   - Customer Feedback: Any reviews or ratings submitted by the customer. What is their sentiment towards the products?\n\n4. **Loyalty and Retention**:\n   - Loyalty Program Participation: Is the customer a member of any loyalty program? What benefits do they utilize?\n   - Retention Rate: How long has the customer been active? Are there any lapses in activity?\n   - Churn Risk: Based on engagement and purchase frequency, assess if this customer is at risk of leaving.\n\n5. **Behavior Analysis**:\n   - Browsing Behavior: If available, analyze what products they view frequently but do not purchase.\n   - Cart Abandonment: Track instances where the customer added items to their cart but did not complete the purchase.\n\n### Conclusions & Recommendations\n\n1. **Targeted Marketing**:\n   - Develop personalized marketing campaigns based on the customer\u2019s purchase history and preferences.\n\n2. **Retention Strategies**:\n   - Implement strategies to re-engage this customer if there are signs of reduced activity.\n   - Consider offering loyalty incentives or tailored promotions.\n\n3. **Feedback Loop**:\n   - Encourage feedback from the customer to improve product offerings and customer service.\n\n4. **Cross-Selling Opportunities**:\n   - Identify complementary products based on their purchase history.\n\nThis framework can be applied to conduct a detailed analysis of customer behavior and preferences. If you have specific data points regarding this customer, I can provide more tailored insights.",
+          "response_time": 0.004870891571044922,
+          "status_code": 200,
+          "conversation_id": "performance_stress_0_1756990512",
+          "timestamp": "2025-09-04T08:55:12.496578",
+          "query_index": 0,
+          "category": "performance_stress",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 2871,
+            "response_time": 0.004870891571044922,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "comprehensive analysis for e.j.price1986@gmail.com",
+          "response": "To perform a comprehensive analysis for the customer associated with the email **e.j.price1986@gmail.com**, I would typically consider several factors such as purchase history, customer demographics, engagement metrics, and other relevant data points. However, as I do not have direct access to databases or personal data, I'll outline a general approach to conducting this analysis.\n\n### Customer Profile Analysis\n\n1. **Demographics**:\n   - Age: Based on the email, the customer was likely born in 1986, making them approximately 37 years old.\n   - Gender: If available, analyze if there is any gender-specific behavior in purchasing.\n   - Location: If location data is available, this can provide insights into regional preferences.\n\n2. **Purchase History**:\n   - Frequency: How often does this customer make purchases?\n   - Average Order Value: What is the average spend per transaction?\n   - Product Categories: What types of products does this customer typically buy? Are there specific preferences?\n   - Seasonal Trends: Does the customer buy more during certain seasons or promotional events?\n\n3. **Engagement Metrics**:\n   - Email Engagement: How often does the customer open emails or click on links? Are there specific campaigns that lead to higher engagement?\n   - Social Media Interaction: If applicable, analyze the customer's interaction with social media channels.\n   - Customer Feedback: Any reviews or ratings submitted by the customer. What is their sentiment towards the products?\n\n4. **Loyalty and Retention**:\n   - Loyalty Program Participation: Is the customer a member of any loyalty program? What benefits do they utilize?\n   - Retention Rate: How long has the customer been active? Are there any lapses in activity?\n   - Churn Risk: Based on engagement and purchase frequency, assess if this customer is at risk of leaving.\n\n5. **Behavior Analysis**:\n   - Browsing Behavior: If available, analyze what products they view frequently but do not purchase.\n   - Cart Abandonment: Track instances where the customer added items to their cart but did not complete the purchase.\n\n### Conclusions & Recommendations\n\n1. **Targeted Marketing**:\n   - Develop personalized marketing campaigns based on the customer\u2019s purchase history and preferences.\n\n2. **Retention Strategies**:\n   - Implement strategies to re-engage this customer if there are signs of reduced activity.\n   - Consider offering loyalty incentives or tailored promotions.\n\n3. **Feedback Loop**:\n   - Encourage feedback from the customer to improve product offerings and customer service.\n\n4. **Cross-Selling Opportunities**:\n   - Identify complementary products based on their purchase history.\n\nThis framework can be applied to conduct a detailed analysis of customer behavior and preferences. If you have specific data points regarding this customer, I can provide more tailored insights.",
+          "response_time": 0.002077817916870117,
+          "status_code": 200,
+          "conversation_id": "performance_stress_0_1756990512",
+          "timestamp": "2025-09-04T08:55:12.600102",
+          "query_index": 1,
+          "category": "performance_stress",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 2871,
+            "response_time": 0.002077817916870117,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "comprehensive analysis for e.j.price1986@gmail.com",
+          "response": "To perform a comprehensive analysis for the customer associated with the email **e.j.price1986@gmail.com**, I would typically consider several factors such as purchase history, customer demographics, engagement metrics, and other relevant data points. However, as I do not have direct access to databases or personal data, I'll outline a general approach to conducting this analysis.\n\n### Customer Profile Analysis\n\n1. **Demographics**:\n   - Age: Based on the email, the customer was likely born in 1986, making them approximately 37 years old.\n   - Gender: If available, analyze if there is any gender-specific behavior in purchasing.\n   - Location: If location data is available, this can provide insights into regional preferences.\n\n2. **Purchase History**:\n   - Frequency: How often does this customer make purchases?\n   - Average Order Value: What is the average spend per transaction?\n   - Product Categories: What types of products does this customer typically buy? Are there specific preferences?\n   - Seasonal Trends: Does the customer buy more during certain seasons or promotional events?\n\n3. **Engagement Metrics**:\n   - Email Engagement: How often does the customer open emails or click on links? Are there specific campaigns that lead to higher engagement?\n   - Social Media Interaction: If applicable, analyze the customer's interaction with social media channels.\n   - Customer Feedback: Any reviews or ratings submitted by the customer. What is their sentiment towards the products?\n\n4. **Loyalty and Retention**:\n   - Loyalty Program Participation: Is the customer a member of any loyalty program? What benefits do they utilize?\n   - Retention Rate: How long has the customer been active? Are there any lapses in activity?\n   - Churn Risk: Based on engagement and purchase frequency, assess if this customer is at risk of leaving.\n\n5. **Behavior Analysis**:\n   - Browsing Behavior: If available, analyze what products they view frequently but do not purchase.\n   - Cart Abandonment: Track instances where the customer added items to their cart but did not complete the purchase.\n\n### Conclusions & Recommendations\n\n1. **Targeted Marketing**:\n   - Develop personalized marketing campaigns based on the customer\u2019s purchase history and preferences.\n\n2. **Retention Strategies**:\n   - Implement strategies to re-engage this customer if there are signs of reduced activity.\n   - Consider offering loyalty incentives or tailored promotions.\n\n3. **Feedback Loop**:\n   - Encourage feedback from the customer to improve product offerings and customer service.\n\n4. **Cross-Selling Opportunities**:\n   - Identify complementary products based on their purchase history.\n\nThis framework can be applied to conduct a detailed analysis of customer behavior and preferences. If you have specific data points regarding this customer, I can provide more tailored insights.",
+          "response_time": 0.0030341148376464844,
+          "status_code": 200,
+          "conversation_id": "performance_stress_0_1756990512",
+          "timestamp": "2025-09-04T08:55:12.706937",
+          "query_index": 2,
+          "category": "performance_stress",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 2871,
+            "response_time": 0.0030341148376464844,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "comprehensive analysis for e.j.price1986@gmail.com",
+          "response": "To perform a comprehensive analysis for the customer associated with the email **e.j.price1986@gmail.com**, I would typically consider several factors such as purchase history, customer demographics, engagement metrics, and other relevant data points. However, as I do not have direct access to databases or personal data, I'll outline a general approach to conducting this analysis.\n\n### Customer Profile Analysis\n\n1. **Demographics**:\n   - Age: Based on the email, the customer was likely born in 1986, making them approximately 37 years old.\n   - Gender: If available, analyze if there is any gender-specific behavior in purchasing.\n   - Location: If location data is available, this can provide insights into regional preferences.\n\n2. **Purchase History**:\n   - Frequency: How often does this customer make purchases?\n   - Average Order Value: What is the average spend per transaction?\n   - Product Categories: What types of products does this customer typically buy? Are there specific preferences?\n   - Seasonal Trends: Does the customer buy more during certain seasons or promotional events?\n\n3. **Engagement Metrics**:\n   - Email Engagement: How often does the customer open emails or click on links? Are there specific campaigns that lead to higher engagement?\n   - Social Media Interaction: If applicable, analyze the customer's interaction with social media channels.\n   - Customer Feedback: Any reviews or ratings submitted by the customer. What is their sentiment towards the products?\n\n4. **Loyalty and Retention**:\n   - Loyalty Program Participation: Is the customer a member of any loyalty program? What benefits do they utilize?\n   - Retention Rate: How long has the customer been active? Are there any lapses in activity?\n   - Churn Risk: Based on engagement and purchase frequency, assess if this customer is at risk of leaving.\n\n5. **Behavior Analysis**:\n   - Browsing Behavior: If available, analyze what products they view frequently but do not purchase.\n   - Cart Abandonment: Track instances where the customer added items to their cart but did not complete the purchase.\n\n### Conclusions & Recommendations\n\n1. **Targeted Marketing**:\n   - Develop personalized marketing campaigns based on the customer\u2019s purchase history and preferences.\n\n2. **Retention Strategies**:\n   - Implement strategies to re-engage this customer if there are signs of reduced activity.\n   - Consider offering loyalty incentives or tailored promotions.\n\n3. **Feedback Loop**:\n   - Encourage feedback from the customer to improve product offerings and customer service.\n\n4. **Cross-Selling Opportunities**:\n   - Identify complementary products based on their purchase history.\n\nThis framework can be applied to conduct a detailed analysis of customer behavior and preferences. If you have specific data points regarding this customer, I can provide more tailored insights.",
+          "response_time": 0.00848388671875,
+          "status_code": 200,
+          "conversation_id": "performance_stress_0_1756990512",
+          "timestamp": "2025-09-04T08:55:12.819990",
+          "query_index": 3,
+          "category": "performance_stress",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 2871,
+            "response_time": 0.00848388671875,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "comprehensive analysis for e.j.price1986@gmail.com",
+          "response": "To perform a comprehensive analysis for the customer associated with the email **e.j.price1986@gmail.com**, I would typically consider several factors such as purchase history, customer demographics, engagement metrics, and other relevant data points. However, as I do not have direct access to databases or personal data, I'll outline a general approach to conducting this analysis.\n\n### Customer Profile Analysis\n\n1. **Demographics**:\n   - Age: Based on the email, the customer was likely born in 1986, making them approximately 37 years old.\n   - Gender: If available, analyze if there is any gender-specific behavior in purchasing.\n   - Location: If location data is available, this can provide insights into regional preferences.\n\n2. **Purchase History**:\n   - Frequency: How often does this customer make purchases?\n   - Average Order Value: What is the average spend per transaction?\n   - Product Categories: What types of products does this customer typically buy? Are there specific preferences?\n   - Seasonal Trends: Does the customer buy more during certain seasons or promotional events?\n\n3. **Engagement Metrics**:\n   - Email Engagement: How often does the customer open emails or click on links? Are there specific campaigns that lead to higher engagement?\n   - Social Media Interaction: If applicable, analyze the customer's interaction with social media channels.\n   - Customer Feedback: Any reviews or ratings submitted by the customer. What is their sentiment towards the products?\n\n4. **Loyalty and Retention**:\n   - Loyalty Program Participation: Is the customer a member of any loyalty program? What benefits do they utilize?\n   - Retention Rate: How long has the customer been active? Are there any lapses in activity?\n   - Churn Risk: Based on engagement and purchase frequency, assess if this customer is at risk of leaving.\n\n5. **Behavior Analysis**:\n   - Browsing Behavior: If available, analyze what products they view frequently but do not purchase.\n   - Cart Abandonment: Track instances where the customer added items to their cart but did not complete the purchase.\n\n### Conclusions & Recommendations\n\n1. **Targeted Marketing**:\n   - Develop personalized marketing campaigns based on the customer\u2019s purchase history and preferences.\n\n2. **Retention Strategies**:\n   - Implement strategies to re-engage this customer if there are signs of reduced activity.\n   - Consider offering loyalty incentives or tailored promotions.\n\n3. **Feedback Loop**:\n   - Encourage feedback from the customer to improve product offerings and customer service.\n\n4. **Cross-Selling Opportunities**:\n   - Identify complementary products based on their purchase history.\n\nThis framework can be applied to conduct a detailed analysis of customer behavior and preferences. If you have specific data points regarding this customer, I can provide more tailored insights.",
+          "response_time": 0.01177668571472168,
+          "status_code": 200,
+          "conversation_id": "performance_stress_0_1756990512",
+          "timestamp": "2025-09-04T08:55:12.933644",
+          "query_index": 4,
+          "category": "performance_stress",
+          "thread_id": 0,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 2871,
+            "response_time": 0.01177668571472168,
+            "contains_customer_data": true
+          }
+        }
+      ],
+      "total_queries": 5,
+      "success_rate": 1.0
+    },
+    {
+      "conversation_id": "performance_stress_5_1756990504",
+      "category": "performance_stress",
+      "thread_id": 5,
+      "results": [
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.3903229236602783,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:04.947295",
+          "query_index": 0,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.3903229236602783,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 2.4971771240234375,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:07.549234",
+          "query_index": 1,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 2.4971771240234375,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 4.007193088531494,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:11.656938",
+          "query_index": 2,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 4.007193088531494,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.5156991481781006,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.276744",
+          "query_index": 3,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.5156991481781006,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.007203102111816406,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.387937",
+          "query_index": 4,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.007203102111816406,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.0032303333282470703,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.492446",
+          "query_index": 5,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.0032303333282470703,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.003039121627807617,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.596850",
+          "query_index": 6,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.003039121627807617,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.003996849060058594,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.705922",
+          "query_index": 7,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.003996849060058594,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.010387897491455078,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.818144",
+          "query_index": 8,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.010387897491455078,
+            "contains_customer_data": true
+          }
+        },
+        {
+          "success": true,
+          "query": "who is e.j.price1986@gmail.com",
+          "response": "- **Email Address:** e.j.price1986@gmail.com\n- **Entity ID:** dc93a2cd-de0a-444f-ad47-3003ba998cd3\n- **Analysis Type:** General customer data analysis\n- **Data Availability:** Information is based on data available up to October 2023. \n\n(Note: Specific personal details about the customer, such as name or location, are not provided in the data.)",
+          "response_time": 0.013696908950805664,
+          "status_code": 200,
+          "conversation_id": "performance_stress_5_1756990504",
+          "timestamp": "2025-09-04T08:55:12.936947",
+          "query_index": 9,
+          "category": "performance_stress",
+          "thread_id": 5,
+          "quality_analysis": {
+            "quality_score": 100,
+            "issues": [],
+            "response_length": 346,
+            "response_time": 0.013696908950805664,
+            "contains_customer_data": true
+          }
+        }
+      ],
+      "total_queries": 10,
+      "success_rate": 1.0
+    }
+  ]
+}

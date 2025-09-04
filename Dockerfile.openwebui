@@ -1,0 +1,19 @@
+# Production Dockerfile for Open WebUI on Railway
+# Uses the official Open WebUI Docker image with production configurations
+
+FROM ghcr.io/open-webui/open-webui:main
+
+# Set production environment variables
+ENV WEBUI_AUTH=true
+ENV ENABLE_SIGNUP=false
+ENV DEFAULT_USER_ROLE=user
+
+# Create data directory with proper permissions
+RUN mkdir -p /app/backend/data && \
+    chown -R 1000:1000 /app/backend/data
+
+# Expose port (Railway will handle port mapping)
+EXPOSE 8080
+
+# Use the default Open WebUI start command
+CMD ["bash", "start.sh"]

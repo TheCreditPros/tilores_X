@@ -1,0 +1,92 @@
+{
+  "diagnostic_summary": {
+    "total_tests": 33,
+    "successful_tests": 29,
+    "success_rate": 0.8787878787878788,
+    "timestamp": "2025-09-04T08:57:13.421204"
+  },
+  "category_analysis": {
+    "api_errors": {
+      "total": 8,
+      "successful": 7,
+      "failed": 1,
+      "avg_time": 0.9157858576093402,
+      "issues": [
+        "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}"
+      ]
+    },
+    "slow_responses": {
+      "total": 6,
+      "successful": 6,
+      "failed": 0,
+      "avg_time": 4.530571262041728,
+      "issues": []
+    },
+    "customer_data": {
+      "total": 6,
+      "successful": 6,
+      "failed": 0,
+      "avg_time": 1.8767012755076091,
+      "issues": []
+    },
+    "error_handling": {
+      "total": 6,
+      "successful": 3,
+      "failed": 3,
+      "avg_time": 0.08739288647969563,
+      "issues": [
+        "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+        "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+        "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}"
+      ]
+    },
+    "data_transitions": {
+      "total": 7,
+      "successful": 7,
+      "failed": 0,
+      "avg_time": 0.0038059098379952566,
+      "issues": []
+    }
+  },
+  "recommendations": [
+    "MEDIUM: Improve error handling for invalid customer queries"
+  ],
+  "detailed_failures": [
+    {
+      "success": false,
+      "query": "",
+      "error": "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+      "response_time": 0.008832931518554688,
+      "status_code": 500,
+      "timestamp": "2025-09-04T08:56:21.454140",
+      "test_category": "api_errors"
+    },
+    {
+      "success": false,
+      "query": "",
+      "error": "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+      "response_time": 0.0036509037017822266,
+      "status_code": 500,
+      "timestamp": "2025-09-04T08:57:09.555498",
+      "test_category": "error_handling"
+    },
+    {
+      "success": false,
+      "query": "   ",
+      "error": "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+      "response_time": 0.0022668838500976562,
+      "status_code": 500,
+      "timestamp": "2025-09-04T08:57:09.662207",
+      "test_category": "error_handling"
+    },
+    {
+      "success": false,
+      "query": "",
+      "error": "HTTP 500: {\"detail\":\"400: Query cannot be empty\"}",
+      "response_time": 0.002418994903564453,
+      "status_code": 500,
+      "timestamp": "2025-09-04T08:57:09.769336",
+      "test_category": "error_handling"
+    }
+  ]
+}
