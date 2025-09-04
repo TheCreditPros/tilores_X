@@ -696,6 +696,35 @@ app.add_middleware(
 # Global API instance
 api = MultiProviderCreditAPI()
 
+# Conversation logging function
+def log_conversation(user_message: str, assistant_response: str, model: str, request_id: str = None):
+    """Log full conversation to persistent storage"""
+    try:
+        if not request_id:
+            request_id = f"req_{uuid.uuid4().hex[:8]}"
+        
+        conversation_log = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "request_id": request_id,
+            "model": model,
+            "user_message": user_message,
+            "assistant_response": assistant_response,
+            "message_length": len(user_message),
+            "response_length": len(assistant_response)
+        }
+        
+        # Write to persistent log file
+        log_file = "conversation_logs.jsonl"
+        os.makedirs(os.path.dirname(log_file) if os.path.dirname(log_file) else ".", exist_ok=True)
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(json.dumps(conversation_log, ensure_ascii=False) + "\n")
+        
+        print(f"💾 Conversation logged: {request_id} - User: {len(user_message)} chars, Response: {len(assistant_response)} chars")
+        
+    except Exception as e:
+        print(f"⚠️ Failed to log conversation: {e}")
+        # Don't fail the request if logging fails
+
 # Include enhanced chat webhook router (preserved - not Agenta-related)
 if ENHANCED_CHAT_LOGGING and chat_webhook_router:
     app.include_router(chat_webhook_router)
@@ -798,6 +827,35 @@ async def list_models():
         ]
     }
 
+@app.get("/v1/conversations/recent")
+async def get_recent_conversations(limit: int = 10):
+    """Get recent conversation logs"""
+    try:
+        conversations = []
+        log_file = "conversation_logs.jsonl"
+        
+        if os.path.exists(log_file):
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            # Get the last N lines
+            for line in lines[-limit:]:
+                try:
+                    conversation = json.loads(line.strip())
+                    conversations.append(conversation)
+                except json.JSONDecodeError:
+                    continue
+        
+        return {
+            "conversations": conversations,
+            "count": len(conversations),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    
+    except Exception as e:
+        print(f"❌ Error retrieving conversations: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -873,6 +931,9 @@ async def chat_completions(request: Request):
                 }
             }
 
+        # Generate unique request ID for logging
+        request_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
+        
         # Process the request with optimized routing
         response_content = api.process_chat_request(
             query=query,
@@ -882,10 +943,17 @@ async def chat_completions(request: Request):
             prompt_id=prompt_id,
             prompt_version=prompt_version
         )
+        
+        # Log the complete conversation
+        log_conversation(
+            user_message=query,
+            assistant_response=response_content,
+            model=model,
+            request_id=request_id
+        )
 
         # Handle streaming vs non-streaming response
         if stream:
-            request_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
             return StreamingResponse(
                 api._generate_streaming_response(response_content, request_id, model),
                 media_type="text/plain",
@@ -898,7 +966,7 @@ async def chat_completions(request: Request):
         else:
             # Standard JSON response
             return JSONResponse(content={
-                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
+                "id": request_id,
                 "object": "chat.completion",
                 "created": int(time.time()),
                 "model": model,
