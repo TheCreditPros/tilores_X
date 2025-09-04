@@ -598,9 +598,9 @@ class MultiProviderCreditAPI:
     def _fetch_comprehensive_customer_data(self, entity_id: str, query_type: str) -> str:
         """Fetch comprehensive customer data from Tilores API - CRITICAL FIX"""
         try:
-            # Build comprehensive GraphQL query for all customer data
+            # Build comprehensive GraphQL query using WORKING format
             query_gql = """
-            query ComprehensiveCustomerData($id: ID!) {
+            query($id: ID!) {
               entity(input: { id: $id }) {
                 entity {
                   id
@@ -609,16 +609,14 @@ class MultiProviderCreditAPI:
                     EMAIL
                     FIRST_NAME
                     LAST_NAME
-                    MIDDLE_NAME
                     CLIENT_ID
-                    PHONE_NUMBER
+                    PHONE_EXTERNAL
                     STATUS
                     ACTIVE
                     ENROLL_DATE
                     CREATED_DATE
                     CURRENT_PRODUCT
                     PRODUCT_NAME
-                    ENROLLMENT_FEE
                     TRANSACTION_AMOUNT
                     PAYMENT_METHOD
                     LAST_APPROVED_TRANSACTION
@@ -631,23 +629,18 @@ class MultiProviderCreditAPI:
                     ZOHO_STATUS
                     CREDIT_RESPONSE {
                       CREDIT_BUREAU
+                      CreditReportFirstIssuedDate
                       CREDIT_SCORE {
                         Value
-                        Date
+                        ModelNameType
+                        CreditRepositorySourceType
                       }
-                      CreditReportFirstIssuedDate
-                      CREDIT_UTILIZATION_RATE
-                      PAYMENT_HISTORY
-                      ACCOUNT_BALANCES
-                      CREDIT_INQUIRIES
                     }
                   }
                   recordInsights {
                     totalRecords: count
                     creditScores: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_SCORE.Value")
                     creditBureaus: valuesDistinct(field: "CREDIT_RESPONSE.CREDIT_BUREAU")
-                    transactionAmounts: valuesDistinct(field: "TRANSACTION_AMOUNT")
-                    paymentMethods: valuesDistinct(field: "PAYMENT_METHOD")
                   }
                 }
               }
