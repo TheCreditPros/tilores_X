@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Multi-Provider Direct Credit Analysis API - Fixed Version with Agenta.ai SDK
-Fixes Salesforce status query and integrates Agenta.ai SDK for dynamic prompts
+Multi-Provider Direct Credit Analysis API - Production Version
+Optimized for performance with query-type-specific prompt routing
 """
 
 import json
@@ -23,25 +23,22 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-# Import our Agenta SDK manager
-try:
-    from agenta_sdk_manager import agenta_manager
-    AGENTA_INTEGRATION = True
-    print("✅ Agenta SDK manager imported")
-except ImportError as e:
-    print(f"⚠️ Agenta SDK manager not available: {e}")
-    AGENTA_INTEGRATION = False
-    agenta_manager = None
+# Agenta.ai Integration - DEPRECATED for performance optimization
+# All Agenta functionality has been replaced with optimized fallback system
+# Files preserved in deprecated/agenta/ for future reinstatement if needed
+AGENTA_INTEGRATION = False
+agenta_manager = None
+print("📝 Agenta.ai integration disabled - using optimized fallback system")
 
-# Import webhook handlers
+# Enhanced Chat Webhook Integration (PRESERVED - not Agenta-related)
 try:
-    from agenta_webhook_handlers import webhook_router
-    WEBHOOK_INTEGRATION = True
-    print("✅ Agenta webhook handlers imported")
+    from enhanced_chat_webhook import chat_webhook_router
+    ENHANCED_CHAT_LOGGING = True
+    print("✅ Enhanced chat logging endpoints imported")
 except ImportError as e:
-    print(f"⚠️ Agenta webhook handlers not available: {e}")
-    WEBHOOK_INTEGRATION = False
-    webhook_router = None
+    print(f"⚠️ Enhanced chat logging not available: {e}")
+    ENHANCED_CHAT_LOGGING = False
+    chat_webhook_router = None
 
 # Load environment variables
 load_dotenv()
@@ -59,7 +56,7 @@ class ChatCompletionRequest(BaseModel):
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = None
     stream: Optional[bool] = False
-    # Agenta.ai specific fields
+    # Optional advanced configuration fields
     prompt_id: Optional[str] = None
     prompt_version: Optional[str] = None
     # Additional OpenAI-compatible fields
@@ -356,44 +353,42 @@ class MultiProviderCreditAPI:
             query_type = self.detect_query_type(query)
             print(f"🎯 Detected query type: {query_type}")
 
-            # Get appropriate prompt from Agenta SDK or local store
-            # TEMPORARILY DISABLED FOR QA TESTING - Use fallback system
-            if False and AGENTA_INTEGRATION and agenta_manager:
-                prompt_config = agenta_manager.get_prompt_config(query_type, query)
-                print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
-            else:
-                # Query-type-specific fallback prompts (Perfect Steady State)
-                fallback_prompts = {
-                    "status": {
-                        "system_prompt": "You are a customer service AI assistant. Provide concise account status information using bullet points.",
-                        "temperature": 0.3,
-                        "max_tokens": 200
-                    },
-                    "general": {
-                        "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
-                        "temperature": 0.3,
-                        "max_tokens": 300
-                    },
-                    "credit": {
-                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                        "temperature": 0.7,
-                        "max_tokens": 1000
-                    },
-                    "transaction": {
-                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                        "temperature": 0.7,
-                        "max_tokens": 1000
-                    },
-                    "multi_data": {
-                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                        "temperature": 0.7,
-                        "max_tokens": 1500
-                    }
+            # Use optimized query-type-specific prompts (Agenta.ai deprecated)
+            # Query-type-specific prompts optimized for performance
+            prompt_config = {
+                "status": {
+                    "system_prompt": "You are a customer service AI assistant. Provide concise account status information using bullet points.",
+                    "temperature": 0.3,
+                    "max_tokens": 200
+                },
+                "general": {
+                    "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
+                    "temperature": 0.3,
+                    "max_tokens": 300
+                },
+                "credit": {
+                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                },
+                "transaction": {
+                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                },
+                "multi_data": {
+                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                    "temperature": 0.7,
+                    "max_tokens": 1500
                 }
-                
-                prompt_config = fallback_prompts.get(query_type, fallback_prompts["general"])
-                prompt_config["source"] = "fallback"
-                print(f"📝 Using fallback prompt for {query_type}")
+            }.get(query_type, {
+                "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
+                "temperature": 0.3,
+                "max_tokens": 300
+            })
+            
+            prompt_config["source"] = "optimized"
+            print(f"📝 Using optimized prompt for {query_type}")
 
             # Create cache key
             cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()
@@ -424,17 +419,8 @@ class MultiProviderCreditAPI:
             # Cache the response
             self._cache_response(cache_key, response)
 
-            # Log performance back to Agenta
+            # Performance logging (Agenta.ai deprecated)
             duration = time.time() - start_time
-            if AGENTA_INTEGRATION and agenta_manager:
-                agenta_manager.log_interaction(
-                    query_type,
-                    query,
-                    response,
-                    True,
-                    duration,
-                    prompt_config
-                )
 
             print(f"✅ Request #{request_id} completed in {duration:.1f}s")
             return response
@@ -444,16 +430,7 @@ class MultiProviderCreditAPI:
             error_msg = f"Processing error: {str(e)}"
             print(f"❌ Request #{request_id} failed in {duration:.1f}s: {error_msg}")
 
-            # Log failure to Agenta
-            if AGENTA_INTEGRATION and agenta_manager and 'prompt_config' in locals():
-                agenta_manager.log_interaction(
-                    query_type if 'query_type' in locals() else 'unknown',
-                    query,
-                    error_msg,
-                    False,
-                    duration,
-                    prompt_config
-                )
+            # Error logging (Agenta.ai deprecated)
 
             return error_msg
 
@@ -580,7 +557,7 @@ class MultiProviderCreditAPI:
         if not entity_id:
             return "No customer records found for the provided information."
 
-        # Use dynamic prompt from Agenta
+        # Use optimized prompt configuration
         system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
 
         # Override temperature and max_tokens from prompt config if not explicitly set
@@ -684,14 +661,14 @@ class MultiProviderCreditAPI:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for FastAPI"""
-    print("🚀 Multi-Provider Credit Analysis API with Agenta.ai starting up...")
+    print("🚀 Multi-Provider Credit Analysis API starting up...")
     print("🌐 Server will bind to 0.0.0.0:8080")
     yield
     print("🛑 Application shutting down...")
 
 app = FastAPI(
-    title="Multi-Provider Credit Analysis API with Agenta.ai SDK",
-    description="Advanced credit analysis with dynamic prompt management via Agenta.ai SDK",
+    title="Multi-Provider Credit Analysis API",
+    description="Advanced credit analysis with optimized query-type-specific routing",
     version="2.1.0",
     lifespan=lifespan
 )
@@ -708,10 +685,10 @@ app.add_middleware(
 # Global API instance
 api = MultiProviderCreditAPI()
 
-# Include webhook router if available
-if WEBHOOK_INTEGRATION and webhook_router:
-    app.include_router(webhook_router)
-    print("✅ Agenta webhook endpoints registered")
+# Include enhanced chat webhook router (preserved - not Agenta-related)
+if ENHANCED_CHAT_LOGGING and chat_webhook_router:
+    app.include_router(chat_webhook_router)
+    print("✅ Enhanced chat logging endpoints registered")
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -740,12 +717,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {"message": "Multi-Provider Credit Analysis API with Agenta.ai SDK", "version": "2.1.0"}
+    return {"message": "Multi-Provider Credit Analysis API", "version": "2.1.0"}
 
 @app.get("/v1")
 async def v1_root():
     """V1 API root - required for some integrations"""
-    return {"message": "Multi-Provider Credit Analysis API v1 with Agenta.ai SDK", "version": "2.1.0"}
+    return {"message": "Multi-Provider Credit Analysis API v1", "version": "2.1.0"}
 
 @app.get("/v1/models")
 async def list_models():
@@ -760,21 +737,21 @@ async def list_models():
                 "owned_by": "openai"
             },
             {
-                "id": "gpt-4o-mini", 
+                "id": "gpt-4o-mini",
                 "object": "model",
                 "created": 1677610602,
                 "owned_by": "openai"
             },
             {
                 "id": "gpt-3.5-turbo",
-                "object": "model", 
+                "object": "model",
                 "created": 1677610602,
                 "owned_by": "openai"
             },
             {
                 "id": "gemini-1.5-flash",
                 "object": "model",
-                "created": 1677610602, 
+                "created": 1677610602,
                 "owned_by": "google"
             },
             {
@@ -791,7 +768,7 @@ async def list_models():
             },
             {
                 "id": "gemini-2.5-flash",
-                "object": "model", 
+                "object": "model",
                 "created": 1677610602,
                 "owned_by": "google"
             },
@@ -818,7 +795,7 @@ async def health_check():
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     """
-    OpenAI-compatible chat completions endpoint with Agenta.ai dynamic prompts
+    OpenAI-compatible chat completions endpoint with optimized query routing
     """
     try:
         # Parse request body manually to handle both Pydantic and raw JSON
@@ -835,13 +812,13 @@ async def chat_completions(request: Request):
         max_tokens = request_data.get("max_tokens")
         stream = request_data.get("stream", False)
 
-        # Agenta.ai specific fields
+        # Optional fields for advanced configuration
         prompt_id = request_data.get("prompt_id")
         prompt_version = request_data.get("prompt_version")
 
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
         if prompt_id:
-            print(f"🔍 DEBUG: Agenta.ai - Prompt ID: {prompt_id}, Version: {prompt_version}")
+            print(f"🔍 DEBUG: Advanced config - Prompt ID: {prompt_id}, Version: {prompt_version}")
 
         if not messages:
             raise HTTPException(status_code=400, detail="Messages are required")
@@ -866,7 +843,7 @@ async def chat_completions(request: Request):
         if not query.strip():
             raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-        # Process the request with Agenta.ai integration
+        # Process the request with optimized routing
         response_content = api.process_chat_request(
             query=query,
             model=model,
@@ -921,5 +898,5 @@ async def chat_completions(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Multi-Provider Credit Analysis API with Agenta.ai SDK...")
+    print("🚀 Starting Multi-Provider Credit Analysis API...")
     uvicorn.run(app, host="0.0.0.0", port=8080)
