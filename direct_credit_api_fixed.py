@@ -722,6 +722,69 @@ async def v1_root():
     """V1 API root - required for some integrations"""
     return {"message": "Multi-Provider Credit Analysis API v1 with Agenta.ai SDK", "version": "2.1.0"}
 
+@app.get("/v1/models")
+async def list_models():
+    """List available models - OpenAI compatible endpoint"""
+    return {
+        "object": "list",
+        "data": [
+            {
+                "id": "gpt-4o",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "openai"
+            },
+            {
+                "id": "gpt-4o-mini", 
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "openai"
+            },
+            {
+                "id": "gpt-3.5-turbo",
+                "object": "model", 
+                "created": 1677610602,
+                "owned_by": "openai"
+            },
+            {
+                "id": "gemini-1.5-flash",
+                "object": "model",
+                "created": 1677610602, 
+                "owned_by": "google"
+            },
+            {
+                "id": "gemini-1.5-pro",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "google"
+            },
+            {
+                "id": "gemini-2.0-flash-exp",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "google"
+            },
+            {
+                "id": "gemini-2.5-flash",
+                "object": "model", 
+                "created": 1677610602,
+                "owned_by": "google"
+            },
+            {
+                "id": "llama-3.3-70b-versatile",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "groq"
+            },
+            {
+                "id": "deepseek-r1-distill-llama-70b",
+                "object": "model",
+                "created": 1677610602,
+                "owned_by": "groq"
+            }
+        ]
+    }
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
