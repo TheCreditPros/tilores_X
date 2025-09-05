@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Multi-Provider Direct Credit Analysis API - Production Version
-Optimized for performance with query-type-specific prompt routing
+Multi-Provider Direct Credit Analysis API - Fixed Version with Agenta.ai SDK
+Fixes Salesforce status query and integrates Agenta.ai SDK for dynamic prompts
 """
 
 import json
@@ -11,11 +11,11 @@ import hashlib
 import asyncio
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone, timedelta
-from typing import List, Optional, Dict, Any
+from datetime import datetime, timedelta
+from typing import List, Optional, Dict
 
 import requests
-# import redis  # Disabled for local testing
+import redis
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -23,22 +23,25 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-# Agenta.ai Integration - DEPRECATED for performance optimization
-# All Agenta functionality has been replaced with optimized fallback system
-# Files preserved in deprecated/agenta/ for future reinstatement if needed
-AGENTA_INTEGRATION = False
-agenta_manager = None
-print("📝 Agenta.ai integration disabled - using optimized fallback system")
-
-# Enhanced Chat Webhook Integration (PRESERVED - not Agenta-related)
+# Import our Agenta SDK manager
 try:
-    from enhanced_chat_webhook import chat_webhook_router
-    ENHANCED_CHAT_LOGGING = True
-    print("✅ Enhanced chat logging endpoints imported")
+    from agenta_sdk_manager import agenta_manager
+    AGENTA_INTEGRATION = True
+    print("✅ Agenta SDK manager imported")
 except ImportError as e:
-    print(f"⚠️ Enhanced chat logging not available: {e}")
-    ENHANCED_CHAT_LOGGING = False
-    chat_webhook_router = None
+    print(f"⚠️ Agenta SDK manager not available: {e}")
+    AGENTA_INTEGRATION = False
+    agenta_manager = None
+
+# Import webhook handlers
+try:
+    from agenta_webhook_handlers import webhook_router
+    WEBHOOK_INTEGRATION = True
+    print("✅ Agenta webhook handlers imported")
+except ImportError as e:
+    print(f"⚠️ Agenta webhook handlers not available: {e}")
+    WEBHOOK_INTEGRATION = False
+    webhook_router = None
 
 # Load environment variables
 load_dotenv()
@@ -56,7 +59,7 @@ class ChatCompletionRequest(BaseModel):
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = None
     stream: Optional[bool] = False
-    # Optional advanced configuration fields
+    # Agenta.ai specific fields
     prompt_id: Optional[str] = None
     prompt_version: Optional[str] = None
     # Additional OpenAI-compatible fields
@@ -80,10 +83,16 @@ class MultiProviderCreditAPI:
         self.query_cache = {}
         self.cache_ttl = 300  # 5 minutes
 
-        # Redis caching for Tilores responses - DISABLED FOR LOCAL TESTING
-        # Redis caching causes problems during local development and testing
-        print("🚫 Redis caching disabled for local testing")
-        self.redis_client = None
+        # Redis caching for Tilores responses
+        try:
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+            self.redis_client = redis.from_url(redis_url, decode_responses=True)
+            # Test connection
+            self.redis_client.ping()
+            print("✅ Redis connected successfully")
+        except Exception as e:
+            print(f"⚠️ Redis connection failed: {e}")
+            self.redis_client = None
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -111,46 +120,9 @@ class MultiProviderCreditAPI:
         # Request counter for logging
         self.request_counter = 0
 
-    def detect_query_type(self, query: str, has_session_context: bool = False) -> str:
+    def detect_query_type(self, query: str) -> str:
         """Detect the type of query to route to appropriate prompt"""
-        query_lower = query.lower().strip()
-
-        # Handle common typos
-        typo_corrections = {
-            'accont': 'account',
-            'credt': 'credit',
-            'custmer': 'customer',
-            'staus': 'status',
-            'profle': 'profile'
-        }
-
-        for typo, correction in typo_corrections.items():
-            query_lower = query_lower.replace(typo, correction)
-
-        # Credit analysis queries
-        credit_keywords = ['credit', 'score', 'bureau', 'experian', 'transunion', 'equifax',
-                          'utilization', 'tradeline', 'inquiry', 'late payment', 'delinquent']
-        has_credit_keywords = any(keyword in query_lower for keyword in credit_keywords)
-
-        # Transaction analysis queries
-        transaction_keywords = ['transaction', 'payment', 'billing', 'charge', 'amount', 'invoice']
-        has_transaction_keywords = any(keyword in query_lower for keyword in transaction_keywords)
-
-        # Multi-data queries
-        combined_keywords = ['comprehensive', 'complete', 'full analysis', 'everything', 'all data', 'overview']
-        has_combined_keywords = any(keyword in query_lower for keyword in combined_keywords)
-
-        # Customer identification queries (should get real customer data)
-
-
-        # Check if query contains customer identifiers (email, phone, client_id)
-        has_email = '@' in query_lower
-        has_client_id = any(word.isdigit() and len(word) >= 6 for word in query_lower.split())
-
-        # Dynamic customer name detection - check if query contains known customer names from Tilores
-        has_known_customer_name = self.detect_known_customer_names(query_lower)
-
-        has_customer_identifier = has_email or has_client_id or has_known_customer_name
+        query_lower = query.lower()
 
         # Account status queries (Salesforce status: active/canceled/past due)
         account_status_keywords = ['account status', 'customer status', 'subscription status',
@@ -165,317 +137,30 @@ class MultiProviderCreditAPI:
         if has_status_keywords and not is_credit_status_query:
             return "status"
 
+        # Credit analysis queries
+        credit_keywords = ['credit', 'score', 'bureau', 'experian', 'transunion', 'equifax',
+                          'utilization', 'tradeline', 'inquiry', 'late payment', 'delinquent']
+        has_credit_keywords = any(keyword in query_lower for keyword in credit_keywords)
+
+        # Transaction analysis queries
+        transaction_keywords = ['transaction', 'payment', 'billing', 'charge', 'amount', 'invoice']
+        has_transaction_keywords = any(keyword in query_lower for keyword in transaction_keywords)
+
+        # Multi-data queries
+        combined_keywords = ['comprehensive', 'complete', 'full analysis', 'everything', 'all data', 'overview']
+        has_combined_keywords = any(keyword in query_lower for keyword in combined_keywords)
+
         # Count data types requested
         data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
-        # Check for bureau-specific credit score queries that need multi_data handler
-        bureau_score_keywords = ['experian score', 'transunion score', 'equifax score', 'bureau score', 'credit score']
-        has_bureau_score_query = any(keyword in query_lower for keyword in bureau_score_keywords)
-
-        # PRIORITY: Multi-data queries (comprehensive analysis) - even with customer identifiers
-        if has_combined_keywords or data_type_count > 1 or has_bureau_score_query:
+        if has_combined_keywords or data_type_count > 1:
             return "multi_data"
-
-        # PRIORITY: Customer identification with real data
-        # Route to appropriate analysis type when customer is identified
-        elif has_customer_identifier or has_known_customer_name or has_session_context:
-            if has_credit_keywords:
-                return "credit"
-            elif has_transaction_keywords:
-                return "transaction"
-            else:
-                return "status"  # Default for basic customer info
-
-        # Secondary routing for non-customer queries only
         elif has_credit_keywords:
             return "credit"
         elif has_transaction_keywords:
             return "transaction"
         else:
             return "general"
-
-    def detect_known_customer_names(self, query_lower: str) -> bool:
-        """Detect if query contains known customer names from our system"""
-        # Known customer names in our system (can be expanded dynamically)
-        known_customers = {
-            'esteban price': 'e.j.price1986@gmail.com',
-            'esteban': 'e.j.price1986@gmail.com',
-            'price': 'e.j.price1986@gmail.com'
-        }
-
-        # Check if any known customer name appears in the query
-        for name in known_customers:
-            if name in query_lower:
-                return True
-
-        return False
-
-    def extract_conversation_context(self, messages: List[Dict]) -> Dict[str, Any]:
-        """Extract customer identifiers and context from conversation history"""
-        context = {
-            "customer_email": None,
-            "customer_name": None,
-            "client_id": None,
-            "entity_id": None,
-            "has_customer_context": False
-        }
-
-        # Look through all messages for customer identifiers
-        for message in messages:
-            if message.get("role") == "user":
-                content = message.get("content", "")
-                if isinstance(content, list):
-                    # Handle structured content
-                    content = " ".join([block.get("text", "") for block in content if block.get("type") == "text"])
-
-                content_lower = content.lower()
-
-                # Extract email addresses
-                import re
-                email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-                emails = re.findall(email_pattern, content)
-                if emails and not context["customer_email"]:
-                    context["customer_email"] = emails[0]
-                    context["has_customer_context"] = True
-
-                # Extract client IDs (6+ digit numbers)
-                client_id_pattern = r'\b(?:client\s+)?(\d{6,})\b'
-                client_ids = re.findall(client_id_pattern, content_lower)
-                if client_ids and not context["client_id"]:
-                    context["client_id"] = client_ids[0]
-                    context["has_customer_context"] = True
-
-            elif message.get("role") == "assistant":
-                # Extract customer info from assistant responses
-                content = message.get("content", "")
-
-                # Look for customer names in responses
-                if "Customer:" in content and not context["customer_name"]:
-                    # Extract name after "Customer:"
-                    import re
-                    name_match = re.search(r'Customer:\s*([^•\n]+)', content)
-                    if name_match:
-                        context["customer_name"] = name_match.group(1).strip()
-                        context["has_customer_context"] = True
-
-                # Look for entity IDs in responses
-                entity_pattern = r'([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})'
-                entity_matches = re.findall(entity_pattern, content)
-                if entity_matches and not context["entity_id"]:
-                    context["entity_id"] = entity_matches[0]
-
-        return context
-
-    def enhance_query_with_context(self, query: str, context: Dict[str, Any]) -> str:
-        """Enhance query with conversation context for better routing"""
-        if not context["has_customer_context"]:
-            return query
-
-        query_lower = query.lower()
-
-        # Check for contextual pronouns OR ambiguous queries that need customer info
-        contextual_indicators = ['their', 'them', 'his', 'her', 'this customer', 'the customer']
-        has_contextual_reference = any(indicator in query_lower for indicator in contextual_indicators)
-
-        # Also enhance ambiguous queries that would benefit from customer context
-        is_ambiguous = self.is_ambiguous_query(query)
-
-        if has_contextual_reference or is_ambiguous:
-            # Add customer identifier to the query for proper routing
-            if context["customer_email"]:
-                enhanced_query = f"{query} for {context['customer_email']}"
-            elif context["client_id"]:
-                enhanced_query = f"{query} for client {context['client_id']}"
-            elif context["customer_name"]:
-                enhanced_query = f"{query} for {context['customer_name']}"
-            else:
-                enhanced_query = query
-
-            print(f"🔍 DEBUG: Enhanced query with context: '{query}' -> '{enhanced_query}'")
-            return enhanced_query
-
-        # Handle name queries by adding email for proper routing (but don't replace if email already present)
-        query_lower = query.lower()
-        if ('esteban' in query_lower or 'price' in query_lower) and '@' not in query_lower:
-            # Handle various name patterns
-            if 'esteban price' in query_lower:
-                enhanced_query = query.replace('Esteban Price', 'e.j.price1986@gmail.com')
-                enhanced_query = enhanced_query.replace('esteban price', 'e.j.price1986@gmail.com')
-            elif 'for esteban' in query_lower:
-                enhanced_query = query.replace('for Esteban', 'for e.j.price1986@gmail.com')
-                enhanced_query = enhanced_query.replace('for esteban', 'for e.j.price1986@gmail.com')
-            elif 'esteban' in query_lower:
-                enhanced_query = query.replace('Esteban', 'e.j.price1986@gmail.com')
-                enhanced_query = enhanced_query.replace('esteban', 'e.j.price1986@gmail.com')
-            elif 'for price' in query_lower:
-                enhanced_query = query.replace('for Price', 'for e.j.price1986@gmail.com')
-                enhanced_query = enhanced_query.replace('for price', 'for e.j.price1986@gmail.com')
-            elif 'price' in query_lower:
-                enhanced_query = query.replace('Price', 'e.j.price1986@gmail.com')
-                enhanced_query = enhanced_query.replace('price', 'e.j.price1986@gmail.com')
-            else:
-                enhanced_query = query
-
-            if enhanced_query != query:
-                print(f"🔍 DEBUG: Enhanced name query: '{query}' -> '{enhanced_query}'")
-                return enhanced_query
-
-        return query
-
-    def get_recent_customer_context(self) -> Dict[str, Any]:
-        """Get the most recent customer context from cache"""
-        if not self.redis_client:
-            # Return empty context when Redis is disabled
-            return {
-                'customer_email': None,
-                'customer_name': None,
-                'client_id': None,
-                'entity_id': None,
-                'has_customer_context': False
-            }
-        try:
-            context_data = self.redis_client.get("recent_customer_context")
-            if context_data:
-                return json.loads(context_data)
-        except Exception as e:
-            print(f"⚠️ Error getting recent customer context: {e}")
-
-        # Return empty context if none found
-        return {
-            'customer_email': None,
-            'customer_name': None,
-            'client_id': None,
-            'entity_id': None,
-            'has_customer_context': False
-        }
-
-    def update_recent_customer_context(self, context: Dict[str, Any]):
-        """Update the recent customer context cache"""
-        if not self.redis_client:
-            print(f"🚫 Redis disabled - skipping context update: {context}")
-            return
-        try:
-            # Store context for 30 minutes
-            self.redis_client.setex("recent_customer_context", 1800, json.dumps(context))
-            print(f"💾 Updated recent customer context: {context}")
-        except Exception as e:
-            print(f"⚠️ Error updating recent customer context: {e}")
-
-    def is_ambiguous_query(self, query: str) -> bool:
-        """Check if query is ambiguous and could benefit from customer context"""
-        query_lower = query.lower().strip()
-
-        # Queries that are ambiguous without customer context
-        ambiguous_patterns = [
-            'credit score', 'experian', 'transunion', 'equifax', 'utilization',
-            'payment history', 'transaction', 'billing', 'recent', 'latest',
-            'what is', 'show me', 'their', 'his', 'her'
-        ]
-
-        # Check if query contains ambiguous patterns but no customer identifiers
-        has_ambiguous = any(pattern in query_lower for pattern in ambiguous_patterns)
-        has_customer_id = '@' in query_lower or any(word.isdigit() and len(word) >= 6 for word in query_lower.split())
-
-        return has_ambiguous and not has_customer_id
-
-    def get_session_context(self, client_ip: str) -> Dict[str, Any]:
-        """Get stored session context for a client IP"""
-        if not self.redis_client:
-            # Return empty context when Redis is disabled
-            return {
-                'customer_email': None,
-                'customer_name': None,
-                'client_id': None,
-                'entity_id': None,
-                'has_customer_context': False
-            }
-        try:
-            session_key = f"session_context:{client_ip}"
-            context_data = self.redis_client.get(session_key)
-            if context_data:
-                return json.loads(context_data)
-        except Exception as e:
-            print(f"⚠️ Error getting session context: {e}")
-
-        # Return empty context if none found
-        return {
-            'customer_email': None,
-            'customer_name': None,
-            'client_id': None,
-            'entity_id': None,
-            'has_customer_context': False
-        }
-
-    def update_session_context(self, client_ip: str, context: Dict[str, Any]):
-        """Update session context for a client IP"""
-        if not self.redis_client:
-            print(f"🚫 Redis disabled - skipping session context update for {client_ip}: {context}")
-            return
-        try:
-            session_key = f"session_context:{client_ip}"
-            # Store context for 1 hour
-            self.redis_client.setex(session_key, 3600, json.dumps(context))
-            print(f"💾 Updated session context for {client_ip}: {context}")
-        except Exception as e:
-            print(f"⚠️ Error updating session context: {e}")
-
-    def store_query_in_session(self, client_ip: str, original_query: str, enhanced_query: str):
-        """Store query information in session for debugging"""
-        if not self.redis_client:
-            print(f"🚫 Redis disabled - skipping query storage for {client_ip}")
-            return
-        try:
-            session_key = f"session_queries:{client_ip}"
-            query_data = {
-                'timestamp': datetime.now(timezone.utc).isoformat(),
-                'original_query': original_query,
-                'enhanced_query': enhanced_query
-            }
-            # Keep last 10 queries
-            self.redis_client.lpush(session_key, json.dumps(query_data))
-            self.redis_client.ltrim(session_key, 0, 9)
-            self.redis_client.expire(session_key, 3600)
-        except Exception as e:
-            print(f"⚠️ Error storing query in session: {e}")
-
-    def get_client_ip(self, request: Request) -> str:
-        """Extract client IP address from request, handling local development and proxies"""
-        # Check for forwarded headers (common in production behind proxies)
-        forwarded_for = request.headers.get("X-Forwarded-For")
-        if forwarded_for:
-            # X-Forwarded-For can contain multiple IPs, take the first one
-            client_ip = forwarded_for.split(",")[0].strip()
-            print(f"🌐 Client IP from X-Forwarded-For: {client_ip}")
-            return client_ip
-
-        # Check for real IP header (some proxies use this)
-        real_ip = request.headers.get("X-Real-IP")
-        if real_ip:
-            print(f"🌐 Client IP from X-Real-IP: {real_ip}")
-            return real_ip
-
-        # Fallback to direct client host
-        if request.client and request.client.host:
-            client_ip = request.client.host
-            print(f"🌐 Client IP from request.client: {client_ip}")
-            return client_ip
-
-        # Final fallback for local development
-        fallback_ip = "127.0.0.1"
-        print(f"🌐 Using fallback IP for local development: {fallback_ip}")
-        return fallback_ip
-
-    def clear_memory_cache(self):
-        """Clear the in-memory query cache for fresh responses"""
-        cache_count = len(self.query_cache)
-        self.query_cache.clear()
-        print(f"🧹 Memory cache cleared: {cache_count} cached responses removed")
-        return cache_count
-
-    def is_local_testing(self, client_ip: str) -> bool:
-        """Determine if this is a local testing environment"""
-        local_ips = ["127.0.0.1", "localhost", "::1"]
-        return client_ip in local_ips or client_ip.startswith("192.168.") or client_ip.startswith("10.")
 
     def get_tilores_token(self):
         """Get or refresh Tilores OAuth token"""
@@ -658,7 +343,7 @@ class MultiProviderCreditAPI:
 
     def process_chat_request(self, query: str, model: str = "gpt-4o-mini",
                            temperature: float = 0.7, max_tokens: int = None,
-                           prompt_id: str = None, prompt_version: str = None, query_type: str = None) -> str:
+                           prompt_id: str = None, prompt_version: str = None) -> str:
         """Process chat request with dynamic prompt selection and fixed Salesforce status"""
         start_time = time.time()
         self.request_counter += 1
@@ -667,47 +352,23 @@ class MultiProviderCreditAPI:
         print(f"🔄 Processing request #{request_id} started at {datetime.now().strftime('%H:%M:%S')}")
 
         try:
-            # Use provided query type or detect it
-            if query_type is None:
-                query_type = self.detect_query_type(query)
+            # Detect query type for prompt routing
+            query_type = self.detect_query_type(query)
             print(f"🎯 Detected query type: {query_type}")
 
-            # Use optimized query-type-specific prompts (Agenta.ai deprecated)
-            # Natural language prompts that leverage LLM intelligence
-            prompt_config = {
-    "general": {
-        "system_prompt": "You're a knowledgeable customer service representative for a credit repair company. Help customers understand their options and provide clear, helpful information about credit repair services.",
-        "temperature": 0.7,
-        "max_tokens": 500
-    },
-    "status": {
-        "system_prompt": "You're looking at a customer's account information. Explain their current status in a friendly, professional way that helps them understand where they stand with their credit repair service.",
-        "temperature": 0.7,
-        "max_tokens": 600
-    },
-    "credit": {
-        "system_prompt": "You are a credit analysis expert. You have been provided with ACTUAL CUSTOMER DATA below. You MUST use this specific customer information to answer their credit question. DO NOT give generic advice - use the real customer details provided. If specific credit scores aren't available, acknowledge this for THIS SPECIFIC CUSTOMER and provide relevant guidance based on their enrollment in credit repair services and account status.",
-        "temperature": 0.8,
-        "max_tokens": 1200
-    },
-    "transaction": {
-        "system_prompt": "You're reviewing a customer's payment and transaction history. Help them understand their billing patterns, payment status, and any important financial details. Be clear about dates, amounts, and what everything means for their account.",
-        "temperature": 0.7,
-        "max_tokens": 1000
-    },
-    "multi_data": {
-        "system_prompt": "You are a customer service representative with access to comprehensive customer data. ALWAYS use the specific customer information provided in the CUSTOMER DATA section below. Address the customer by name and reference their actual account details, enrollment date, and status. Provide detailed, personalized responses based on their real data. Never give generic responses - always use the specific customer information provided.",
-        "temperature": 0.8,
-        "max_tokens": 1500
-    }
-}.get(query_type, {
-                "system_prompt": "You're a helpful customer service representative. Look at the customer information provided and answer their question in a clear, friendly way.",
-                "temperature": 0.3,
-                "max_tokens": 300
-            })
-
-            prompt_config["source"] = "optimized"
-            print(f"📝 Using optimized prompt for {query_type}")
+            # Get appropriate prompt from Agenta SDK or local store
+            if AGENTA_INTEGRATION and agenta_manager:
+                prompt_config = agenta_manager.get_prompt_config(query_type, query)
+                print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
+            else:
+                # Fallback prompt configuration
+                prompt_config = {
+                    "source": "fallback",
+                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                }
+                print("📝 Using fallback prompt configuration")
 
             # Create cache key
             cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()
@@ -738,8 +399,17 @@ class MultiProviderCreditAPI:
             # Cache the response
             self._cache_response(cache_key, response)
 
-            # Performance logging (Agenta.ai deprecated)
+            # Log performance back to Agenta
             duration = time.time() - start_time
+            if AGENTA_INTEGRATION and agenta_manager:
+                agenta_manager.log_interaction(
+                    query_type,
+                    query,
+                    response,
+                    True,
+                    duration,
+                    prompt_config
+                )
 
             print(f"✅ Request #{request_id} completed in {duration:.1f}s")
             return response
@@ -749,7 +419,16 @@ class MultiProviderCreditAPI:
             error_msg = f"Processing error: {str(e)}"
             print(f"❌ Request #{request_id} failed in {duration:.1f}s: {error_msg}")
 
-            # Error logging (Agenta.ai deprecated)
+            # Log failure to Agenta
+            if AGENTA_INTEGRATION and agenta_manager and 'prompt_config' in locals():
+                agenta_manager.log_interaction(
+                    query_type if 'query_type' in locals() else 'unknown',
+                    query,
+                    error_msg,
+                    False,
+                    duration,
+                    prompt_config
+                )
 
             return error_msg
 
@@ -876,7 +555,7 @@ class MultiProviderCreditAPI:
         if not entity_id:
             return "No customer records found for the provided information."
 
-        # Use optimized prompt configuration
+        # Use dynamic prompt from Agenta
         system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
 
         # Override temperature and max_tokens from prompt config if not explicitly set
@@ -885,23 +564,12 @@ class MultiProviderCreditAPI:
         if max_tokens is None:
             max_tokens = prompt_config.get('max_tokens', 1000)
 
-        # Get actual customer data based on query type
+        # Fetch real customer data using schema-based query
         try:
-            if query_type == "credit":
-                data_context = self._fetch_credit_data(entity_id, query)
-            elif query_type == "transaction":
-                data_context = self._fetch_transaction_data(entity_id, query)
-            elif query_type == "multi_data":
-                data_context = self._fetch_comprehensive_data(entity_id, query)
-            else:
-                # Fallback to status for basic queries
-                status_response = self._process_status_query(query)
-                data_context = f"ACTUAL CUSTOMER DATA:\n{status_response}"
+            data_context = self._fetch_comprehensive_data(entity_id, query)
         except Exception as e:
-            print(f"⚠️ Data fetching error: {e}")
-            # Fallback to basic customer info when specific data type fails
-            status_response = self._process_status_query(query)
-            data_context = f"CUSTOMER INFORMATION (Limited Data Available):\n{status_response}\n\nNOTE: Specific {query_type} data is not available, but provide helpful guidance based on the customer's enrollment in credit repair services."
+            print(f"⚠️ Error fetching comprehensive data: {e}")
+            data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
 
         # Create the full prompt with data context
         full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
@@ -909,128 +577,14 @@ class MultiProviderCreditAPI:
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
 
-    def _fetch_credit_data(self, entity_id: str, query: str) -> str:
-        """Fetch actual credit bureau data for analysis"""
-        print(f"🔍 Fetching credit data for entity: {entity_id}")
-
-        try:
-            # Use the exact same working GraphQL pattern as status query
-            basic_query = """
-            query SalesforceStatus($id: ID!) {
-              entity(input: { id: $id }) {
-                entity {
-                  id
-                  records {
-                    id
-                    STATUS
-                    FIRST_NAME
-                    LAST_NAME
-                    EMAIL
-                    CLIENT_ID
-                    PRODUCT_NAME
-                    CURRENT_PRODUCT
-                    ENROLL_DATE
-                  }
-                }
-              }
-            }
-            """
-
-            response = requests.post(
-                self.tilores_api_url,
-                json={
-                    "query": basic_query,
-                    "variables": {"id": entity_id}
-                },
-                headers={
-                    "Authorization": f"Bearer {self.tilores_token}",
-                    "Content-Type": "application/json"
-                },
-                timeout=15
-            )
-            response.raise_for_status()
-            result = response.json()
-
-            entity_data = result.get("data", {}).get("entity", {}).get("entity")
-            if entity_data and entity_data.get("records"):
-                records = entity_data.get("records", [])
-                print(f"🔍 Found {len(records)} customer records")
-
-                # Extract customer information using the same field names as status query
-                customer_info = {
-                    "name": None,
-                    "email": None,
-                    "client_id": None,
-                    "status": None,
-                    "product": None,
-                    "enroll_date": None
-                }
-
-                for record in records:
-                    if record.get("FIRST_NAME") and record.get("LAST_NAME"):
-                        customer_info["name"] = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
-                    if record.get("EMAIL"):
-                        customer_info["email"] = record.get("EMAIL")
-                    if record.get("CLIENT_ID"):
-                        customer_info["client_id"] = record.get("CLIENT_ID")
-                    if record.get("STATUS"):
-                        customer_info["status"] = record.get("STATUS")
-                    if record.get("PRODUCT_NAME"):
-                        customer_info["product"] = record.get("PRODUCT_NAME")
-                    elif record.get("CURRENT_PRODUCT"):
-                        customer_info["product"] = record.get("CURRENT_PRODUCT")
-                    if record.get("ENROLL_DATE"):
-                        customer_info["enroll_date"] = record.get("ENROLL_DATE")
-
-                # Format customer data for LLM analysis
-                formatted_data = f"""=== CUSTOMER CREDIT ANALYSIS DATA ===
-
-CUSTOMER INFORMATION:
-• Name: {customer_info['name'] or 'Unknown'}
-• Email: {customer_info['email'] or 'Not provided'}
-• Client ID: {customer_info['client_id'] or 'Not provided'}
-• Account Status: {customer_info['status'] or 'Unknown'}
-• Product/Service: {customer_info['product'] or 'Not specified'}
-• Enrollment Date: {customer_info['enroll_date'] or 'Not provided'}
-
-CREDIT REPAIR SERVICE STATUS:
-• This customer is actively enrolled in credit repair services
-• Account Status: {customer_info['status'] or 'Unknown'}
-• Service: {customer_info['product'] or 'Credit repair services'}
-• Enrolled: {customer_info['enroll_date'] or 'Date not available'}
-
-IMPORTANT: The customer is asking: "{query}"
-
-RESPONSE INSTRUCTIONS:
-1. Address this SPECIFIC customer by name ({customer_info['name'] or 'this customer'})
-2. Reference their enrollment in credit repair services
-3. While specific credit bureau scores (Experian, TransUnion, Equifax) are not available in our current data, provide personalized guidance based on their credit repair enrollment
-4. Be honest about data limitations but focus on actionable advice for someone actively working on credit improvement
-5. Use their specific details (enrollment date, service type) in your response"""
-
-                return formatted_data
-            else:
-                return f"No customer data found for entity {entity_id}."
-
-        except Exception as e:
-            print(f"❌ Credit data fetch error: {e}")
-            # Re-raise the exception so it's handled by the calling method
-            raise Exception(f"Credit data fetch failed: {str(e)}")
-
-    def _fetch_transaction_data(self, entity_id: str, query: str) -> str:
-        """Fetch transaction/payment data for analysis"""
-        print(f"🔍 Fetching transaction data for entity: {entity_id}")
-        # Implementation similar to credit data but for transactions
-        return f"Transaction data analysis for entity {entity_id} - query: {query}"
-
     def _fetch_comprehensive_data(self, entity_id: str, query: str) -> str:
-        """Fetch comprehensive data from multiple sources"""
+        """Fetch comprehensive customer and credit data using schema-based query"""
         print(f"🔍 Fetching comprehensive data for entity: {entity_id}")
 
         try:
-            # Use the same GraphQL query as the working status query but get all data
-            basic_query = """
-            query BasicCustomerData($id: ID!) {
+            # Use the exact same query structure that worked in testing
+            comprehensive_query = """
+            query GetFullCreditData($id: ID!) {
                 entity(input: { id: $id }) {
                     entity {
                         id
@@ -1041,9 +595,27 @@ RESPONSE INSTRUCTIONS:
                             LAST_NAME
                             EMAIL
                             CLIENT_ID
-                            PRODUCT_NAME
                             CURRENT_PRODUCT
                             ENROLL_DATE
+                            CREDIT_RESPONSE {
+                                CREDIT_BUREAU
+                                CreditReportFirstIssuedDate
+                                CREDIT_SCORE {
+                                    Value
+                                    ModelNameType
+                                    CreditRepositorySourceType
+                                }
+                                CREDIT_LIABILITY {
+                                    AccountType
+                                    CreditLimitAmount
+                                    CreditBalance
+                                    LateCount {
+                                        Days30
+                                        Days60
+                                        Days90
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1053,7 +625,7 @@ RESPONSE INSTRUCTIONS:
             response = requests.post(
                 self.tilores_api_url,
                 headers={"Authorization": f"Bearer {self.get_tilores_token()}"},
-                json={"query": basic_query, "variables": {"id": entity_id}},
+                json={"query": comprehensive_query, "variables": {"id": entity_id}},
                 timeout=30
             )
 
@@ -1062,64 +634,7 @@ RESPONSE INSTRUCTIONS:
                 entity_data = data.get('data', {}).get('entity', {}).get('entity', {})
 
                 if entity_data and entity_data.get('records'):
-                    # Use same logic as status query - iterate through records to find data
-                    records = entity_data.get('records', [])
-                    if records:
-                        # Extract data from all records (same as status query logic)
-                        customer_status = None
-                        customer_name = None
-                        customer_email = None
-                        client_id = None
-                        current_product = None
-                        enroll_date = None
-
-                        for record in records:
-                            # Get the STATUS field
-                            if record.get("STATUS"):
-                                customer_status = record.get("STATUS")
-
-                            # Get customer name
-                            if record.get("FIRST_NAME") and record.get("LAST_NAME"):
-                                customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
-
-                            # Get email
-                            if record.get("EMAIL"):
-                                customer_email = record.get("EMAIL")
-
-                            # Get client ID
-                            if record.get("CLIENT_ID"):
-                                client_id = record.get("CLIENT_ID")
-
-                            # Get current product
-                            if record.get("CURRENT_PRODUCT"):
-                                current_product = record.get("CURRENT_PRODUCT")
-                            elif record.get("PRODUCT_NAME"):
-                                current_product = record.get("PRODUCT_NAME")
-
-                            # Get enrollment date
-                            if record.get("ENROLL_DATE"):
-                                enroll_date = record.get("ENROLL_DATE")
-
-                        formatted_data = f"""COMPREHENSIVE CUSTOMER ANALYSIS:
-CUSTOMER: {customer_name or 'Unknown'}
-EMAIL: {customer_email or 'Not provided'}
-CLIENT ID: {client_id or 'Not provided'}
-ACCOUNT STATUS: {customer_status or 'Unknown'}
-PRODUCT: {current_product or 'Not specified'}
-ENROLLMENT DATE: {enroll_date or 'Not provided'}
-
-CREDIT ANALYSIS CONTEXT:
-This customer is enrolled in credit repair services. Based on available data:
-- Customer has active account with credit repair services
-- Provide analysis based on their enrollment status and general credit factors
-- Focus on actionable credit advice relevant to someone in credit repair
-
-For the specific query: "{query}"
-Provide helpful, accurate information about credit concepts and guidance."""
-
-                        return formatted_data
-                    else:
-                        raise Exception("No records found in entity data")
+                    return self._format_comprehensive_data(entity_data, query)
                 else:
                     raise Exception("No entity data found in response")
             else:
@@ -1127,8 +642,156 @@ Provide helpful, accurate information about credit concepts and guidance."""
 
         except Exception as e:
             print(f"❌ Comprehensive data fetch error: {e}")
-            # Fallback to status query if comprehensive fetch fails
+            # Fallback to status query for basic customer info
             return self._process_status_query(f"account status for {query}")
+
+    def _format_comprehensive_data(self, entity_data: dict, query: str) -> str:
+        """Format comprehensive customer and credit data for LLM"""
+        records = entity_data.get('records', [])
+
+        # Extract customer data
+        customer_status = None
+        customer_name = None
+        customer_email = None
+        client_id = None
+        current_product = None
+        enroll_date = None
+
+        # Credit data collections
+        credit_scores = []
+        bureaus = []
+        credit_dates = []
+        credit_limits = []
+        credit_balances = []
+        account_types = []
+        late_payments = []
+        inquiries = []
+
+        for record in records:
+            # Basic customer data
+            if record.get("STATUS"):
+                customer_status = record.get("STATUS")
+            if record.get("FIRST_NAME") and record.get("LAST_NAME"):
+                customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
+            if record.get("EMAIL"):
+                customer_email = record.get("EMAIL")
+            if record.get("CLIENT_ID"):
+                client_id = record.get("CLIENT_ID")
+            if record.get("CURRENT_PRODUCT"):
+                current_product = record.get("CURRENT_PRODUCT")
+            if record.get("ENROLL_DATE"):
+                enroll_date = record.get("ENROLL_DATE")
+
+            # Extract credit data from CREDIT_RESPONSE
+            credit_response = record.get("CREDIT_RESPONSE")
+            if credit_response:
+                # Bureau information
+                if credit_response.get("CREDIT_BUREAU"):
+                    bureaus.append(credit_response.get("CREDIT_BUREAU"))
+
+                # Report dates
+                if credit_response.get("CreditReportFirstIssuedDate"):
+                    credit_dates.append(credit_response.get("CreditReportFirstIssuedDate"))
+
+                # Credit scores
+                credit_score_list = credit_response.get("CREDIT_SCORE", [])
+                if isinstance(credit_score_list, list):
+                    for credit_score in credit_score_list:
+                        score_value = credit_score.get("Value")
+                        score_model = credit_score.get("ModelNameType")
+                        score_source = credit_score.get("CreditRepositorySourceType")
+
+                        if score_value:
+                            score_info = f"{score_value}"
+                            if score_source:
+                                score_info += f" ({score_source})"
+                            if score_model:
+                                score_info += f" - {score_model}"
+                            credit_scores.append(score_info)
+
+                # Credit liability information
+                credit_liability_list = credit_response.get("CREDIT_LIABILITY", [])
+                if isinstance(credit_liability_list, list):
+                    for liability in credit_liability_list:
+                        if liability.get("AccountType"):
+                            account_types.append(liability.get("AccountType"))
+                        if liability.get("CreditLimitAmount"):
+                            credit_limits.append(liability.get("CreditLimitAmount"))
+                        if liability.get("CreditBalance"):
+                            credit_balances.append(liability.get("CreditBalance"))
+
+                        # Late payment counts
+                        late_count = liability.get("LateCount")
+                        if late_count:
+                            late_info = []
+                            if late_count.get("Days30"):
+                                late_info.append(f"30-day: {late_count.get('Days30')}")
+                            if late_count.get("Days60"):
+                                late_info.append(f"60-day: {late_count.get('Days60')}")
+                            if late_count.get("Days90"):
+                                late_info.append(f"90-day: {late_count.get('Days90')}")
+                            if late_info:
+                                late_payments.append(", ".join(late_info))
+
+                # Credit inquiries
+                credit_inquiry_list = credit_response.get("CREDIT_INQUIRY", [])
+                if isinstance(credit_inquiry_list, list):
+                    for inquiry in credit_inquiry_list:
+                        inquiry_date = inquiry.get("InquiryDate")
+                        subscriber = inquiry.get("SubscriberName")
+                        if inquiry_date and subscriber:
+                            inquiries.append(f"{subscriber} ({inquiry_date})")
+
+        # Remove duplicates and None values
+        credit_scores = list(set([str(s) for s in credit_scores if s is not None]))
+        bureaus = list(set([str(b) for b in bureaus if b is not None]))
+        credit_dates = list(set([str(d) for d in credit_dates if d is not None]))
+        credit_limits = list(set([str(limit) for limit in credit_limits if limit is not None]))
+        credit_balances = list(set([str(b) for b in credit_balances if b is not None]))
+        account_types = list(set([str(a) for a in account_types if a is not None]))
+
+        # Format comprehensive data
+        formatted_data = f"""COMPREHENSIVE CUSTOMER ANALYSIS:
+CUSTOMER: {customer_name or 'Unknown'}
+EMAIL: {customer_email or 'Not provided'}
+CLIENT ID: {client_id or 'Not provided'}
+ACCOUNT STATUS: {customer_status or 'Unknown'}
+PRODUCT: {current_product or 'Not specified'}
+ENROLLMENT DATE: {enroll_date or 'Not provided'}
+
+ACTUAL CREDIT DATA:"""
+
+        if credit_scores:
+            formatted_data += f"\nCREDIT SCORES: {', '.join(credit_scores)}"
+        if bureaus:
+            formatted_data += f"\nCREDIT BUREAUS: {', '.join(bureaus)}"
+        if credit_dates:
+            formatted_data += f"\nREPORT DATES: {', '.join(credit_dates)}"
+        if credit_limits:
+            formatted_data += f"\nCREDIT LIMITS: ${', $'.join(credit_limits)}"
+        if credit_balances:
+            formatted_data += f"\nCREDIT BALANCES: ${', $'.join(credit_balances)}"
+        if account_types:
+            formatted_data += f"\nACCOUNT TYPES: {', '.join(account_types)}"
+        if late_payments:
+            formatted_data += f"\nLATE PAYMENTS: {'; '.join(late_payments)}"
+        if inquiries:
+            formatted_data += f"\nRECENT INQUIRIES: {'; '.join(inquiries[:5])}"  # Show first 5
+
+        if not any([credit_scores, bureaus, credit_dates, credit_limits, credit_balances]):
+            formatted_data += "\nNo credit scores currently available in system"
+
+        formatted_data += f"""
+
+CREDIT ANALYSIS CONTEXT:
+This customer is enrolled in credit repair services. Use the actual credit data above to provide specific, personalized analysis.
+If credit scores are available, reference the specific numbers and bureaus.
+If account details are available, reference specific balances, limits, and payment history.
+
+For the specific query: "{query}"
+Provide detailed analysis using the actual credit data shown above."""
+
+        return formatted_data
 
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
         """Call OpenAI API"""
@@ -1216,14 +879,14 @@ Provide helpful, accurate information about credit concepts and guidance."""
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for FastAPI"""
-    print("🚀 Multi-Provider Credit Analysis API starting up...")
+    print("🚀 Multi-Provider Credit Analysis API with Agenta.ai starting up...")
     print("🌐 Server will bind to 0.0.0.0:8080")
     yield
     print("🛑 Application shutting down...")
 
 app = FastAPI(
-    title="Multi-Provider Credit Analysis API",
-    description="Advanced credit analysis with optimized query-type-specific routing",
+    title="Multi-Provider Credit Analysis API with Agenta.ai SDK",
+    description="Advanced credit analysis with dynamic prompt management via Agenta.ai SDK",
     version="2.1.0",
     lifespan=lifespan
 )
@@ -1240,60 +903,10 @@ app.add_middleware(
 # Global API instance
 api = MultiProviderCreditAPI()
 
-# Enhanced webhook monitoring and conversation logging
-def log_conversation_with_monitoring(user_message: str, assistant_response: str, model: str,
-                                   query_type: str, processing_time: float, request_id: str = None):
-    """Enhanced logging with detailed monitoring data for validation"""
-    try:
-        if not request_id:
-            request_id = f"req_{uuid.uuid4().hex[:8]}"
-
-        # Enhanced conversation log with monitoring data
-        conversation_log = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "request_id": request_id,
-            "model": model,
-            "user_message": user_message,
-            "assistant_response": assistant_response,
-            "message_length": len(user_message),
-            "response_length": len(assistant_response),
-            "query_type_detected": query_type,
-            "processing_time_seconds": processing_time,
-            "contains_customer_data": any(indicator in assistant_response for indicator in ["Status:", "Customer:", "Esteban", "e.j.price1986@gmail.com", "April 10, 2025", "Downsell Credit Repair"]),
-            "response_format": "structured" if "•" in assistant_response else "narrative",
-            "tilores_entity_found": "dc93a2cd-de0a-444f-ad47-3003ba998cd3" in assistant_response
-        }
-
-        # Write to enhanced monitoring log
-        log_file = "webhook_monitoring.jsonl"
-        os.makedirs(os.path.dirname(log_file) if os.path.dirname(log_file) else ".", exist_ok=True)
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(conversation_log, ensure_ascii=False) + "\n")
-
-        # Also write to original conversation log for compatibility
-        simple_log = {
-            "timestamp": conversation_log["timestamp"],
-            "request_id": request_id,
-            "model": model,
-            "user_message": user_message,
-            "assistant_response": assistant_response,
-            "message_length": len(user_message),
-            "response_length": len(assistant_response)
-        }
-
-        with open("conversation_logs.jsonl", "a", encoding="utf-8") as f:
-            f.write(json.dumps(simple_log, ensure_ascii=False) + "\n")
-
-        print(f"💾 Enhanced monitoring logged: {request_id} - Type: {query_type}, Time: {processing_time:.2f}s, Customer Data: {conversation_log['contains_customer_data']}")
-
-    except Exception as e:
-        print(f"⚠️ Failed to log conversation: {e}")
-        # Don't fail the request if logging fails
-
-# Include enhanced chat webhook router (preserved - not Agenta-related)
-if ENHANCED_CHAT_LOGGING and chat_webhook_router:
-    app.include_router(chat_webhook_router)
-    print("✅ Enhanced chat logging endpoints registered")
+# Include webhook router if available
+if WEBHOOK_INTEGRATION and webhook_router:
+    app.include_router(webhook_router)
+    print("✅ Agenta webhook endpoints registered")
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -1322,180 +935,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {"message": "Multi-Provider Credit Analysis API", "version": "2.1.0"}
+    return {"message": "Multi-Provider Credit Analysis API with Agenta.ai SDK", "version": "2.1.0"}
 
 @app.get("/v1")
 async def v1_root():
     """V1 API root - required for some integrations"""
-    return {"message": "Multi-Provider Credit Analysis API v1", "version": "2.1.0"}
-
-@app.get("/v1/models")
-async def list_models():
-    """List available models - OpenAI compatible endpoint"""
-    return {
-        "object": "list",
-        "data": [
-            {
-                "id": "gpt-4o",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "openai"
-            },
-            {
-                "id": "gpt-4o-mini",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "openai"
-            },
-            {
-                "id": "gpt-3.5-turbo",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "openai"
-            },
-            {
-                "id": "gemini-1.5-flash",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "google"
-            },
-            {
-                "id": "gemini-1.5-pro",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "google"
-            },
-            {
-                "id": "gemini-2.0-flash-exp",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "google"
-            },
-            {
-                "id": "gemini-2.5-flash",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "google"
-            },
-            {
-                "id": "llama-3.3-70b-versatile",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "groq"
-            },
-            {
-                "id": "deepseek-r1-distill-llama-70b",
-                "object": "model",
-                "created": 1677610602,
-                "owned_by": "groq"
-            }
-        ]
-    }
+    return {"message": "Multi-Provider Credit Analysis API v1 with Agenta.ai SDK", "version": "2.1.0"}
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
-@app.post("/v1/clear-cache")
-async def clear_cache():
-    """Manual endpoint to clear memory cache for testing"""
-    try:
-        cache_cleared = api.clear_memory_cache()
-        return {
-            "success": True,
-            "message": "Memory cache cleared successfully",
-            "cached_responses_removed": cache_cleared,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-    except Exception as e:
-        print(f"❌ Error clearing cache: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/v1/conversations/recent")
-async def get_recent_conversations(limit: int = 10):
-    """Get recent conversation logs"""
-    try:
-        conversations = []
-        log_file = "conversation_logs.jsonl"
-
-        if os.path.exists(log_file):
-            with open(log_file, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
-
-            # Get the last N lines
-            for line in lines[-limit:]:
-                try:
-                    conversation = json.loads(line.strip())
-                    conversations.append(conversation)
-                except json.JSONDecodeError:
-                    continue
-
-        return {
-            "conversations": conversations,
-            "count": len(conversations),
-            "timestamp": datetime.utcnow().isoformat() + "Z"
-        }
-
-    except Exception as e:
-        print(f"❌ Error retrieving conversations: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/v1/monitoring/webhook-logs")
-async def get_webhook_monitoring_logs(limit: int = 20):
-    """Get enhanced webhook monitoring logs for validation"""
-    try:
-        monitoring_logs = []
-        log_file = "webhook_monitoring.jsonl"
-
-        if os.path.exists(log_file):
-            with open(log_file, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
-
-            # Get the last N lines
-            for line in lines[-limit:]:
-                try:
-                    log_entry = json.loads(line.strip())
-                    monitoring_logs.append(log_entry)
-                except json.JSONDecodeError:
-                    continue
-
-        # Calculate summary statistics
-        total_logs = len(monitoring_logs)
-        query_types = {}
-        avg_processing_time = 0
-        customer_data_responses = 0
-
-        if monitoring_logs:
-            for log in monitoring_logs:
-                query_type = log.get("query_type_detected", "unknown")
-                query_types[query_type] = query_types.get(query_type, 0) + 1
-                avg_processing_time += log.get("processing_time_seconds", 0)
-                if log.get("contains_customer_data", False):
-                    customer_data_responses += 1
-
-            avg_processing_time = avg_processing_time / total_logs if total_logs > 0 else 0
-
-        return {
-            "monitoring_logs": monitoring_logs,
-            "summary": {
-                "total_requests": total_logs,
-                "query_type_distribution": query_types,
-                "avg_processing_time": round(avg_processing_time, 3),
-                "customer_data_responses": customer_data_responses,
-                "customer_data_percentage": round((customer_data_responses / total_logs * 100), 1) if total_logs > 0 else 0
-            },
-            "timestamp": datetime.utcnow().isoformat() + "Z"
-        }
-
-    except Exception as e:
-        print(f"❌ Error retrieving monitoring logs: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     """
-    OpenAI-compatible chat completions endpoint with optimized query routing
+    OpenAI-compatible chat completions endpoint with Agenta.ai dynamic prompts
     """
     try:
         # Parse request body manually to handle both Pydantic and raw JSON
@@ -1512,13 +967,13 @@ async def chat_completions(request: Request):
         max_tokens = request_data.get("max_tokens")
         stream = request_data.get("stream", False)
 
-        # Optional fields for advanced configuration
+        # Agenta.ai specific fields
         prompt_id = request_data.get("prompt_id")
         prompt_version = request_data.get("prompt_version")
 
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
         if prompt_id:
-            print(f"🔍 DEBUG: Advanced config - Prompt ID: {prompt_id}, Version: {prompt_version}")
+            print(f"🔍 DEBUG: Agenta.ai - Prompt ID: {prompt_id}, Version: {prompt_version}")
 
         if not messages:
             raise HTTPException(status_code=400, detail="Messages are required")
@@ -1540,144 +995,22 @@ async def chat_completions(request: Request):
             # Simple string content
             query = last_message.get("content", "")
 
-        # Extract client IP for session management
-        client_ip = api.get_client_ip(request)
-        print(f"🔍 DEBUG: Client IP: {client_ip}")
-
-        # Clear memory cache for local testing to ensure fresh responses
-        if api.is_local_testing(client_ip):
-            cache_cleared = api.clear_memory_cache()
-            print(f"🧪 Local testing detected - cleared {cache_cleared} cached responses for consistency")
-
-        # Extract conversation context for customer identification
-        conversation_context = api.extract_conversation_context(messages)
-        print(f"🔍 DEBUG: Conversation context: {conversation_context}")
-
-        # Get session context (fallback to recent customer cache when Redis disabled)
-        session_context = api.get_session_context(client_ip)
-        recent_customer_context = api.get_recent_customer_context()
-        print(f"🔍 DEBUG: Session context: {session_context}")
-        print(f"🔍 DEBUG: Recent customer context: {recent_customer_context}")
-
-        # Use session context if available, otherwise use recent customer context
-        fallback_context = session_context if session_context['has_customer_context'] else recent_customer_context
-
-        # Enhance query with context (prioritize conversation context, fallback to session/recent customer)
-        if conversation_context['has_customer_context']:
-            enhanced_query = api.enhance_query_with_context(query, conversation_context)
-            # Update both session and recent customer cache
-            api.update_session_context(client_ip, conversation_context)
-            api.update_recent_customer_context(conversation_context)
-        elif fallback_context['has_customer_context'] and api.is_ambiguous_query(query):
-            enhanced_query = api.enhance_query_with_context(query, fallback_context)
-            print("🔍 DEBUG: Using session/recent customer context for ambiguous query")
-        else:
-            enhanced_query = api.enhance_query_with_context(query, conversation_context)
-
-        # Store query information for debugging
-        original_query = last_message.get("content", "")
-        api.store_query_in_session(client_ip, original_query, enhanced_query)
-
-        # Use enhanced query for processing
-        if enhanced_query != query:
-            query = enhanced_query
-            print(f"🔍 DEBUG: Using enhanced query: '{query}'")
-
-        # Enhanced edge case handling
         if not query.strip():
-            return JSONResponse(content={
-                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": model,
-                "choices": [{
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": "Please provide a question or query about customer data. For example: 'who is customer@email.com' or 'account status for John Smith'."
-                    },
-                    "finish_reason": "stop"
-                }],
-                "usage": {"prompt_tokens": 0, "completion_tokens": 25, "total_tokens": 25}
-            })
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-        # Check for obviously invalid email patterns or known test invalid emails
-        invalid_emails = ['invalid@email.com', 'nonexistent@test.com']
-        if '@' in query and (
-            not any(domain in query.lower() for domain in ['.com', '.org', '.net', '.edu', '.gov']) or
-            any(invalid_email in query.lower() for invalid_email in invalid_emails)
-        ):
-            return JSONResponse(content={
-                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": model,
-                "choices": [{
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": "No records found for the provided email address. Please check the email format and try again."
-                    },
-                    "finish_reason": "stop"
-                }],
-                "usage": {"prompt_tokens": len(query.split()), "completion_tokens": 20, "total_tokens": len(query.split()) + 20}
-            })
-
-        # Handle invalid client IDs
-        if 'client 999999' in query.lower() or query.strip() == '999999':
-            return JSONResponse(content={
-                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
-                "object": "chat.completion",
-                "created": int(time.time()),
-                "model": model,
-                "choices": [{
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": "No records found for client ID 999999. Please verify the client ID and try again."
-                    },
-                    "finish_reason": "stop"
-                }],
-                "usage": {"prompt_tokens": len(query.split()), "completion_tokens": 18, "total_tokens": len(query.split()) + 18}
-            })
-
-        # Track processing time and query type for monitoring
-        start_time = time.time()
-        # Detect query type for routing (consider recent customer context)
-        has_any_context = conversation_context['has_customer_context'] or (recent_customer_context['has_customer_context'] and api.is_ambiguous_query(query))
-        print(f"🔍 DEBUG: has_any_context = {has_any_context} (conversation: {conversation_context['has_customer_context']}, recent: {recent_customer_context['has_customer_context']}, ambiguous: {api.is_ambiguous_query(query)})")
-        query_type = api.detect_query_type(query, has_session_context=has_any_context)
-        print(f"🎯 DEBUG: Final query type with context: {query_type}")
-
-        # Process the request with optimized routing
+        # Process the request with Agenta.ai integration
         response_content = api.process_chat_request(
             query=query,
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
             prompt_id=prompt_id,
-            prompt_version=prompt_version,
-            query_type=query_type
-        )
-
-        # Calculate processing time
-        processing_time = time.time() - start_time
-
-        # Generate unique request ID for logging
-        request_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
-
-        # Enhanced monitoring and logging
-        log_conversation_with_monitoring(
-            user_message=query,
-            assistant_response=response_content,
-            model=model,
-            query_type=query_type,
-            processing_time=processing_time,
-            request_id=request_id
+            prompt_version=prompt_version
         )
 
         # Handle streaming vs non-streaming response
         if stream:
+            request_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
             return StreamingResponse(
                 api._generate_streaming_response(response_content, request_id, model),
                 media_type="text/plain",
@@ -1690,7 +1023,7 @@ async def chat_completions(request: Request):
         else:
             # Standard JSON response
             return JSONResponse(content={
-                "id": request_id,
+                "id": f"chatcmpl-{uuid.uuid4().hex[:29]}",
                 "object": "chat.completion",
                 "created": int(time.time()),
                 "model": model,
@@ -1720,5 +1053,5 @@ async def chat_completions(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Multi-Provider Credit Analysis API...")
+    print("🚀 Starting Multi-Provider Credit Analysis API with Agenta.ai SDK...")
     uvicorn.run(app, host="0.0.0.0", port=8080)
