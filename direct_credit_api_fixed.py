@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Dict, Any
 
 import requests
-import redis
+# import redis  # Disabled for local testing
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -80,21 +80,10 @@ class MultiProviderCreditAPI:
         self.query_cache = {}
         self.cache_ttl = 300  # 5 minutes
 
-        # Redis caching for Tilores responses
-        try:
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            self.redis_client = redis.from_url(redis_url, decode_responses=True)
-            # Test connection
-            self.redis_client.ping()
-            print("✅ Redis connected successfully")
-
-            # CRITICAL: Flush cache on startup to prevent stale responses after deployments
-            cache_flushed = self.redis_client.flushdb()
-            print(f"🧹 Redis cache flushed on startup: {cache_flushed}")
-
-        except Exception as e:
-            print(f"⚠️ Redis connection failed: {e}")
-            self.redis_client = None
+        # Redis caching for Tilores responses - DISABLED FOR LOCAL TESTING
+        # Redis caching causes problems during local development and testing
+        print("🚫 Redis caching disabled for local testing")
+        self.redis_client = None
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -335,6 +324,15 @@ class MultiProviderCreditAPI:
 
     def get_recent_customer_context(self) -> Dict[str, Any]:
         """Get the most recent customer context from cache"""
+        if not self.redis_client:
+            # Return empty context when Redis is disabled
+            return {
+                'customer_email': None,
+                'customer_name': None,
+                'client_id': None,
+                'entity_id': None,
+                'has_customer_context': False
+            }
         try:
             context_data = self.redis_client.get("recent_customer_context")
             if context_data:
@@ -353,6 +351,9 @@ class MultiProviderCreditAPI:
 
     def update_recent_customer_context(self, context: Dict[str, Any]):
         """Update the recent customer context cache"""
+        if not self.redis_client:
+            print(f"🚫 Redis disabled - skipping context update: {context}")
+            return
         try:
             # Store context for 30 minutes
             self.redis_client.setex("recent_customer_context", 1800, json.dumps(context))
@@ -379,6 +380,15 @@ class MultiProviderCreditAPI:
 
     def get_session_context(self, client_ip: str) -> Dict[str, Any]:
         """Get stored session context for a client IP"""
+        if not self.redis_client:
+            # Return empty context when Redis is disabled
+            return {
+                'customer_email': None,
+                'customer_name': None,
+                'client_id': None,
+                'entity_id': None,
+                'has_customer_context': False
+            }
         try:
             session_key = f"session_context:{client_ip}"
             context_data = self.redis_client.get(session_key)
@@ -398,6 +408,9 @@ class MultiProviderCreditAPI:
 
     def update_session_context(self, client_ip: str, context: Dict[str, Any]):
         """Update session context for a client IP"""
+        if not self.redis_client:
+            print(f"🚫 Redis disabled - skipping session context update for {client_ip}: {context}")
+            return
         try:
             session_key = f"session_context:{client_ip}"
             # Store context for 1 hour
@@ -408,6 +421,9 @@ class MultiProviderCreditAPI:
 
     def store_query_in_session(self, client_ip: str, original_query: str, enhanced_query: str):
         """Store query information in session for debugging"""
+        if not self.redis_client:
+            print(f"🚫 Redis disabled - skipping query storage for {client_ip}")
+            return
         try:
             session_key = f"session_queries:{client_ip}"
             query_data = {
@@ -421,6 +437,45 @@ class MultiProviderCreditAPI:
             self.redis_client.expire(session_key, 3600)
         except Exception as e:
             print(f"⚠️ Error storing query in session: {e}")
+
+    def get_client_ip(self, request: Request) -> str:
+        """Extract client IP address from request, handling local development and proxies"""
+        # Check for forwarded headers (common in production behind proxies)
+        forwarded_for = request.headers.get("X-Forwarded-For")
+        if forwarded_for:
+            # X-Forwarded-For can contain multiple IPs, take the first one
+            client_ip = forwarded_for.split(",")[0].strip()
+            print(f"🌐 Client IP from X-Forwarded-For: {client_ip}")
+            return client_ip
+
+        # Check for real IP header (some proxies use this)
+        real_ip = request.headers.get("X-Real-IP")
+        if real_ip:
+            print(f"🌐 Client IP from X-Real-IP: {real_ip}")
+            return real_ip
+
+        # Fallback to direct client host
+        if request.client and request.client.host:
+            client_ip = request.client.host
+            print(f"🌐 Client IP from request.client: {client_ip}")
+            return client_ip
+
+        # Final fallback for local development
+        fallback_ip = "127.0.0.1"
+        print(f"🌐 Using fallback IP for local development: {fallback_ip}")
+        return fallback_ip
+
+    def clear_memory_cache(self):
+        """Clear the in-memory query cache for fresh responses"""
+        cache_count = len(self.query_cache)
+        self.query_cache.clear()
+        print(f"🧹 Memory cache cleared: {cache_count} cached responses removed")
+        return cache_count
+
+    def is_local_testing(self, client_ip: str) -> bool:
+        """Determine if this is a local testing environment"""
+        local_ips = ["127.0.0.1", "localhost", "::1"]
+        return client_ip in local_ips or client_ip.startswith("192.168.") or client_ip.startswith("10.")
 
     def get_tilores_token(self):
         """Get or refresh Tilores OAuth token"""
@@ -641,7 +696,7 @@ class MultiProviderCreditAPI:
         "max_tokens": 1000
     },
     "multi_data": {
-        "system_prompt": "You're providing a comprehensive overview of a customer's complete profile - their account status, credit information, payment history, and any other relevant data. Give them a complete picture that helps them understand their overall situation and next steps.",
+        "system_prompt": "You are a customer service representative with access to comprehensive customer data. ALWAYS use the specific customer information provided in the CUSTOMER DATA section below. Address the customer by name and reference their actual account details, enrollment date, and status. Provide detailed, personalized responses based on their real data. Never give generic responses - always use the specific customer information provided.",
         "temperature": 0.8,
         "max_tokens": 1500
     }
@@ -971,8 +1026,109 @@ RESPONSE INSTRUCTIONS:
     def _fetch_comprehensive_data(self, entity_id: str, query: str) -> str:
         """Fetch comprehensive data from multiple sources"""
         print(f"🔍 Fetching comprehensive data for entity: {entity_id}")
-        # Implementation for multi-source data
-        return f"Comprehensive data analysis for entity {entity_id} - query: {query}"
+
+        try:
+            # Use the same GraphQL query as the working status query but get all data
+            basic_query = """
+            query BasicCustomerData($id: ID!) {
+                entity(input: { id: $id }) {
+                    entity {
+                        id
+                        records {
+                            id
+                            STATUS
+                            FIRST_NAME
+                            LAST_NAME
+                            EMAIL
+                            CLIENT_ID
+                            PRODUCT_NAME
+                            CURRENT_PRODUCT
+                            ENROLL_DATE
+                        }
+                    }
+                }
+            }
+            """
+
+            response = requests.post(
+                self.tilores_api_url,
+                headers={"Authorization": f"Bearer {self.get_tilores_token()}"},
+                json={"query": basic_query, "variables": {"id": entity_id}},
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                entity_data = data.get('data', {}).get('entity', {}).get('entity', {})
+
+                if entity_data and entity_data.get('records'):
+                    # Use same logic as status query - iterate through records to find data
+                    records = entity_data.get('records', [])
+                    if records:
+                        # Extract data from all records (same as status query logic)
+                        customer_status = None
+                        customer_name = None
+                        customer_email = None
+                        client_id = None
+                        current_product = None
+                        enroll_date = None
+
+                        for record in records:
+                            # Get the STATUS field
+                            if record.get("STATUS"):
+                                customer_status = record.get("STATUS")
+
+                            # Get customer name
+                            if record.get("FIRST_NAME") and record.get("LAST_NAME"):
+                                customer_name = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
+
+                            # Get email
+                            if record.get("EMAIL"):
+                                customer_email = record.get("EMAIL")
+
+                            # Get client ID
+                            if record.get("CLIENT_ID"):
+                                client_id = record.get("CLIENT_ID")
+
+                            # Get current product
+                            if record.get("CURRENT_PRODUCT"):
+                                current_product = record.get("CURRENT_PRODUCT")
+                            elif record.get("PRODUCT_NAME"):
+                                current_product = record.get("PRODUCT_NAME")
+
+                            # Get enrollment date
+                            if record.get("ENROLL_DATE"):
+                                enroll_date = record.get("ENROLL_DATE")
+
+                        formatted_data = f"""COMPREHENSIVE CUSTOMER ANALYSIS:
+CUSTOMER: {customer_name or 'Unknown'}
+EMAIL: {customer_email or 'Not provided'}
+CLIENT ID: {client_id or 'Not provided'}
+ACCOUNT STATUS: {customer_status or 'Unknown'}
+PRODUCT: {current_product or 'Not specified'}
+ENROLLMENT DATE: {enroll_date or 'Not provided'}
+
+CREDIT ANALYSIS CONTEXT:
+This customer is enrolled in credit repair services. Based on available data:
+- Customer has active account with credit repair services
+- Provide analysis based on their enrollment status and general credit factors
+- Focus on actionable credit advice relevant to someone in credit repair
+
+For the specific query: "{query}"
+Provide helpful, accurate information about credit concepts and guidance."""
+
+                        return formatted_data
+                    else:
+                        raise Exception("No records found in entity data")
+                else:
+                    raise Exception("No entity data found in response")
+            else:
+                raise Exception(f"GraphQL request failed: {response.status_code}")
+
+        except Exception as e:
+            print(f"❌ Comprehensive data fetch error: {e}")
+            # Fallback to status query if comprehensive fetch fails
+            return self._process_status_query(f"account status for {query}")
 
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
         """Call OpenAI API"""
@@ -1241,6 +1397,21 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
+@app.post("/v1/clear-cache")
+async def clear_cache():
+    """Manual endpoint to clear memory cache for testing"""
+    try:
+        cache_cleared = api.clear_memory_cache()
+        return {
+            "success": True,
+            "message": "Memory cache cleared successfully",
+            "cached_responses_removed": cache_cleared,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        print(f"❌ Error clearing cache: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/v1/conversations/recent")
 async def get_recent_conversations(limit: int = 10):
     """Get recent conversation logs"""
@@ -1369,24 +1540,43 @@ async def chat_completions(request: Request):
             # Simple string content
             query = last_message.get("content", "")
 
+        # Extract client IP for session management
+        client_ip = api.get_client_ip(request)
+        print(f"🔍 DEBUG: Client IP: {client_ip}")
+
+        # Clear memory cache for local testing to ensure fresh responses
+        if api.is_local_testing(client_ip):
+            cache_cleared = api.clear_memory_cache()
+            print(f"🧪 Local testing detected - cleared {cache_cleared} cached responses for consistency")
+
         # Extract conversation context for customer identification
         conversation_context = api.extract_conversation_context(messages)
         print(f"🔍 DEBUG: Conversation context: {conversation_context}")
 
-        # Simple recent customer cache approach (more reliable than IP-based sessions)
+        # Get session context (fallback to recent customer cache when Redis disabled)
+        session_context = api.get_session_context(client_ip)
         recent_customer_context = api.get_recent_customer_context()
+        print(f"🔍 DEBUG: Session context: {session_context}")
         print(f"🔍 DEBUG: Recent customer context: {recent_customer_context}")
 
-        # Enhance query with context (prioritize conversation context, fallback to recent customer)
+        # Use session context if available, otherwise use recent customer context
+        fallback_context = session_context if session_context['has_customer_context'] else recent_customer_context
+
+        # Enhance query with context (prioritize conversation context, fallback to session/recent customer)
         if conversation_context['has_customer_context']:
             enhanced_query = api.enhance_query_with_context(query, conversation_context)
-            # Update recent customer cache
+            # Update both session and recent customer cache
+            api.update_session_context(client_ip, conversation_context)
             api.update_recent_customer_context(conversation_context)
-        elif recent_customer_context['has_customer_context'] and api.is_ambiguous_query(query):
-            enhanced_query = api.enhance_query_with_context(query, recent_customer_context)
-            print("🔍 DEBUG: Using recent customer context for ambiguous query")
+        elif fallback_context['has_customer_context'] and api.is_ambiguous_query(query):
+            enhanced_query = api.enhance_query_with_context(query, fallback_context)
+            print("🔍 DEBUG: Using session/recent customer context for ambiguous query")
         else:
             enhanced_query = api.enhance_query_with_context(query, conversation_context)
+
+        # Store query information for debugging
+        original_query = last_message.get("content", "")
+        api.store_query_in_session(client_ip, original_query, enhanced_query)
 
         # Use enhanced query for processing
         if enhanced_query != query:
