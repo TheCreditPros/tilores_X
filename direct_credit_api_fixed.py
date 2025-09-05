@@ -682,35 +682,35 @@ Type `/help` for detailed usage information."""
         """
         if not response or len(response.strip()) < 10:
             return response
-            
+
         try:
             import re
-            
+
             # Split response into sections based on ### markers
             sections = re.split(r'###\s*([^#]+?):', response)
-            
+
             if len(sections) <= 1:
                 # No sections found, apply basic formatting
                 return self._apply_basic_formatting(response)
-            
+
             formatted_parts = []
-            
+
             # First part is usually the intro (before any ###)
             if sections[0].strip():
                 intro = sections[0].strip()
                 formatted_parts.append(intro)
                 formatted_parts.append('')  # Paragraph break
-            
+
             # Process section pairs (header, content)
             for i in range(1, len(sections), 2):
                 if i + 1 < len(sections):
                     header = sections[i].strip()
                     content = sections[i + 1].strip()
-                    
+
                     # Format header with proper markdown
                     formatted_parts.append(f"**{header}:**")
                     formatted_parts.append('')  # Space after header
-                    
+
                     # Format content with proper bullet points and line breaks
                     content_lines = content.split('\n')
                     for line in content_lines:
@@ -719,19 +719,24 @@ Type `/help` for detailed usage information."""
                             # Clean existing bullets and apply proper markdown
                             clean_line = line.lstrip('•-* ').strip()
                             if clean_line:
-                                # Use proper markdown bullet with two spaces for line break
-                                formatted_parts.append(f"- {clean_line}  ")
-                    
+                                # Split multiple items on same line into separate bullets
+                                items = re.split(r'[•·]', clean_line)
+                                for item in items:
+                                    item = item.strip()
+                                    if item:
+                                        formatted_parts.append(f"- {item}")
+                                        formatted_parts.append('')  # Blank line after each bullet
+
                     formatted_parts.append('')  # Paragraph break after section
-            
+
             # Join with proper line breaks
             result = '\n'.join(formatted_parts)
-            
+
             # Apply OpenWebUI-specific formatting fixes
             result = self._apply_openwebui_fixes(result)
-            
+
             return result
-            
+
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
             return self._apply_basic_formatting(response)
@@ -739,39 +744,39 @@ Type `/help` for detailed usage information."""
     def _apply_basic_formatting(self, text: str) -> str:
         """Apply basic OpenWebUI formatting to text without sections"""
         import re
-        
+
         # Ensure proper line breaks with two spaces
         text = re.sub(r'\n', '  \n', text)
-        
+
         # Fix bullet points
         text = re.sub(r'^(\s*)[-•*]\s+', r'\1- ', text, flags=re.MULTILINE)
-        
+
         return text.strip()
 
     def _apply_openwebui_fixes(self, text: str) -> str:
         """Apply OpenWebUI-specific formatting fixes"""
         import re
-        
+
         # Ensure proper paragraph breaks (double newline)
         text = re.sub(r'\n\n+', '\n\n', text)
-        
+
         # Ensure bullet points have blank lines before/after lists
         text = re.sub(r'(\w)\n(- )', r'\1\n\n\2', text)  # Add blank line before list
         text = re.sub(r'(- .+?)\n([A-Z*])', r'\1\n\n\2', text)  # Add blank line after list
-        
+
         # Ensure proper spacing around headers
         text = re.sub(r'(\*\*[^*]+\*\*:)\n([^-\n])', r'\1\n\n\2', text)
-        
+
         # Clean up excessive whitespace but preserve intentional spacing
         text = re.sub(r'[ \t]+\n', '  \n', text)  # Preserve two-space line breaks
-        
+
         return text.strip()
 
     def _clean_bullet_points_only(self, text: str) -> str:
         """Simple fallback: just clean up bullet points"""
         lines = text.split('\n')
         cleaned_lines = []
-        
+
         for line in lines:
             line = line.strip()
             if line:
@@ -782,7 +787,7 @@ Type `/help` for detailed usage information."""
                 cleaned_lines.append(line)
             else:
                 cleaned_lines.append('')
-        
+
         return '\n'.join(cleaned_lines)
 
     def _preprocess_inline_sections(self, text: str) -> str:
