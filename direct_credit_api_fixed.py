@@ -115,6 +115,16 @@ class MultiProviderCreditAPI:
                 "api_key": os.getenv("OPENAI_API_KEY"),
                 "base_url": "https://api.openai.com/v1",
                 "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
+            },
+            "google": {
+                "api_key": os.getenv("GOOGLE_API_KEY"),
+                "base_url": "https://generativelanguage.googleapis.com/v1beta",
+                "models": ["gemini-1.5-flash-002", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-pro"]
+            },
+            "groq": {
+                "api_key": os.getenv("GROQ_API_KEY"),
+                "base_url": "https://api.groq.com/openai/v1",
+                "models": ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b"]
             }
         }
 
