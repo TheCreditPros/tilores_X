@@ -677,22 +677,21 @@ Type `/help` for detailed usage information."""
 
     def _enhance_response_formatting(self, response: str) -> str:
         """
-        Universal response formatting enhancement for ALL system prompts
-        Ensures proper line breaks, bullet points, and visual structure optimized for chat interfaces
+        OpenWebUI-optimized formatting based on community research
+        Uses proper markdown with two spaces + newline for line breaks
         """
         if not response or len(response.strip()) < 10:
             return response
             
         try:
-            # Simple and reliable approach: Split on ### and format sections
             import re
             
             # Split response into sections based on ### markers
             sections = re.split(r'###\s*([^#]+?):', response)
             
             if len(sections) <= 1:
-                # No sections found, just clean up bullet points
-                return self._clean_bullet_points_only(response)
+                # No sections found, apply basic formatting
+                return self._apply_basic_formatting(response)
             
             formatted_parts = []
             
@@ -700,7 +699,7 @@ Type `/help` for detailed usage information."""
             if sections[0].strip():
                 intro = sections[0].strip()
                 formatted_parts.append(intro)
-                formatted_parts.append('')  # Add spacing
+                formatted_parts.append('')  # Paragraph break
             
             # Process section pairs (header, content)
             for i in range(1, len(sections), 2):
@@ -708,33 +707,65 @@ Type `/help` for detailed usage information."""
                     header = sections[i].strip()
                     content = sections[i + 1].strip()
                     
-                    # Format header as bold
+                    # Format header with proper markdown
                     formatted_parts.append(f"**{header}:**")
-                    formatted_parts.append('')
+                    formatted_parts.append('')  # Space after header
                     
-                    # Format content with proper bullet points
+                    # Format content with proper bullet points and line breaks
                     content_lines = content.split('\n')
                     for line in content_lines:
                         line = line.strip()
                         if line:
-                            if not line.startswith('•'):
-                                # Convert to bullet point if it looks like it should be one
-                                if any(indicator in line.lower() for indicator in ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:', 'payment:']):
-                                    formatted_parts.append(f"• {line}")
-                                else:
-                                    formatted_parts.append(f"• {line}")
-                            else:
-                                formatted_parts.append(line)
+                            # Clean existing bullets and apply proper markdown
+                            clean_line = line.lstrip('•-* ').strip()
+                            if clean_line:
+                                # Use proper markdown bullet with two spaces for line break
+                                formatted_parts.append(f"- {clean_line}  ")
                     
-                    formatted_parts.append('')  # Add spacing after section
+                    formatted_parts.append('')  # Paragraph break after section
             
-            # Join and clean up
+            # Join with proper line breaks
             result = '\n'.join(formatted_parts)
-            return self._final_cleanup(result)
+            
+            # Apply OpenWebUI-specific formatting fixes
+            result = self._apply_openwebui_fixes(result)
+            
+            return result
             
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
-            return self._clean_bullet_points_only(response)  # Fallback to simple cleanup
+            return self._apply_basic_formatting(response)
+
+    def _apply_basic_formatting(self, text: str) -> str:
+        """Apply basic OpenWebUI formatting to text without sections"""
+        import re
+        
+        # Ensure proper line breaks with two spaces
+        text = re.sub(r'\n', '  \n', text)
+        
+        # Fix bullet points
+        text = re.sub(r'^(\s*)[-•*]\s+', r'\1- ', text, flags=re.MULTILINE)
+        
+        return text.strip()
+
+    def _apply_openwebui_fixes(self, text: str) -> str:
+        """Apply OpenWebUI-specific formatting fixes"""
+        import re
+        
+        # Ensure proper paragraph breaks (double newline)
+        text = re.sub(r'\n\n+', '\n\n', text)
+        
+        # Ensure bullet points have blank lines before/after lists
+        text = re.sub(r'(\w)\n(- )', r'\1\n\n\2', text)  # Add blank line before list
+        text = re.sub(r'(- .+?)\n([A-Z*])', r'\1\n\n\2', text)  # Add blank line after list
+        
+        # Ensure proper spacing around headers
+        text = re.sub(r'(\*\*[^*]+\*\*:)\n([^-\n])', r'\1\n\n\2', text)
+        
+        # Clean up excessive whitespace but preserve intentional spacing
+        text = re.sub(r'[ \t]+\n', '  \n', text)  # Preserve two-space line breaks
+        
+        return text.strip()
 
     def _clean_bullet_points_only(self, text: str) -> str:
         """Simple fallback: just clean up bullet points"""
