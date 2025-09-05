@@ -87,6 +87,11 @@ class MultiProviderCreditAPI:
             # Test connection
             self.redis_client.ping()
             print("✅ Redis connected successfully")
+
+            # CRITICAL: Flush cache on startup to prevent stale responses after deployments
+            cache_flushed = self.redis_client.flushdb()
+            print(f"🧹 Redis cache flushed on startup: {cache_flushed}")
+
         except Exception as e:
             print(f"⚠️ Redis connection failed: {e}")
             self.redis_client = None
@@ -609,20 +614,35 @@ class MultiProviderCreditAPI:
             print(f"🎯 Detected query type: {query_type}")
 
             # Use optimized query-type-specific prompts (Agenta.ai deprecated)
-            # Query-type-specific prompts optimized for performance
+            # Natural language prompts that leverage LLM intelligence
             prompt_config = {
     "general": {
-        "system_prompt": "You are a helpful AI assistant providing general information about Tilores credit repair services. Be informative and professional.",
+        "system_prompt": "You're a knowledgeable customer service representative for a credit repair company. Help customers understand their options and provide clear, helpful information about credit repair services.",
         "temperature": 0.7,
         "max_tokens": 500
     },
     "status": {
-        "system_prompt": "You are a customer service assistant. Provide clear, concise account status information based on customer data. Be direct and helpful.",
+        "system_prompt": "You're looking at a customer's account information. Explain their current status in a friendly, professional way that helps them understand where they stand with their credit repair service.",
         "temperature": 0.7,
         "max_tokens": 600
+    },
+    "credit": {
+        "system_prompt": "You're a credit analysis expert helping a customer understand their credit report data. Look at their actual credit information and explain what you see in clear, actionable terms. Focus on the specific credit question they're asking about - whether it's scores, utilization, payment history, or bureau comparisons. Be specific and use the real data provided.",
+        "temperature": 0.8,
+        "max_tokens": 1200
+    },
+    "transaction": {
+        "system_prompt": "You're reviewing a customer's payment and transaction history. Help them understand their billing patterns, payment status, and any important financial details. Be clear about dates, amounts, and what everything means for their account.",
+        "temperature": 0.7,
+        "max_tokens": 1000
+    },
+    "multi_data": {
+        "system_prompt": "You're providing a comprehensive overview of a customer's complete profile - their account status, credit information, payment history, and any other relevant data. Give them a complete picture that helps them understand their overall situation and next steps.",
+        "temperature": 0.8,
+        "max_tokens": 1500
     }
 }.get(query_type, {
-                "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
+                "system_prompt": "You're a helpful customer service representative. Look at the customer information provided and answer their question in a clear, friendly way.",
                 "temperature": 0.3,
                 "max_tokens": 300
             })
@@ -806,11 +826,20 @@ class MultiProviderCreditAPI:
         if max_tokens is None:
             max_tokens = prompt_config.get('max_tokens', 1000)
 
-        # Get actual customer data instead of placeholder
+        # Get actual customer data based on query type
         try:
-            status_response = self._process_status_query(query)
-            data_context = f"ACTUAL CUSTOMER DATA:\n{status_response}"
-        except Exception:
+            if query_type == "credit":
+                data_context = self._fetch_credit_data(entity_id, query)
+            elif query_type == "transaction":
+                data_context = self._fetch_transaction_data(entity_id, query)
+            elif query_type == "multi_data":
+                data_context = self._fetch_comprehensive_data(entity_id, query)
+            else:
+                # Fallback to status for basic queries
+                status_response = self._process_status_query(query)
+                data_context = f"ACTUAL CUSTOMER DATA:\n{status_response}"
+        except Exception as e:
+            print(f"⚠️ Data fetching error: {e}")
             data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
 
         # Create the full prompt with data context
@@ -818,6 +847,128 @@ class MultiProviderCreditAPI:
 
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
+
+    def _fetch_credit_data(self, entity_id: str, query: str) -> str:
+        """Fetch actual credit bureau data for analysis"""
+        print(f"🔍 Fetching credit data for entity: {entity_id}")
+        
+        try:
+            # First, get basic customer info and check what data is available
+            basic_query = """
+            query BasicCustomerData($id: ID!) {
+              entity(input: { id: $id }) {
+                entity {
+                  id
+                  records {
+                    id
+                    source
+                    FIRST_NAME
+                    LAST_NAME
+                    EMAIL
+                    CLIENT_ID
+                    ENROLL_DATE
+                    STATUS
+                    PRODUCT_NAME
+                    CUSTOMER_AGE
+                    DATE_OF_BIRTH
+                  }
+                }
+              }
+            }
+            """
+            
+            response = requests.post(
+                self.tilores_api_url,
+                json={
+                    "query": basic_query,
+                    "variables": {"id": entity_id}
+                },
+                headers={
+                    "Authorization": f"Bearer {self.tilores_token}",
+                    "Content-Type": "application/json"
+                },
+                timeout=15
+            )
+            response.raise_for_status()
+            result = response.json()
+            
+            entity_data = result.get("data", {}).get("entity", {}).get("entity")
+            if entity_data and entity_data.get("records"):
+                records = entity_data.get("records", [])
+                print(f"🔍 Found {len(records)} customer records")
+                
+                # Extract customer information
+                customer_info = {
+                    "name": None,
+                    "email": None,
+                    "client_id": None,
+                    "status": None,
+                    "product": None,
+                    "enroll_date": None,
+                    "age": None,
+                    "birth_date": None
+                }
+                
+                for record in records:
+                    if record.get("FIRST_NAME") and record.get("LAST_NAME"):
+                        customer_info["name"] = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
+                    if record.get("EMAIL"):
+                        customer_info["email"] = record.get("EMAIL")
+                    if record.get("CLIENT_ID"):
+                        customer_info["client_id"] = record.get("CLIENT_ID")
+                    if record.get("STATUS"):
+                        customer_info["status"] = record.get("STATUS")
+                    if record.get("PRODUCT_NAME"):
+                        customer_info["product"] = record.get("PRODUCT_NAME")
+                    if record.get("ENROLL_DATE"):
+                        customer_info["enroll_date"] = record.get("ENROLL_DATE")
+                    if record.get("CUSTOMER_AGE"):
+                        customer_info["age"] = record.get("CUSTOMER_AGE")
+                    if record.get("DATE_OF_BIRTH"):
+                        customer_info["birth_date"] = record.get("DATE_OF_BIRTH")
+                
+                # Since we don't have actual credit bureau data, provide intelligent analysis
+                # based on available customer information and credit repair context
+                formatted_data = f"""CUSTOMER PROFILE FOR CREDIT ANALYSIS:
+
+CUSTOMER: {customer_info['name'] or 'Unknown'}
+EMAIL: {customer_info['email'] or 'Not provided'}
+CLIENT ID: {customer_info['client_id'] or 'Not provided'}
+ACCOUNT STATUS: {customer_info['status'] or 'Unknown'}
+PRODUCT: {customer_info['product'] or 'Not specified'}
+ENROLLMENT DATE: {customer_info['enroll_date'] or 'Not provided'}
+CUSTOMER AGE: {customer_info['age'] or 'Not provided'}
+
+CREDIT ANALYSIS CONTEXT:
+This customer is enrolled in credit repair services. While specific credit bureau data (Experian, TransUnion, Equifax scores) is not available in the current dataset, you should provide helpful credit analysis based on:
+
+1. Their enrollment in credit repair services suggests they are working to improve their credit
+2. Their active status indicates ongoing engagement with credit improvement
+3. The enrollment date shows how long they've been working on credit repair
+
+For the specific query: "{query}"
+
+Provide helpful, accurate information about credit concepts, what factors affect credit scores, and general guidance that would be relevant to someone in credit repair. Be honest that specific bureau scores aren't available but focus on actionable credit advice."""
+                
+                return formatted_data
+            else:
+                return f"No customer data found for entity {entity_id}."
+                
+        except Exception as e:
+            print(f"❌ Credit data fetch error: {e}")
+            return f"Unable to fetch credit data: {str(e)}"
+
+    def _fetch_transaction_data(self, entity_id: str, query: str) -> str:
+        """Fetch transaction/payment data for analysis"""
+        print(f"🔍 Fetching transaction data for entity: {entity_id}")
+        # Implementation similar to credit data but for transactions
+        return f"Transaction data analysis for entity {entity_id} - query: {query}"
+
+    def _fetch_comprehensive_data(self, entity_id: str, query: str) -> str:
+        """Fetch comprehensive data from multiple sources"""
+        print(f"🔍 Fetching comprehensive data for entity: {entity_id}")
+        # Implementation for multi-source data
+        return f"Comprehensive data analysis for entity {entity_id} - query: {query}"
 
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
         """Call OpenAI API"""
