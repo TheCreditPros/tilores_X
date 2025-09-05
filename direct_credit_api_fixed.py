@@ -688,6 +688,9 @@ Type `/help` for detailed usage information."""
             return response
             
         try:
+            # First, handle inline ### sections by splitting them properly
+            response = self._preprocess_inline_sections(response)
+            
             # Split into lines and process
             lines = response.split('\n')
             formatted_lines = []
@@ -736,6 +739,21 @@ Type `/help` for detailed usage information."""
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
             return response  # Return original if formatting fails
+
+    def _preprocess_inline_sections(self, text: str) -> str:
+        """Preprocess text to split inline ### sections onto separate lines"""
+        import re
+        
+        # Replace ### Section: with proper line breaks
+        text = re.sub(r'###\s*([^#]+?):', r'\n\n### \1:\n', text)
+        
+        # Handle cases where bullet points follow sections without line breaks
+        text = re.sub(r'(### [^:]+:)\s*•', r'\1\n•', text)
+        
+        # Ensure bullet points are on separate lines
+        text = re.sub(r'•\s*([^•]+?)•', r'• \1\n•', text)
+        
+        return text
 
     def _is_section_header(self, line: str) -> bool:
         """Detect if line should be a section header"""
