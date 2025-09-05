@@ -1,60 +1,63 @@
+# Production-only repository - exclude development/test files
+
 # Test files and results
+test_*.py
 *_test.py
 *_test_*.py
-*test_suite.py
+test_results_*.json
 *_results_*.json
 *_validation_*.json
-test_*.json
-*_20250904_*.json
-
-# Test scripts
-client_success_agent_test_suite.py
-comprehensive_*.py
-focused_*.py
-intelligent_test_suite.py
-multi_threaded_*.py
-precision_*.py
-prompt_optimization_system.py
-real_world_validation_test.py
-reliable_*.py
-smart_*.py
-temporal_prompt_enhancer.py
-timeout_analyzer.py
-failure_diagnosis_system.py
-
-# Log files
 *.log
-server.log
-timeout_optimized_server.log
-precision_server.log
-routing_fix_server.log
-temporal_server.log
+*.jsonl
 
-# Test shell scripts
-test-*.sh
+# Development and debug files
+debug_*.py
+analyze_*.py
+investigate_*.py
+discover_*.py
+*_debug.py
+*_analysis.py
 
-# Temporary documentation
-openwebui-conversation-fix.md
-complete-openwebui-setup.sh
-openwebui-environment-config.sh
+# Experimental files
+experimental/
+archived/
+archive/
+temp/
+temporary/
 
-# JSON log files
-conversation_logs.jsonl
-webhook_monitoring.jsonl
+# Configuration and setup files (keep only essential)
+configure_*.py
+setup_*.py
+install_*.py
 
-# Python cache
+# Agenta.ai files (deprecated)
+agenta_*.py
+*_agenta_*.py
+AGENTA_*.md
+
+# Documentation files (keep only essential)
+*_REPORT.md
+*_GUIDE.md
+*_SUMMARY.md
+*_COMPLETE.md
+*_SUCCESS.md
+
+# Data files
+*.json
+!package.json
+!package-lock.json
+!railway.json
+!tilores_*.json
+
+# Cache and temporary
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 *.so
-
-# Environment
-.env
-.venv
-env/
-venv/
+.coverage
+.pytest_cache/
 
 # IDE
 .vscode/
@@ -64,6 +67,21 @@ venv/
 
 # OS
 .DS_Store
-Thumbs.dbarchived/
-*.jsonl
-test_*.py
+Thumbs.db
+
+# Node modules
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
