@@ -678,73 +678,91 @@ Type `/help` for detailed usage information."""
     def _enhance_response_formatting(self, response: str) -> str:
         """
         Universal response formatting enhancement for ALL system prompts
-        Ensures proper line breaks, bullet points, and visual structure
+        Ensures proper line breaks, bullet points, and visual structure optimized for chat interfaces
         """
         if not response or len(response.strip()) < 10:
             return response
-
+            
         try:
-            # First, handle inline ### sections by splitting them properly
-            response = self._preprocess_inline_sections(response)
-
-            # Split into lines and process
-            lines = response.split('\n')
-            formatted_lines = []
-
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    formatted_lines.append('')
-                    continue
-
-                # Detect and format different content types
-                if self._is_section_header(line):
-                    # Add spacing around section headers
-                    if formatted_lines and formatted_lines[-1] != '':
-                        formatted_lines.append('')
-                    formatted_lines.append(f"### {line.replace('###', '').strip()}")
-                    formatted_lines.append('')
-
-                elif self._should_be_bullet_point(line):
-                    # Convert to proper bullet point
-                    clean_line = self._clean_bullet_point(line)
-                    formatted_lines.append(f"• {clean_line}")
-
-                elif self._is_important_info(line):
-                    # Format important information with bold
-                    formatted_lines.append(f"**{line}**")
-
-                else:
-                    # Regular line - check if it should be broken up
-                    if len(line) > 150:
-                        # Break long lines into bullet points
-                        sentences = self._split_long_line(line)
-                        for sentence in sentences:
-                            formatted_lines.append(f"• {sentence.strip()}")
-                    else:
-                        formatted_lines.append(line)
-
+            # Simple and reliable approach: Split on ### and format sections
+            import re
+            
+            # Split response into sections based on ### markers
+            sections = re.split(r'###\s*([^#]+?):', response)
+            
+            if len(sections) <= 1:
+                # No sections found, just clean up bullet points
+                return self._clean_bullet_points_only(response)
+            
+            formatted_parts = []
+            
+            # First part is usually the intro (before any ###)
+            if sections[0].strip():
+                intro = sections[0].strip()
+                formatted_parts.append(intro)
+                formatted_parts.append('')  # Add spacing
+            
+            # Process section pairs (header, content)
+            for i in range(1, len(sections), 2):
+                if i + 1 < len(sections):
+                    header = sections[i].strip()
+                    content = sections[i + 1].strip()
+                    
+                    # Format header as bold
+                    formatted_parts.append(f"**{header}:**")
+                    formatted_parts.append('')
+                    
+                    # Format content with proper bullet points
+                    content_lines = content.split('\n')
+                    for line in content_lines:
+                        line = line.strip()
+                        if line:
+                            if not line.startswith('•'):
+                                # Convert to bullet point if it looks like it should be one
+                                if any(indicator in line.lower() for indicator in ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:', 'payment:']):
+                                    formatted_parts.append(f"• {line}")
+                                else:
+                                    formatted_parts.append(f"• {line}")
+                            else:
+                                formatted_parts.append(line)
+                    
+                    formatted_parts.append('')  # Add spacing after section
+            
             # Join and clean up
-            formatted_response = '\n'.join(formatted_lines)
-
-            # Final cleanup
-            formatted_response = self._final_cleanup(formatted_response)
-
-            return formatted_response
-
+            result = '\n'.join(formatted_parts)
+            return self._final_cleanup(result)
+            
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
-            return response  # Return original if formatting fails
+            return self._clean_bullet_points_only(response)  # Fallback to simple cleanup
+
+    def _clean_bullet_points_only(self, text: str) -> str:
+        """Simple fallback: just clean up bullet points"""
+        lines = text.split('\n')
+        cleaned_lines = []
+        
+        for line in lines:
+            line = line.strip()
+            if line:
+                # Ensure bullet points are properly formatted
+                if not line.startswith('•') and any(indicator in line.lower() for indicator in ['•', 'experian:', 'equifax:', 'transunion:']):
+                    if not line.startswith('•'):
+                        line = f"• {line.lstrip('•-* ')}"
+                cleaned_lines.append(line)
+            else:
+                cleaned_lines.append('')
+        
+        return '\n'.join(cleaned_lines)
 
     def _preprocess_inline_sections(self, text: str) -> str:
         """Preprocess text to split inline ### sections onto separate lines"""
         import re
 
-        # Replace ### Section: with proper line breaks
-        text = re.sub(r'###\s*([^#]+?):', r'\n\n### \1:\n', text)
+        # Replace ### Section: with proper line breaks using bold headers
+        text = re.sub(r'###\s*([^#:]+?):', r'\n\n**\1:**\n', text)
 
         # Handle cases where bullet points follow sections without line breaks
-        text = re.sub(r'(### [^:]+:)\s*•', r'\1\n•', text)
+        text = re.sub(r'(\*\*[^:]+:\*\*)\s*•', r'\1\n•', text)
 
         # Ensure bullet points are on separate lines
         text = re.sub(r'•\s*([^•]+?)•', r'• \1\n•', text)
