@@ -456,11 +456,7 @@ class MultiProviderCreditAPI:
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
 
             # Apply universal formatting enhancement to ALL responses
-            print(f"🎨 DEBUG: Original response length: {len(response)}")
-            print(f"🎨 DEBUG: Original response preview: {response[:100]}...")
             response = self._enhance_response_formatting(response)
-            print(f"🎨 DEBUG: Formatted response length: {len(response)}")
-            print(f"🎨 DEBUG: Formatted response preview: {response[:100]}...")
 
             # Cache the response
             self._cache_response(cache_key, response)
@@ -692,15 +688,11 @@ Type `/help` for detailed usage information."""
             return response
 
         try:
-            print(f"🎨 FORMATTING DEBUG: Input response: {repr(response[:200])}")
-            
             # First, handle inline ### sections by splitting them properly
             response = self._preprocess_inline_sections(response)
-            print(f"🎨 FORMATTING DEBUG: After preprocessing: {repr(response[:200])}")
             
             # Split into lines and process
             lines = response.split('\n')
-            print(f"🎨 FORMATTING DEBUG: Split into {len(lines)} lines")
             formatted_lines = []
 
             for line in lines:
