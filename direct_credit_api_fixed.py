@@ -6,13 +6,14 @@ Fixes Salesforce status query and integrates Agenta.ai SDK for dynamic prompts
 
 import json
 import os
+import re
 import uuid
 import hashlib
 import asyncio
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 
 import requests
 import redis
@@ -793,6 +794,59 @@ Provide detailed analysis using the actual credit data shown above."""
 
         return formatted_data
 
+    def _extract_conversation_context(self, messages: List[Dict[str, Any]]) -> Dict[str, str]:
+        """Extract customer context from conversation history"""
+        context = {}
+
+        # Process messages in reverse order (most recent first)
+        for msg in reversed(messages):
+            # Skip if we already have key identifiers
+            if all(context.get(k) for k in ["client_id", "email"]):
+                break
+
+            content = msg.get("content", "")
+            if isinstance(content, list):
+                # Handle structured content
+                content = " ".join([item.get("text", "") for item in content if item.get("type") == "text"])
+
+            # Extract identifiers from content
+            if not context.get("email"):
+                email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', content)
+                if email_match:
+                    context["email"] = email_match.group(0)
+
+            if not context.get("client_id"):
+                client_id_match = re.search(r'\b\d{6,10}\b', content)
+                if client_id_match:
+                    context["client_id"] = client_id_match.group(0)
+
+            if not context.get("phone"):
+                phone_match = re.search(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', content)
+                if phone_match:
+                    context["phone"] = phone_match.group(0)
+
+        return context
+
+    def _enhance_query_with_context(self, query: str, context: Dict[str, str]) -> str:
+        """Enhance query with conversational context if customer identifier is missing"""
+        # Check if query already contains customer identifier
+        has_identifier = any([
+            re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', query),  # Email
+            re.search(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', query),  # Phone
+            re.search(r'\b\d{6,10}\b', query)  # Client ID
+        ])
+
+        if not has_identifier and context:
+            # Add context to query
+            if context.get("email"):
+                query += f" for {context['email']}"
+            elif context.get("client_id"):
+                query += f" for client ID {context['client_id']}"
+            elif context.get("phone"):
+                query += f" for {context['phone']}"
+
+        return query
+
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
         """Call OpenAI API"""
         try:
@@ -947,6 +1001,53 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
+
+@app.get("/v1/models")
+async def list_models():
+    """List available models - OpenAI compatible endpoint"""
+    models = []
+    for provider, config in api.providers.items():
+        if config.get("models"):
+            for model in config["models"]:
+                models.append({
+                    "id": model,
+                    "object": "model",
+                    "created": int(datetime.now().timestamp()),
+                    "owned_by": provider,
+                    "permission": [],
+                    "root": model,
+                    "parent": None
+                })
+
+    return {
+        "object": "list",
+        "data": models
+    }
+
+
+@app.post("/v1/clear-cache")
+async def clear_cache():
+    """Manual endpoint to clear memory cache for testing"""
+    try:
+        # Clear Redis cache
+        cache_flushed = api.redis_client.flushdb()
+
+        # Clear memory cache
+        cache_count = len(api.query_cache)
+        api.query_cache.clear()
+
+        return {
+            "success": True,
+            "message": "All caches cleared successfully",
+            "redis_flushed": cache_flushed,
+            "memory_cache_cleared": cache_count,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        print(f"❌ Error clearing cache: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     """
@@ -978,6 +1079,10 @@ async def chat_completions(request: Request):
         if not messages:
             raise HTTPException(status_code=400, detail="Messages are required")
 
+        # Extract conversational context from message history
+        conversation_context = api._extract_conversation_context(messages)
+        print(f"🔍 DEBUG: Conversation context: {conversation_context}")
+
         # Extract query from the last user message
         last_message = messages[-1]
 
@@ -997,6 +1102,13 @@ async def chat_completions(request: Request):
 
         if not query.strip():
             raise HTTPException(status_code=400, detail="Query cannot be empty")
+
+        # Enhance query with conversational context if available
+        if conversation_context:
+            enhanced_query = api._enhance_query_with_context(query, conversation_context)
+            if enhanced_query != query:
+                print(f"🔍 DEBUG: Enhanced query: '{query}' -> '{enhanced_query}'")
+                query = enhanced_query
 
         # Process the request with Agenta.ai integration
         response_content = api.process_chat_request(
