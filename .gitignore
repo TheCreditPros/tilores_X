@@ -1,146 +1,67 @@
-# Environment variables
-.env
-.env.local
-.env.production
-.env.staging
+# Test files and results
+*_test.py
+*_test_*.py
+*test_suite.py
+*_results_*.json
+*_validation_*.json
+test_*.json
+*_20250904_*.json
 
-# Python
+# Test scripts
+client_success_agent_test_suite.py
+comprehensive_*.py
+focused_*.py
+intelligent_test_suite.py
+multi_threaded_*.py
+precision_*.py
+prompt_optimization_system.py
+real_world_validation_test.py
+reliable_*.py
+smart_*.py
+temporal_prompt_enhancer.py
+timeout_analyzer.py
+failure_diagnosis_system.py
+
+# Log files
+*.log
+server.log
+timeout_optimized_server.log
+precision_server.log
+routing_fix_server.log
+temporal_server.log
+
+# Test shell scripts
+test-*.sh
+
+# Temporary documentation
+openwebui-conversation-fix.md
+complete-openwebui-setup.sh
+openwebui-environment-config.sh
+
+# JSON log files
+conversation_logs.jsonl
+webhook_monitoring.jsonl
+
+# Python cache
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+*.so
 
-# Virtual environments
-venv/
-ENV/
+# Environment
+.env
+.venv
 env/
-.venv/
+venv/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-# Logs
-*.log
-logs/
-server.log
-
-# Database
-*.db
-*.sqlite
-
-# Temporary files
-tmp/
-temp/
-.tmp/
-
-# Railway
-.railway/
-
-# LangSmith
-.langchain.db
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-
-# Documentation builds
-docs/_build/
-site/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Credentials and keys (extra safety)
-*key*
-*secret*
-*token*
-*password*
-
-# But allow requirements files
-!requirements*.txt
-set_railway_vars.sh
-
-# Dashboard/Frontend
-dashboard/node_modules/
-# dashboard/dist/ - Allow dist for production deployment
-dashboard/.parcel-cache/
-dashboard/coverage/
-dashboard/.vite/
-dashboard/playwright-report/
-dashboard/test-results/
-dashboard/package-lock.json
-dashboard/yarn.lock
-dashboard/pnpm-lock.yaml
-dashboard/.env
-dashboard/.env.local
-dashboard/.env.production
-dashboard/.env.staging
-dashboard/npm-debug.log*
-dashboard/yarn-debug.log*
-dashboard/yarn-error.log*
-dashboard/pnpm-debug.log*
-langsmith_openapi.json
-
-# Deployment backups
-deployment_backup_*/
-
-# Validation test results
-tool_execution_validation_results_*.json
-simplified_tool_calling_validation_*.json
-
-# Validation scripts (temporary)
-validate_*.py
-gemini_fix_validation.py
-
-# Deployment reports (temporary)
-*_DEPLOYMENT_*_REPORT.md
-*_TESTING_REPORT.md
-*_OPTIMIZATION_GUIDE.md
-
-# Build scripts (temporary)
-pre-deploy-build.sh
-
-# Railway monitoring configs
-.env.railway-monitoring
-openwebui_data/
