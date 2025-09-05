@@ -456,7 +456,11 @@ class MultiProviderCreditAPI:
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
 
             # Apply universal formatting enhancement to ALL responses
+            print(f"🎨 DEBUG: Original response length: {len(response)}")
+            print(f"🎨 DEBUG: Original response preview: {response[:100]}...")
             response = self._enhance_response_formatting(response)
+            print(f"🎨 DEBUG: Formatted response length: {len(response)}")
+            print(f"🎨 DEBUG: Formatted response preview: {response[:100]}...")
 
             # Cache the response
             self._cache_response(cache_key, response)
@@ -686,21 +690,25 @@ Type `/help` for detailed usage information."""
         """
         if not response or len(response.strip()) < 10:
             return response
-            
+
         try:
+            print(f"🎨 FORMATTING DEBUG: Input response: {repr(response[:200])}")
+            
             # First, handle inline ### sections by splitting them properly
             response = self._preprocess_inline_sections(response)
+            print(f"🎨 FORMATTING DEBUG: After preprocessing: {repr(response[:200])}")
             
             # Split into lines and process
             lines = response.split('\n')
+            print(f"🎨 FORMATTING DEBUG: Split into {len(lines)} lines")
             formatted_lines = []
-            
+
             for line in lines:
                 line = line.strip()
                 if not line:
                     formatted_lines.append('')
                     continue
-                
+
                 # Detect and format different content types
                 if self._is_section_header(line):
                     # Add spacing around section headers
@@ -708,16 +716,16 @@ Type `/help` for detailed usage information."""
                         formatted_lines.append('')
                     formatted_lines.append(f"### {line.replace('###', '').strip()}")
                     formatted_lines.append('')
-                    
+
                 elif self._should_be_bullet_point(line):
                     # Convert to proper bullet point
                     clean_line = self._clean_bullet_point(line)
                     formatted_lines.append(f"• {clean_line}")
-                    
+
                 elif self._is_important_info(line):
                     # Format important information with bold
                     formatted_lines.append(f"**{line}**")
-                    
+
                 else:
                     # Regular line - check if it should be broken up
                     if len(line) > 150:
@@ -727,15 +735,15 @@ Type `/help` for detailed usage information."""
                             formatted_lines.append(f"• {sentence.strip()}")
                     else:
                         formatted_lines.append(line)
-            
+
             # Join and clean up
             formatted_response = '\n'.join(formatted_lines)
-            
+
             # Final cleanup
             formatted_response = self._final_cleanup(formatted_response)
-            
+
             return formatted_response
-            
+
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
             return response  # Return original if formatting fails
@@ -743,27 +751,27 @@ Type `/help` for detailed usage information."""
     def _preprocess_inline_sections(self, text: str) -> str:
         """Preprocess text to split inline ### sections onto separate lines"""
         import re
-        
+
         # Replace ### Section: with proper line breaks
         text = re.sub(r'###\s*([^#]+?):', r'\n\n### \1:\n', text)
-        
+
         # Handle cases where bullet points follow sections without line breaks
         text = re.sub(r'(### [^:]+:)\s*•', r'\1\n•', text)
-        
+
         # Ensure bullet points are on separate lines
         text = re.sub(r'•\s*([^•]+?)•', r'• \1\n•', text)
-        
+
         return text
 
     def _is_section_header(self, line: str) -> bool:
         """Detect if line should be a section header"""
         line_lower = line.lower()
-        headers = ['credit score', 'account overview', 'payment history', 'key insights', 
+        headers = ['credit score', 'account overview', 'payment history', 'key insights',
                   'next steps', 'account information', 'product analysis', 'financial analysis',
                   'customer profile', 'recommendations', 'summary', 'status', 'details']
-        
+
         # Check if line contains header keywords and ends with colon
-        return (any(header in line_lower for header in headers) and 
+        return (any(header in line_lower for header in headers) and
                 (line.endswith(':') or line.endswith(':-') or '###' in line))
 
     def _should_be_bullet_point(self, line: str) -> bool:
@@ -771,11 +779,11 @@ Type `/help` for detailed usage information."""
         # Already a bullet point
         if line.startswith('•') or line.startswith('-') or line.startswith('*'):
             return True
-            
+
         # Contains key indicators that suggest it should be a bullet
-        indicators = ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:', 
+        indicators = ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:',
                      'payment:', 'account:', 'status:', 'score:', 'utilization:']
-        
+
         line_lower = line.lower()
         return any(indicator in line_lower for indicator in indicators)
 
@@ -783,10 +791,10 @@ Type `/help` for detailed usage information."""
         """Clean and standardize bullet point text"""
         # Remove existing bullet symbols
         line = line.lstrip('•-*').strip()
-        
+
         # Remove extra spaces
         line = ' '.join(line.split())
-        
+
         return line
 
     def _is_important_info(self, line: str) -> bool:
@@ -799,7 +807,7 @@ Type `/help` for detailed usage information."""
         """Split long lines into shorter, more readable segments"""
         # Split on common delimiters
         segments = []
-        
+
         # Try splitting on sentences first
         sentences = line.split('. ')
         for sentence in sentences:
@@ -808,7 +816,7 @@ Type `/help` for detailed usage information."""
                 if not sentence.endswith('.') and sentence != sentences[-1]:
                     sentence += '.'
                 segments.append(sentence)
-        
+
         return segments if len(segments) > 1 else [line]
 
     def _final_cleanup(self, text: str) -> str:
@@ -817,7 +825,7 @@ Type `/help` for detailed usage information."""
         lines = text.split('\n')
         cleaned_lines = []
         prev_empty = False
-        
+
         for line in lines:
             if line.strip() == '':
                 if not prev_empty:
@@ -826,11 +834,11 @@ Type `/help` for detailed usage information."""
             else:
                 cleaned_lines.append(line)
                 prev_empty = False
-        
+
         # Remove trailing empty lines
         while cleaned_lines and cleaned_lines[-1] == '':
             cleaned_lines.pop()
-            
+
         return '\n'.join(cleaned_lines)
 
     def _process_status_query(self, query: str) -> str:
