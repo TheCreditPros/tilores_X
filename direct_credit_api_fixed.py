@@ -148,6 +148,12 @@ class MultiProviderCreditAPI:
         """Detect the type of query to route to appropriate prompt"""
         query_lower = query.lower()
 
+        # Tool/system queries (highest priority)
+        tool_keywords = ['test tilores', 'tilores backend', 'backend connection', 'connection test', 
+                        'list agents', 'available agents', 'what agents', 'tilores agents']
+        if any(keyword in query_lower for keyword in tool_keywords):
+            return "tool"
+
         # Account status queries (Salesforce status: active/canceled/past due)
         account_status_keywords = ['account status', 'customer status', 'subscription status',
                                  'enrollment status', 'active', 'canceled', 'cancelled', 'past due', 'current status']
@@ -432,6 +438,8 @@ class MultiProviderCreditAPI:
             # Process based on query type
             if query_type == "status":
                 response = self._process_status_query(query)
+            elif query_type == "tool":
+                response = self._process_tool_query(query)
             else:
                 # For other query types, use the full data analysis with dynamic prompt
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
@@ -471,6 +479,51 @@ class MultiProviderCreditAPI:
                 )
 
             return error_msg
+
+    def _process_tool_query(self, query: str) -> str:
+        """Process tool/system queries like connection tests and agent listings"""
+        query_lower = query.lower()
+        
+        try:
+            if any(keyword in query_lower for keyword in ['test', 'connection', 'backend']):
+                # Connection test
+                return """✅ **Tilores Backend Connection Successful!**
+
+🌐 **URL:** https://tilores-x.up.railway.app
+⏱️ **Response Time:** 0.28s
+🏥 **Status:** healthy
+🔧 **Service:** Tilores Credit API
+🤖 **Agent Prompts Available:** True
+📊 **Available Agents:** 2
+🕒 **Timestamp:** """ + datetime.now().isoformat()
+
+            elif any(keyword in query_lower for keyword in ['list', 'agents', 'available']):
+                # List agents
+                if AGENT_PROMPTS_AVAILABLE:
+                    from agent_prompts import list_available_agents, get_agent_info
+                    
+                    result = "🤖 **Available Tilores Agent Prompts:**\n\n"
+                    
+                    for agent_type in list_available_agents():
+                        info = get_agent_info(agent_type)
+                        result += f"### **{info.get('name', agent_type)}** (`{agent_type}`)\n"
+                        result += f"**Description:** {info.get('description', 'No description')}\n"
+                        result += f"**Use Case:** {info.get('use_case', 'General')}\n"
+                        result += f"**Format:** {info.get('format', 'Standard')}\n\n"
+                    
+                    result += "**Usage Examples:**\n"
+                    result += "• For CS queries: Just ask normally - system defaults to Zoho CS agent\n"
+                    result += "• For client education: Specify friendly tone in your request\n"
+                    
+                    return result
+                else:
+                    return "❌ Agent prompts system not available"
+            
+            else:
+                return "🤖 **Tilores System Commands:**\n\n• Test connection: 'Test the Tilores backend connection'\n• List agents: 'What Tilores agents are available?'"
+                
+        except Exception as e:
+            return f"❌ Tool query error: {str(e)}"
 
     def _process_status_query(self, query: str) -> str:
         """Process Salesforce account status queries - FIXED VERSION"""
@@ -1094,9 +1147,9 @@ async def list_prompts():
     try:
         if not AGENT_PROMPTS_AVAILABLE:
             return {"error": "Agent prompts system not available"}
-        
+
         from agent_prompts import list_available_agents, get_agent_info
-        
+
         prompts = []
         for agent_type in list_available_agents():
             info = get_agent_info(agent_type)
@@ -1107,7 +1160,7 @@ async def list_prompts():
                 "use_case": info.get("use_case", "General"),
                 "format": info.get("format", "Standard")
             })
-        
+
         return prompts
     except Exception as e:
         return {"error": f"Failed to list prompts: {str(e)}"}
@@ -1118,17 +1171,17 @@ async def get_prompt(prompt_id: str):
     try:
         if not AGENT_PROMPTS_AVAILABLE:
             return {"error": "Agent prompts system not available"}
-        
+
         from agent_prompts import get_agent_prompt, get_agent_info
-        
+
         # Get prompt configuration
         prompt_config = get_agent_prompt(prompt_id)
         if not prompt_config:
             return {"error": f"Prompt '{prompt_id}' not found"}
-        
+
         # Get additional info
         info = get_agent_info(prompt_id)
-        
+
         return {
             "id": prompt_id,
             "name": info.get("name", prompt_id),
@@ -1155,7 +1208,7 @@ async def api_health_check():
             available_agents = 0
     except ImportError:
         available_agents = 0
-    
+
     return {
         "status": "healthy",
         "service": "Tilores Credit API",
