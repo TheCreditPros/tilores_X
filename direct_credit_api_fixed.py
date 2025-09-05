@@ -153,7 +153,7 @@ class MultiProviderCreditAPI:
             return "slash_command"
 
         # Tool/system queries (second priority)
-        tool_keywords = ['test tilores', 'tilores backend', 'backend connection', 'connection test', 
+        tool_keywords = ['test tilores', 'tilores backend', 'backend connection', 'connection test',
                         'list agents', 'available agents', 'what agents', 'tilores agents']
         if any(keyword in query_lower for keyword in tool_keywords):
             return "tool"
@@ -455,6 +455,9 @@ class MultiProviderCreditAPI:
                 # For other query types, use the full data analysis with dynamic prompt
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
 
+            # Apply universal formatting enhancement to ALL responses
+            response = self._enhance_response_formatting(response)
+
             # Cache the response
             self._cache_response(cache_key, response)
 
@@ -539,7 +542,7 @@ class MultiProviderCreditAPI:
     def _process_slash_command(self, query: str) -> str:
         """Process slash commands for quick agent switching"""
         query_stripped = query.strip()
-        
+
         # Check if it's a slash command with additional content (e.g., "/client my email is...")
         if ' ' in query_stripped:
             parts = query_stripped.split(' ', 1)
@@ -548,7 +551,7 @@ class MultiProviderCreditAPI:
         else:
             command = query_stripped.lower()
             remaining_query = None
-        
+
         # Define slash command mappings
         slash_commands = {
             '/client': 'client_chat_agent',
@@ -558,7 +561,7 @@ class MultiProviderCreditAPI:
             '/help': 'help',
             '/agents': 'list_agents'
         }
-        
+
         try:
             if command == '/help':
                 return """🤖 **Tilores Slash Commands:**
@@ -586,13 +589,13 @@ class MultiProviderCreditAPI:
 
             elif command == '/agents':
                 return self._process_tool_query("list agents")
-            
+
             elif command in slash_commands:
                 agent_type = slash_commands[command]
-                
+
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
-                
+
                 # If there's a remaining query, process it with the new agent
                 if remaining_query:
                     print(f"🎯 Processing slash command with query: {command} + '{remaining_query}'")
@@ -607,7 +610,7 @@ class MultiProviderCreditAPI:
                     # Just switching agent without a query
                     if AGENT_PROMPTS_AVAILABLE:
                         from agent_prompts import get_agent_info
-                        
+
                         try:
                             info = get_agent_info(agent_type)
                             return f"""✅ **Agent Switched Successfully!**
@@ -620,12 +623,12 @@ class MultiProviderCreditAPI:
 **Ready for your questions!** The system will now use this agent's prompt style for all responses until you switch again.
 
 💾 **Session stored** - Your agent preference will persist for this conversation."""
-                        
+
                         except Exception:
                             return f"✅ **Agent switched to:** `{agent_type}`\n\n**Ready for your questions!**\n\n💾 **Session stored** - Your agent preference will persist."
                     else:
                         return "❌ Agent prompts system not available"
-            
+
             else:
                 available_commands = ', '.join([cmd for cmd in slash_commands.keys() if cmd not in ['/help', '/agents']])
                 return f"""❌ **Unknown slash command:** `{command}`
@@ -633,7 +636,7 @@ class MultiProviderCreditAPI:
 **Available commands:** {available_commands}, `/help`, `/agents`
 
 Type `/help` for detailed usage information."""
-                
+
         except Exception as e:
             return f"❌ Slash command error: {str(e)}"
 
@@ -675,6 +678,142 @@ Type `/help` for detailed usage information."""
                 return f"ip_{hashlib.md5('default_session'.encode()).hexdigest()}"
         except Exception:
             return f"default_{hashlib.md5('fallback'.encode()).hexdigest()}"
+
+    def _enhance_response_formatting(self, response: str) -> str:
+        """
+        Universal response formatting enhancement for ALL system prompts
+        Ensures proper line breaks, bullet points, and visual structure
+        """
+        if not response or len(response.strip()) < 10:
+            return response
+            
+        try:
+            # Split into lines and process
+            lines = response.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    formatted_lines.append('')
+                    continue
+                
+                # Detect and format different content types
+                if self._is_section_header(line):
+                    # Add spacing around section headers
+                    if formatted_lines and formatted_lines[-1] != '':
+                        formatted_lines.append('')
+                    formatted_lines.append(f"### {line.replace('###', '').strip()}")
+                    formatted_lines.append('')
+                    
+                elif self._should_be_bullet_point(line):
+                    # Convert to proper bullet point
+                    clean_line = self._clean_bullet_point(line)
+                    formatted_lines.append(f"• {clean_line}")
+                    
+                elif self._is_important_info(line):
+                    # Format important information with bold
+                    formatted_lines.append(f"**{line}**")
+                    
+                else:
+                    # Regular line - check if it should be broken up
+                    if len(line) > 150:
+                        # Break long lines into bullet points
+                        sentences = self._split_long_line(line)
+                        for sentence in sentences:
+                            formatted_lines.append(f"• {sentence.strip()}")
+                    else:
+                        formatted_lines.append(line)
+            
+            # Join and clean up
+            formatted_response = '\n'.join(formatted_lines)
+            
+            # Final cleanup
+            formatted_response = self._final_cleanup(formatted_response)
+            
+            return formatted_response
+            
+        except Exception as e:
+            print(f"⚠️ Formatting enhancement error: {e}")
+            return response  # Return original if formatting fails
+
+    def _is_section_header(self, line: str) -> bool:
+        """Detect if line should be a section header"""
+        line_lower = line.lower()
+        headers = ['credit score', 'account overview', 'payment history', 'key insights', 
+                  'next steps', 'account information', 'product analysis', 'financial analysis',
+                  'customer profile', 'recommendations', 'summary', 'status', 'details']
+        
+        # Check if line contains header keywords and ends with colon
+        return (any(header in line_lower for header in headers) and 
+                (line.endswith(':') or line.endswith(':-') or '###' in line))
+
+    def _should_be_bullet_point(self, line: str) -> bool:
+        """Determine if line should be formatted as bullet point"""
+        # Already a bullet point
+        if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+            return True
+            
+        # Contains key indicators that suggest it should be a bullet
+        indicators = ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:', 
+                     'payment:', 'account:', 'status:', 'score:', 'utilization:']
+        
+        line_lower = line.lower()
+        return any(indicator in line_lower for indicator in indicators)
+
+    def _clean_bullet_point(self, line: str) -> str:
+        """Clean and standardize bullet point text"""
+        # Remove existing bullet symbols
+        line = line.lstrip('•-*').strip()
+        
+        # Remove extra spaces
+        line = ' '.join(line.split())
+        
+        return line
+
+    def _is_important_info(self, line: str) -> bool:
+        """Detect if line contains important information that should be bold"""
+        important_patterns = ['past due', 'account status:', 'urgent', 'important:', 'note:']
+        line_lower = line.lower()
+        return any(pattern in line_lower for pattern in important_patterns)
+
+    def _split_long_line(self, line: str) -> list:
+        """Split long lines into shorter, more readable segments"""
+        # Split on common delimiters
+        segments = []
+        
+        # Try splitting on sentences first
+        sentences = line.split('. ')
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if sentence:
+                if not sentence.endswith('.') and sentence != sentences[-1]:
+                    sentence += '.'
+                segments.append(sentence)
+        
+        return segments if len(segments) > 1 else [line]
+
+    def _final_cleanup(self, text: str) -> str:
+        """Final cleanup and formatting"""
+        # Remove excessive blank lines
+        lines = text.split('\n')
+        cleaned_lines = []
+        prev_empty = False
+        
+        for line in lines:
+            if line.strip() == '':
+                if not prev_empty:
+                    cleaned_lines.append('')
+                prev_empty = True
+            else:
+                cleaned_lines.append(line)
+                prev_empty = False
+        
+        # Remove trailing empty lines
+        while cleaned_lines and cleaned_lines[-1] == '':
+            cleaned_lines.pop()
+            
+        return '\n'.join(cleaned_lines)
 
     def _process_status_query(self, query: str) -> str:
         """Process Salesforce account status queries - FIXED VERSION"""
