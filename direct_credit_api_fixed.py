@@ -538,7 +538,16 @@ class MultiProviderCreditAPI:
 
     def _process_slash_command(self, query: str) -> str:
         """Process slash commands for quick agent switching"""
-        command = query.strip().lower()
+        query_stripped = query.strip()
+        
+        # Check if it's a slash command with additional content (e.g., "/client my email is...")
+        if ' ' in query_stripped:
+            parts = query_stripped.split(' ', 1)
+            command = parts[0].lower()
+            remaining_query = parts[1]
+        else:
+            command = query_stripped.lower()
+            remaining_query = None
         
         # Define slash command mappings
         slash_commands = {
@@ -564,9 +573,14 @@ class MultiProviderCreditAPI:
 • `/help` - Show this help message
 
 **Usage Examples:**
-• `/client` → Switches to client-friendly responses
-• `/cs` → Switches to CS bullet-point format
-• Just type your question after using a slash command!
+• `/client` → Just switches agent
+• `/client my email is e.j.price1986@gmail.com` → Switches agent AND processes query
+• `/cs what is their account status` → Switches to CS format and answers
+• `/help` → Shows this help
+
+**Two Ways to Use:**
+1. **Switch Only:** `/client` (then ask questions normally)
+2. **Switch + Query:** `/client [your question]` (switches and answers immediately)
 
 **Note:** Agent selection persists for the conversation until changed."""
 
@@ -579,12 +593,24 @@ class MultiProviderCreditAPI:
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
                 
-                if AGENT_PROMPTS_AVAILABLE:
-                    from agent_prompts import get_agent_info
-                    
-                    try:
-                        info = get_agent_info(agent_type)
-                        return f"""✅ **Agent Switched Successfully!**
+                # If there's a remaining query, process it with the new agent
+                if remaining_query:
+                    print(f"🎯 Processing slash command with query: {command} + '{remaining_query}'")
+                    # Process the remaining query with the selected agent
+                    return self.process_chat_request(
+                        query=remaining_query,
+                        agent_type=agent_type,
+                        model="gpt-4o-mini",
+                        temperature=0.7
+                    )
+                else:
+                    # Just switching agent without a query
+                    if AGENT_PROMPTS_AVAILABLE:
+                        from agent_prompts import get_agent_info
+                        
+                        try:
+                            info = get_agent_info(agent_type)
+                            return f"""✅ **Agent Switched Successfully!**
 
 🤖 **Active Agent:** {info.get('name', agent_type)}
 📝 **Format:** {info.get('format', 'Standard')}
@@ -594,11 +620,11 @@ class MultiProviderCreditAPI:
 **Ready for your questions!** The system will now use this agent's prompt style for all responses until you switch again.
 
 💾 **Session stored** - Your agent preference will persist for this conversation."""
-                    
-                    except Exception:
-                        return f"✅ **Agent switched to:** `{agent_type}`\n\n**Ready for your questions!**\n\n💾 **Session stored** - Your agent preference will persist."
-                else:
-                    return "❌ Agent prompts system not available"
+                        
+                        except Exception:
+                            return f"✅ **Agent switched to:** `{agent_type}`\n\n**Ready for your questions!**\n\n💾 **Session stored** - Your agent preference will persist."
+                    else:
+                        return "❌ Agent prompts system not available"
             
             else:
                 available_commands = ', '.join([cmd for cmd in slash_commands.keys() if cmd not in ['/help', '/agents']])
