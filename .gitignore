@@ -64,4 +64,6 @@ venv/
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.dbarchived/
+*.jsonl
+test_*.py

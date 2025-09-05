@@ -179,8 +179,12 @@ class MultiProviderCreditAPI:
         # Count data types requested
         data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
+        # Check for bureau-specific credit score queries that need multi_data handler
+        bureau_score_keywords = ['experian score', 'transunion score', 'equifax score', 'bureau score', 'credit score']
+        has_bureau_score_query = any(keyword in query_lower for keyword in bureau_score_keywords)
+
         # PRIORITY: Multi-data queries (comprehensive analysis) - even with customer identifiers
-        if has_combined_keywords or data_type_count > 1:
+        if has_combined_keywords or data_type_count > 1 or has_bureau_score_query:
             return "multi_data"
 
         # PRIORITY: Customer identification with real data
