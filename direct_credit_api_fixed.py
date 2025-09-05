@@ -94,19 +94,14 @@ class MultiProviderCreditAPI:
         self.token_expires_at = None
 
         # Performance optimization - simple in-memory cache for recent queries
+        # DISABLED for development to prevent cache interference
         self.query_cache = {}
-        self.cache_ttl = 300  # 5 minutes
+        self.cache_ttl = 0  # Disabled - set to 0 to bypass caching
 
         # Redis caching for Tilores responses
-        try:
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            self.redis_client = redis.from_url(redis_url, decode_responses=True)
-            # Test connection
-            self.redis_client.ping()
-            print("✅ Redis connected successfully")
-        except Exception as e:
-            print(f"⚠️ Redis connection failed: {e}")
-            self.redis_client = None
+        # Redis caching DISABLED for development to prevent cache interference
+        print("🚫 Redis caching DISABLED for development")
+        self.redis_client = None
 
         # Tilores API configuration
         self.tilores_api_url = os.getenv("TILORES_GRAPHQL_API_URL")
@@ -436,7 +431,7 @@ class MultiProviderCreditAPI:
                 return redis_cached
 
             # Check memory cache
-            if cache_key in self.query_cache:
+            if self.cache_ttl > 0 and cache_key in self.query_cache:
                 cached_data = self.query_cache[cache_key]
                 if datetime.now().timestamp() - cached_data['timestamp'] < self.cache_ttl:
                     duration = time.time() - start_time
@@ -458,8 +453,9 @@ class MultiProviderCreditAPI:
             # Apply universal formatting enhancement to ALL responses
             response = self._enhance_response_formatting(response)
 
-            # Cache the response
-            self._cache_response(cache_key, response)
+            # Cache the response (disabled during development)
+            if self.cache_ttl > 0:
+                self._cache_response(cache_key, response)
 
             # Log performance back to Agenta
             duration = time.time() - start_time
@@ -690,7 +686,7 @@ Type `/help` for detailed usage information."""
         try:
             # First, handle inline ### sections by splitting them properly
             response = self._preprocess_inline_sections(response)
-            
+
             # Split into lines and process
             lines = response.split('\n')
             formatted_lines = []
