@@ -174,14 +174,21 @@ class MultiProviderCreditAPI:
         # Count data types requested
         data_type_count = sum([has_credit_keywords, has_transaction_keywords])
 
-        # PRIORITY: Customer identification with real data (always route to status for customer data)
-        # This includes queries with customer identifiers + credit/transaction keywords + session context
-        if has_customer_identifier or has_known_customer_name or has_session_context:
-            return "status"
+        # PRIORITY: Multi-data queries (comprehensive analysis) - even with customer identifiers
+        if has_combined_keywords or data_type_count > 1:
+            return "multi_data"
+
+        # PRIORITY: Customer identification with real data
+        # Route to appropriate analysis type when customer is identified
+        elif has_customer_identifier or has_known_customer_name or has_session_context:
+            if has_credit_keywords:
+                return "credit"
+            elif has_transaction_keywords:
+                return "transaction"
+            else:
+                return "status"  # Default for basic customer info
 
         # Secondary routing for non-customer queries only
-        elif has_combined_keywords or data_type_count > 1:
-            return "multi_data"
         elif has_credit_keywords:
             return "credit"
         elif has_transaction_keywords:
@@ -604,32 +611,17 @@ class MultiProviderCreditAPI:
             # Use optimized query-type-specific prompts (Agenta.ai deprecated)
             # Query-type-specific prompts optimized for performance
             prompt_config = {
-                "status": {
-                    "system_prompt": "You are a customer service AI assistant. Provide concise account status information using bullet points.",
-                    "temperature": 0.3,
-                    "max_tokens": 200
-                },
-                "general": {
-                    "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
-                    "temperature": 0.3,
-                    "max_tokens": 300
-                },
-                "credit": {
-                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
-                },
-                "transaction": {
-                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
-                },
-                "multi_data": {
-                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                    "temperature": 0.7,
-                    "max_tokens": 1500
-                }
-            }.get(query_type, {
+    "general": {
+        "system_prompt": "You are a helpful AI assistant providing general information about Tilores credit repair services. Be informative and professional.",
+        "temperature": 0.7,
+        "max_tokens": 500
+    },
+    "status": {
+        "system_prompt": "You are a customer service assistant. Provide clear, concise account status information based on customer data. Be direct and helpful.",
+        "temperature": 0.7,
+        "max_tokens": 600
+    }
+}.get(query_type, {
                 "system_prompt": "You are a helpful AI assistant. Provide concise, factual customer profile information using bullet points.",
                 "temperature": 0.3,
                 "max_tokens": 300
@@ -818,7 +810,7 @@ class MultiProviderCreditAPI:
         try:
             status_response = self._process_status_query(query)
             data_context = f"ACTUAL CUSTOMER DATA:\n{status_response}"
-        except Exception as e:
+        except Exception:
             data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
 
         # Create the full prompt with data context
@@ -1237,7 +1229,7 @@ async def chat_completions(request: Request):
             api.update_recent_customer_context(conversation_context)
         elif recent_customer_context['has_customer_context'] and api.is_ambiguous_query(query):
             enhanced_query = api.enhance_query_with_context(query, recent_customer_context)
-            print(f"🔍 DEBUG: Using recent customer context for ambiguous query")
+            print("🔍 DEBUG: Using recent customer context for ambiguous query")
         else:
             enhanced_query = api.enhance_query_with_context(query, conversation_context)
 

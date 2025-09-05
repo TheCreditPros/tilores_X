@@ -1,0 +1,291 @@
+{
+  "summary": {
+    "success_rate": 80.0,
+    "average_score": 80.0,
+    "total_tests": 25,
+    "passes": 20,
+    "target_achieved": false,
+    "close_to_target": false,
+    "categories": {
+      "Customer Lookup": {
+        "total": 5,
+        "passed": 5,
+        "scores": [
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Account Status": {
+        "total": 4,
+        "passed": 4,
+        "scores": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Service Information": {
+        "total": 6,
+        "passed": 6,
+        "scores": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Payment History": {
+        "total": 3,
+        "passed": 2,
+        "scores": [
+          0,
+          100,
+          100
+        ],
+        "success_rate": 66.66666666666666,
+        "avg_score": 66.66666666666667
+      },
+      "Credit Analysis": {
+        "total": 2,
+        "passed": 1,
+        "scores": [
+          100,
+          0
+        ],
+        "success_rate": 50.0,
+        "avg_score": 50.0
+      },
+      "Multi-Part Query": {
+        "total": 1,
+        "passed": 0,
+        "scores": [
+          0
+        ],
+        "success_rate": 0.0,
+        "avg_score": 0.0
+      },
+      "Comprehensive Analysis": {
+        "total": 4,
+        "passed": 2,
+        "scores": [
+          0,
+          0,
+          100,
+          100
+        ],
+        "success_rate": 50.0,
+        "avg_score": 50.0
+      }
+    }
+  },
+  "detailed_results": [
+    {
+      "query": "Who is e.j.price1986@gmail.com?",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0070018768310546875
+    },
+    {
+      "query": "Customer profile for client 1747598",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.2290761470794678
+    },
+    {
+      "query": "Customer information for e.j.price1986@gmail.com",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0021140575408935547
+    },
+    {
+      "query": "Customer details for Esteban Price",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0019648075103759766
+    },
+    {
+      "query": "Profile of client 1747598",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0025620460510253906
+    },
+    {
+      "query": "Is e.j.price1986@gmail.com account active?",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.0962250232696533
+    },
+    {
+      "query": "Account status for client 1747598",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.0164589881896973
+    },
+    {
+      "query": "Account standing for e.j.price1986@gmail.com",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0027310848236083984
+    },
+    {
+      "query": "Status check for client 1747598",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0024018287658691406
+    },
+    {
+      "query": "Enrollment date for Esteban Price",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.8185691833496094
+    },
+    {
+      "query": "Monthly service cost for Esteban Price",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.8210980892181396
+    },
+    {
+      "query": "What product is client 1747598 enrolled in?",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.00292205810546875
+    },
+    {
+      "query": "Service type for e.j.price1986@gmail.com",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0018420219421386719
+    },
+    {
+      "query": "When did Esteban Price start service?",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0022559165954589844
+    },
+    {
+      "query": "What services does e.j.price1986@gmail.com have?",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.9240140914916992
+    },
+    {
+      "query": "Monthly charges for e.j.price1986@gmail.com",
+      "category": "Payment History",
+      "status": "FAIL",
+      "score": 0,
+      "error": "Timeout or connection error"
+    },
+    {
+      "query": "Payment status for client 1747598",
+      "category": "Payment History",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1412,
+      "response_time": 2.9199249744415283
+    },
+    {
+      "query": "What's the billing status for client 1747598?",
+      "category": "Payment History",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1035,
+      "response_time": 4.969149112701416
+    },
+    {
+      "query": "What is the credit score for e.j.price1986@gmail.com?",
+      "category": "Credit Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1202,
+      "response_time": 0.0042340755462646484
+    },
+    {
+      "query": "Credit report for e.j.price1986@gmail.com",
+      "category": "Credit Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "Timeout or connection error"
+    },
+    {
+      "query": "Customer info for Esteban Price and their payment status",
+      "category": "Multi-Part Query",
+      "status": "FAIL",
+      "score": 0,
+      "error": "Timeout or connection error"
+    },
+    {
+      "query": "Complete overview of e.j.price1986@gmail.com account",
+      "category": "Comprehensive Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "Timeout or connection error"
+    },
+    {
+      "query": "Full account summary for client 1747598",
+      "category": "Comprehensive Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "Timeout or connection error"
+    },
+    {
+      "query": "Everything about Esteban Price's account",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0512089729309082
+    },
+    {
+      "query": "Detailed report for e.j.price1986@gmail.com",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.4330940246582031
+    }
+  ],
+  "timestamp": "20250904_195019"
+}

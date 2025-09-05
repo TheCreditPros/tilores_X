@@ -1,0 +1,317 @@
+{
+  "summary": {
+    "success_rate": 76.0,
+    "average_score": 76.0,
+    "total_tests": 25,
+    "passes": 19,
+    "timeout_failures": 6,
+    "other_failures": 0,
+    "target_achieved": false,
+    "close_to_target": false,
+    "categories": {
+      "Customer Lookup": {
+        "total": 3,
+        "passed": 3,
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Account Status": {
+        "total": 3,
+        "passed": 3,
+        "scores": [
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Service Information": {
+        "total": 5,
+        "passed": 5,
+        "scores": [
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Payment History": {
+        "total": 5,
+        "passed": 2,
+        "scores": [
+          0,
+          100,
+          100,
+          0,
+          0
+        ],
+        "success_rate": 40.0,
+        "avg_score": 40.0
+      },
+      "Credit Analysis": {
+        "total": 4,
+        "passed": 1,
+        "scores": [
+          0,
+          100,
+          0,
+          0
+        ],
+        "success_rate": 25.0,
+        "avg_score": 25.0
+      },
+      "Multi-Part Query": {
+        "total": 1,
+        "passed": 1,
+        "scores": [
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      },
+      "Comprehensive Analysis": {
+        "total": 4,
+        "passed": 4,
+        "scores": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "success_rate": 100.0,
+        "avg_score": 100.0
+      }
+    }
+  },
+  "detailed_results": [
+    {
+      "query": "Who is e.j.price1986@gmail.com?",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.5958950519561768,
+      "expected_success": true
+    },
+    {
+      "query": "Customer profile for client 1747598",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.002237081527709961,
+      "expected_success": true
+    },
+    {
+      "query": "Is e.j.price1986@gmail.com account active?",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0017409324645996094,
+      "expected_success": true
+    },
+    {
+      "query": "Account status for client 1747598",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.002560853958129883,
+      "expected_success": true
+    },
+    {
+      "query": "Enrollment date for Esteban Price",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.002396821975708008,
+      "expected_success": true
+    },
+    {
+      "query": "Monthly service cost for Esteban Price",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.001911163330078125,
+      "expected_success": true
+    },
+    {
+      "query": "What services does e.j.price1986@gmail.com have?",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.0018301010131835938,
+      "expected_success": true
+    },
+    {
+      "query": "Payment status for client 1747598",
+      "category": "Payment History",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    },
+    {
+      "query": "What's the billing status for client 1747598?",
+      "category": "Payment History",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1035,
+      "response_time": 0.5519380569458008,
+      "expected_success": true
+    },
+    {
+      "query": "What is the credit score for e.j.price1986@gmail.com?",
+      "category": "Credit Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    },
+    {
+      "query": "Monthly charges for e.j.price1986@gmail.com",
+      "category": "Payment History",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1567,
+      "response_time": 2.6789042949676514,
+      "expected_success": true
+    },
+    {
+      "query": "Credit report for e.j.price1986@gmail.com",
+      "category": "Credit Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1712,
+      "response_time": 0.0030281543731689453,
+      "expected_success": true
+    },
+    {
+      "query": "Customer info for Esteban Price and their payment status",
+      "category": "Multi-Part Query",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 1742,
+      "response_time": 0.0020551681518554688,
+      "expected_success": true
+    },
+    {
+      "query": "Complete overview of e.j.price1986@gmail.com account",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.0426220893859863,
+      "expected_success": true
+    },
+    {
+      "query": "Everything about Esteban Price's account",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.8224692344665527,
+      "expected_success": true
+    },
+    {
+      "query": "Customer details for Esteban Price",
+      "category": "Customer Lookup",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.9894840717315674,
+      "expected_success": true
+    },
+    {
+      "query": "Service type for e.j.price1986@gmail.com",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.8505311012268066,
+      "expected_success": true
+    },
+    {
+      "query": "When did Esteban Price start service?",
+      "category": "Service Information",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.9035170078277588,
+      "expected_success": true
+    },
+    {
+      "query": "Account standing for e.j.price1986@gmail.com",
+      "category": "Account Status",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 1.0104048252105713,
+      "expected_success": true
+    },
+    {
+      "query": "Full account summary for client 1747598",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.003059864044189453,
+      "expected_success": true
+    },
+    {
+      "query": "Detailed report for e.j.price1986@gmail.com",
+      "category": "Comprehensive Analysis",
+      "status": "PASS",
+      "score": 100,
+      "response_length": 163,
+      "response_time": 0.001893758773803711,
+      "expected_success": true
+    },
+    {
+      "query": "Credit repair progress for e.j.price1986@gmail.com",
+      "category": "Credit Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    },
+    {
+      "query": "Show me the Experian credit report for Esteban Price",
+      "category": "Credit Analysis",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    },
+    {
+      "query": "Payment history for Esteban Price",
+      "category": "Payment History",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    },
+    {
+      "query": "Billing history for e.j.price1986@gmail.com",
+      "category": "Payment History",
+      "status": "FAIL",
+      "score": 0,
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Read timed out. (read timeout=6)",
+      "expected_success": true
+    }
+  ],
+  "timestamp": "20250904_195502"
+}
