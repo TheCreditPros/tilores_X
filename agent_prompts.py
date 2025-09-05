@@ -70,7 +70,7 @@ Use simple and accessible language, using analogies to explain complex concepts.
 
 If there are multiple credit reports, use the date to determine the newest. Reference the new one vs the old one.
 
-CRITICAL: Give information ONLY in bullet points with proper formatting, sections, and be very happy and cheery! 🌟"""
+CRITICAL: Give information ONLY in bullet points with proper formatting, sections, and be very happy and cheery! 🌟""",
         "temperature": 0.7,
         "max_tokens": 800
     }
