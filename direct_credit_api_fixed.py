@@ -24,6 +24,17 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+# Agent Prompts Integration
+try:
+    from agent_prompts import get_agent_prompt
+    AGENT_PROMPTS_AVAILABLE = True
+    print("✅ Agent prompts system loaded")
+except ImportError as e:
+    print(f"⚠️ Agent prompts not available: {e}")
+    AGENT_PROMPTS_AVAILABLE = False
+    def get_agent_prompt(agent_type, query_type):
+        return None
+
 # Import our Agenta SDK manager
 try:
     from agenta_sdk_manager import agenta_manager
@@ -60,6 +71,8 @@ class ChatCompletionRequest(BaseModel):
     temperature: Optional[float] = 0.7
     max_tokens: Optional[int] = None
     stream: Optional[bool] = False
+    # Agent selection
+    agent_type: Optional[str] = None
     # Agenta.ai specific fields
     prompt_id: Optional[str] = None
     prompt_version: Optional[str] = None
@@ -354,7 +367,8 @@ class MultiProviderCreditAPI:
 
     def process_chat_request(self, query: str, model: str = "gpt-4o-mini",
                            temperature: float = 0.7, max_tokens: int = None,
-                           prompt_id: str = None, prompt_version: str = None) -> str:
+                           prompt_id: str = None, prompt_version: str = None,
+                           agent_type: str = None) -> str:
         """Process chat request with dynamic prompt selection and fixed Salesforce status"""
         start_time = time.time()
         self.request_counter += 1
@@ -367,8 +381,23 @@ class MultiProviderCreditAPI:
             query_type = self.detect_query_type(query)
             print(f"🎯 Detected query type: {query_type}")
 
-            # Get appropriate prompt from Agenta SDK or local store
-            if AGENTA_INTEGRATION and agenta_manager:
+            # Check for agent-specific prompt override
+            agent_prompt_config = None
+            # Default to zoho_cs_agent if no agent_type specified
+            if not agent_type:
+                agent_type = "zoho_cs_agent"
+                print(f"🤖 DEBUG: Defaulting to agent_type: {agent_type}")
+
+            if AGENT_PROMPTS_AVAILABLE and agent_type:
+                agent_prompt_config = get_agent_prompt(agent_type, query_type)
+                if agent_prompt_config:
+                    print(f"🤖 Using agent prompt: {agent_type}")
+
+            # Get appropriate prompt from agent, Agenta SDK, or local store
+            if agent_prompt_config:
+                prompt_config = agent_prompt_config
+                prompt_config["source"] = f"agent_{agent_type}"
+            elif AGENTA_INTEGRATION and agenta_manager:
                 prompt_config = agenta_manager.get_prompt_config(query_type, query)
                 print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
             else:
@@ -596,18 +625,18 @@ class MultiProviderCreditAPI:
             # Use the exact same query structure that worked in testing
             comprehensive_query = """
             query GetFullCreditData($id: ID!) {
-                entity(input: { id: $id }) {
-                    entity {
-                        id
-                        records {
-                            id
-                            STATUS
-                            FIRST_NAME
-                            LAST_NAME
-                            EMAIL
-                            CLIENT_ID
-                            CURRENT_PRODUCT
-                            ENROLL_DATE
+              entity(input: { id: $id }) {
+                entity {
+                  id
+                  records {
+                    id
+                    STATUS
+                    FIRST_NAME
+                    LAST_NAME
+                    EMAIL
+                    CLIENT_ID
+                    CURRENT_PRODUCT
+                    ENROLL_DATE
                             CREDIT_RESPONSE {
                                 CREDIT_BUREAU
                                 CreditReportFirstIssuedDate
@@ -627,9 +656,9 @@ class MultiProviderCreditAPI:
                                     }
                                 }
                             }
-                        }
-                    }
+                  }
                 }
+              }
             }
             """
 
@@ -1058,6 +1087,84 @@ async def clear_cache():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Backend Prompt API Endpoints for OpenWebUI Tool Integration
+@app.get("/api/prompts")
+async def list_prompts():
+    """List all available agent prompts for OpenWebUI tool"""
+    try:
+        if not AGENT_PROMPTS_AVAILABLE:
+            return {"error": "Agent prompts system not available"}
+        
+        from agent_prompts import list_available_agents, get_agent_info
+        
+        prompts = []
+        for agent_type in list_available_agents():
+            info = get_agent_info(agent_type)
+            prompts.append({
+                "id": agent_type,
+                "name": info.get("name", agent_type),
+                "description": info.get("description", "No description available"),
+                "use_case": info.get("use_case", "General"),
+                "format": info.get("format", "Standard")
+            })
+        
+        return prompts
+    except Exception as e:
+        return {"error": f"Failed to list prompts: {str(e)}"}
+
+@app.get("/api/prompts/{prompt_id}")
+async def get_prompt(prompt_id: str):
+    """Get specific agent prompt by ID for OpenWebUI tool"""
+    try:
+        if not AGENT_PROMPTS_AVAILABLE:
+            return {"error": "Agent prompts system not available"}
+        
+        from agent_prompts import get_agent_prompt, get_agent_info
+        
+        # Get prompt configuration
+        prompt_config = get_agent_prompt(prompt_id)
+        if not prompt_config:
+            return {"error": f"Prompt '{prompt_id}' not found"}
+        
+        # Get additional info
+        info = get_agent_info(prompt_id)
+        
+        return {
+            "id": prompt_id,
+            "name": info.get("name", prompt_id),
+            "description": info.get("description", "No description available"),
+            "content": prompt_config.get("system_prompt", ""),
+            "temperature": prompt_config.get("temperature", 0.7),
+            "max_tokens": prompt_config.get("max_tokens", 1000),
+            "use_case": info.get("use_case", "General"),
+            "format": info.get("format", "Standard"),
+            "created_at": "2025-01-09T10:00:00Z",
+            "updated_at": "2025-01-09T10:00:00Z"
+        }
+    except Exception as e:
+        return {"error": f"Failed to get prompt: {str(e)}"}
+
+@app.get("/api/health")
+async def api_health_check():
+    """Health check endpoint for OpenWebUI tool"""
+    try:
+        if AGENT_PROMPTS_AVAILABLE:
+            from agent_prompts import AGENT_PROMPTS
+            available_agents = len(AGENT_PROMPTS)
+        else:
+            available_agents = 0
+    except ImportError:
+        available_agents = 0
+    
+    return {
+        "status": "healthy",
+        "service": "Tilores Credit API",
+        "timestamp": datetime.now().isoformat(),
+        "agent_prompts_available": AGENT_PROMPTS_AVAILABLE,
+        "available_agents": available_agents
+    }
+
+
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     """
@@ -1078,11 +1185,16 @@ async def chat_completions(request: Request):
         max_tokens = request_data.get("max_tokens")
         stream = request_data.get("stream", False)
 
+        # Agent selection
+        agent_type = request_data.get("agent_type")
+
         # Agenta.ai specific fields
         prompt_id = request_data.get("prompt_id")
         prompt_version = request_data.get("prompt_version")
 
         print(f"🔍 DEBUG: Extracted - Model: {model}, Messages: {len(messages)}, Temp: {temperature}")
+        if agent_type:
+            print(f"🤖 DEBUG: Agent Type: {agent_type}")
         if prompt_id:
             print(f"🔍 DEBUG: Agenta.ai - Prompt ID: {prompt_id}, Version: {prompt_version}")
 
@@ -1120,14 +1232,15 @@ async def chat_completions(request: Request):
                 print(f"🔍 DEBUG: Enhanced query: '{query}' -> '{enhanced_query}'")
                 query = enhanced_query
 
-        # Process the request with Agenta.ai integration
+        # Process the request with agent and Agenta.ai integration
         response_content = api.process_chat_request(
             query=query,
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
             prompt_id=prompt_id,
-            prompt_version=prompt_version
+            prompt_version=prompt_version,
+            agent_type=agent_type
         )
 
         # Handle streaming vs non-streaming response
