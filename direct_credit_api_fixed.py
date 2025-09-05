@@ -148,7 +148,11 @@ class MultiProviderCreditAPI:
         """Detect the type of query to route to appropriate prompt"""
         query_lower = query.lower()
 
-        # Tool/system queries (highest priority)
+        # Slash commands (highest priority)
+        if query.strip().startswith('/'):
+            return "slash_command"
+
+        # Tool/system queries (second priority)
         tool_keywords = ['test tilores', 'tilores backend', 'backend connection', 'connection test', 
                         'list agents', 'available agents', 'what agents', 'tilores agents']
         if any(keyword in query_lower for keyword in tool_keywords):
@@ -389,8 +393,13 @@ class MultiProviderCreditAPI:
 
             # Check for agent-specific prompt override
             agent_prompt_config = None
-            # Default to zoho_cs_agent if no agent_type specified
-            if not agent_type:
+            # Check for session-stored agent preference first
+            session_agent = self._get_session_agent(query)
+            if session_agent:
+                agent_type = session_agent
+                print(f"🤖 DEBUG: Using session agent: {agent_type}")
+            elif not agent_type:
+                # Default to zoho_cs_agent if no agent_type specified
                 agent_type = "zoho_cs_agent"
                 print(f"🤖 DEBUG: Defaulting to agent_type: {agent_type}")
 
@@ -440,6 +449,8 @@ class MultiProviderCreditAPI:
                 response = self._process_status_query(query)
             elif query_type == "tool":
                 response = self._process_tool_query(query)
+            elif query_type == "slash_command":
+                response = self._process_slash_command(query)
             else:
                 # For other query types, use the full data analysis with dynamic prompt
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
@@ -483,7 +494,7 @@ class MultiProviderCreditAPI:
     def _process_tool_query(self, query: str) -> str:
         """Process tool/system queries like connection tests and agent listings"""
         query_lower = query.lower()
-        
+
         try:
             if any(keyword in query_lower for keyword in ['test', 'connection', 'backend']):
                 # Connection test
@@ -501,29 +512,143 @@ class MultiProviderCreditAPI:
                 # List agents
                 if AGENT_PROMPTS_AVAILABLE:
                     from agent_prompts import list_available_agents, get_agent_info
-                    
+
                     result = "🤖 **Available Tilores Agent Prompts:**\n\n"
-                    
+
                     for agent_type in list_available_agents():
                         info = get_agent_info(agent_type)
                         result += f"### **{info.get('name', agent_type)}** (`{agent_type}`)\n"
                         result += f"**Description:** {info.get('description', 'No description')}\n"
                         result += f"**Use Case:** {info.get('use_case', 'General')}\n"
                         result += f"**Format:** {info.get('format', 'Standard')}\n\n"
-                    
+
                     result += "**Usage Examples:**\n"
                     result += "• For CS queries: Just ask normally - system defaults to Zoho CS agent\n"
                     result += "• For client education: Specify friendly tone in your request\n"
-                    
+
                     return result
+                else:
+                    return "❌ Agent prompts system not available"
+
+            else:
+                return "🤖 **Tilores System Commands:**\n\n• Test connection: 'Test the Tilores backend connection'\n• List agents: 'What Tilores agents are available?'"
+
+        except Exception as e:
+            return f"❌ Tool query error: {str(e)}"
+
+    def _process_slash_command(self, query: str) -> str:
+        """Process slash commands for quick agent switching"""
+        command = query.strip().lower()
+        
+        # Define slash command mappings
+        slash_commands = {
+            '/client': 'client_chat_agent',
+            '/cs': 'zoho_cs_agent',
+            '/cst': 'zoho_cs_agent',
+            '/zoho': 'zoho_cs_agent',
+            '/help': 'help',
+            '/agents': 'list_agents'
+        }
+        
+        try:
+            if command == '/help':
+                return """🤖 **Tilores Slash Commands:**
+
+**Agent Selection:**
+• `/client` - Switch to Client Chat Agent (friendly, educational)
+• `/cs` or `/cst` - Switch to Zoho CS Agent (concise, bullet points)
+• `/zoho` - Switch to Zoho CS Agent
+
+**System Commands:**
+• `/agents` - List all available agents
+• `/help` - Show this help message
+
+**Usage Examples:**
+• `/client` → Switches to client-friendly responses
+• `/cs` → Switches to CS bullet-point format
+• Just type your question after using a slash command!
+
+**Note:** Agent selection persists for the conversation until changed."""
+
+            elif command == '/agents':
+                return self._process_tool_query("list agents")
+            
+            elif command in slash_commands:
+                agent_type = slash_commands[command]
+                
+                # Store the agent selection for this session
+                self._set_session_agent(query, agent_type)
+                
+                if AGENT_PROMPTS_AVAILABLE:
+                    from agent_prompts import get_agent_info
+                    
+                    try:
+                        info = get_agent_info(agent_type)
+                        return f"""✅ **Agent Switched Successfully!**
+
+🤖 **Active Agent:** {info.get('name', agent_type)}
+📝 **Format:** {info.get('format', 'Standard')}
+🎯 **Use Case:** {info.get('use_case', 'General')}
+💬 **Style:** {info.get('description', 'No description')}
+
+**Ready for your questions!** The system will now use this agent's prompt style for all responses until you switch again.
+
+💾 **Session stored** - Your agent preference will persist for this conversation."""
+                    
+                    except Exception:
+                        return f"✅ **Agent switched to:** `{agent_type}`\n\n**Ready for your questions!**\n\n💾 **Session stored** - Your agent preference will persist."
                 else:
                     return "❌ Agent prompts system not available"
             
             else:
-                return "🤖 **Tilores System Commands:**\n\n• Test connection: 'Test the Tilores backend connection'\n• List agents: 'What Tilores agents are available?'"
+                available_commands = ', '.join([cmd for cmd in slash_commands.keys() if cmd not in ['/help', '/agents']])
+                return f"""❌ **Unknown slash command:** `{command}`
+
+**Available commands:** {available_commands}, `/help`, `/agents`
+
+Type `/help` for detailed usage information."""
                 
         except Exception as e:
-            return f"❌ Tool query error: {str(e)}"
+            return f"❌ Slash command error: {str(e)}"
+
+    def _get_session_agent(self, query: str) -> str:
+        """Get the stored agent preference for this session"""
+        try:
+            # Extract session identifier from query context
+            session_key = self._get_session_key(query)
+            if session_key and self.redis_client:
+                stored_agent = self.redis_client.get(f"session_agent:{session_key}")
+                if stored_agent:
+                    return stored_agent.decode('utf-8')
+        except Exception as e:
+            print(f"⚠️ Session agent retrieval error: {e}")
+        return None
+
+    def _set_session_agent(self, query: str, agent_type: str):
+        """Store the agent preference for this session"""
+        try:
+            session_key = self._get_session_key(query)
+            if session_key and self.redis_client:
+                # Store for 24 hours
+                self.redis_client.setex(f"session_agent:{session_key}", 86400, agent_type)
+                print(f"💾 Session agent stored: {agent_type} for session {session_key[:8]}...")
+        except Exception as e:
+            print(f"⚠️ Session agent storage error: {e}")
+
+    def _get_session_key(self, query: str) -> str:
+        """Generate a session key from query context"""
+        try:
+            # Use customer email/phone as session key if available
+            customer_info = self._parse_query_for_customer(query)
+            if customer_info.get('email'):
+                return f"user_{hashlib.md5(customer_info['email'].encode()).hexdigest()}"
+            elif customer_info.get('phone'):
+                return f"user_{hashlib.md5(customer_info['phone'].encode()).hexdigest()}"
+            else:
+                # Fallback to IP-based session (basic)
+                return f"ip_{hashlib.md5('default_session'.encode()).hexdigest()}"
+        except Exception:
+            return f"default_{hashlib.md5('fallback'.encode()).hexdigest()}"
 
     def _process_status_query(self, query: str) -> str:
         """Process Salesforce account status queries - FIXED VERSION"""
