@@ -1,0 +1,67 @@
+{
+  "timestamp": "2025-09-05 08:43:06",
+  "total_duration": 17.036251068115234,
+  "local_results": [
+    {
+      "query": "what is their experian credit score for e.j.price1986@gmail.com",
+      "duration": 8.975114107131958,
+      "status_code": 200,
+      "response_length": 1205,
+      "is_generic_openai": false,
+      "is_customer_specific": false,
+      "is_placeholder": false,
+      "has_real_data": false,
+      "response_preview": "I'm sorry for the confusion, but due to privacy and security reasons, I can't provide specific information like the Experian credit score for a customer. I can provide a general status overview and st..."
+    },
+    {
+      "query": "what is the transunion score for e.j.price1986@gmail.com",
+      "duration": 2.524587869644165,
+      "status_code": 200,
+      "response_length": 277,
+      "is_generic_openai": false,
+      "is_customer_specific": false,
+      "is_placeholder": false,
+      "has_real_data": false,
+      "response_preview": "Unfortunately, as an AI model, I have no capability to access confidential personal information or data from external sources or databases, such as TransUnion credit scores. I suggest reaching out to ..."
+    },
+    {
+      "query": "what is the account status for e.j.price1986@gmail.com",
+      "duration": 0.4600529670715332,
+      "status_code": 200,
+      "response_length": 163,
+      "is_generic_openai": false,
+      "is_customer_specific": true,
+      "is_placeholder": false,
+      "has_real_data": false,
+      "response_preview": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n"
+    }
+  ],
+  "production_results": [
+    {
+      "query": "what is their experian credit score for e.j.price1986@gmail.com",
+      "duration": 3.970924139022827,
+      "status_code": 200,
+      "response_length": 261,
+      "is_generic_openai": false,
+      "is_customer_specific": false,
+      "has_real_data": false,
+      "response_preview": "Apologies for the confusion, but as an AI, I don't have access to personal data unless it has been shared with me in the course of our conversation. I'm designed to respect user privacy and confidenti..."
+    },
+    {
+      "query": "what is the account status for e.j.price1986@gmail.com",
+      "duration": 1.1049540042877197,
+      "status_code": 200,
+      "response_length": 163,
+      "is_generic_openai": false,
+      "is_customer_specific": true,
+      "has_real_data": false,
+      "response_preview": "**Salesforce Account Status:**\n\n\u2022 **Status:** Active\n\u2022 **Customer:** Esteban Price\n\u2022 **Product:** Downsell Credit Repair Monthly $54.75\n\u2022 **Enrolled:** 2025-04-10\n"
+    }
+  ],
+  "summary": {
+    "generic_responses": 0,
+    "customer_specific": 2,
+    "real_data": 0,
+    "errors": 0
+  }
+}

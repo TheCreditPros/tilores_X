@@ -677,22 +677,21 @@ Type `/help` for detailed usage information."""
 
     def _enhance_response_formatting(self, response: str) -> str:
         """
-        Universal response formatting enhancement for ALL system prompts
-        Ensures proper line breaks, bullet points, and visual structure optimized for chat interfaces
+        OpenWebUI-optimized response formatting based on community research
+        Uses triple backticks and proper markdown that OpenWebUI can handle
         """
         if not response or len(response.strip()) < 10:
             return response
             
         try:
-            # Simple and reliable approach: Split on ### and format sections
             import re
             
             # Split response into sections based on ### markers
             sections = re.split(r'###\s*([^#]+?):', response)
             
             if len(sections) <= 1:
-                # No sections found, just clean up bullet points
-                return self._clean_bullet_points_only(response)
+                # No sections found, return original with minimal cleanup
+                return response.strip()
             
             formatted_parts = []
             
@@ -702,45 +701,45 @@ Type `/help` for detailed usage information."""
                 formatted_parts.append(intro)
                 formatted_parts.append('')  # Add spacing
             
-            # Process section pairs (header, content)
+            # Process section pairs (header, content) using code block formatting
+            formatted_parts.append('```')  # Start code block for structured content
+            
             for i in range(1, len(sections), 2):
                 if i + 1 < len(sections):
                     header = sections[i].strip()
                     content = sections[i + 1].strip()
                     
-                    # Format header as bold
-                    formatted_parts.append(f"**{header}:**")
+                    # Format as structured text within code block
+                    formatted_parts.append(f"{header.upper()}:")
                     formatted_parts.append('')
                     
-                    # Format content with proper bullet points
+                    # Format content with dashes instead of bullets (better in code blocks)
                     content_lines = content.split('\n')
                     for line in content_lines:
                         line = line.strip()
                         if line:
-                            if not line.startswith('•'):
-                                # Convert to bullet point if it looks like it should be one
-                                if any(indicator in line.lower() for indicator in ['experian:', 'equifax:', 'transunion:', 'credit limit:', 'balance:', 'payment:']):
-                                    formatted_parts.append(f"• {line}")
-                                else:
-                                    formatted_parts.append(f"• {line}")
-                            else:
-                                formatted_parts.append(line)
+                            # Clean up existing bullets and use dashes
+                            clean_line = line.lstrip('•-* ').strip()
+                            if clean_line:
+                                formatted_parts.append(f"- {clean_line}")
                     
                     formatted_parts.append('')  # Add spacing after section
             
-            # Join and clean up
+            formatted_parts.append('```')  # End code block
+            
+            # Join and return
             result = '\n'.join(formatted_parts)
-            return self._final_cleanup(result)
+            return result
             
         except Exception as e:
             print(f"⚠️ Formatting enhancement error: {e}")
-            return self._clean_bullet_points_only(response)  # Fallback to simple cleanup
+            return response.strip()  # Return original if formatting fails
 
     def _clean_bullet_points_only(self, text: str) -> str:
         """Simple fallback: just clean up bullet points"""
         lines = text.split('\n')
         cleaned_lines = []
-        
+
         for line in lines:
             line = line.strip()
             if line:
@@ -751,7 +750,7 @@ Type `/help` for detailed usage information."""
                 cleaned_lines.append(line)
             else:
                 cleaned_lines.append('')
-        
+
         return '\n'.join(cleaned_lines)
 
     def _preprocess_inline_sections(self, text: str) -> str:

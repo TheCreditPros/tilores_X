@@ -1,0 +1,191 @@
+[
+  {
+    "id": "gpt-4o",
+    "name": "GPT-4o",
+    "meta": {
+      "description": "OpenAI's most advanced model with superior reasoning capabilities",
+      "provider": "OpenAI",
+      "context_length": 128000,
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "top_p": 1.0
+    }
+  },
+  {
+    "id": "gpt-4o-mini",
+    "name": "GPT-4o Mini",
+    "meta": {
+      "description": "Faster, cost-effective version of GPT-4o with excellent performance",
+      "provider": "OpenAI",
+      "context_length": 128000,
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "top_p": 1.0
+    }
+  },
+  {
+    "id": "gpt-3.5-turbo",
+    "name": "GPT-3.5 Turbo",
+    "meta": {
+      "description": "Fast and efficient model for general conversations",
+      "provider": "OpenAI",
+      "context_length": 16385,
+      "max_tokens": 4096,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "top_p": 1.0
+    }
+  },
+  {
+    "id": "gemini-1.5-flash-002",
+    "name": "Gemini 1.5 Flash",
+    "meta": {
+      "description": "Google's fast and efficient multimodal model",
+      "provider": "Google",
+      "context_length": 1000000,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "top_p": 0.95
+    }
+  },
+  {
+    "id": "gemini-2.5-flash",
+    "name": "Gemini 2.5 Flash",
+    "meta": {
+      "description": "Google's latest enhanced reasoning model with improved capabilities",
+      "provider": "Google",
+      "context_length": 1000000,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "top_p": 0.95
+    }
+  },
+  {
+    "id": "gemini-2.5-flash-lite",
+    "name": "Gemini 2.5 Flash Lite",
+    "meta": {
+      "description": "Lightweight version of Gemini 2.5 Flash optimized for speed",
+      "provider": "Google",
+      "context_length": 1000000,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "top_p": 0.95
+    }
+  },
+  {
+    "id": "gemini-1.5-pro",
+    "name": "Gemini 1.5 Pro",
+    "meta": {
+      "description": "Google's most capable model for complex reasoning tasks",
+      "provider": "Google",
+      "context_length": 2000000,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "top_p": 0.95
+    }
+  },
+  {
+    "id": "llama-3.3-70b-versatile",
+    "name": "Llama 3.3 70B Versatile",
+    "meta": {
+      "description": "Meta's powerful open-source model via Groq for fast inference",
+      "provider": "Groq",
+      "context_length": 131072,
+      "max_tokens": 32768,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 32768,
+      "top_p": 1.0
+    }
+  },
+  {
+    "id": "deepseek-r1-distill-llama-70b",
+    "name": "DeepSeek R1 Distill Llama 70B",
+    "meta": {
+      "description": "Advanced reasoning model optimized for complex problem solving",
+      "provider": "Groq",
+      "context_length": 131072,
+      "max_tokens": 32768,
+      "temperature": 0.7,
+      "top_p": 1.0,
+      "frequency_penalty": 0.0,
+      "presence_penalty": 0.0
+    },
+    "base_url": "https://tilores-x.up.railway.app/v1",
+    "api_key": "{{TILORES_API_KEY}}",
+    "params": {
+      "temperature": 0.7,
+      "max_tokens": 32768,
+      "top_p": 1.0
+    }
+  }
+]
