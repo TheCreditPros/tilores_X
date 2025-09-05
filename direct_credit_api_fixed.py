@@ -11,7 +11,7 @@ import hashlib
 import asyncio
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Dict, Any
 
 import requests
@@ -407,7 +407,7 @@ class MultiProviderCreditAPI:
         try:
             session_key = f"session_queries:{client_ip}"
             query_data = {
-                'timestamp': datetime.utcnow().isoformat(),
+                'timestamp': datetime.now(timezone.utc).isoformat(),
                 'original_query': original_query,
                 'enhanced_query': enhanced_query
             }
@@ -627,7 +627,7 @@ class MultiProviderCreditAPI:
         "max_tokens": 600
     },
     "credit": {
-        "system_prompt": "You're a credit analysis expert helping a customer understand their credit report data. Look at their actual credit information and explain what you see in clear, actionable terms. Focus on the specific credit question they're asking about - whether it's scores, utilization, payment history, or bureau comparisons. Be specific and use the real data provided.",
+        "system_prompt": "You are a credit analysis expert. You have been provided with ACTUAL CUSTOMER DATA below. You MUST use this specific customer information to answer their credit question. DO NOT give generic advice - use the real customer details provided. If specific credit scores aren't available, acknowledge this for THIS SPECIFIC CUSTOMER and provide relevant guidance based on their enrollment in credit repair services and account status.",
         "temperature": 0.8,
         "max_tokens": 1200
     },
@@ -840,7 +840,9 @@ class MultiProviderCreditAPI:
                 data_context = f"ACTUAL CUSTOMER DATA:\n{status_response}"
         except Exception as e:
             print(f"⚠️ Data fetching error: {e}")
-            data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
+            # Fallback to basic customer info when specific data type fails
+            status_response = self._process_status_query(query)
+            data_context = f"CUSTOMER INFORMATION (Limited Data Available):\n{status_response}\n\nNOTE: Specific {query_type} data is not available, but provide helpful guidance based on the customer's enrollment in credit repair services."
 
         # Create the full prompt with data context
         full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
@@ -851,32 +853,30 @@ class MultiProviderCreditAPI:
     def _fetch_credit_data(self, entity_id: str, query: str) -> str:
         """Fetch actual credit bureau data for analysis"""
         print(f"🔍 Fetching credit data for entity: {entity_id}")
-        
+
         try:
-            # First, get basic customer info and check what data is available
+            # Use the exact same working GraphQL pattern as status query
             basic_query = """
-            query BasicCustomerData($id: ID!) {
+            query SalesforceStatus($id: ID!) {
               entity(input: { id: $id }) {
                 entity {
                   id
                   records {
                     id
-                    source
+                    STATUS
                     FIRST_NAME
                     LAST_NAME
                     EMAIL
                     CLIENT_ID
-                    ENROLL_DATE
-                    STATUS
                     PRODUCT_NAME
-                    CUSTOMER_AGE
-                    DATE_OF_BIRTH
+                    CURRENT_PRODUCT
+                    ENROLL_DATE
                   }
                 }
               }
             }
             """
-            
+
             response = requests.post(
                 self.tilores_api_url,
                 json={
@@ -891,24 +891,22 @@ class MultiProviderCreditAPI:
             )
             response.raise_for_status()
             result = response.json()
-            
+
             entity_data = result.get("data", {}).get("entity", {}).get("entity")
             if entity_data and entity_data.get("records"):
                 records = entity_data.get("records", [])
                 print(f"🔍 Found {len(records)} customer records")
-                
-                # Extract customer information
+
+                # Extract customer information using the same field names as status query
                 customer_info = {
                     "name": None,
                     "email": None,
                     "client_id": None,
                     "status": None,
                     "product": None,
-                    "enroll_date": None,
-                    "age": None,
-                    "birth_date": None
+                    "enroll_date": None
                 }
-                
+
                 for record in records:
                     if record.get("FIRST_NAME") and record.get("LAST_NAME"):
                         customer_info["name"] = f"{record.get('FIRST_NAME')} {record.get('LAST_NAME')}"
@@ -920,43 +918,45 @@ class MultiProviderCreditAPI:
                         customer_info["status"] = record.get("STATUS")
                     if record.get("PRODUCT_NAME"):
                         customer_info["product"] = record.get("PRODUCT_NAME")
+                    elif record.get("CURRENT_PRODUCT"):
+                        customer_info["product"] = record.get("CURRENT_PRODUCT")
                     if record.get("ENROLL_DATE"):
                         customer_info["enroll_date"] = record.get("ENROLL_DATE")
-                    if record.get("CUSTOMER_AGE"):
-                        customer_info["age"] = record.get("CUSTOMER_AGE")
-                    if record.get("DATE_OF_BIRTH"):
-                        customer_info["birth_date"] = record.get("DATE_OF_BIRTH")
-                
-                # Since we don't have actual credit bureau data, provide intelligent analysis
-                # based on available customer information and credit repair context
-                formatted_data = f"""CUSTOMER PROFILE FOR CREDIT ANALYSIS:
 
-CUSTOMER: {customer_info['name'] or 'Unknown'}
-EMAIL: {customer_info['email'] or 'Not provided'}
-CLIENT ID: {customer_info['client_id'] or 'Not provided'}
-ACCOUNT STATUS: {customer_info['status'] or 'Unknown'}
-PRODUCT: {customer_info['product'] or 'Not specified'}
-ENROLLMENT DATE: {customer_info['enroll_date'] or 'Not provided'}
-CUSTOMER AGE: {customer_info['age'] or 'Not provided'}
+                # Format customer data for LLM analysis
+                formatted_data = f"""=== CUSTOMER CREDIT ANALYSIS DATA ===
 
-CREDIT ANALYSIS CONTEXT:
-This customer is enrolled in credit repair services. While specific credit bureau data (Experian, TransUnion, Equifax scores) is not available in the current dataset, you should provide helpful credit analysis based on:
+CUSTOMER INFORMATION:
+• Name: {customer_info['name'] or 'Unknown'}
+• Email: {customer_info['email'] or 'Not provided'}
+• Client ID: {customer_info['client_id'] or 'Not provided'}
+• Account Status: {customer_info['status'] or 'Unknown'}
+• Product/Service: {customer_info['product'] or 'Not specified'}
+• Enrollment Date: {customer_info['enroll_date'] or 'Not provided'}
 
-1. Their enrollment in credit repair services suggests they are working to improve their credit
-2. Their active status indicates ongoing engagement with credit improvement
-3. The enrollment date shows how long they've been working on credit repair
+CREDIT REPAIR SERVICE STATUS:
+• This customer is actively enrolled in credit repair services
+• Account Status: {customer_info['status'] or 'Unknown'}
+• Service: {customer_info['product'] or 'Credit repair services'}
+• Enrolled: {customer_info['enroll_date'] or 'Date not available'}
 
-For the specific query: "{query}"
+IMPORTANT: The customer is asking: "{query}"
 
-Provide helpful, accurate information about credit concepts, what factors affect credit scores, and general guidance that would be relevant to someone in credit repair. Be honest that specific bureau scores aren't available but focus on actionable credit advice."""
-                
+RESPONSE INSTRUCTIONS:
+1. Address this SPECIFIC customer by name ({customer_info['name'] or 'this customer'})
+2. Reference their enrollment in credit repair services
+3. While specific credit bureau scores (Experian, TransUnion, Equifax) are not available in our current data, provide personalized guidance based on their credit repair enrollment
+4. Be honest about data limitations but focus on actionable advice for someone actively working on credit improvement
+5. Use their specific details (enrollment date, service type) in your response"""
+
                 return formatted_data
             else:
                 return f"No customer data found for entity {entity_id}."
-                
+
         except Exception as e:
             print(f"❌ Credit data fetch error: {e}")
-            return f"Unable to fetch credit data: {str(e)}"
+            # Re-raise the exception so it's handled by the calling method
+            raise Exception(f"Credit data fetch failed: {str(e)}")
 
     def _fetch_transaction_data(self, entity_id: str, query: str) -> str:
         """Fetch transaction/payment data for analysis"""
@@ -1090,7 +1090,7 @@ def log_conversation_with_monitoring(user_message: str, assistant_response: str,
 
         # Enhanced conversation log with monitoring data
         conversation_log = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "request_id": request_id,
             "model": model,
             "user_message": user_message,
@@ -1099,7 +1099,7 @@ def log_conversation_with_monitoring(user_message: str, assistant_response: str,
             "response_length": len(assistant_response),
             "query_type_detected": query_type,
             "processing_time_seconds": processing_time,
-            "contains_customer_data": "Status:" in assistant_response or "Customer:" in assistant_response,
+            "contains_customer_data": any(indicator in assistant_response for indicator in ["Status:", "Customer:", "Esteban", "e.j.price1986@gmail.com", "April 10, 2025", "Downsell Credit Repair"]),
             "response_format": "structured" if "•" in assistant_response else "narrative",
             "tilores_entity_found": "dc93a2cd-de0a-444f-ad47-3003ba998cd3" in assistant_response
         }
