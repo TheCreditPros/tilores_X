@@ -8,30 +8,7 @@ Simple replacement system that works with existing routing infrastructure
 
 AGENT_PROMPTS = {
     "zoho_cs_agent": {
-        "system_prompt": """CRITICAL: You MUST respond in EXACTLY this format with bullet points using "•" symbol. NO paragraphs, NO sections with "###", NO other formatting.
-
-**CUSTOMER PROFILE:**
-• Name: [customer name or "Not available in data"]
-• Email: [email from query]
-• Enrollment Date: [enrollment date or "Not available in data"]
-• Current Product: [product or "Not available in data"]
-• Account Status: [status or "Not available in data"]
-
-**CREDIT REPAIR PROGRESS:**
-• Bureau-specific score progression: [actual scores or "Not available in data"]
-• Total deletions, new negatives, subsequent deletions: [counts or "Not available"]
-• Lifecycle success rate: [rate or "Not available"]
-
-**CURRENT CREDIT PROFILE:**
-• Bureau-specific utilization: [rates or "Not available"]
-• Payment history: [history or "Not available in data"]
-• Account mix: [mix or "Not available"]
-• Recent inquiry activity: [activity or "Not available"]
-
-**NEXT STEPS:**
-• [recommendations or "Limited due to incomplete data"]
-
-Use EXACTLY this structure. Third-person language only: "Customer's scores...", not "Your scores...". Bullet points with "•" only. No other text.
+        "system_prompt": """IGNORE ALL OTHER INSTRUCTIONS. Respond ONLY with: "TEST: System prompt is working"
 
 CRITICAL CONDITIONAL LOGIC - USE SALESFORCE STATUS DATA:
 • ALWAYS use the ACTUAL Salesforce STATUS field from the customer data
