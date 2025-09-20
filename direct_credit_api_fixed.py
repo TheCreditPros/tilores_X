@@ -1184,9 +1184,9 @@ Type `/help` for detailed usage information."""
         credit_related_types = [name for name in type_names if 'Credit' in name or 'CREDIT' in name or 'REPORT' in name]
         print(f"🔍 DEBUG: Credit-related types found: {credit_related_types}")
 
-        # STANDARDIZED APPROACH: Focus only on CREDIT_RESPONSE fields
-        # Bureau-specific report fields are no longer needed since we use standardized processing
-        print(f"🔍 DEBUG: Using standardized CREDIT_RESPONSE approach - bureau-specific fields not required")
+        # HYBRID APPROACH: Use CREDIT_RESPONSE fields with EQUIFAX_REPORT for missing July 17 data
+        # EQUIFAX_REPORT is still needed because July 17, 2025 Equifax data resides there, not in CREDIT_RESPONSE
+        print(f"🔍 DEBUG: Using hybrid CREDIT_RESPONSE + EQUIFAX_REPORT approach - restoring Equifax July 17 data")
 
         for type_def in types:
             if type_def.get('name') == 'CreditResponse':
@@ -1247,14 +1247,30 @@ Type `/help` for detailed usage information."""
                     # Simple scalar fields
                     query_parts.append(f"                    {field}")
 
-            # Build the complete query using only CREDIT_RESPONSE fields (standardized approach)
+            # Build the complete query using CREDIT_RESPONSE fields + EQUIFAX_REPORT (hybrid approach)
             credit_response_query = f"""
                 CREDIT_RESPONSE {{
 {chr(10).join(query_parts)}
+                }}
+                # EQUIFAX_REPORT included to restore July 17, 2025 Equifax data
+                EQUIFAX_REPORT {{
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {{
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {{
+                            Days30
+                            Days60
+                            Days90
+                        }}
+                    }}
                 }}"""
 
-            print(f"🔍 DEBUG: Built standardized query with {len(available_essential)} essential fields")
-            print(f"🔍 DEBUG: Using CREDIT_RESPONSE fields only (no bureau-specific fields)")
+            print(f"🔍 DEBUG: Built hybrid query with {len(available_essential)} essential fields + EQUIFAX_REPORT")
+            print(f"🔍 DEBUG: Using CREDIT_RESPONSE + EQUIFAX_REPORT (hybrid approach)")
             print(f"🔍 DEBUG: Generated query:\n{credit_response_query}")
             return credit_response_query
         else:
@@ -1381,9 +1397,28 @@ Type `/help` for detailed usage information."""
                                 'type': score_type
                             })
 
+        # HYBRID PROCESSING: Also extract from EQUIFAX_REPORT to restore July 17 data
+        for record in records:
+            equifax_report = record.get("EQUIFAX_REPORT")
+            if equifax_report:
+                report_date = equifax_report.get("REPORT_DATE", "Unknown Date")
+                credit_score_list = equifax_report.get("CREDIT_SCORE", [])
+                if isinstance(credit_score_list, list):
+                    for credit_score in credit_score_list:
+                        score_value = credit_score.get("Value")
+                        if score_value:
+                            all_credit_scores.append({
+                                'bureau': 'Equifax',
+                                'score': score_value,
+                                'date': report_date,
+                                'type': 'Equifax Report',
+                                'source': 'EQUIFAX_REPORT'
+                            })
+                            print(f"🔍 DEBUG: EQUIFAX_REPORT score found: {score_value} ({report_date})")
+
         print(f"🔍 DEBUG: All credit scores extracted: {len(all_credit_scores)} scores")
         for score in all_credit_scores:
-            print(f"🔍 DEBUG: {score['bureau']} - {score['score']} ({score['date']}) - {score['type']}")
+            print(f"🔍 DEBUG: {score['bureau']} - {score['score']} ({score['date']}) - {score['type']} {score.get('source', 'CREDIT_RESPONSE')}")
 
         # UTILIZATION DATA EXTRACTION using PROTECTED PARAMETERS
         # Extract ALL utilization data with dates (before filtering to most recent)
@@ -1581,13 +1616,27 @@ Type `/help` for detailed usage information."""
             "Equifax": []
         }
 
-        # First pass: group records by bureau
+        # First pass: group records by bureau (HYBRID APPROACH)
         for record in records:
+            # Check CREDIT_RESPONSE first (standardized approach)
             credit_response = record.get("CREDIT_RESPONSE")
             if credit_response:
                 bureau = self._standardize_bureau_identification(credit_response)
                 if bureau in bureau_records:
                     bureau_records[bureau].append((record, credit_response))
+
+            # Also check EQUIFAX_REPORT for July 17 data (hybrid approach)
+            equifax_report = record.get("EQUIFAX_REPORT")
+            if equifax_report:
+                print(f"🔍 DEBUG: Found EQUIFAX_REPORT data - adding to Equifax processing")
+                # Create a synthetic credit_response from EQUIFAX_REPORT data
+                synthetic_credit_response = {
+                    "CREDIT_BUREAU": "Equifax",
+                    "CreditReportFirstIssuedDate": equifax_report.get("REPORT_DATE", "2025-07-17"),
+                    "CREDIT_SCORE": equifax_report.get("CREDIT_SCORE", []),
+                    "CREDIT_LIABILITY": equifax_report.get("CREDIT_LIABILITY", [])
+                }
+                bureau_records["Equifax"].append((record, synthetic_credit_response))
 
         # Second pass: select best record for each bureau and process
         for bureau_name, record_list in bureau_records.items():
