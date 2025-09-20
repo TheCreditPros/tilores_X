@@ -86,9 +86,7 @@ class AdvancedCreditAnalyzer:
                 EMAIL: valuesDistinct(field: "EMAIL")
                 STARTING_CREDIT_SCORE: valuesDistinct(field: "STARTING_CREDIT_SCORE")  # noqa E501
                 CURRENT_CREDIT_SCORE: valuesDistinct(field: "CURRENT_CREDIT_SCORE")  # noqa E501
-                TRANSUNION_REPORT: valuesDistinct(field: "TRANSUNION_REPORT")
-                EXPERIAN_REPORT: valuesDistinct(field: "EXPERIAN_REPORT")
-                EQUIFAX_REPORT: valuesDistinct(field: "EQUIFAX_REPORT")
+                # NOTE: Bureau-specific report fields removed - using standardized CREDIT_RESPONSE processing
                 CREDIT_UTILIZATION: valuesDistinct(field: "CREDIT_UTILIZATION")
                 PAYMENT_HISTORY: valuesDistinct(field: "PAYMENT_HISTORY")
                 CREDIT_AGE: valuesDistinct(field: "CREDIT_AGE")

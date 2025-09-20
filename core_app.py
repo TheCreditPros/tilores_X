@@ -1313,10 +1313,10 @@ class MultiProviderLLMEngine:
             except (ValueError, TypeError):
                 primary_score = None
 
-        # Check for credit bureau data
+        # Check for credit bureau data (standardized approach)
         raw_data_str = "\n".join(credit_report.get("raw_credit_data", []))
         has_credit_response = "CREDIT_RESPONSE" in raw_data_str
-        has_transunion_data = "TRANSUNION_REPORT" in raw_data_str or "TransUnion" in raw_data_str
+        # NOTE: Bureau-specific detection removed - all bureaus use CREDIT_RESPONSE now
 
         # Look for credit indicators
         credit_indicators = [
@@ -1437,9 +1437,9 @@ class MultiProviderLLMEngine:
         unique_scores = list(set(credit_scores))
         primary_score = unique_scores[0] if unique_scores else 0
 
-        # Extract credit bureau data and CREDIT_RESPONSE information
+        # Extract credit bureau data and CREDIT_RESPONSE information (standardized)
         has_credit_response = "CREDIT_RESPONSE" in result_str
-        has_transunion_data = "TRANSUNION_REPORT" in result_str or "TransUnion" in result_str
+        # NOTE: Bureau-specific detection removed - all bureaus use CREDIT_RESPONSE now
 
         # Look for credit account indicators in the data
         credit_indicators = [

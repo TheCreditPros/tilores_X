@@ -1,0 +1,50 @@
+=== CODE ARCHITECTURE COMPARISON: WORKING vs BROKEN ===
+
+UTILIZATION PROCESSING (WORKING - BUREAU-SPECIFIC):
+Lines 1405-1444 in direct_credit_api_fixed.py:
+
+// Experian/TransUnion specific logic
+if item_id == "PT016" and "Utilization on revolving trades" in name and data_type == "creditSummary":
+    all_utilization_data.append({
+        'bureau': bureau,  // BUREAU TRACKED
+        'utilization': value,
+        'date': report_date,
+        'type': 'revolving'
+    })
+
+// Equifax specific logic  
+if not item_id and "Utilization on revolving trades" in name and data_type == "creditAttributes":
+    all_utilization_data.append({
+        'bureau': bureau,  // BUREAU TRACKED
+        'utilization': value,
+        'date': report_date,
+        'type': 'revolving'
+    })
+
+RESULT: Bureau-specific data preserved ✅
+
+LATE PAYMENT PROCESSING (BROKEN - GLOBAL):
+Lines 1502-1512 in direct_credit_api_fixed.py:
+
+late_count = liability.get("LateCount")
+if late_count:
+    late_info = []
+    if late_count.get("Days30"):
+        late_info.append(f"30-day: {late_count.get('Days30')}")
+    if late_count.get("Days60"): 
+        late_info.append(f"60-day: {late_count.get('Days60')}")
+    if late_count.get("Days90"):
+        late_info.append(f"90-day: {late_count.get('Days90')}")
+    if late_info:
+        late_payments.append(", ".join(late_info))  // NO BUREAU TRACKING ❌
+
+RESULT: Bureau data lost in global aggregation ❌
+
+ROOT CAUSE IDENTIFIED:
+The utilization processing correctly tracks bureau information:
+all_utilization_data.append({'bureau': bureau, ...})
+
+But late payment processing does NOT track bureau:
+late_payments.append(", ".join(late_info))  // Missing bureau context
+
+This architectural inconsistency causes Experian data to be lost.

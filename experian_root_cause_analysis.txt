@@ -1,0 +1,34 @@
+=== ROOT CAUSE ANALYSIS: EXPERIAN INCONGRUENCY ===
+
+ARCHITECTURAL PROBLEM IDENTIFIED:
+The code has inconsistent data processing architecture between different credit data types.
+
+UTILIZATION DATA PROCESSING (BUREAU-SPECIFIC - WORKING):
+├── Experian/TransUnion: ID="PT016", Type="creditSummary"
+├── Equifax: NO ID, Type="creditAttributes"
+├── Result: Each bureau processed separately with specific logic
+
+LATE PAYMENT DATA PROCESSING (GLOBAL - BROKEN):
+├── All bureaus: Same CREDIT_LIABILITY query structure
+├── Processing: Global late_payments[] list (no bureau separation)
+├── Result: Experian data lost or filtered out in global aggregation
+
+ROOT CAUSE: ARCHITECTURAL INCONSISTENCY
+The system was designed with bureau-specific logic for utilization data but global logic for late payments.
+This creates different processing paths that handle Experian data differently.
+
+TECHNICAL FLOW:
+1. GraphQL Query: Identical structure for all bureaus ✅
+2. Data Retrieval: Same CREDIT_LIABILITY fields for all bureaus ✅
+3. Processing Logic: Different architectures ❌
+   ├── Utilization: Bureau-specific filters and processing ✅
+   ├── Late Payments: Global aggregation without bureau isolation ❌
+
+WHY EXPERIAN FAILS:
+- Experian late payment data enters global processing pipeline
+- Global deduplication logic may filter out Experian entries
+- No bureau-specific handling to preserve Experian data integrity
+- Experian data gets lost in the global aggregation process
+
+SOLUTION REQUIRED:
+Implement bureau-specific late payment processing similar to utilization logic.
