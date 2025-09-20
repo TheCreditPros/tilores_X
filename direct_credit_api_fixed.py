@@ -2267,6 +2267,30 @@ async def api_health_check():
     }
 
 
+@app.get("/debug/agent-prompts")
+async def debug_agent_prompts():
+    """Debug endpoint to check agent prompt loading"""
+    try:
+        from agent_prompts import get_agent_prompt, AGENT_PROMPTS
+
+        # Test zoho_cs_agent
+        zoho_prompt = get_agent_prompt('zoho_cs_agent', 'credit')
+
+        debug_info = {
+            "AGENT_PROMPTS_AVAILABLE": AGENT_PROMPTS_AVAILABLE,
+            "available_agents": list(AGENT_PROMPTS.keys()) if AGENT_PROMPTS else [],
+            "zoho_cs_agent_loaded": bool(zoho_prompt),
+            "zoho_cs_agent_prompt_length": len(zoho_prompt.get('system_prompt', '')) if zoho_prompt else 0,
+            "zoho_cs_agent_prompt_start": zoho_prompt.get('system_prompt', '')[:200] + "..." if zoho_prompt else None,
+            "uses_bullet_points": "•" in zoho_prompt.get('system_prompt', '') if zoho_prompt else False,
+            "uses_third_person": "Customer's credit scores" in zoho_prompt.get('system_prompt', '') if zoho_prompt else False,
+        }
+
+        return debug_info
+
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     """
