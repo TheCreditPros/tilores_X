@@ -612,11 +612,7 @@ class MultiProviderCreditAPI:
                 # If there's a remaining query, process it directly with the agent
                 if remaining_query:
                     print(f"🎯 Processing slash command with agent: {agent_type} for query: {remaining_query}")
-                    if agent_type == "zoho_cs_agent":
-                        return "**TEST: ZOHO_CS_AGENT CALLED DIRECTLY** - This proves the routing is working"
-                    result = self._process_agent_query(remaining_query, agent_type)
-                    print(f"🎯 Agent result length: {len(result)} chars")
-                    return result
+                    return self._process_agent_query(remaining_query, agent_type)
                 else:
                     # Just switching agent without a query
                     if AGENT_PROMPTS_AVAILABLE:
@@ -1009,11 +1005,9 @@ Type `/help` for detailed usage information."""
 
     def _process_agent_query(self, query: str, agent_type: str) -> str:
         """Process agent queries directly with dedicated prompts - simplified routing"""
-        print(f"🤖 DIRECT AGENT PROCESSING: {agent_type} for query: {query}")
         try:
             # Load the agent prompt
             if not AGENT_PROMPTS_AVAILABLE:
-                print("❌ Agent prompts system not available")
                 return "Agent prompts system not available"
 
             from agent_prompts import get_agent_prompt
@@ -1040,7 +1034,6 @@ Type `/help` for detailed usage information."""
             try:
                 data_context = self._fetch_comprehensive_data(entity_id, query)
             except Exception as e:
-                print(f"⚠️ Error fetching comprehensive data: {e}")
                 data_context = f"Customer data analysis for entity {entity_id} - credit analysis requested"
 
             # Prepare messages: system prompt + user content
