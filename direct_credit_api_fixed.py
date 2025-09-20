@@ -402,6 +402,9 @@ class MultiProviderCreditAPI:
                 agent_prompt_config = get_agent_prompt(agent_type, query_type)
                 if agent_prompt_config:
                     print(f"🤖 Using agent prompt: {agent_type}")
+                    print(f"🤖 Agent prompt system_message preview: {agent_prompt_config.get('system_prompt', '')[:100]}...")
+                else:
+                    print(f"❌ Agent prompt not found for: {agent_type}")
 
             # Get appropriate prompt from agent, Agenta SDK, or local store
             if agent_prompt_config:
@@ -1030,6 +1033,8 @@ Type `/help` for detailed usage information."""
 
         # Create the full prompt with data context
         full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
+
+        print(f"🤖 DEBUG: Final prompt being sent to LLM (first 200 chars): {full_prompt[:200]}...")
 
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
