@@ -91,9 +91,7 @@ class TiloresFieldDiscovery:
                 "FICO_SCORE",
                 "VANTAGE_SCORE",
                 "CREDIT_KARMA_SCORE",
-                "TRANSUNION_REPORT",
-                "EXPERIAN_REPORT",
-                "EQUIFAX_REPORT",
+                # NOTE: Bureau-specific report fields removed - using standardized CREDIT_RESPONSE processing
                 "CREDIT_UTILIZATION",
                 "PAYMENT_HISTORY",
                 "CREDIT_AGE",
