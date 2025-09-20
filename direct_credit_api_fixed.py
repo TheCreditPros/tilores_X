@@ -604,6 +604,8 @@ class MultiProviderCreditAPI:
                 # If there's a remaining query, process it directly with the agent
                 if remaining_query:
                     print(f"🎯 Processing slash command with agent: {agent_type} for query: {remaining_query}")
+                    if agent_type == "zoho_cs_agent":
+                        return "**TEST: ZOHO_CS_AGENT CALLED DIRECTLY** - This proves the routing is working"
                     result = self._process_agent_query(remaining_query, agent_type)
                     print(f"🎯 Agent result length: {len(result)} chars")
                     return result
