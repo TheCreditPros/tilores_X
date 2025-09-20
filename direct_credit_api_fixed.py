@@ -141,10 +141,12 @@ class MultiProviderCreditAPI:
 
     def detect_query_type(self, query: str) -> str:
         """Detect the type of query to route to appropriate prompt"""
+        print(f"🔍 DETECT_QUERY_TYPE: Received query: '{query}'")
         query_lower = query.lower()
 
         # Slash commands (highest priority)
         if query.strip().startswith('/'):
+            print(f"🔍 DETECT_QUERY_TYPE: Detected SLASH COMMAND")
             return "slash_command"
 
         # Tool/system queries (second priority)
