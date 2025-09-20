@@ -1028,18 +1028,213 @@ Type `/help` for detailed usage information."""
         # Call LLM with dynamic prompt
         return self._call_llm(full_prompt, model, temperature, max_tokens)
 
+    def _introspect_graphql_schema(self) -> dict:
+        """Use GraphQL introspection to discover the complete schema"""
+        introspection_query = """
+        query IntrospectionQuery {
+          __schema {
+            types {
+              name
+              kind
+              fields {
+                name
+                type {
+                  name
+                  kind
+                  ofType {
+                    name
+                    kind
+                    fields {
+                      name
+                      type {
+                        name
+                        kind
+                        ofType {
+                          name
+                          kind
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+
+        try:
+            response = requests.post(
+                self.tilores_api_url,
+                headers={"Authorization": f"Bearer {self.get_tilores_token()}"},
+                json={"query": introspection_query},
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                print(f"🔍 DEBUG: Introspection successful, response keys: {list(result.keys())}")
+                if 'data' in result:
+                    print(f"🔍 DEBUG: Data keys: {list(result['data'].keys())}")
+                if 'errors' in result:
+                    print(f"🔍 DEBUG: GraphQL errors: {result['errors']}")
+                return result
+            else:
+                print(f"🔍 DEBUG: Introspection failed with status {response.status_code}")
+                print(f"🔍 DEBUG: Response text: {response.text}")
+                return {}
+        except Exception as e:
+            print(f"🔍 DEBUG: Introspection error: {e}")
+            return {}
+
+    def _build_credit_response_query(self) -> str:
+        """Build CREDIT_RESPONSE query based on introspected schema"""
+        # First, try to introspect the schema
+        schema = self._introspect_graphql_schema()
+
+        if not schema:
+            print("🔍 DEBUG: Using COMPLETE fallback CREDIT_RESPONSE query with utilization data")
+            return """
+                CREDIT_RESPONSE {
+                    CREDIT_BUREAU
+                    CreditReportFirstIssuedDate
+                    CreditRatingCodeType
+                    CREDIT_SCORE {
+                        Value
+                        ModelNameType
+                        CreditRepositorySourceType
+                        CreditScoreType
+                    }
+                    CREDIT_SUMMARY {
+                        BorrowerID
+                        Name
+                        DATA_SET {
+                            ID
+                            Name
+                            Value
+                        }
+                    }
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }
+            """
+
+        # Find CREDIT_RESPONSE type in schema
+        credit_response_fields = []
+        types = schema.get('data', {}).get('__schema', {}).get('types', [])
+
+        print(f"🔍 DEBUG: Schema introspection returned {len(types)} types")
+
+        # Debug: Show all type names to understand the schema structure
+        type_names = [t.get('name') for t in types if t.get('name')]
+        credit_related_types = [name for name in type_names if 'Credit' in name or 'CREDIT' in name]
+        print(f"🔍 DEBUG: Credit-related types found: {credit_related_types}")
+
+        for type_def in types:
+            if type_def.get('name') == 'CreditResponse':
+                fields = type_def.get('fields', [])
+                print(f"🔍 DEBUG: CreditResponse type found with {len(fields)} fields")
+                for field in fields:
+                    field_name = field.get('name')
+                    if field_name:
+                        credit_response_fields.append(field_name)
+                        print(f"🔍 DEBUG: Found CreditResponse field: {field_name}")
+                break
+
+        if credit_response_fields:
+            # Build focused query with only essential fields for utilization data
+            essential_fields = ['CREDIT_BUREAU', 'CreditReportFirstIssuedDate', 'CreditRatingCodeType',
+                              'CREDIT_SCORE', 'CREDIT_SUMMARY', 'CREDIT_LIABILITY']
+
+            available_essential = [f for f in essential_fields if f in credit_response_fields]
+            print(f"🔍 DEBUG: Available essential fields: {available_essential}")
+
+            query_parts = []
+            for field in available_essential:
+                if field == 'CREDIT_SCORE':
+                    query_parts.append("""                    CREDIT_SCORE {
+                        Value
+                        ModelNameType
+                        CreditRepositorySourceType
+                    }""")
+                elif field == 'CREDIT_LIABILITY':
+                    query_parts.append("""                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }""")
+                elif field == 'CREDIT_SUMMARY':
+                    query_parts.append("""                    CREDIT_SUMMARY {
+                        BorrowerID
+                        Name
+                        DATA_SET {
+                            ID
+                            Name
+                            Value
+                        }
+                    }""")
+                else:
+                    # Simple scalar fields
+                    query_parts.append(f"                    {field}")
+
+            full_query = f"""
+                CREDIT_RESPONSE {{
+{chr(10).join(query_parts)}
+                }}
+            """
+            print(f"🔍 DEBUG: Built focused CREDIT_RESPONSE query with {len(available_essential)} essential fields")
+            print(f"🔍 DEBUG: Generated query:\n{full_query}")
+            return full_query
+        else:
+            print("🔍 DEBUG: No CREDIT_RESPONSE fields found, using fallback")
+            return """
+                CREDIT_RESPONSE {
+                    CREDIT_BUREAU
+                    CreditReportFirstIssuedDate
+                    CREDIT_SCORE {
+                        Value
+                        ModelNameType
+                        CreditRepositorySourceType
+                    }
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }
+            """
+
     def _fetch_comprehensive_data(self, entity_id: str, query: str) -> str:
         """Fetch comprehensive customer and credit data using schema-based query"""
         print(f"🔍 Fetching comprehensive data for entity: {entity_id}")
 
         try:
-            # Use the exact same query structure that worked in testing
-            comprehensive_query = """
-            query GetFullCreditData($id: ID!) {
-              entity(input: { id: $id }) {
-                entity {
+            # Build dynamic CREDIT_RESPONSE query based on schema
+            credit_response_query = self._build_credit_response_query()
+            comprehensive_query = f"""
+            query GetFullCreditData($id: ID!) {{
+              entity(input: {{ id: $id }}) {{
+                entity {{
                   id
-                  records {
+                  records {{
                     id
                     STATUS
                     FIRST_NAME
@@ -1048,29 +1243,11 @@ Type `/help` for detailed usage information."""
                     CLIENT_ID
                     CURRENT_PRODUCT
                     ENROLL_DATE
-                            CREDIT_RESPONSE {
-                                CREDIT_BUREAU
-                                CreditReportFirstIssuedDate
-                                CREDIT_SCORE {
-                                    Value
-                                    ModelNameType
-                                    CreditRepositorySourceType
-                                }
-                                CREDIT_LIABILITY {
-                                    AccountType
-                                    CreditLimitAmount
-                                    CreditBalance
-                                    LateCount {
-                                        Days30
-                                        Days60
-                                        Days90
-                                    }
-                                }
-                            }
-                  }
-                }
-              }
-            }
+                    {credit_response_query}
+                  }}
+                }}
+              }}
+            }}
             """
 
             response = requests.post(
@@ -1117,6 +1294,156 @@ Type `/help` for detailed usage information."""
         account_types = []
         late_payments = []
         inquiries = []
+        all_credit_liability_data = []
+
+        # MANDATORY CREDIT SCORE EXTRACTION FORMULA - NEVER EDIT OR REMOVE
+        # Extract ALL credit scores with dates (before filtering to most recent)
+        all_credit_scores = []
+        for record in records:
+            credit_response = record.get("CREDIT_RESPONSE")
+            if credit_response:
+                report_date = credit_response.get("CreditReportFirstIssuedDate", "Unknown Date")
+                credit_score_list = credit_response.get("CREDIT_SCORE", [])
+                if isinstance(credit_score_list, list):
+                    for credit_score in credit_score_list:
+                        score_value = credit_score.get("Value")
+                        score_source = credit_score.get("CreditRepositorySourceType")
+                        score_type = credit_score.get("CreditScoreType", "Unknown")
+                        if score_value and score_source:
+                            all_credit_scores.append({
+                                'bureau': score_source,
+                                'score': score_value,
+                                'date': report_date,
+                                'type': score_type
+                            })
+
+        print(f"🔍 DEBUG: All credit scores extracted: {len(all_credit_scores)} scores")
+        for score in all_credit_scores:
+            print(f"🔍 DEBUG: {score['bureau']} - {score['score']} ({score['date']}) - {score['type']}")
+
+        # UTILIZATION DATA EXTRACTION using PROTECTED PARAMETERS
+        # Extract ALL utilization data with dates (before filtering to most recent)
+        all_utilization_data = []
+        for record in records:
+            credit_response = record.get("CREDIT_RESPONSE")
+            if credit_response:
+                # PROTECTED PARAMETERS - NEVER EDIT OR REMOVE
+                report_date = credit_response.get("CreditReportFirstIssuedDate", "Unknown Date")
+                # Bureau identification MUST use CreditRepositorySourceType from CREDIT_SCORE array (same method as protected credit score algorithm)
+                bureau = "Unknown Bureau"
+                credit_score_list = credit_response.get("CREDIT_SCORE", [])
+                if isinstance(credit_score_list, list) and credit_score_list:
+                    bureau = credit_score_list[0].get("CreditRepositorySourceType", "Unknown Bureau")
+                print(f"🔍 DEBUG: Utilization Report - Date: {report_date}, Bureau: {bureau} (using CreditRepositorySourceType from CREDIT_SCORE)")
+                print(f"🔍 DEBUG: {bureau} CREDIT_RESPONSE keys: {list(credit_response.keys())}")
+
+                # Process CREDIT_SUMMARY for utilization data (Experian/TransUnion with PT016)
+                credit_summary = credit_response.get("CREDIT_SUMMARY")
+                print(f"🔍 DEBUG: {bureau} CREDIT_SUMMARY exists: {credit_summary is not None}, type: {type(credit_summary)}")
+                if credit_summary:
+                    print(f"🔍 DEBUG: {bureau} CREDIT_SUMMARY structure: {list(credit_summary.keys()) if isinstance(credit_summary, dict) else 'Not a dict'}")
+                    if isinstance(credit_summary, dict) and 'DATA_SET' in credit_summary:
+                        data_sets = credit_summary.get("DATA_SET", [])
+                        print(f"🔍 DEBUG: {bureau} CREDIT_SUMMARY.DATA_SET has {len(data_sets)} items")
+                        for i, data_set in enumerate(data_sets[:3]):  # Show first 3 items
+                            print(f"🔍 DEBUG: {bureau} DATA_SET[{i}]: ID={data_set.get('ID')}, Name={data_set.get('Name')}, Value={data_set.get('Value')}")
+
+                # Handle both dict and list structures for CREDIT_SUMMARY
+                if credit_summary and isinstance(credit_summary, dict):
+                    # New dict structure from GraphQL introspection
+                    data_sets = credit_summary.get("DATA_SET", [])
+                    if isinstance(data_sets, list):
+                        print(f"🔍 DEBUG: {bureau} CREDIT_SUMMARY (dict) has {len(data_sets)} DATA_SET items")
+                        for data_set in data_sets:
+                            name = data_set.get("Name", "")
+                            value = data_set.get("Value", "")
+                            item_id = data_set.get("ID", "")
+
+                            # Debug: Show all utilization-related fields
+                            if "utilization" in name.lower() or item_id == "PT016":
+                                print(f"🔍 DEBUG: {bureau} UTILIZATION FIELD - ID: {item_id}, Name: {name}, Value: {value}")
+
+                            # Experian/TransUnion: ID="PT016", Name contains "Utilization on revolving trades"
+                            if item_id == "PT016" and "utilization" in name.lower() and "revolving" in name.lower():
+                                if value and bureau != "Unknown Bureau":
+                                    all_utilization_data.append({
+                                        'bureau': bureau,
+                                        'utilization': value,
+                                        'date': report_date,
+                                        'type': 'revolving'
+                                    })
+                                    print(f"🔍 DEBUG: Found {bureau} utilization (PT016) - {value}% ({report_date})")
+
+                            # Equifax: ID=None, Name contains "Utilization on revolving trades"
+                            elif not item_id and "utilization" in name.lower() and "revolving" in name.lower():
+                                if value and bureau != "Unknown Bureau":
+                                    all_utilization_data.append({
+                                        'bureau': bureau,
+                                        'utilization': value,
+                                        'date': report_date,
+                                        'type': 'revolving'
+                                    })
+                                    print(f"🔍 DEBUG: Found {bureau} utilization (no ID) - {value}% ({report_date})")
+
+                elif credit_summary and isinstance(credit_summary, list):
+                    # Legacy list structure (fallback)
+                    print(f"🔍 DEBUG: {bureau} has {len(credit_summary)} CREDIT_SUMMARY sections (legacy list)")
+                    for summary in credit_summary:
+                        data_sets = summary.get("DATA_SET", [])
+                        if isinstance(data_sets, list):
+                            print(f"🔍 DEBUG: {bureau} CREDIT_SUMMARY has {len(data_sets)} DATA_SET items")
+                            for data_set in data_sets:
+                                name = data_set.get("Name", "")
+                                value = data_set.get("Value", "")
+                                item_id = data_set.get("ID", "")
+                                data_type = data_set.get("Type", "")
+
+                                # Debug: Show all utilization-related fields
+                                if "utilization" in name.lower() or item_id == "PT016":
+                                    print(f"🔍 DEBUG: {bureau} UTILIZATION FIELD - ID: {item_id}, Name: {name}, Value: {value}, Type: {data_type}")
+
+                                # Experian/TransUnion: ID="PT016", Type="creditSummary"
+                                if item_id == "PT016" and "Utilization on revolving trades" in name and data_type == "creditSummary":
+                                    if value and bureau != "Unknown Bureau":
+                                        all_utilization_data.append({
+                                            'bureau': bureau,
+                                            'utilization': value,
+                                            'date': report_date,
+                                            'type': 'revolving'
+                                        })
+                                        print(f"🔍 DEBUG: Found {bureau} utilization (PT016) - {value}% ({report_date})")
+
+                # Process CREDIT_ATTRIBUTES for utilization data (Equifax without ID)
+                credit_attributes = credit_response.get("CREDIT_ATTRIBUTES")
+                print(f"🔍 DEBUG: {bureau} CREDIT_ATTRIBUTES exists: {credit_attributes is not None}, type: {type(credit_attributes)}")
+                if credit_attributes and isinstance(credit_attributes, list):
+                    print(f"🔍 DEBUG: {bureau} has {len(credit_attributes)} CREDIT_ATTRIBUTES sections")
+                    for attribute in credit_attributes:
+                        data_sets = attribute.get("DATA_SET", [])
+                        if isinstance(data_sets, list):
+                            print(f"🔍 DEBUG: {bureau} CREDIT_ATTRIBUTES has {len(data_sets)} DATA_SET items")
+                            for data_set in data_sets:
+                                name = data_set.get("Name", "")
+                                value = data_set.get("Value", "")
+                                item_id = data_set.get("ID", "")
+                                data_type = data_set.get("Type", "")
+
+                                # Debug: Show all utilization-related fields
+                                if "utilization" in name.lower():
+                                    print(f"🔍 DEBUG: {bureau} UTILIZATION FIELD - ID: {item_id}, Name: {name}, Value: {value}, Type: {data_type}")
+
+                                # Equifax: NO ID, Type="creditAttributes"
+                                if not item_id and "Utilization on revolving trades" in name and data_type == "creditAttributes":
+                                    if value and bureau != "Unknown Bureau":
+                                        all_utilization_data.append({
+                                            'bureau': bureau,
+                                            'utilization': value,
+                                            'date': report_date,
+                                            'type': 'revolving'
+                                        })
+                                        print(f"🔍 DEBUG: Found {bureau} utilization (creditAttributes) - {value}% ({report_date})")
+
+        print(f"🔍 DEBUG: All utilization data extracted: {len(all_utilization_data)} records")
 
         for record in records:
             # Basic customer data
@@ -1136,9 +1463,17 @@ Type `/help` for detailed usage information."""
             # Extract credit data from CREDIT_RESPONSE
             credit_response = record.get("CREDIT_RESPONSE")
             if credit_response:
-                # Bureau information
-                if credit_response.get("CREDIT_BUREAU"):
-                    bureaus.append(credit_response.get("CREDIT_BUREAU"))
+                # Bureau information - try both methods
+                current_bureau = credit_response.get("CREDIT_BUREAU", "Unknown Bureau")
+                if current_bureau == "Unknown Bureau":
+                    # Fallback to CreditRepositorySourceType from CREDIT_SCORE
+                    credit_score_list = credit_response.get("CREDIT_SCORE", [])
+                    if isinstance(credit_score_list, list) and credit_score_list:
+                        current_bureau = credit_score_list[0].get("CreditRepositorySourceType", "Unknown Bureau")
+
+                print(f"🔍 DEBUG: Processing CREDIT_RESPONSE for bureau: {current_bureau} (CREDIT_BUREAU: {credit_response.get('CREDIT_BUREAU')}, CreditRepositorySourceType: {credit_score_list[0].get('CreditRepositorySourceType') if credit_score_list else 'N/A'})")
+                if current_bureau != "Unknown Bureau":
+                    bureaus.append(current_bureau)
 
                 # Report dates
                 if credit_response.get("CreditReportFirstIssuedDate"):
@@ -1162,8 +1497,24 @@ Type `/help` for detailed usage information."""
 
                 # Credit liability information
                 credit_liability_list = credit_response.get("CREDIT_LIABILITY", [])
+                print(f"🔍 DEBUG: {current_bureau} - Processing {len(credit_liability_list) if isinstance(credit_liability_list, list) else 0} CREDIT_LIABILITY entries")
                 if isinstance(credit_liability_list, list):
-                    for liability in credit_liability_list:
+                    total_late_30 = 0
+                    total_late_60 = 0
+                    total_late_90 = 0
+
+                    for i, liability in enumerate(credit_liability_list):
+                        late_count = liability.get("LateCount", {})
+                        days_30 = late_count.get("Days30", 0)
+                        days_60 = late_count.get("Days60", 0)
+                        days_90 = late_count.get("Days90", 0)
+
+                        print(f"🔍 DEBUG: {current_bureau} CREDIT_LIABILITY[{i}]: AccountType={liability.get('AccountType')}, LateCount={{Days30: {days_30}, Days60: {days_60}, Days90: {days_90}}}")
+
+                        total_late_30 += days_30
+                        total_late_60 += days_60
+                        total_late_90 += days_90
+
                         if liability.get("AccountType"):
                             account_types.append(liability.get("AccountType"))
                         if liability.get("CreditLimitAmount"):
@@ -1171,18 +1522,13 @@ Type `/help` for detailed usage information."""
                         if liability.get("CreditBalance"):
                             credit_balances.append(liability.get("CreditBalance"))
 
-                        # Late payment counts
-                        late_count = liability.get("LateCount")
-                        if late_count:
-                            late_info = []
-                            if late_count.get("Days30"):
-                                late_info.append(f"30-day: {late_count.get('Days30')}")
-                            if late_count.get("Days60"):
-                                late_info.append(f"60-day: {late_count.get('Days60')}")
-                            if late_count.get("Days90"):
-                                late_info.append(f"90-day: {late_count.get('Days90')}")
-                            if late_info:
-                                late_payments.append(", ".join(late_info))
+                    # Only add late payment entry if there are actual late payments
+                    if total_late_30 > 0 or total_late_60 > 0 or total_late_90 > 0:
+                        late_payment_entry = f"{current_bureau}: 30-day: {total_late_30}, 60-day: {total_late_60}, 90-day: {total_late_90}"
+                        print(f"🔍 DEBUG: {current_bureau} TOTAL LATE PAYMENTS: {total_late_30}/{total_late_60}/{total_late_90}")
+                        late_payments.append(late_payment_entry)
+                    else:
+                        print(f"🔍 DEBUG: {current_bureau} has NO late payments")
 
                 # Credit inquiries
                 credit_inquiry_list = credit_response.get("CREDIT_INQUIRY", [])
@@ -1212,7 +1558,79 @@ ENROLLMENT DATE: {enroll_date or 'Not provided'}
 
 ACTUAL CREDIT DATA:"""
 
-        if credit_scores:
+        # Display ALL credit scores with dates (using protected extraction formula)
+        if all_credit_scores:
+            # Sort by date for chronological display (older → newer)
+            sorted_scores = sorted(all_credit_scores, key=lambda x: (x['bureau'], x['date']))
+            score_display = []
+            for score in sorted_scores:
+                score_display.append(f"{score['score']} ({score['bureau']}) - {score['date']}")
+            formatted_data += f"\nCREDIT SCORES (ALL HISTORICAL): {', '.join(score_display)}"
+
+            # Calculate credit repair progress by bureau (starting vs ending scores)
+            bureau_progress = {}
+            for score in all_credit_scores:
+                bureau = score['bureau']
+                if bureau not in bureau_progress:
+                    bureau_progress[bureau] = {'scores': []}
+                bureau_progress[bureau]['scores'].append({
+                    'score': int(score['score']),
+                    'date': score['date']
+                })
+
+            # Sort scores by date for each bureau and calculate progress
+            progress_display = []
+            for bureau, data in bureau_progress.items():
+                # Sort by date to get chronological order (older → newer)
+                sorted_bureau_scores = sorted(data['scores'], key=lambda x: x['date'])
+                if len(sorted_bureau_scores) >= 2:
+                    starting_score = sorted_bureau_scores[0]['score']
+                    ending_score = sorted_bureau_scores[-1]['score']
+                    starting_date = sorted_bureau_scores[0]['date']
+                    ending_date = sorted_bureau_scores[-1]['date']
+                    change = ending_score - starting_score
+                    change_symbol = "+" if change > 0 else ""
+                    progress_display.append(f"{bureau}: {starting_score} ({starting_date}) → {ending_score} ({ending_date}) = {change_symbol}{change} points")
+                elif len(sorted_bureau_scores) == 1:
+                    score = sorted_bureau_scores[0]['score']
+                    date = sorted_bureau_scores[0]['date']
+                    progress_display.append(f"{bureau}: {score} ({date}) - Single report available")
+
+            if progress_display:
+                formatted_data += f"\nCREDIT REPAIR PROGRESS: {'; '.join(progress_display)}"
+
+            # Calculate utilization progress by bureau (using all_utilization_data)
+            if all_utilization_data:
+                bureau_utilization = {}
+                for util in all_utilization_data:
+                    bureau = util['bureau']
+                    if bureau not in bureau_utilization:
+                        bureau_utilization[bureau] = {'utilizations': []}
+                    bureau_utilization[bureau]['utilizations'].append({
+                        'utilization': util['utilization'],
+                        'date': util['date']
+                    })
+
+                # Sort utilizations by date for each bureau and calculate progress
+                utilization_display = []
+                for bureau, data in bureau_utilization.items():
+                    # Sort by date to get chronological order (older → newer)
+                    sorted_utilizations = sorted(data['utilizations'], key=lambda x: x['date'])
+                    if len(sorted_utilizations) >= 2:
+                        starting_util = sorted_utilizations[0]['utilization']
+                        ending_util = sorted_utilizations[-1]['utilization']
+                        starting_date = sorted_utilizations[0]['date']
+                        ending_date = sorted_utilizations[-1]['date']
+                        utilization_display.append(f"{bureau}: {starting_util}% ({starting_date}) → {ending_util}% ({ending_date})")
+                    elif len(sorted_utilizations) == 1:
+                        util = sorted_utilizations[0]['utilization']
+                        date = sorted_utilizations[0]['date']
+                        utilization_display.append(f"{bureau}: {util}% ({date}) - Single report available")
+
+                if utilization_display:
+                    formatted_data += f"\nUTILIZATION PROGRESS: {'; '.join(utilization_display)}"
+
+        elif credit_scores:
             formatted_data += f"\nCREDIT SCORES: {', '.join(credit_scores)}"
         if bureaus:
             formatted_data += f"\nCREDIT BUREAUS: {', '.join(bureaus)}"
