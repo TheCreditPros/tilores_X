@@ -384,76 +384,82 @@ class MultiProviderCreditAPI:
         print(f"🔄 Processing request #{request_id} started at {datetime.now().strftime('%H:%M:%S')}")
 
         try:
-            # Detect query type for prompt routing
-            query_type = self.detect_query_type(query)
-            print(f"🎯 Detected query type: {query_type}")
-
-            # Check for agent-specific prompt override
-            agent_prompt_config = None
-            # Check for session-stored agent preference first
-            session_agent = self._get_session_agent(query)
-            if session_agent:
-                agent_type = session_agent
-                print(f"🤖 DEBUG: Using session agent: {agent_type}")
-            elif not agent_type:
-                # Default to zoho_cs_agent if no agent_type specified
-                agent_type = "zoho_cs_agent"
-                print(f"🤖 DEBUG: Defaulting to agent_type: {agent_type}")
-
-            if AGENT_PROMPTS_AVAILABLE and agent_type:
-                agent_prompt_config = get_agent_prompt(agent_type, query_type)
-                if agent_prompt_config:
-                    print(f"🤖 Using agent prompt: {agent_type}")
-                    print(f"🤖 Agent prompt system_message preview: {agent_prompt_config.get('system_prompt', '')[:100]}...")
-                else:
-                    print(f"❌ Agent prompt not found for: {agent_type}")
-
-            # Get appropriate prompt from agent, Agenta SDK, or local store
-            if agent_prompt_config:
-                prompt_config = agent_prompt_config
-                prompt_config["source"] = f"agent_{agent_type}"
-            elif AGENTA_INTEGRATION and agenta_manager:
-                prompt_config = agenta_manager.get_prompt_config(query_type, query)
-                print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
-            else:
-                # Fallback prompt configuration
-                prompt_config = {
-                    "source": "fallback",
-                    "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
-                }
-                print("📝 Using fallback prompt configuration")
-
-            # Create cache key
-            cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()
-
-            # Check cache first
-            redis_cached = self._get_redis_cache(cache_key)
-            if redis_cached:
-                duration = time.time() - start_time
-                print(f"✅ Request #{request_id} completed in {duration:.1f}s (cached)")
-                return redis_cached
-
-            # Check memory cache
-            if self.cache_ttl > 0 and cache_key in self.query_cache:
-                cached_data = self.query_cache[cache_key]
-                if datetime.now().timestamp() - cached_data['timestamp'] < self.cache_ttl:
-                    duration = time.time() - start_time
-                    print(f"🚀 Memory cache hit: {cache_key[:8]}...")
-                    print(f"✅ Request #{request_id} completed in {duration:.1f}s (memory cached)")
-                    return cached_data['response']
-
-            # Process based on query type
-            if query_type == "status":
-                response = self._process_status_query(query)
-            elif query_type == "tool":
-                response = self._process_tool_query(query)
-            elif query_type == "slash_command":
+            # SIMPLE LINEAR ROUTING: Direct slash command handling
+            if query.strip().startswith('/'):
+                print(f"🎯 DIRECT SLASH COMMAND DETECTED: {query}")
                 response = self._process_slash_command(query)
             else:
-                # For other query types, use the full data analysis with dynamic prompt
-                response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
+                # For non-slash commands, use the original complex routing
+                # Detect query type for prompt routing
+                query_type = self.detect_query_type(query)
+                print(f"🎯 Detected query type: {query_type}")
+
+                # Check for agent-specific prompt override
+                agent_prompt_config = None
+                # Check for session-stored agent preference first
+                session_agent = self._get_session_agent(query)
+                if session_agent:
+                    agent_type = session_agent
+                    print(f"🤖 DEBUG: Using session agent: {agent_type}")
+                elif not agent_type:
+                    # Default to zoho_cs_agent if no agent_type specified
+                    agent_type = "zoho_cs_agent"
+                    print(f"🤖 DEBUG: Defaulting to agent_type: {agent_type}")
+
+                if AGENT_PROMPTS_AVAILABLE and agent_type:
+                    agent_prompt_config = get_agent_prompt(agent_type, query_type)
+                    if agent_prompt_config:
+                        print(f"🤖 Using agent prompt: {agent_type}")
+                        print(f"🤖 Agent prompt system_message preview: {agent_prompt_config.get('system_prompt', '')[:100]}...")
+                    else:
+                        print(f"❌ Agent prompt not found for: {agent_type}")
+
+                # Get appropriate prompt from agent, Agenta SDK, or local store
+                if agent_prompt_config:
+                    prompt_config = agent_prompt_config
+                    prompt_config["source"] = f"agent_{agent_type}"
+                elif AGENTA_INTEGRATION and agenta_manager:
+                    prompt_config = agenta_manager.get_prompt_config(query_type, query)
+                    print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
+                else:
+                    # Fallback prompt configuration
+                    prompt_config = {
+                        "source": "fallback",
+                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
+                        "temperature": 0.7,
+                        "max_tokens": 1000
+                    }
+                    print("📝 Using fallback prompt configuration")
+
+                # Create cache key
+                cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()
+
+                # Check cache first
+                redis_cached = self._get_redis_cache(cache_key)
+                if redis_cached:
+                    duration = time.time() - start_time
+                    print(f"✅ Request #{request_id} completed in {duration:.1f}s (cached)")
+                    return redis_cached
+
+                # Check memory cache
+                if self.cache_ttl > 0 and cache_key in self.query_cache:
+                    cached_data = self.query_cache[cache_key]
+                    if datetime.now().timestamp() - cached_data['timestamp'] < self.cache_ttl:
+                        duration = time.time() - start_time
+                        print(f"🚀 Memory cache hit: {cache_key[:8]}...")
+                        print(f"✅ Request #{request_id} completed in {duration:.1f}s (memory cached)")
+                        return cached_data['response']
+
+                # Process based on query type
+                if query_type == "status":
+                    response = self._process_status_query(query)
+                elif query_type == "tool":
+                    response = self._process_tool_query(query)
+                elif query_type == "slash_command":
+                    response = self._process_slash_command(query)
+                else:
+                    # For other query types, use the full data analysis with dynamic prompt
+                    response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
 
             # Apply universal formatting enhancement ONLY to non-agent responses
             # Agent prompts have their own specific formatting requirements
