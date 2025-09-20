@@ -601,16 +601,10 @@ class MultiProviderCreditAPI:
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
 
-                # If there's a remaining query, process it with the new agent
+                # If there's a remaining query, process it directly with the agent
                 if remaining_query:
-                    print(f"🎯 Processing slash command with query: {command} + '{remaining_query}'")
-                    # Process the remaining query with the selected agent
-                    return self.process_chat_request(
-                        query=remaining_query,
-                        agent_type=agent_type,
-                        model="gpt-4o-mini",
-                        temperature=0.7
-                    )
+                    print(f"🎯 Processing slash command with agent: {agent_type}")
+                    return self._process_agent_query(remaining_query, agent_type)
                 else:
                     # Just switching agent without a query
                     if AGENT_PROMPTS_AVAILABLE:
@@ -1000,6 +994,52 @@ Type `/help` for detailed usage information."""
         except Exception as e:
             print(f"⚠️ Error fetching Salesforce status: {e}")
             return f"Error retrieving account status: {str(e)}"
+
+    def _process_agent_query(self, query: str, agent_type: str) -> str:
+        """Process agent queries directly with dedicated prompts - simplified routing"""
+        try:
+            # Load the agent prompt
+            if not AGENT_PROMPTS_AVAILABLE:
+                return "Agent prompts system not available"
+
+            from agent_prompts import get_agent_prompt
+            agent_config = get_agent_prompt(agent_type, "credit")
+
+            if not agent_config:
+                return f"Agent '{agent_type}' not found"
+
+            system_prompt = agent_config.get('system_prompt', '')
+            temperature = agent_config.get('temperature', 0.7)
+            max_tokens = agent_config.get('max_tokens', 800)
+
+            # Parse customer information from query
+            customer_info = self._parse_query_for_customer(query)
+            if not customer_info:
+                return "I need customer information (email, phone, name, or client ID) to analyze their data."
+
+            # Search for customer
+            entity_id = self._search_for_customer(customer_info)
+            if not entity_id:
+                return "No customer records found for the provided information."
+
+            # Fetch customer data
+            try:
+                data_context = self._fetch_comprehensive_data(entity_id, query)
+            except Exception as e:
+                print(f"⚠️ Error fetching comprehensive data: {e}")
+                data_context = f"Customer data analysis for entity {entity_id} - credit analysis requested"
+
+            # Prepare messages: system prompt + user content
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"**CUSTOMER DATA:**\n{data_context}\n\n**QUERY:** {query}"}
+            ]
+
+            # Call LLM directly with agent prompt
+            return self._call_llm_with_messages(messages, "llama-3.3-70b-versatile", temperature, max_tokens)
+
+        except Exception as e:
+            return f"Agent processing error: {str(e)}"
 
     def _process_data_analysis_query(self, query: str, query_type: str, prompt_config: Dict,
                                    model: str, temperature: float, max_tokens: int) -> str:
