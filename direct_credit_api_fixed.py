@@ -1988,37 +1988,81 @@ Provide detailed analysis using the actual credit data shown above."""
 
         return query
 
+    def _get_provider_for_model(self, model: str) -> dict:
+        """Get the provider configuration for a given model"""
+        for provider_name, provider_config in self.providers.items():
+            if provider_config.get("models") and model in provider_config["models"]:
+                return {
+                    "name": provider_name,
+                    **provider_config
+                }
+        # Default to OpenAI if model not found
+        return {
+            "name": "openai",
+            **self.providers["openai"]
+        }
+
     def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
-        """Call OpenAI API"""
+        """Call LLM API with proper provider routing"""
         try:
-            headers = {
-                "Authorization": f"Bearer {self.providers['openai']['api_key']}",
-                "Content-Type": "application/json"
-            }
+            # Get the correct provider for this model
+            provider = self._get_provider_for_model(model)
+            provider_name = provider["name"]
 
-            payload = {
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": prompt}
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens
-            }
+            # Prepare headers based on provider
+            if provider_name == "google":
+                headers = {
+                    "Content-Type": "application/json",
+                }
+                # Google uses different auth format
+                payload = {
+                    "contents": [{
+                        "parts": [{
+                            "text": f"System: {prompt}\n\nUser: Please analyze this customer data and respond in the exact format requested."
+                        }]
+                    }],
+                    "generationConfig": {
+                        "temperature": temperature,
+                        "maxOutputTokens": max_tokens,
+                    }
+                }
+                url = f"{provider['base_url']}/models/{model}:generateContent?key={provider['api_key']}"
+                response = requests.post(url, json=payload, timeout=30)
 
-            response = requests.post(
-                f"{self.providers['openai']['base_url']}/chat/completions",
-                json=payload,
-                headers=headers,
-                timeout=30
-            )
+            else:
+                # OpenAI-compatible providers (OpenAI, Groq)
+                headers = {
+                    "Authorization": f"Bearer {provider['api_key']}",
+                    "Content-Type": "application/json"
+                }
+
+                payload = {
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": prompt}
+                    ],
+                    "temperature": temperature,
+                    "max_tokens": max_tokens
+                }
+
+                response = requests.post(
+                    f"{provider['base_url']}/chat/completions",
+                    json=payload,
+                    headers=headers,
+                    timeout=30
+                )
 
             response.raise_for_status()
             result = response.json()
 
-            return result["choices"][0]["message"]["content"]
+            # Extract content based on provider response format
+            if provider_name == "google":
+                return result["candidates"][0]["content"]["parts"][0]["text"]
+            else:
+                return result["choices"][0]["message"]["content"]
 
         except Exception as e:
-            return f"Error calling OpenAI: {str(e)}"
+            return f"Error calling {provider_name} API: {str(e)}"
 
     async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
         """Generate streaming response chunks"""
