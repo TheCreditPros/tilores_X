@@ -450,8 +450,14 @@ class MultiProviderCreditAPI:
                 # For other query types, use the full data analysis with dynamic prompt
                 response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
 
-            # Apply universal formatting enhancement to ALL responses
-            response = self._enhance_response_formatting(response)
+            # Apply universal formatting enhancement ONLY to non-agent responses
+            # Agent prompts have their own specific formatting requirements
+            if agent_type and agent_type in ['zoho_cs_agent', 'client_chat_agent']:
+                print(f"🔍 DEBUG: SKIPPING universal formatting for agent: {agent_type}")
+                # Do NOT apply formatting for agent prompts
+            else:
+                print(f"🔍 DEBUG: APPLYING universal formatting (agent_type: {agent_type})")
+                response = self._enhance_response_formatting(response)
 
             # Cache the response (disabled during development)
             if self.cache_ttl > 0:
