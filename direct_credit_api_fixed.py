@@ -1018,6 +1018,10 @@ Type `/help` for detailed usage information."""
         # Use dynamic prompt from Agenta
         system_prompt = prompt_config.get('system_prompt', 'You are a helpful AI assistant.')
 
+        # DEBUG: Log the system prompt being used
+        print(f"🤖 DEBUG: Using system_prompt from: {prompt_config.get('source', 'unknown')}")
+        print(f"🤖 DEBUG: System prompt starts with: {system_prompt[:100]}...")
+
         # Override temperature and max_tokens from prompt config if not explicitly set
         if temperature == 0.7:  # Default value
             temperature = prompt_config.get('temperature', 0.7)
