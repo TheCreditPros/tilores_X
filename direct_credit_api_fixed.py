@@ -1035,13 +1035,17 @@ Type `/help` for detailed usage information."""
             print(f"⚠️ Error fetching comprehensive data: {e}")
             data_context = f"Customer data analysis for entity {entity_id} - {query_type} analysis requested"
 
-        # Create the full prompt with data context
-        full_prompt = f"{system_prompt}\n\n**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"
+        # Prepare messages: system prompt + user content (data + query)
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"**CUSTOMER DATA:**\n{data_context}\n\n**USER QUERY:** {query}"}
+        ]
 
-        print(f"🤖 DEBUG: Final prompt being sent to LLM (first 200 chars): {full_prompt[:200]}...")
+        print(f"🤖 DEBUG: System prompt (first 100 chars): {system_prompt[:100]}...")
+        print(f"🤖 DEBUG: User content (first 200 chars): {messages[1]['content'][:200]}...")
 
-        # Call LLM with dynamic prompt
-        return self._call_llm(full_prompt, model, temperature, max_tokens)
+        # Call LLM with proper message structure
+        return self._call_llm_with_messages(messages, model, temperature, max_tokens)
 
     def _introspect_graphql_schema(self) -> dict:
         """Use GraphQL introspection to discover the complete schema"""
@@ -2002,8 +2006,8 @@ Provide detailed analysis using the actual credit data shown above."""
             **self.providers["openai"]
         }
 
-    def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
-        """Call LLM API with proper provider routing"""
+    def _call_llm_with_messages(self, messages: list, model: str, temperature: float, max_tokens: int) -> str:
+        """Call LLM API with proper provider routing using messages format"""
         try:
             # Get the correct provider for this model
             provider = self._get_provider_for_model(model)
@@ -2011,16 +2015,19 @@ Provide detailed analysis using the actual credit data shown above."""
 
             print(f"🤖 DEBUG: Using provider '{provider_name}' for model '{model}'")
 
-            # Prepare headers based on provider
+            # Prepare headers and payload based on provider
             if provider_name == "google":
                 headers = {
                     "Content-Type": "application/json",
                 }
-                # Google uses different auth format
+                # Convert messages to Google format
+                system_msg = next((msg["content"] for msg in messages if msg["role"] == "system"), "")
+                user_msg = next((msg["content"] for msg in messages if msg["role"] == "user"), "")
+
                 payload = {
                     "contents": [{
                         "parts": [{
-                            "text": f"System: {prompt}\n\nUser: Please analyze this customer data and respond in the exact format requested."
+                            "text": f"System: {system_msg}\n\n{user_msg}"
                         }]
                     }],
                     "generationConfig": {
@@ -2040,9 +2047,7 @@ Provide detailed analysis using the actual credit data shown above."""
 
                 payload = {
                     "model": model,
-                    "messages": [
-                        {"role": "system", "content": prompt}
-                    ],
+                    "messages": messages,
                     "temperature": temperature,
                     "max_tokens": max_tokens
                 }
@@ -2065,6 +2070,11 @@ Provide detailed analysis using the actual credit data shown above."""
 
         except Exception as e:
             return f"Error calling {provider_name} API: {str(e)}"
+
+    def _call_llm(self, prompt: str, model: str, temperature: float, max_tokens: int) -> str:
+        """Legacy method for backward compatibility - converts prompt to messages format"""
+        messages = [{"role": "system", "content": prompt}]
+        return self._call_llm_with_messages(messages, model, temperature, max_tokens)
 
     async def _generate_streaming_response(self, response_content: str, request_id: str, model: str):
         """Generate streaming response chunks"""
