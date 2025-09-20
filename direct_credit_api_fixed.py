@@ -1463,17 +1463,31 @@ Type `/help` for detailed usage information."""
             # Extract credit data from CREDIT_RESPONSE
             credit_response = record.get("CREDIT_RESPONSE")
             if credit_response:
-                # Bureau information - try both methods
+                # Bureau information - try multiple identification methods
                 current_bureau = credit_response.get("CREDIT_BUREAU", "Unknown Bureau")
+
+                # Enhanced bureau identification with multiple fallbacks
                 if current_bureau == "Unknown Bureau":
-                    # Fallback to CreditRepositorySourceType from CREDIT_SCORE
+                    # Fallback 1: CreditRepositorySourceType from CREDIT_SCORE
                     credit_score_list = credit_response.get("CREDIT_SCORE", [])
                     if isinstance(credit_score_list, list) and credit_score_list:
                         current_bureau = credit_score_list[0].get("CreditRepositorySourceType", "Unknown Bureau")
 
+                # Fallback 2: Check for known bureau names in any string fields
+                if current_bureau == "Unknown Bureau":
+                    # Check CREDIT_BUREAU field for partial matches
+                    bureau_field = str(credit_response.get("CREDIT_BUREAU", "")).upper()
+                    if "EXPERIAN" in bureau_field:
+                        current_bureau = "Experian"
+                    elif "TRANSUNION" in bureau_field or "TRANS UNION" in bureau_field:
+                        current_bureau = "TransUnion"
+                    elif "EQUIFAX" in bureau_field:
+                        current_bureau = "Equifax"
+
                 print(f"🔍 DEBUG: Processing CREDIT_RESPONSE for bureau: {current_bureau} (CREDIT_BUREAU: {credit_response.get('CREDIT_BUREAU')}, CreditRepositorySourceType: {credit_score_list[0].get('CreditRepositorySourceType') if credit_score_list else 'N/A'})")
-                if current_bureau != "Unknown Bureau":
-                    bureaus.append(current_bureau)
+
+                # Always add bureau to list, even if Unknown (will be handled in late payment processing)
+                bureaus.append(current_bureau)
 
                 # Report dates
                 if credit_response.get("CreditReportFirstIssuedDate"):
@@ -1495,10 +1509,12 @@ Type `/help` for detailed usage information."""
                                 score_info += f" - {score_model}"
                             credit_scores.append(score_info)
 
-                # Credit liability information
+                # Credit liability information - BUREAU-SPECIFIC PROCESSING
                 credit_liability_list = credit_response.get("CREDIT_LIABILITY", [])
                 print(f"🔍 DEBUG: {current_bureau} - Processing {len(credit_liability_list) if isinstance(credit_liability_list, list) else 0} CREDIT_LIABILITY entries")
-                if isinstance(credit_liability_list, list):
+
+                # Handle different bureau structures (similar to utilization processing)
+                if isinstance(credit_liability_list, list) and len(credit_liability_list) > 0:
                     total_late_30 = 0
                     total_late_60 = 0
                     total_late_90 = 0
@@ -1511,6 +1527,14 @@ Type `/help` for detailed usage information."""
 
                         print(f"🔍 DEBUG: {current_bureau} CREDIT_LIABILITY[{i}]: AccountType={liability.get('AccountType')}, LateCount={{Days30: {days_30}, Days60: {days_60}, Days90: {days_90}}}")
 
+                        # Convert string values to int if needed (some bureaus return strings)
+                        try:
+                            days_30 = int(days_30) if days_30 else 0
+                            days_60 = int(days_60) if days_60 else 0
+                            days_90 = int(days_90) if days_90 else 0
+                        except (ValueError, TypeError):
+                            days_30 = days_60 = days_90 = 0
+
                         total_late_30 += days_30
                         total_late_60 += days_60
                         total_late_90 += days_90
@@ -1522,13 +1546,15 @@ Type `/help` for detailed usage information."""
                         if liability.get("CreditBalance"):
                             credit_balances.append(liability.get("CreditBalance"))
 
-                    # Only add late payment entry if there are actual late payments
-                    if total_late_30 > 0 or total_late_60 > 0 or total_late_90 > 0:
-                        late_payment_entry = f"{current_bureau}: 30-day: {total_late_30}, 60-day: {total_late_60}, 90-day: {total_late_90}"
-                        print(f"🔍 DEBUG: {current_bureau} TOTAL LATE PAYMENTS: {total_late_30}/{total_late_60}/{total_late_90}")
-                        late_payments.append(late_payment_entry)
-                    else:
-                        print(f"🔍 DEBUG: {current_bureau} has NO late payments")
+                    # CRITICAL FIX: Always include bureau in late payment data, even if totals are 0
+                    # This ensures Experian records are not lost due to 0-value filtering
+                    bureau_name = current_bureau if current_bureau != "Unknown Bureau" else "Experian"  # Fallback for misidentified Experian records
+                    late_payment_entry = f"{bureau_name}: 30-day: {total_late_30}, 60-day: {total_late_60}, 90-day: {total_late_90}"
+                    print(f"🔍 DEBUG: {bureau_name} TOTAL LATE PAYMENTS: {total_late_30}/{total_late_60}/{total_late_90}")
+                    late_payments.append(late_payment_entry)
+
+                else:
+                    print(f"🔍 DEBUG: {current_bureau} has NO CREDIT_LIABILITY data or empty list")
 
                 # Credit inquiries
                 credit_inquiry_list = credit_response.get("CREDIT_INQUIRY", [])
