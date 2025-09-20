@@ -2009,6 +2009,8 @@ Provide detailed analysis using the actual credit data shown above."""
             provider = self._get_provider_for_model(model)
             provider_name = provider["name"]
 
+            print(f"🤖 DEBUG: Using provider '{provider_name}' for model '{model}'")
+
             # Prepare headers based on provider
             if provider_name == "google":
                 headers = {
