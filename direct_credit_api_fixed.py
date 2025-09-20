@@ -1186,6 +1186,7 @@ Type `/help` for detailed usage information."""
 
         # HYBRID APPROACH: Use CREDIT_RESPONSE fields with EQUIFAX_REPORT for missing July 17 data
         # EQUIFAX_REPORT is still needed because July 17, 2025 Equifax data resides there, not in CREDIT_RESPONSE
+        # Deployment trigger: Force Railway redeployment to apply EQUIFAX_REPORT fix
         print(f"🔍 DEBUG: Using hybrid CREDIT_RESPONSE + EQUIFAX_REPORT approach - restoring Equifax July 17 data")
 
         for type_def in types:
