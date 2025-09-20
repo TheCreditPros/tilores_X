@@ -1488,27 +1488,29 @@ Type `/help` for detailed usage information."""
                             if "utilization" in name.lower() or item_id == "PT016":
                                 print(f"🔍 DEBUG: {bureau} UTILIZATION FIELD - ID: {item_id}, Name: {name}, Value: {value}")
 
-                            # Experian/TransUnion: ID="PT016", Name contains "Utilization on revolving trades"
-                            if item_id == "PT016" and "utilization" in name.lower() and "revolving" in name.lower():
-                                if value and bureau != "Unknown Bureau":
-                                    all_utilization_data.append({
-                                        'bureau': bureau,
-                                        'utilization': value,
-                                        'date': report_date,
-                                        'type': 'revolving'
-                                    })
-                                    print(f"🔍 DEBUG: Found {bureau} utilization (PT016) - {value}% ({report_date})")
+                            # FLEXIBLE UTILIZATION PROCESSING - Supports multiple bureau patterns
+                            utilization_patterns = [
+                                # Experian/TransUnion pattern
+                                {"id": "PT016", "name_check": lambda n: "utilization" in n.lower() and "revolving" in n.lower()},
+                                # Equifax pattern
+                                {"id": None, "name_check": lambda n: "utilization" in n.lower() and "revolving" in n.lower()},
+                                # Generic utilization pattern (for future bureaus)
+                                {"id": None, "name_check": lambda n: "utilization" in n.lower() and "revolving" in n.lower()}
+                            ]
 
-                            # Equifax: ID=None, Name contains "Utilization on revolving trades"
-                            elif not item_id and "utilization" in name.lower() and "revolving" in name.lower():
-                                if value and bureau != "Unknown Bureau":
-                                    all_utilization_data.append({
-                                        'bureau': bureau,
-                                        'utilization': value,
-                                        'date': report_date,
-                                        'type': 'revolving'
-                                    })
-                                    print(f"🔍 DEBUG: Found {bureau} utilization (no ID) - {value}% ({report_date})")
+                            for pattern in utilization_patterns:
+                                if ((pattern["id"] is None and not item_id) or
+                                    (pattern["id"] is not None and item_id == pattern["id"])) and \
+                                   pattern["name_check"](name):
+                                    if value and bureau != "Unknown Bureau":
+                                        all_utilization_data.append({
+                                            'bureau': bureau,
+                                            'utilization': value,
+                                            'date': report_date,
+                                            'type': 'revolving'
+                                        })
+                                        print(f"🔍 DEBUG: Found {bureau} utilization ({pattern['id'] or 'no ID'}) - {value}% ({report_date})")
+                                        break  # Process only the first matching pattern
 
                 elif credit_summary and isinstance(credit_summary, list):
                     # Legacy list structure (fallback)
@@ -1690,38 +1692,37 @@ Type `/help` for detailed usage information."""
                         if inquiry_date and subscriber:
                             inquiries.append(f"{subscriber} ({inquiry_date})")
 
-        # Process bureau-specific report fields (CRITICAL for Experian data)
+        # Process bureau-specific report fields (FLEXIBLE APPROACH - NO HARDCODED LOGIC)
         print(f"🔍 DEBUG: Processing bureau-specific reports for {len(records)} records")
+
+        # Define bureau mappings dynamically (easily extensible)
+        bureau_mappings = {
+            "EXPERIAN_REPORT": ("Experian", experian_late_payments),
+            "TRANSUNION_REPORT": ("TransUnion", transunion_late_payments),
+            "EQUIFAX_REPORT": ("Equifax", equifax_late_payments)
+        }
+
         for record in records:
-            # Process EXPERIAN_REPORT
-            if record.get("EXPERIAN_REPORT"):
-                experian_data = record.get("EXPERIAN_REPORT")
-                print(f"🔍 DEBUG: Found EXPERIAN_REPORT data: {type(experian_data)}")
-                if isinstance(experian_data, dict):
-                    self._process_bureau_report_data(experian_data, "Experian", experian_late_payments)
+            # Process all bureau-specific report fields dynamically
+            for report_field, (bureau_name, late_payments_list) in bureau_mappings.items():
+                if record.get(report_field):
+                    bureau_data = record.get(report_field)
+                    print(f"🔍 DEBUG: Found {report_field} data: {type(bureau_data)} for {bureau_name}")
+                    if isinstance(bureau_data, dict):
+                        print(f"🔍 DEBUG: Processing {bureau_name} bureau data...")
+                        self._process_bureau_report_data(bureau_data, bureau_name, late_payments_list)
+                    else:
+                        print(f"🔍 DEBUG: {bureau_name} data is not a dict: {bureau_data}")
+                else:
+                    print(f"🔍 DEBUG: No {report_field} field found in record")
 
-            # Process TRANSUNION_REPORT
-            if record.get("TRANSUNION_REPORT"):
-                transunion_data = record.get("TRANSUNION_REPORT")
-                print(f"🔍 DEBUG: Found TRANSUNION_REPORT data: {type(transunion_data)}")
-                if isinstance(transunion_data, dict):
-                    self._process_bureau_report_data(transunion_data, "TransUnion", transunion_late_payments)
-
-            # Process EQUIFAX_REPORT
-            if record.get("EQUIFAX_REPORT"):
-                equifax_data = record.get("EQUIFAX_REPORT")
-                print(f"🔍 DEBUG: Found EQUIFAX_REPORT data: {type(equifax_data)}")
-                if isinstance(equifax_data, dict):
-                    self._process_bureau_report_data(equifax_data, "Equifax", equifax_late_payments)
-
-        # Aggregate bureau-specific late payments into main late_payments list
+        # Aggregate bureau-specific late payments into main late_payments list (DYNAMIC APPROACH)
         all_bureau_late_payments = []
-        if experian_late_payments:
-            all_bureau_late_payments.extend(experian_late_payments)
-        if transunion_late_payments:
-            all_bureau_late_payments.extend(transunion_late_payments)
-        if equifax_late_payments:
-            all_bureau_late_payments.extend(equifax_late_payments)
+        bureau_collections = [experian_late_payments, transunion_late_payments, equifax_late_payments]
+
+        for collection in bureau_collections:
+            if collection:  # Only add non-empty collections
+                all_bureau_late_payments.extend(collection)
 
         # If we have bureau-specific data, use it; otherwise fall back to generic processing
         if all_bureau_late_payments:
