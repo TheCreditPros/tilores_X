@@ -1093,7 +1093,7 @@ Type `/help` for detailed usage information."""
         schema = self._introspect_graphql_schema()
 
         if not schema:
-            print("🔍 DEBUG: Using COMPLETE fallback CREDIT_RESPONSE query with utilization data")
+            print("🔍 DEBUG: Using COMPLETE fallback CREDIT_RESPONSE query with bureau-specific fields")
             return """
                 CREDIT_RESPONSE {
                     CREDIT_BUREAU
@@ -1125,6 +1125,52 @@ Type `/help` for detailed usage information."""
                         }
                     }
                 }
+                # Bureau-specific report fields (CRITICAL for Experian data)
+                EXPERIAN_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }
+                TRANSUNION_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }
+                EQUIFAX_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }
             """
 
         # Find CREDIT_RESPONSE type in schema
@@ -1135,8 +1181,13 @@ Type `/help` for detailed usage information."""
 
         # Debug: Show all type names to understand the schema structure
         type_names = [t.get('name') for t in types if t.get('name')]
-        credit_related_types = [name for name in type_names if 'Credit' in name or 'CREDIT' in name]
+        credit_related_types = [name for name in type_names if 'Credit' in name or 'CREDIT' in name or 'REPORT' in name]
         print(f"🔍 DEBUG: Credit-related types found: {credit_related_types}")
+
+        # Check for bureau-specific report types
+        bureau_reports = ['ExperianReport', 'TransUnionReport', 'EquifaxReport', 'EXPERIAN_REPORT', 'TRANSUNION_REPORT', 'EQUIFAX_REPORT']
+        available_bureau_reports = [report for report in bureau_reports if report in type_names]
+        print(f"🔍 DEBUG: Available bureau-specific reports: {available_bureau_reports}")
 
         for type_def in types:
             if type_def.get('name') == 'CreditResponse':
@@ -1157,7 +1208,22 @@ Type `/help` for detailed usage information."""
             available_essential = [f for f in essential_fields if f in credit_response_fields]
             print(f"🔍 DEBUG: Available essential fields: {available_essential}")
 
+            # Add bureau-specific report fields if available
+            bureau_report_fields = []
+            if 'EXPERIAN_REPORT' in type_names or 'ExperianReport' in type_names:
+                bureau_report_fields.append('EXPERIAN_REPORT')
+            if 'TRANSUNION_REPORT' in type_names or 'TransUnionReport' in type_names:
+                bureau_report_fields.append('TRANSUNION_REPORT')
+            if 'EQUIFAX_REPORT' in type_names or 'EquifaxReport' in type_names:
+                bureau_report_fields.append('EQUIFAX_REPORT')
+
+            if bureau_report_fields:
+                available_essential.extend(bureau_report_fields)
+                print(f"🔍 DEBUG: Added bureau-specific fields: {bureau_report_fields}")
+
             query_parts = []
+            bureau_query_parts = []
+
             for field in available_essential:
                 if field == 'CREDIT_SCORE':
                     query_parts.append("""                    CREDIT_SCORE {
@@ -1186,16 +1252,70 @@ Type `/help` for detailed usage information."""
                             Value
                         }
                     }""")
+                elif field == 'EXPERIAN_REPORT':
+                    bureau_query_parts.append("""                EXPERIAN_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }""")
+                elif field == 'TRANSUNION_REPORT':
+                    bureau_query_parts.append("""                TRANSUNION_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }""")
+                elif field == 'EQUIFAX_REPORT':
+                    bureau_query_parts.append("""                EQUIFAX_REPORT {
+                    CREDIT_SCORE
+                    REPORT_DATE
+                    BUREAU
+                    CREDIT_LIABILITY {
+                        AccountType
+                        CreditLimitAmount
+                        CreditBalance
+                        LateCount {
+                            Days30
+                            Days60
+                            Days90
+                        }
+                    }
+                }""")
                 else:
                     # Simple scalar fields
                     query_parts.append(f"                    {field}")
 
-            full_query = f"""
+            # Build the complete query with both CREDIT_RESPONSE and bureau-specific fields
+            credit_response_query = f"""
                 CREDIT_RESPONSE {{
 {chr(10).join(query_parts)}
-                }}
-            """
-            print(f"🔍 DEBUG: Built focused CREDIT_RESPONSE query with {len(available_essential)} essential fields")
+                }}"""
+
+            full_query = credit_response_query
+            if bureau_query_parts:
+                full_query += "\n" + "\n".join(bureau_query_parts)
+
+            print(f"🔍 DEBUG: Built focused query with {len(available_essential)} essential fields")
+            print(f"🔍 DEBUG: Bureau-specific fields included: {len(bureau_query_parts)}")
             print(f"🔍 DEBUG: Generated query:\n{full_query}")
             return full_query
         else:
@@ -1295,6 +1415,11 @@ Type `/help` for detailed usage information."""
         late_payments = []
         inquiries = []
         all_credit_liability_data = []
+
+        # Bureau-specific data collections for late payments
+        experian_late_payments = []
+        transunion_late_payments = []
+        equifax_late_payments = []
 
         # MANDATORY CREDIT SCORE EXTRACTION FORMULA - NEVER EDIT OR REMOVE
         # Extract ALL credit scores with dates (before filtering to most recent)
@@ -1565,6 +1690,46 @@ Type `/help` for detailed usage information."""
                         if inquiry_date and subscriber:
                             inquiries.append(f"{subscriber} ({inquiry_date})")
 
+        # Process bureau-specific report fields (CRITICAL for Experian data)
+        print(f"🔍 DEBUG: Processing bureau-specific reports for {len(records)} records")
+        for record in records:
+            # Process EXPERIAN_REPORT
+            if record.get("EXPERIAN_REPORT"):
+                experian_data = record.get("EXPERIAN_REPORT")
+                print(f"🔍 DEBUG: Found EXPERIAN_REPORT data: {type(experian_data)}")
+                if isinstance(experian_data, dict):
+                    self._process_bureau_report_data(experian_data, "Experian", experian_late_payments)
+
+            # Process TRANSUNION_REPORT
+            if record.get("TRANSUNION_REPORT"):
+                transunion_data = record.get("TRANSUNION_REPORT")
+                print(f"🔍 DEBUG: Found TRANSUNION_REPORT data: {type(transunion_data)}")
+                if isinstance(transunion_data, dict):
+                    self._process_bureau_report_data(transunion_data, "TransUnion", transunion_late_payments)
+
+            # Process EQUIFAX_REPORT
+            if record.get("EQUIFAX_REPORT"):
+                equifax_data = record.get("EQUIFAX_REPORT")
+                print(f"🔍 DEBUG: Found EQUIFAX_REPORT data: {type(equifax_data)}")
+                if isinstance(equifax_data, dict):
+                    self._process_bureau_report_data(equifax_data, "Equifax", equifax_late_payments)
+
+        # Aggregate bureau-specific late payments into main late_payments list
+        all_bureau_late_payments = []
+        if experian_late_payments:
+            all_bureau_late_payments.extend(experian_late_payments)
+        if transunion_late_payments:
+            all_bureau_late_payments.extend(transunion_late_payments)
+        if equifax_late_payments:
+            all_bureau_late_payments.extend(equifax_late_payments)
+
+        # If we have bureau-specific data, use it; otherwise fall back to generic processing
+        if all_bureau_late_payments:
+            late_payments.extend(all_bureau_late_payments)
+            print(f"🔍 DEBUG: Using bureau-specific late payments: {len(all_bureau_late_payments)} entries")
+        else:
+            print(f"🔍 DEBUG: No bureau-specific late payments found, using generic processing results")
+
         # Remove duplicates and None values
         credit_scores = list(set([str(s) for s in credit_scores if s is not None]))
         bureaus = list(set([str(b) for b in bureaus if b is not None]))
@@ -1687,6 +1852,46 @@ For the specific query: "{query}"
 Provide detailed analysis using the actual credit data shown above."""
 
         return formatted_data
+
+    def _process_bureau_report_data(self, bureau_data: dict, bureau_name: str, late_payments_list: list):
+        """Process bureau-specific report data for late payments"""
+        print(f"🔍 DEBUG: Processing {bureau_name} report data")
+
+        # Extract CREDIT_LIABILITY from bureau-specific report
+        credit_liability = bureau_data.get("CREDIT_LIABILITY", [])
+        print(f"🔍 DEBUG: {bureau_name} CREDIT_LIABILITY: {len(credit_liability) if isinstance(credit_liability, list) else 'Not a list'} entries")
+
+        if isinstance(credit_liability, list) and len(credit_liability) > 0:
+            total_late_30 = 0
+            total_late_60 = 0
+            total_late_90 = 0
+
+            for i, liability in enumerate(credit_liability):
+                late_count = liability.get("LateCount", {})
+                days_30 = late_count.get("Days30", 0)
+                days_60 = late_count.get("Days60", 0)
+                days_90 = late_count.get("Days90", 0)
+
+                print(f"🔍 DEBUG: {bureau_name} LIABILITY[{i}]: LateCount={{Days30: {days_30}, Days60: {days_60}, Days90: {days_90}}}")
+
+                # Convert string values to int if needed
+                try:
+                    days_30 = int(days_30) if days_30 else 0
+                    days_60 = int(days_60) if days_60 else 0
+                    days_90 = int(days_90) if days_90 else 0
+                except (ValueError, TypeError):
+                    days_30 = days_60 = days_90 = 0
+
+                total_late_30 += days_30
+                total_late_60 += days_60
+                total_late_90 += days_90
+
+            # Add to bureau-specific late payments list
+            late_payment_entry = f"{bureau_name}: 30-day: {total_late_30}, 60-day: {total_late_60}, 90-day: {total_late_90}"
+            late_payments_list.append(late_payment_entry)
+            print(f"🔍 DEBUG: {bureau_name} TOTAL LATE PAYMENTS: {total_late_30}/{total_late_60}/{total_late_90}")
+        else:
+            print(f"🔍 DEBUG: {bureau_name} has no CREDIT_LIABILITY data")
 
     def _extract_conversation_context(self, messages: List[Dict[str, Any]]) -> Dict[str, str]:
         """Extract customer context from conversation history"""
