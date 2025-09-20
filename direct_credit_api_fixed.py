@@ -603,8 +603,10 @@ class MultiProviderCreditAPI:
 
                 # If there's a remaining query, process it directly with the agent
                 if remaining_query:
-                    print(f"🎯 Processing slash command with agent: {agent_type}")
-                    return self._process_agent_query(remaining_query, agent_type)
+                    print(f"🎯 Processing slash command with agent: {agent_type} for query: {remaining_query}")
+                    result = self._process_agent_query(remaining_query, agent_type)
+                    print(f"🎯 Agent result length: {len(result)} chars")
+                    return result
                 else:
                     # Just switching agent without a query
                     if AGENT_PROMPTS_AVAILABLE:
@@ -997,9 +999,11 @@ Type `/help` for detailed usage information."""
 
     def _process_agent_query(self, query: str, agent_type: str) -> str:
         """Process agent queries directly with dedicated prompts - simplified routing"""
+        print(f"🤖 DIRECT AGENT PROCESSING: {agent_type} for query: {query}")
         try:
             # Load the agent prompt
             if not AGENT_PROMPTS_AVAILABLE:
+                print("❌ Agent prompts system not available")
                 return "Agent prompts system not available"
 
             from agent_prompts import get_agent_prompt
