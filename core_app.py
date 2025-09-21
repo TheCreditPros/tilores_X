@@ -1856,8 +1856,14 @@ def run_chain(
 
         # DEBUG: Log routing decision for production debugging
         print(
-            f"🎯 QUERY ROUTING: '{user_input[:50]}...' → {'CUSTOMER (tools)' if use_tilores_tools else 'GENERAL (no tools)'}"
+            f"🎯 QUERY ROUTING: '{user_input[:50]}...' → {'CUSTOMER (orchestration)' if use_tilores_tools else 'GENERAL (no tools)'}"
         )
+
+        # EXTRA DEBUG: Check what the router found
+        if use_tilores_tools:
+            print(f"🎯 CUSTOMER QUERY DETECTED - will use new orchestration system")
+        else:
+            print(f"🎯 GENERAL QUERY - will use direct LLM")
 
         if not use_tilores_tools:
             # GENERAL QUERY PATH - Direct LLM without tools
@@ -1904,24 +1910,39 @@ def run_chain(
 
                 return final_response
 
-        # CUSTOMER QUERY PATH - Continue with existing Tilores logic
-        # Get the appropriate model
-        llm = engine.get_model(model, **kwargs)
+        # CUSTOMER QUERY PATH - Use new LLM orchestration system
+        print("🎯 Using new LLM orchestration system for customer queries")
 
-        # Tilores tools are required - no fallback to direct LLM
-        if not engine or not engine.tools:
-            print("🚨 CRITICAL: No tools available in production!")
-            print(f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}")
-            print("   This explains why LLM gives generic responses instead of calling tools")
-            return f"❌ DEBUG: Tilores tools not available in production. Engine state: {len(engine.tools) if engine and engine.tools else 'No tools initialized'}. This is why customer searches fail."
+        # Import the new orchestration system
+        try:
+            from direct_credit_api_fixed import MultiProviderCreditAPI
+            api = MultiProviderCreditAPI()
 
-        # DEBUG: Log tool availability
-        print(f"🔧 TOOLS AVAILABLE: {len(engine.tools)} tools ready for customer query")
-        for i, tool in enumerate(engine.tools):
-            print(f"   Tool {i + 1}: {tool.name}")
+            # Process through the new orchestration system
+            result = api.process_chat_request(user_input, model=model)
+            print(f"✅ Orchestration returned: {len(result)} characters")
 
-        # Get LLM with tools (simplified without caching)
-        llm_with_tools = engine.get_llm_with_tools(model, **kwargs)
+            return result
+
+        except Exception as e:
+            print(f"❌ Orchestration system failed: {e}")
+            # Fallback to old system if new system fails
+            print("🔄 Falling back to legacy Tilores tools system")
+            llm = engine.get_model(model, **kwargs)
+
+            # Tilores tools are required - no fallback to direct LLM
+            if not engine or not engine.tools:
+                print("🚨 CRITICAL: No tools available in production!")
+                print(f"   Engine tools: {engine.tools if engine else 'Engine not initialized'}")
+                return f"❌ DEBUG: Tilores tools not available in production. Engine state: {len(engine.tools) if engine and engine.tools else 'No tools initialized'}."
+
+            # DEBUG: Log tool availability
+            print(f"🔧 TOOLS AVAILABLE: {len(engine.tools)} tools ready for customer query")
+            for i, tool in enumerate(engine.tools):
+                print(f"   Tool {i + 1}: {tool.name}")
+
+            # Get LLM with tools (simplified without caching)
+            llm_with_tools = engine.get_llm_with_tools(model, **kwargs)
 
         # Get comprehensive fields for LLM context
         comprehensive_fields_text = ""

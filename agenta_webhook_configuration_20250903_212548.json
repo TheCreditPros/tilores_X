@@ -1,8 +1,0 @@
-{
-  "configuration_date": "2025-09-03T21:25:48Z",
-  "webhooks": [
-    {"name": "evaluation_complete", "url": "https://tilores-x.up.railway.app/webhooks/evaluation-complete", "events": ["evaluation.completed", "evaluation.failed"], "active": true},
-    {"name": "deployment_status", "url": "https://tilores-x.up.railway.app/webhooks/deployment-status", "events": ["deployment.started", "deployment.completed", "deployment.failed"], "active": true},
-    {"name": "performance_alert", "url": "https://tilores-x.up.railway.app/webhooks/performance-alert", "events": ["alert.performance", "alert.error_rate", "alert.token_usage"], "active": true}
-  ]
-}

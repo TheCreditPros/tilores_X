@@ -335,8 +335,23 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
         # Calculate prompt tokens
         prompt_tokens = count_messages_tokens(chat_request.messages, chat_request.model)
 
-        # Use core_app to process the request with full conversation context
-        response = run_chain(messages, model=chat_request.model)
+        # Check if this is a slash command query that should use the new orchestration system
+        user_input = messages[-1]["content"] if messages else ""
+        is_slash_command = user_input.strip().startswith('/')
+
+        if is_slash_command:
+            print(f"🎯 SLASH COMMAND DETECTED: {user_input[:50]}... - Using new orchestration system")
+            try:
+                from direct_credit_api_fixed import MultiProviderCreditAPI
+                api = MultiProviderCreditAPI()
+                response = api.process_chat_request(user_input, model=chat_request.model)
+                print(f"✅ Orchestration completed for slash command")
+            except Exception as e:
+                print(f"❌ Orchestration failed: {e} - falling back to core_app")
+                response = run_chain(messages, model=chat_request.model)
+        else:
+            # Use core_app to process the request with full conversation context
+            response = run_chain(messages, model=chat_request.model)
 
         # Extract clean content from any LangChain response type
         content = ""

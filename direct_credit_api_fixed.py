@@ -139,60 +139,6 @@ class MultiProviderCreditAPI:
         # Request counter for logging
         self.request_counter = 0
 
-    def detect_query_type(self, query: str) -> str:
-        """Detect the type of query to route to appropriate prompt"""
-        print(f"🔍 DETECT_QUERY_TYPE: Received query: '{query}'")
-        query_lower = query.lower()
-
-        # Slash commands (highest priority)
-        if query.strip().startswith('/'):
-            print(f"🔍 DETECT_QUERY_TYPE: Detected SLASH COMMAND")
-            return "slash_command"
-
-        # Tool/system queries (second priority)
-        tool_keywords = ['test tilores', 'tilores backend', 'backend connection', 'connection test',
-                        'list agents', 'available agents', 'what agents', 'tilores agents']
-        if any(keyword in query_lower for keyword in tool_keywords):
-            return "tool"
-
-        # Account status queries (Salesforce status: active/canceled/past due)
-        account_status_keywords = ['account status', 'customer status', 'subscription status',
-                                 'enrollment status', 'active', 'canceled', 'cancelled', 'past due', 'current status']
-        has_status_keywords = any(keyword in query_lower for keyword in account_status_keywords)
-
-        # Exclude credit-related status queries
-        credit_status_indicators = ['credit status', 'credit score', 'bureau', 'utilization', 'tradeline']
-        is_credit_status_query = any(indicator in query_lower for indicator in credit_status_indicators)
-
-        # Only treat as account status if it's not a credit status query
-        if has_status_keywords and not is_credit_status_query:
-            return "status"
-
-        # Credit analysis queries
-        credit_keywords = ['credit', 'score', 'bureau', 'experian', 'transunion', 'equifax',
-                          'utilization', 'tradeline', 'inquiry', 'late payment', 'delinquent']
-        has_credit_keywords = any(keyword in query_lower for keyword in credit_keywords)
-
-        # Transaction analysis queries
-        transaction_keywords = ['transaction', 'payment', 'billing', 'charge', 'amount', 'invoice']
-        has_transaction_keywords = any(keyword in query_lower for keyword in transaction_keywords)
-
-        # Multi-data queries
-        combined_keywords = ['comprehensive', 'complete', 'full analysis', 'everything', 'all data', 'overview']
-        has_combined_keywords = any(keyword in query_lower for keyword in combined_keywords)
-
-        # Count data types requested
-        data_type_count = sum([has_credit_keywords, has_transaction_keywords])
-
-        if has_combined_keywords or data_type_count > 1:
-            return "multi_data"
-        elif has_credit_keywords:
-            return "credit"
-        elif has_transaction_keywords:
-            return "transaction"
-        else:
-            return "general"
-
     def get_tilores_token(self):
         """Get or refresh Tilores OAuth token"""
         if self.tilores_token and self.token_expires_at and datetime.now() < self.token_expires_at:
@@ -376,7 +322,7 @@ class MultiProviderCreditAPI:
                            temperature: float = 0.7, max_tokens: int = None,
                            prompt_id: str = None, prompt_version: str = None,
                            agent_type: str = None) -> str:
-        """Process chat request with dynamic prompt selection and fixed Salesforce status"""
+        """MANDATORY SLASH COMMAND ROUTING - All queries must start with slash commands"""
         start_time = time.time()
         self.request_counter += 1
         request_id = self.request_counter
@@ -384,108 +330,15 @@ class MultiProviderCreditAPI:
         print(f"🔄 Processing request #{request_id} started at {datetime.now().strftime('%H:%M:%S')}")
 
         try:
-            # SIMPLE LINEAR ROUTING: Direct slash command handling
-            if query.strip().startswith('/'):
-                print(f"🎯 DIRECT SLASH COMMAND DETECTED: {query}")
-                response = self._process_slash_command(query)
-            else:
-                # For non-slash commands, use the original complex routing
-                # Detect query type for prompt routing
-                query_type = self.detect_query_type(query)
-                print(f"🎯 Detected query type: {query_type}")
+            # MANDATORY SLASH COMMAND VALIDATION
+            if not query.strip().startswith('/'):
+                return "❌ **MANDATORY SLASH COMMAND REQUIRED**\n\nPlease start your query with a slash command:\n\n**Zoho CS Agent:**\n• `/cs status` - Account/enrollment queries\n• `/cs credit` - Credit analysis queries\n• `/cs billing` - Transaction/billing queries\n\n**Client Agent:**\n• `/client status` - Account queries\n• `/client credit` - Credit analysis queries\n• `/client billing` - Transaction queries\n\n**System:**\n• `/help` - Show all commands\n• `/agents` - List available agents"
 
-                # Check for agent-specific prompt override
-                agent_prompt_config = None
-                # Check for session-stored agent preference first
-                session_agent = self._get_session_agent(query)
-                if session_agent:
-                    agent_type = session_agent
-                    print(f"🤖 DEBUG: Using session agent: {agent_type}")
-                elif not agent_type:
-                    # Default to zoho_cs_agent if no agent_type specified
-                    agent_type = "zoho_cs_agent"
-                    print(f"🤖 DEBUG: Defaulting to agent_type: {agent_type}")
+            # DIRECT SLASH COMMAND PROCESSING
+            print(f"🎯 SLASH COMMAND DETECTED: {query}")
+            response = self._process_slash_command(query)
 
-                if AGENT_PROMPTS_AVAILABLE and agent_type:
-                    agent_prompt_config = get_agent_prompt(agent_type, query_type)
-                    if agent_prompt_config:
-                        print(f"🤖 Using agent prompt: {agent_type}")
-                        print(f"🤖 Agent prompt system_message preview: {agent_prompt_config.get('system_prompt', '')[:100]}...")
-                    else:
-                        print(f"❌ Agent prompt not found for: {agent_type}")
-
-                # Get appropriate prompt from agent, Agenta SDK, or local store
-                if agent_prompt_config:
-                    prompt_config = agent_prompt_config
-                    prompt_config["source"] = f"agent_{agent_type}"
-                elif AGENTA_INTEGRATION and agenta_manager:
-                    prompt_config = agenta_manager.get_prompt_config(query_type, query)
-                    print(f"📝 Using prompt: {prompt_config.get('variant_slug', 'unknown')} (source: {prompt_config.get('source', 'unknown')})")
-                else:
-                    # Fallback prompt configuration
-                    prompt_config = {
-                        "source": "fallback",
-                        "system_prompt": "You are a helpful AI assistant analyzing customer data.",
-                        "temperature": 0.7,
-                        "max_tokens": 1000
-                    }
-                    print("📝 Using fallback prompt configuration")
-
-                # Create cache key
-                cache_key = hashlib.md5(f"{query}_{model}_{query_type}_{prompt_config.get('variant_slug', '')}".encode()).hexdigest()
-
-                # Check cache first
-                redis_cached = self._get_redis_cache(cache_key)
-                if redis_cached:
-                    duration = time.time() - start_time
-                    print(f"✅ Request #{request_id} completed in {duration:.1f}s (cached)")
-                    return redis_cached
-
-                # Check memory cache
-                if self.cache_ttl > 0 and cache_key in self.query_cache:
-                    cached_data = self.query_cache[cache_key]
-                    if datetime.now().timestamp() - cached_data['timestamp'] < self.cache_ttl:
-                        duration = time.time() - start_time
-                        print(f"🚀 Memory cache hit: {cache_key[:8]}...")
-                        print(f"✅ Request #{request_id} completed in {duration:.1f}s (memory cached)")
-                        return cached_data['response']
-
-                # Process based on query type
-                if query_type == "status":
-                    response = self._process_status_query(query)
-                elif query_type == "tool":
-                    response = self._process_tool_query(query)
-                elif query_type == "slash_command":
-                    response = self._process_slash_command(query)
-                else:
-                    # For other query types, use the full data analysis with dynamic prompt
-                    response = self._process_data_analysis_query(query, query_type, prompt_config, model, temperature, max_tokens)
-
-            # Apply universal formatting enhancement ONLY to non-agent responses
-            # Agent prompts have their own specific formatting requirements
-            if agent_type and agent_type in ['zoho_cs_agent', 'client_chat_agent']:
-                print(f"🔍 DEBUG: SKIPPING universal formatting for agent: {agent_type}")
-                # Do NOT apply formatting for agent prompts
-            else:
-                print(f"🔍 DEBUG: APPLYING universal formatting (agent_type: {agent_type})")
-                response = self._enhance_response_formatting(response)
-
-            # Cache the response (disabled during development)
-            if self.cache_ttl > 0:
-                self._cache_response(cache_key, response)
-
-            # Log performance back to Agenta
             duration = time.time() - start_time
-            if AGENTA_INTEGRATION and agenta_manager:
-                agenta_manager.log_interaction(
-                    query_type,
-                    query,
-                    response,
-                    True,
-                    duration,
-                    prompt_config
-                )
-
             print(f"✅ Request #{request_id} completed in {duration:.1f}s")
             return response
 
@@ -493,18 +346,6 @@ class MultiProviderCreditAPI:
             duration = time.time() - start_time
             error_msg = f"Processing error: {str(e)}"
             print(f"❌ Request #{request_id} failed in {duration:.1f}s: {error_msg}")
-
-            # Log failure to Agenta
-            if AGENTA_INTEGRATION and agenta_manager and 'prompt_config' in locals():
-                agenta_manager.log_interaction(
-                    query_type if 'query_type' in locals() else 'unknown',
-                    query,
-                    error_msg,
-                    False,
-                    duration,
-                    prompt_config
-                )
-
             return error_msg
 
     def _process_tool_query(self, query: str) -> str:
@@ -556,93 +397,133 @@ class MultiProviderCreditAPI:
         """Process slash commands for quick agent switching"""
         query_stripped = query.strip()
 
-        # Check if it's a slash command with additional content (e.g., "/client my email is...")
+        # Check if it's a slash command with additional content (e.g., "/cs credit what are their scores")
         if ' ' in query_stripped:
-            parts = query_stripped.split(' ', 1)
-            command = parts[0].lower()
-            remaining_query = parts[1]
+            parts = query_stripped.split(' ', 2)  # Split into command prefix, category, and query
+            command_prefix = parts[0].lower()
+            if len(parts) >= 2:
+                category = parts[1].lower()
+                command = f"{command_prefix} {category}"  # Full command like "/cs credit"
+                remaining_query = parts[2] if len(parts) > 2 else None
+            else:
+                command = command_prefix
+                remaining_query = None
         else:
             command = query_stripped.lower()
             remaining_query = None
 
-        # Define slash command mappings
-        slash_commands = {
-            '/client': 'client_chat_agent',
-            '/cs': 'zoho_cs_agent',
-            '/cst': 'zoho_cs_agent',
-            '/zoho': 'zoho_cs_agent',
-            '/help': 'help',
-            '/agents': 'list_agents'
+        # Define valid slash command prefixes and their agents
+        slash_command_prefixes = {
+            '/cs': 'zoho_cs_agent',      # /cs status, /cs credit, /cs billing
+            '/cst': 'zoho_cs_agent',     # /cst status, /cst credit, /cst billing
+            '/zoho': 'zoho_cs_agent',    # /zoho status, /zoho credit, /zoho billing
+            '/client': 'client_chat_agent'  # /client status, /client credit, /client billing
         }
 
         try:
             if command == '/help':
-                return """🤖 **Tilores Slash Commands:**
+                return """🤖 **Tilores Slash Commands - MANDATORY FORMAT**
 
-**Agent Selection:**
-• `/client` - Switch to Client Chat Agent (friendly, educational)
-• `/cs` or `/cst` - Switch to Zoho CS Agent (concise, bullet points)
-• `/zoho` - Switch to Zoho CS Agent
+**IMPORTANT:** All queries must start with a slash command. No exceptions.
+
+**Zoho CS Agent Commands:**
+• `/cs status` - Account status, enrollment, subscription details
+• `/cs credit` - Credit scores, reports, bureau data analysis
+• `/cs billing` - Transaction history, payment, billing information
+
+**Client Chat Agent Commands:**
+• `/client status` - Account status, enrollment details
+• `/client credit` - Credit analysis, scores, improvement advice
+• `/client billing` - Transaction history, payment information
 
 **System Commands:**
 • `/agents` - List all available agents
 • `/help` - Show this help message
 
 **Usage Examples:**
-• `/client` → Just switches agent
-• `/client my email is e.j.price1986@gmail.com` → Switches agent AND processes query
-• `/cs what is their account status` → Switches to CS format and answers
+• `/cs status what is their account status` → CS agent handles status query
+• `/client credit what are my credit scores` → Client agent handles credit analysis
+• `/cs billing show me their payment history` → CS agent handles billing query
 • `/help` → Shows this help
 
-**Two Ways to Use:**
-1. **Switch Only:** `/client` (then ask questions normally)
-2. **Switch + Query:** `/client [your question]` (switches and answers immediately)
-
-**Note:** Agent selection persists for the conversation until changed."""
+**Format Required:** `/[agent] [category] [your question]`
+**No free-form queries allowed - must use slash commands!**"""
 
             elif command == '/agents':
                 return self._process_tool_query("list agents")
 
-            elif command in slash_commands:
-                agent_type = slash_commands[command]
+            # Check if command starts with a valid prefix
+            elif any(command.startswith(prefix + ' ') or command == prefix for prefix in slash_command_prefixes):
+                # Find the matching prefix
+                matching_prefix = next(prefix for prefix in slash_command_prefixes if command.startswith(prefix))
+                agent_type = slash_command_prefixes[matching_prefix]
+
+                # Check if this is just the prefix without category
+                if command == matching_prefix:
+                    # Just the prefix without category - show category options
+                    categories = ['status', 'credit', 'billing']
+                    category_list = '\n'.join([f'• `{matching_prefix} {cat}` - {cat.title()} queries' for cat in categories])
+
+                    return f"""❌ **Category Required**
+
+Please specify what type of query you want:
+
+{category_list}
+
+**Example:** `{matching_prefix} credit what are their credit scores`"""
+
+                # This should be a full command with category
+                if ' ' not in command:
+                    return f"❌ **Invalid Format**\n\nPlease use: `{matching_prefix} [category] [your question]`\n\nExample: `{matching_prefix} credit what are their scores`"
+
+                # Extract category from command
+                command_parts = command.split(' ', 1)
+                category_part = command_parts[1] if len(command_parts) > 1 else ""
+                category = category_part.split(' ')[0] if ' ' in category_part else category_part
+
+                valid_categories = ['status', 'credit', 'billing']
+                if category not in valid_categories:
+                    return f"❌ **Invalid Category: `{category}`**\n\nValid categories: {', '.join(valid_categories)}\n\nExample: `{matching_prefix} credit what are their scores`"
 
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
 
-                # If there's a remaining query, process it directly with the agent
+                # Process the query with the agent
                 if remaining_query:
-                    print(f"🎯 Processing slash command with agent: {agent_type} for query: {remaining_query}")
-                    return self._process_agent_query(remaining_query, agent_type)
+                    print(f"🎯 Processing {command} with agent: {agent_type} category: {category} for query: {remaining_query}")
+                    return self._process_agent_query(remaining_query, agent_type, category)
                 else:
-                    # Just switching agent without a query
-                    if AGENT_PROMPTS_AVAILABLE:
-                        from agent_prompts import get_agent_info
+                    # No remaining query provided
+                    return f"""✅ **Agent Ready**
 
-                        try:
-                            info = get_agent_info(agent_type)
-                            return f"""✅ **Agent Switched Successfully!**
-
-🤖 **Active Agent:** {info.get('name', agent_type)}
-📝 **Format:** {info.get('format', 'Standard')}
-🎯 **Use Case:** {info.get('use_case', 'General')}
-💬 **Style:** {info.get('description', 'No description')}
-
-**Ready for your questions!** The system will now use this agent's prompt style for all responses until you switch again.
+🤖 **Active Agent:** {'Zoho CS Agent' if agent_type == 'zoho_cs_agent' else 'Client Chat Agent'}
+📝 **Category:** {category.title()}
+🎯 **Ready for your {category} questions!**
 
 💾 **Session stored** - Your agent preference will persist for this conversation."""
 
-                        except Exception:
-                            return f"✅ **Agent switched to:** `{agent_type}`\n\n**Ready for your questions!**\n\n💾 **Session stored** - Your agent preference will persist."
-                    else:
-                        return "❌ Agent prompts system not available"
-
             else:
-                available_commands = ', '.join([cmd for cmd in slash_commands.keys() if cmd not in ['/help', '/agents']])
-                return f"""❌ **Unknown slash command:** `{command}`
+                # Invalid slash command
+                available_commands = []
+                for prefix in slash_command_prefixes:
+                    agent_type = slash_command_prefixes[prefix]
+                    categories = ['status', 'credit', 'billing']
+                    for cat in categories:
+                        available_commands.append(f'`{prefix} {cat}`')
 
-**Available commands:** {available_commands}, `/help`, `/agents`
+                return f"""❌ **Unknown Slash Command: `{command}`**
 
-Type `/help` for detailed usage information."""
+**Available Commands:**
+
+**Zoho CS Agent:**
+{chr(10).join([f'• `{cmd}`' for cmd in available_commands if 'cs' in cmd or 'zoho' in cmd])}
+
+**Client Agent:**
+{chr(10).join([f'• `{cmd}`' for cmd in available_commands if 'client' in cmd])}
+
+**System:**
+• `/help` - Show detailed help
+• `/agents` - List all agents"""
 
         except Exception as e:
             return f"❌ Slash command error: {str(e)}"
@@ -1003,22 +884,22 @@ Type `/help` for detailed usage information."""
             print(f"⚠️ Error fetching Salesforce status: {e}")
             return f"Error retrieving account status: {str(e)}"
 
-    def _process_agent_query(self, query: str, agent_type: str) -> str:
-        """Process agent queries directly with dedicated prompts - simplified routing"""
+    def _process_agent_query(self, query: str, agent_type: str, category: str = None) -> str:
+        """Process agent queries with LLM-driven GraphQL orchestration"""
         try:
             # Load the agent prompt
             if not AGENT_PROMPTS_AVAILABLE:
                 return "Agent prompts system not available"
 
             from agent_prompts import get_agent_prompt
-            agent_config = get_agent_prompt(agent_type, "credit")
+            agent_config = get_agent_prompt(agent_type, category or "credit")
 
             if not agent_config:
                 return f"Agent '{agent_type}' not found"
 
             system_prompt = agent_config.get('system_prompt', '')
             temperature = agent_config.get('temperature', 0.7)
-            max_tokens = agent_config.get('max_tokens', 800)
+            max_tokens = agent_config.get('max_tokens', 1200)
 
             # Parse customer information from query
             customer_info = self._parse_query_for_customer(query)
@@ -1030,23 +911,156 @@ Type `/help` for detailed usage information."""
             if not entity_id:
                 return "No customer records found for the provided information."
 
-            # Fetch customer data
-            try:
-                data_context = self._fetch_comprehensive_data(entity_id, query)
-            except Exception as e:
-                data_context = f"Customer data analysis for entity {entity_id} - credit analysis requested"
-
-            # Prepare messages: system prompt + user content
-            messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"**CUSTOMER DATA:**\n{data_context}\n\n**QUERY:** {query}"}
-            ]
-
-            # Call LLM directly with agent prompt
-            return self._call_llm_with_messages(messages, "llama-3.3-70b-versatile", temperature, max_tokens)
+            # LLM-ORCHESTRATED PROCESSING: Let the LLM determine what data to fetch
+            print(f"🔄 Calling LLM orchestration for category: {category}, agent: {agent_type}")
+            result = self._process_llm_orchestrated_query(query, category, entity_id, system_prompt, temperature, max_tokens)
+            print(f"🔄 LLM orchestration returned: {len(result)} chars")
+            return result
 
         except Exception as e:
             return f"Agent processing error: {str(e)}"
+
+    def _process_llm_orchestrated_query(self, query: str, category: str, entity_id: str, system_prompt: str, temperature: float, max_tokens: int) -> str:
+        """System-driven GraphQL orchestration - system determines template, LLM analyzes data"""
+        try:
+            # System automatically determines which template to use based on category
+            template_mapping = {
+                "billing": "billing_payment",
+                "credit": "credit_scores",
+                "status": "account_status"
+            }
+
+            # Default to billing_credit_combined for any complex queries
+            template_name = template_mapping.get(category, "billing_credit_combined")
+
+            print(f"🔍 System selected template: {template_name} for category: {category}")
+
+            # Execute the appropriate GraphQL query directly
+            template_queries = {
+                "billing_payment": """
+                query GetBillingPayment($id: ID!) {
+                  entity(input: { id: $id }) {
+                    entity {
+                      records {
+                        PAYMENT_METHOD
+                        CARD_TYPE
+                        CARD_LAST_4
+                        TRANSACTION_AMOUNT
+                        LAST_APPROVED_TRANSACTION
+                        LAST_APPROVED_TRANSACTION_AMOUNT
+                        NET_BALANCE_DUE
+                        ENROLLMENT_BALANCE
+                        RECURRING_MONTHLY_FEE
+                        AMOUNT
+                      }
+                    }
+                  }
+                }
+                """,
+                "credit_scores": """
+                query GetCreditScores($id: ID!) {
+                  entity(input: { id: $id }) {
+                    entity {
+                      records {
+                        CREDIT_RESPONSE
+                      }
+                    }
+                  }
+                }
+                """,
+                "account_status": """
+                query GetAccountStatus($id: ID!) {
+                  entity(input: { id: $id }) {
+                    entity {
+                      records {
+                        STATUS
+                        ENROLL_DATE
+                        CURRENT_PRODUCT
+                        ENROLLMENT_BALANCE
+                        ACTIVE
+                      }
+                    }
+                  }
+                }
+                """,
+                "billing_credit_combined": """
+                query GetBillingCreditCombined($id: ID!) {
+                  entity(input: { id: $id }) {
+                    entity {
+                      records {
+                        PAYMENT_METHOD
+                        CARD_TYPE
+                        CARD_LAST_4
+                        TRANSACTION_AMOUNT
+                        LAST_APPROVED_TRANSACTION
+                        NET_BALANCE_DUE
+                        ENROLLMENT_BALANCE
+                        CREDIT_RESPONSE
+                        STATUS
+                        ENROLL_DATE
+                      }
+                    }
+                  }
+                }
+                """
+            }
+
+            query_content = template_queries.get(template_name, "")
+            if not query_content:
+                return f"Unknown template: {template_name}"
+
+            # Execute the GraphQL query
+            response = requests.post(
+                self.tilores_api_url,
+                headers={"Authorization": f"Bearer {self.get_tilores_token()}"},
+                json={"query": query_content, "variables": {"id": entity_id}},
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                query_result = response.json()
+                print(f"🔍 GraphQL query successful, data received: {len(str(query_result))} chars")
+
+                # Extract customer data
+                customer_data = "No data available"
+                if 'data' in query_result and 'entity' in query_result['data'] and 'entity' in query_result['data']['entity']:
+                    entity_data = query_result['data']['entity']['entity']
+                    if 'records' in entity_data and entity_data['records']:
+                        customer_data = json.dumps(entity_data['records'][0], indent=2)
+                        print(f"🔍 Customer record data extracted: {len(customer_data)} chars")
+                    else:
+                        print("🔍 No customer records found")
+                else:
+                    print("🔍 Unexpected GraphQL response structure")
+
+                # Now give the data to the LLM for analysis
+                data_context = f"""
+CUSTOMER DATA FOR QUERY: {query}
+
+RETRIEVED DATA:
+{customer_data}
+
+Please analyze this customer data and provide a comprehensive response to the user's query. Use your agent-specific formatting guidelines.
+"""
+
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": data_context}
+                ]
+
+                # Get the final analysis from the LLM
+                final_response = self._call_llm_with_messages(messages, "llama-3.3-70b-versatile", temperature, max_tokens)
+                return final_response
+
+            else:
+                print(f"🔍 GraphQL query failed: {response.status_code}")
+                return f"Unable to retrieve customer data at this time. Please try again later."
+
+        except Exception as e:
+            print(f"🔍 Error in orchestration: {e}")
+            return f"Unable to process your request due to a technical issue. Please try again."
+
+    # REMOVED: All old rigid category methods replaced by LLM orchestration
 
     def _process_data_analysis_query(self, query: str, query_type: str, prompt_config: Dict,
                                    model: str, temperature: float, max_tokens: int) -> str:
