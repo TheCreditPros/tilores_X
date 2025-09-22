@@ -962,7 +962,9 @@ Please specify what type of query you want:
                   entity(input: { id: $id }) {
                     entity {
                       records {
-                        CREDIT_RESPONSE
+                        CREDIT_RESPONSE {
+                          CREDIT_BUREAU
+                        }
                       }
                     }
                   }
@@ -1026,8 +1028,29 @@ Please specify what type of query you want:
                 if 'data' in query_result and 'entity' in query_result['data'] and 'entity' in query_result['data']['entity']:
                     entity_data = query_result['data']['entity']['entity']
                     if 'records' in entity_data and entity_data['records']:
-                        customer_data = json.dumps(entity_data['records'][0], indent=2)
-                        print(f"🔍 Customer record data extracted: {len(customer_data)} chars")
+                        records = entity_data['records']
+
+                        # Special handling for credit queries - collect all CREDIT_RESPONSE data
+                        if category == "credit":
+                            credit_data = []
+                            for record in records:
+                                if 'CREDIT_RESPONSE' in record and record['CREDIT_RESPONSE'] is not None:
+                                    credit_data.append(record['CREDIT_RESPONSE'])
+
+                            if credit_data:
+                                customer_data = json.dumps({
+                                    "credit_reports": credit_data,
+                                    "total_reports": len(credit_data),
+                                    "bureaus": list(set(report.get('CREDIT_BUREAU', 'Unknown') for report in credit_data))
+                                }, indent=2)
+                                print(f"🔍 Credit data extracted from {len(credit_data)} reports across {len(records)} records")
+                            else:
+                                customer_data = json.dumps({"message": "No credit reports found for this customer"}, indent=2)
+                                print("🔍 No credit reports found in any records")
+                        else:
+                            # For non-credit queries, use the first record as before
+                            customer_data = json.dumps(records[0], indent=2)
+                            print(f"🔍 Customer record data extracted: {len(customer_data)} chars")
                     else:
                         print("🔍 No customer records found")
                 else:
