@@ -21,7 +21,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           python -c "
-          from autonomous_ai_platform import AutonomousAIPlatform
-          from langsmith_enterprise_client import create_enterprise_client
-          print('✅ Imports successful - Railway will auto-deploy')
+          from direct_credit_api_fixed import MultiProviderCreditAPI
+          from agent_prompts import AGENT_PROMPTS
+          from main_enhanced import app
+          print('✅ New LLM Orchestration Architecture imports successful - Railway will auto-deploy')
           "
