@@ -24,6 +24,7 @@
 **Challenge:** Remove rigid data silos and enable intelligent synthesis across all Tilores data sources
 
 **Solution Implemented:**
+
 - **LLM Intelligence Orchestration**: System selects optimal GraphQL templates, LLM analyzes comprehensive data
 - **Cross-Table Data Synthesis**: Single queries combine transactions, accounts, credit scores, payment methods
 - **Dynamic Template Selection**: System automatically chooses optimal GraphQL queries based on category
@@ -32,6 +33,7 @@
 - **Agent-Specific Formatting**: Zoho CS (professional) vs Client Chat (educational) maintained
 
 **Key Innovations:**
+
 - **Template-Based Orchestration**: System selects from `billing_payment`, `credit_scores`, `account_status`, `billing_credit_combined`
 - **Cross-Data Synthesis**: Billing queries access transaction + account + credit data simultaneously
 - **LLM Intelligence**: AI analyzes patterns across all data sources, not constrained by silos
@@ -42,6 +44,7 @@
 **Challenge:** Eliminate manual server restart cycles that interrupt development workflow
 
 **Solution Implemented:**
+
 - **Zero Manual Restarts**: Server automatically restarts when Python files change
 - **Efficient File Monitoring**: Watchdog library integration with polling fallback
 - **Smart Filtering**: Ignores cache files, logs, temporary files, and non-Python changes
@@ -49,6 +52,7 @@
 - **Development Acceleration**: Eliminates 30-60 seconds of restart time per code change
 
 **Performance Impact:**
+
 - **75% Time Reduction**: Eliminated manual restart overhead
 - **Zero Context Switching**: Developers stay focused on coding
 - **Instant Feedback**: Test changes immediately after saving
@@ -59,6 +63,7 @@
 **Challenge:** Eliminate complex keyword-based query routing and implement intelligent agent-specific processing
 
 **Solution Implemented:**
+
 - **Mandatory Slash Commands**: All queries must start with `/[agent] [category] [query]`
 - **Agent Intelligence**: Each agent routes internally to specialized processing methods
 - **Category-Based Routing**: Status, Credit, and Billing queries handled by dedicated methods
@@ -70,6 +75,7 @@
 **Challenge:** Remove development clutter and focus on production-ready architecture
 
 **Solution Implemented:**
+
 - **17 Deprecated Files Removed**: Eliminated 402KB of obsolete code across multiple cleanup phases
 - **Linear Architecture Achieved**: Single production file with direct agent routing
 - **Simplified Agent System**: Consolidated to 2 core agent types with clean prompts
@@ -91,6 +97,7 @@
 ### **Core Components**
 
 #### **1. FastAPI Production API** (`main_enhanced.py`)
+
 - **OpenAI-Compatible Endpoints**: Full `/v1/chat/completions` API compliance
 - **Slash Command Detection**: Mandatory `/agent category query` format validation
 - **LLM Orchestration Routing**: Direct calls to `direct_credit_api_fixed.py` for customer queries
@@ -98,6 +105,7 @@
 - **Streaming Support**: Server-sent events for real-time responses
 
 #### **2. LLM-Driven Orchestration Engine** (`direct_credit_api_fixed.py`)
+
 - **System Template Selection**: Automatically chooses optimal GraphQL queries based on category
 - **GraphQL Execution**: Direct Tilores API calls with real customer data retrieval
 - **LLM Intelligence Analysis**: Agent-specific prompts with cross-table data synthesis
@@ -105,12 +113,14 @@
 - **Real-Time Data Processing**: 6648 chars of customer data processed per query
 
 #### **3. LangChain Integration Layer** (`core_app.py`)
+
 - **Fallback General Queries**: Non-customer queries handled by traditional LangChain
 - **Tilores Tool Integration**: 4 comprehensive tools for schema exploration
 - **Provider Management**: Dynamic model selection and routing
 - **Caching Integration**: Redis-backed response caching (24h TTL)
 
 #### **4. Auto-Restart Development Daemon** (`auto_restart_daemon.py`)
+
 - **File Change Monitoring**: Intelligent detection of Python file modifications
 - **Smart Filtering**: Excludes `__pycache__`, logs, archives, non-Python files
 - **Process Lifecycle Management**: Graceful server shutdown and auto-restart
@@ -118,6 +128,7 @@
 - **75% Development Time Reduction**: Eliminates manual restart overhead
 
 #### **5. Agent Intelligence System** (`agent_prompts.py`)
+
 - **Zoho CS Agent**: Professional formatting with bullet points and third-person language
 - **Client Chat Agent**: Educational formatting with friendly tone and emojis
 - **Category-Specific Optimization**: Status, Credit, Billing query specialization
@@ -154,11 +165,13 @@ graph TB
 ### **API Endpoints**
 
 #### **Core Chat Completions**
+
 - `POST /v1/chat/completions` - LLM orchestration with slash command routing
 - `GET /v1/models` - Available model listing (500/minute limit)
 - `GET /health` - Basic health check (1000/minute limit)
 
 #### **Advanced Endpoints**
+
 - `GET /health/detailed` - Comprehensive system health with metrics
 - `GET /metrics` - Full system metrics and analytics
 - `GET /v1/virtuous-cycle/status` - Virtuous cycle monitoring
@@ -178,6 +191,7 @@ graph TB
 ### **Development Workflow**
 
 #### **BEFORE (Manual Process):**
+
 ```
 1. Edit code (5s)
 2. Kill server: pkill -f uvicorn (10s)
@@ -187,6 +201,7 @@ Total: 30-60+ seconds per iteration
 ```
 
 #### **AFTER (Automated Process):**
+
 ```
 1. Edit code (5s)
 2. Daemon detects instantly (<1s)
@@ -196,6 +211,7 @@ Total: 8-10 seconds per iteration
 ```
 
 **Performance Impact:**
+
 - **75% Time Reduction**: Eliminated manual restart overhead
 - **Zero Context Switching**: Stay focused on coding
 - **Instant Feedback**: Test changes immediately after saving
@@ -233,15 +249,18 @@ All queries must use the mandatory slash command format:
 ```
 
 #### **Available Agents:**
+
 - `/cs` - Zoho Customer Service Agent (professional formatting)
 - `/client` - Client Chat Agent (educational formatting)
 
 #### **Available Categories:**
+
 - `status` - Account status, enrollment, subscription queries
 - `credit` - Credit scores, reports, bureau data queries
 - `billing` - Transaction history, payment, billing queries
 
 #### **Example Queries:**
+
 ```bash
 # Zoho CS Agent - Professional formatting
 /cs status what is marcogjones@yahoo.com account status
@@ -364,11 +383,13 @@ uvicorn main_enhanced:app --host 0.0.0.0 --port 8080 --reload
 **Development Workflow Comparison:**
 
 **BEFORE (Manual):**
+
 ```
 Edit → Kill Server → Restart → Test (30-60+ seconds)
 ```
 
 **AFTER (Automated):**
+
 ```
 Edit → Auto-Restart → Test (8-10 seconds)
 ```
@@ -376,27 +397,93 @@ Edit → Auto-Restart → Test (8-10 seconds)
 ### **API Testing**
 
 #### **Basic Health Check**
+
 ```bash
 curl "http://localhost:8080/health"
 ```
 
-#### **LLM Orchestration Query**
+#### **Mandatory Slash Command Format for All Queries**
+
+**⚠️ IMPORTANT: All queries MUST use the slash command format: `/[agent] [category] [query]`**
+
+**Available Agents:**
+
+- `/cs` - Zoho Customer Service Agent (professional formatting)
+- `/client` - Client Chat Agent (educational formatting)
+
+**Available Categories:**
+
+- `status` - Account status, enrollment, subscription queries
+- `credit` - Credit scores, reports, bureau data queries
+- `billing` - Transaction history, payment, billing queries
+
+#### **LLM Orchestration Query Examples**
+
+**Zoho CS Agent (Professional):**
+
 ```bash
+# Status queries
 curl -X POST "http://localhost:8080/v1/chat/completions" \
   -H "Content-Type: application/json" \
-  -d '{
-    "messages": [{"role": "user", "content": "/cs billing what are marcogjones@yahoo.com payment methods"}],
-    "model": "gpt-4o-mini"
-  }'
+  -d '{"messages":[{"role":"user","content":"/cs status what is marcogjones@yahoo.com account status"}],"model":"gpt-4o-mini"}'
+
+# Credit queries
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/cs credit what are marcogjones@yahoo.com credit scores"}],"model":"gpt-4o-mini"}'
+
+# Billing queries
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/cs billing what are marcogjones@yahoo.com payment methods"}],"model":"gpt-4o-mini"}'
+```
+
+**Client Chat Agent (Educational):**
+
+```bash
+# Status queries
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/client status show me my account details for marcogjones@yahoo.com"}],"model":"gpt-4o-mini"}'
+
+# Credit queries
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/client credit explain my credit scores for marcogjones@yahoo.com"}],"model":"gpt-4o-mini"}'
+
+# Billing queries
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/client billing show me my payment history for marcogjones@yahoo.com"}],"model":"gpt-4o-mini"}'
 ```
 
 #### **Multi-Threaded Testing**
+
 ```bash
-# Test concurrent queries
-curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/cs billing query1"}],"model":"gpt-4o-mini"}' &
-curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/cs status query2"}],"model":"gpt-4o-mini"}' &
-curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/client billing query3"}],"model":"gpt-4o-mini"}' &
+# Test concurrent queries across all agents and categories
+curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/cs billing what are marcogjones@yahoo.com payment methods"}],"model":"gpt-4o-mini"}' &
+curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/cs status what is marcogjones@yahoo.com account status"}],"model":"gpt-4o-mini"}' &
+curl -X POST "http://localhost:8080/v1/chat/completions" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"/client credit explain my credit scores for marcogjones@yahoo.com"}],"model":"gpt-4o-mini"}' &
 wait
+```
+
+#### **Testing Invalid Commands (Should Fail)**
+
+```bash
+# Missing slash command (should fail with helpful error)
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"what is marcogjones account status"}],"model":"gpt-4o-mini"}'
+
+# Invalid agent (should fail)
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/invalid status test"}],"model":"gpt-4o-mini"}'
+
+# Invalid category (should fail)
+curl -X POST "http://localhost:8080/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"/cs invalid test"}],"model":"gpt-4o-mini"}'
 ```
 
 ---
@@ -417,6 +504,7 @@ See [`docs/architecture_diagrams.md`](docs/architecture_diagrams.md) for detaile
 ## 📁 **REPOSITORY STRUCTURE**
 
 ### **Current Production Files**
+
 ```
 tilores_X/
 ├── main_enhanced.py              # FastAPI production API
@@ -431,6 +519,7 @@ tilores_X/
 ```
 
 ### **Deprecated Files** (`deprecated/`)
+
 ```
 deprecated/
 ├── agenta_*                     # Old Agenta.ai integration
@@ -470,6 +559,7 @@ This project is proprietary software for The Credit Pros.
 ## 📞 **SUPPORT**
 
 For technical support or questions:
+
 - Check the architecture diagrams in `docs/`
 - Review the troubleshooting section above
 - Ensure proper environment configuration
