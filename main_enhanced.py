@@ -93,12 +93,11 @@ async def lifespan(app: FastAPI):
     await shutdown_background_tasks()
 
 
-# FastAPI app - ultra-minimal for AnythingLLM integration
+# Minimal FastAPI app for Railway deployment
 app = FastAPI(
-    title="Tilores API for AnythingLLM",
-    description="Fully OpenAI-compatible API with Tilores integration",
-    version="6.4.0",  # Updated: Phone-optimized with 2-tier cache + batch processing
-    lifespan=lifespan,
+    title="Tilores API - Railway Deployment",
+    description="Minimal deployment mode - full functionality in local development",
+    version="1.0.0",
 )
 
 # Add CORS middleware for dashboard integration
