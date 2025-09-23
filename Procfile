@@ -1,1 +1,1 @@
-web: python direct_credit_api_fixed.py
+web: python -m uvicorn main_minimal:app --host 0.0.0.0 --port $PORT
