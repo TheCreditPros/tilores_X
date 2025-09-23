@@ -3,10 +3,10 @@ nixPkgs = ["python311", "python311Packages.pip"]
 
 [phases.install]
 cmds = [
-  "pip install --break-system-packages -r requirements_direct.txt",
-  "echo 'Production API build completed'",
-  "ls -la direct_credit_api_with_phone.py"
+  "pip install --break-system-packages -r requirements.txt",
+  "echo 'Production LLM Orchestration API build completed'",
+  "ls -la main_enhanced.py direct_credit_api_fixed.py agent_prompts.py"
 ]
 
 [start]
-cmd = "python direct_credit_api_with_phone.py"
+cmd = "python -m uvicorn main_enhanced:app --host 0.0.0.0 --port $PORT"
