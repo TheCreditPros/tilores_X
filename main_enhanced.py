@@ -313,32 +313,26 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
 
 
 @app.post("/v1/chat/completions")
-@limiter.limit("100/minute")  # More restrictive for chat completions
-async def chat_completions(request: Request, chat_request: ChatCompletionRequest):
-    """Simplified chat completions endpoint for Railway deployment"""
-    request_id = generate_unique_id()
-
+async def chat_completions(chat_request: dict):
+    """Ultra-minimal chat completions endpoint for Railway deployment"""
     try:
-        # Get user input
-        messages = [{"role": msg.role, "content": msg.content} for msg in chat_request.messages]
-        user_input = messages[-1]["content"] if messages else ""
+        # Get user input safely
+        user_input = ""
+        if "messages" in chat_request and chat_request["messages"]:
+            user_input = chat_request["messages"][-1].get("content", "")
 
-        # Simplified response for Railway deployment
+        # Simple response
         if user_input.strip().startswith('/'):
-            response = f"🎯 Railway Deployment Mode\\n\\nCommand detected: {user_input[:50]}...\\n\\nFull LLM orchestration and Tilores integration is available in the local development environment.\\n\\n🚀 Deployed successfully to: https://tilores-x.up.railway.app"
+            response = f"Railway Deployment Mode - Command: {user_input[:30]}... Full features in local development."
         else:
-            response = "Hello! This is the Tilores LLM Orchestration API running in Railway deployment mode.\\n\\nFull functionality with credit analysis, billing queries, and agent-based responses is available in the local development environment.\\n\\nUse slash commands like '/cs credit email' or '/client status email' locally for complete features."
+            response = "Tilores LLM API - Railway deployment. Full features available locally."
 
-        # Calculate token counts (simplified)
-        prompt_tokens = len(user_input.split())
-        completion_tokens = len(response.split())
-
-        # Return OpenAI-compatible response
+        # Simple response format
         return {
-            "id": f"chatcmpl-{request_id}",
+            "id": "railway-deployment",
             "object": "chat.completion",
             "created": int(time.time()),
-            "model": chat_request.model,
+            "model": chat_request.get("model", "gpt-4o-mini"),
             "choices": [{
                 "index": 0,
                 "message": {
@@ -348,10 +342,16 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
                 "finish_reason": "stop"
             }],
             "usage": {
-                "prompt_tokens": prompt_tokens,
-                "completion_tokens": completion_tokens,
-                "total_tokens": prompt_tokens + completion_tokens
+                "prompt_tokens": len(user_input.split()),
+                "completion_tokens": len(response.split()),
+                "total_tokens": len(user_input.split()) + len(response.split())
             }
+        }
+
+    except Exception as e:
+        return {
+            "error": f"Railway deployment error: {str(e)}",
+            "status": "deployment_mode"
         }
 
         # Extract clean content from any LangChain response type

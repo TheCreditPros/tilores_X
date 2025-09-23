@@ -35,6 +35,16 @@ except ImportError as e:
     def get_agent_prompt(agent_type, query_type):
         return None
 
+# Langfuse Integration for Metadata Tracking
+try:
+    from langfuse import Langfuse
+    LANGFUSE_AVAILABLE = True
+    print("✅ Langfuse integration loaded for metadata tracking")
+except ImportError as e:
+    print(f"⚠️ Langfuse not available: {e}")
+    LANGFUSE_AVAILABLE = False
+    Langfuse = None
+
 # Import our Agenta SDK manager
 try:
     from agenta_sdk_manager import agenta_manager
@@ -422,6 +432,8 @@ class MultiProviderCreditAPI:
 
         try:
             if command == '/help':
+                # Track help command usage
+                track_slash_command_with_metadata('/help', "")
                 return """🤖 **Tilores Slash Commands - MANDATORY FORMAT**
 
 **IMPORTANT:** All queries must start with a slash command. No exceptions.
@@ -450,6 +462,8 @@ class MultiProviderCreditAPI:
 **No free-form queries allowed - must use slash commands!**"""
 
             elif command == '/agents':
+                # Track agents command usage
+                track_slash_command_with_metadata('/agents', "")
                 return self._process_tool_query("list agents")
 
             # Check if command starts with a valid prefix
@@ -488,6 +502,9 @@ Please specify what type of query you want:
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
 
+                # Track slash command usage with metadata
+                track_slash_command_with_metadata(command, remaining_query or "")
+
                 # Process the query with the agent
                 if remaining_query:
                     print(f"🎯 Processing {command} with agent: {agent_type} category: {category} for query: {remaining_query}")
@@ -503,7 +520,9 @@ Please specify what type of query you want:
 💾 **Session stored** - Your agent preference will persist for this conversation."""
 
             else:
-                # Invalid slash command
+                # Invalid slash command - track it
+                track_slash_command_with_metadata(command, remaining_query or "")
+
                 available_commands = []
                 for prefix in slash_command_prefixes:
                     agent_type = slash_command_prefixes[prefix]
@@ -2210,12 +2229,162 @@ Provide detailed analysis using the actual credit data shown above."""
         yield "data: [DONE]\n\n"
 
 
+# Langfuse client for metadata tracking
+langfuse_client = None
+if LANGFUSE_AVAILABLE:
+    try:
+        langfuse_client = Langfuse()
+        print("✅ Langfuse client initialized for metadata tracking")
+    except Exception as e:
+        print(f"⚠️ Langfuse client initialization failed: {e}")
+        langfuse_client = None
+
+# Slash command metadata tracking
+def get_slash_command_metadata(command: str, query: str) -> Dict[str, Any]:
+    """Extract metadata from slash commands for Langfuse tracking"""
+
+    metadata = {
+        "command_type": "slash_command",
+        "usage_category": "unknown",
+        "agent_type": "unknown",
+        "query_length": len(query),
+        "timestamp": time.time()
+    }
+
+    # Parse command and extract metadata
+    if command.startswith('/cs'):
+        metadata.update({
+            "usage_category": "zoho_cs_agent",
+            "agent_type": "zoho_cs_agent",
+            "subcategory": command.replace('/cs', '').strip() or "general"
+        })
+    elif command.startswith('/cst'):
+        metadata.update({
+            "usage_category": "zoho_cs_agent",
+            "agent_type": "zoho_cs_agent",
+            "subcategory": command.replace('/cst', '').strip() or "general"
+        })
+    elif command.startswith('/zoho'):
+        metadata.update({
+            "usage_category": "zoho_cs_agent",
+            "agent_type": "zoho_cs_agent",
+            "subcategory": command.replace('/zoho', '').strip() or "general"
+        })
+    elif command.startswith('/client'):
+        metadata.update({
+            "usage_category": "client_chat_agent",
+            "agent_type": "client_chat_agent",
+            "subcategory": command.replace('/client', '').strip() or "general"
+        })
+    elif command == '/help':
+        metadata.update({
+            "usage_category": "system_help",
+            "agent_type": "system",
+            "subcategory": "help"
+        })
+    elif command == '/agents':
+        metadata.update({
+            "usage_category": "system_info",
+            "agent_type": "system",
+            "subcategory": "agents_list"
+        })
+    else:
+        metadata.update({
+            "usage_category": "unknown_command",
+            "agent_type": "unknown",
+            "subcategory": "invalid"
+        })
+
+    return metadata
+
+def track_slash_command_with_metadata(command: str, query: str, user_id: str = None, session_id: str = None):
+    """Track slash command usage with comprehensive metadata and session tracking"""
+    if not langfuse_client:
+        return
+
+    try:
+        # Get command metadata
+        metadata = get_slash_command_metadata(command, query)
+
+        # Generate IDs if not provided
+        if not user_id:
+            user_id = f"anon_user_{hash(query) % 10000}"
+        if not session_id:
+            session_id = f"session_{int(time.time())}_{hash(command + query) % 1000}"
+
+        metadata.update({
+            "user_id": user_id,
+            "session_id": session_id
+        })
+
+        # Create session trace with proper user and session tracking
+        with langfuse_client.start_as_current_span(
+            name=f"slash_command_{metadata['usage_category']}",
+            metadata=metadata
+        ) as span:
+            # Update trace with user and session info (following docs)
+            langfuse_client.update_current_trace(user_id=user_id)
+            langfuse_client.update_current_trace(session_id=session_id)
+
+            # Update trace with command metadata
+            trace_metadata = {
+                "command": command,
+                "usage_type": metadata["usage_category"],
+                "agent_routed": metadata["agent_type"],
+                "subcategory": metadata.get("subcategory", "general"),
+                "command_type": "slash_command",
+                "processed_at": time.time()
+            }
+            langfuse_client.update_current_trace(metadata=trace_metadata)
+
+            # Track command execution phases
+            span.update(metadata={
+                "execution_status": "started",
+                "command_length": len(command),
+                "query_length": len(query),
+                "phase": "initialization"
+            })
+
+            # Add processing metadata based on command type
+            if metadata["usage_category"] == "zoho_cs_agent":
+                span.update(metadata={
+                    "agent_type": "zoho_cs_agent",
+                    "processing_type": "customer_support_query",
+                    "phase": "agent_routing"
+                })
+            elif metadata["usage_category"] == "client_chat_agent":
+                span.update(metadata={
+                    "agent_type": "client_chat_agent",
+                    "processing_type": "client_assistance",
+                    "phase": "agent_routing"
+                })
+            elif metadata["usage_category"] in ["system_help", "system_info"]:
+                span.update(metadata={
+                    "agent_type": "system",
+                    "processing_type": "system_command",
+                    "phase": "system_response"
+                })
+
+            # Mark as completed
+            span.update(metadata={
+                "execution_status": "completed",
+                "phase": "finished"
+            })
+
+        # Flush data to Langfuse
+        langfuse_client.flush()
+
+    except Exception as e:
+        print(f"⚠️ Metadata tracking failed: {e}")
+
 # FastAPI app setup
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for FastAPI"""
     print("🚀 Multi-Provider Credit Analysis API with Agenta.ai starting up...")
     print("🌐 Server will bind to 0.0.0.0:8080")
+    if langfuse_client:
+        print("📊 Langfuse metadata tracking active")
     yield
     print("🛑 Application shutting down...")
 
