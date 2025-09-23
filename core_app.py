@@ -12,8 +12,6 @@ import re
 from typing import Any, Dict, Optional, List
 
 from langchain_openai import ChatOpenAI
-from tilores import TiloresAPI
-from tilores_langchain import TiloresTools
 
 # Import debug configuration
 from utils.debug_config import setup_logging
@@ -519,6 +517,9 @@ class MultiProviderLLMEngine:
             # Initialize TiloresAPI with timeout protection and retry logic
             # Respect TimeoutManager settings without overriding
 
+            # Import TiloresAPI locally to avoid import-time failures
+            from tilores import TiloresAPI
+
             for attempt in range(max_retries):
                 try:
                     print(f"🚀 Starting Tilores initialization attempt {attempt + 1}/{max_retries}...")
@@ -563,6 +564,9 @@ class MultiProviderLLMEngine:
             if self.tilores is None:
                 raise Exception("Tilores initialization did not complete; no TiloresAPI instance available")
             assert self.tilores is not None
+
+            # Import TiloresTools locally to avoid import-time failures
+            from tilores_langchain import TiloresTools
             tilores_tools = TiloresTools(self.tilores)
 
             # Initialize function executor for centralized tool management
