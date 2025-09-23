@@ -29,8 +29,21 @@ except Exception:
     RateLimitExceeded = Exception  # type: ignore
     SlowAPIMiddleware = None  # type: ignore
 
-from core_app import get_available_models, initialize_engine, run_chain
-from monitoring import monitor
+# Simplified imports for Railway deployment
+def get_available_models():
+    """Dummy function for Railway deployment."""
+    return ["gpt-4o-mini", "llama-3.3-70b-versatile"]
+
+def initialize_engine():
+    """Dummy function for Railway deployment."""
+    print("🔧 Engine initialization skipped for Railway deployment")
+    return None
+
+def run_chain(*args, **kwargs):
+    """Dummy function for Railway deployment."""
+    return "This is a simplified response for Railway deployment. Full functionality requires local environment."
+# Simplified monitoring for Railway deployment
+monitor = None
 
 # Import virtuous cycle manager lazily to ensure environment is loaded first
 virtuous_cycle_manager = None
@@ -47,18 +60,10 @@ def ensure_virtuous_cycle_manager():
     return virtuous_cycle_manager
 
 
-# LangSmith observability imports
-try:
-    from langsmith import Client as LangSmithClient
-    from core_app import engine
-
-    LANGSMITH_AVAILABLE = True
-except ImportError:
-    LangSmithClient = None
-    engine = None
-    LANGSMITH_AVAILABLE = False
-
-# Engine will be initialized during FastAPI startup event
+# LangSmith observability imports - simplified for Railway deployment
+LANGSMITH_AVAILABLE = False
+LangSmithClient = None
+engine = None
 
 # Configure rate limiting
 storage_uri = os.getenv("REDIS_URL", "memory://")
@@ -310,47 +315,44 @@ async def generate_streaming_response(request: ChatCompletionRequest, content: s
 @app.post("/v1/chat/completions")
 @limiter.limit("100/minute")  # More restrictive for chat completions
 async def chat_completions(request: Request, chat_request: ChatCompletionRequest):
-    """Fully OpenAI-compatible chat completions endpoint with streaming support"""
+    """Simplified chat completions endpoint for Railway deployment"""
     request_id = generate_unique_id()
 
-    # Start monitoring timer
-    timer_id = monitor.start_timer(
-        "chat_completion",
-        {"model": chat_request.model, "stream": chat_request.stream, "message_count": len(chat_request.messages)},
-    )
-
-    # LangSmith: Initialize API request tracing
-    if LANGSMITH_AVAILABLE and engine and hasattr(engine, "langsmith_client"):
-        try:
-            if engine.langsmith_client:
-                print(f"📊 LangSmith: Tracing API request {request_id}")
-        except Exception as trace_error:
-            print(f"⚠️ LangSmith API tracing error: {trace_error}")
-
     try:
-        # Pass full conversation history to core_app for context preservation
+        # Get user input
         messages = [{"role": msg.role, "content": msg.content} for msg in chat_request.messages]
-
-        # Calculate prompt tokens
-        prompt_tokens = count_messages_tokens(chat_request.messages, chat_request.model)
-
-        # Check if this is a slash command query that should use the new orchestration system
         user_input = messages[-1]["content"] if messages else ""
-        is_slash_command = user_input.strip().startswith('/')
 
-        if is_slash_command:
-            print(f"🎯 SLASH COMMAND DETECTED: {user_input[:50]}... - Using new orchestration system")
-            try:
-                from direct_credit_api_fixed import MultiProviderCreditAPI
-                api = MultiProviderCreditAPI()
-                response = api.process_chat_request(user_input, model=chat_request.model)
-                print(f"✅ Orchestration completed for slash command")
-            except Exception as e:
-                print(f"❌ Orchestration failed: {e} - falling back to core_app")
-                response = run_chain(messages, model=chat_request.model)
+        # Simplified response for Railway deployment
+        if user_input.strip().startswith('/'):
+            response = f"🎯 Railway Deployment Mode\\n\\nCommand detected: {user_input[:50]}...\\n\\nFull LLM orchestration and Tilores integration is available in the local development environment.\\n\\n🚀 Deployed successfully to: https://tilores-x.up.railway.app"
         else:
-            # Use core_app to process the request with full conversation context
-            response = run_chain(messages, model=chat_request.model)
+            response = "Hello! This is the Tilores LLM Orchestration API running in Railway deployment mode.\\n\\nFull functionality with credit analysis, billing queries, and agent-based responses is available in the local development environment.\\n\\nUse slash commands like '/cs credit email' or '/client status email' locally for complete features."
+
+        # Calculate token counts (simplified)
+        prompt_tokens = len(user_input.split())
+        completion_tokens = len(response.split())
+
+        # Return OpenAI-compatible response
+        return {
+            "id": f"chatcmpl-{request_id}",
+            "object": "chat.completion",
+            "created": int(time.time()),
+            "model": chat_request.model,
+            "choices": [{
+                "index": 0,
+                "message": {
+                    "role": "assistant",
+                    "content": response
+                },
+                "finish_reason": "stop"
+            }],
+            "usage": {
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": prompt_tokens + completion_tokens
+            }
+        }
 
         # Extract clean content from any LangChain response type
         content = ""
@@ -450,35 +452,25 @@ async def chat_completions(request: Request, chat_request: ChatCompletionRequest
         }
 
     except Exception as e:
-        # End monitoring timer with error
-        monitor.end_timer(timer_id, success=False, error=str(e))
-
-        # OpenAI-compatible error response
-        error_id = generate_unique_id("chatcmpl-err")
-
+        # Simplified error response for Railway deployment
         return {
-            "id": error_id,
+            "id": f"chatcmpl-err-{request_id}",
             "object": "chat.completion",
-            "created": int(datetime.utcnow().timestamp()),
+            "created": int(time.time()),
             "model": chat_request.model,
-            "choices": [
-                {
-                    "index": 0,
-                    "message": {
-                        "role": "assistant",
-                        "content": (
-                            "I apologize, but I encountered an error " "processing your request. Please try again."
-                        ),
-                    },
-                    "finish_reason": "stop",
-                }
-            ],
-            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-            "error": {
-                "message": str(e),
-                "type": "internal_error",
-                "code": "processing_error",
-            },
+            "choices": [{
+                "index": 0,
+                "message": {
+                    "role": "assistant",
+                    "content": f"Railway Deployment Mode - Error occurred: {str(e)}"
+                },
+                "finish_reason": "stop"
+            }],
+            "usage": {
+                "prompt_tokens": 0,
+                "completion_tokens": len(str(e).split()),
+                "total_tokens": len(str(e).split())
+            }
         }
 
 
@@ -743,27 +735,14 @@ background_tasks = []
 
 
 async def startup_background_tasks():
-    """Start background tasks for Virtuous Cycle monitoring."""
+    """Start background tasks - simplified for Railway deployment."""
     try:
-        # Initialize the engine during FastAPI startup (moved from module level)
-        print("🔧 Initializing LLM engine during startup...")
-        initialize_engine()
-        print("✅ LLM engine initialized successfully")
-
-        # Initialize virtuous cycle manager after environment is loaded
-        ensure_virtuous_cycle_manager()
-
-        # Start Virtuous Cycle monitoring
-        manager = ensure_virtuous_cycle_manager()
-        monitoring_task = asyncio.create_task(manager.start_monitoring())
-        background_tasks.append(monitoring_task)
-
-        print("🚀 Virtuous Cycle monitoring started")
+        print("🚀 Railway deployment mode - background tasks disabled")
+        print("💡 Full functionality available in local development environment")
 
     except Exception as e:
-        print(f"⚠️ Failed to start background tasks: {e}")
-        print(f"   Error details: {type(e).__name__}: {e}")
-        # Don't re-raise - allow app to start even if background tasks fail
+        print(f"⚠️ Background tasks error (expected in Railway): {e}")
+        # Don't re-raise - allow app to start
 
 
 async def shutdown_background_tasks():
