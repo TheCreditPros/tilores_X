@@ -22,6 +22,13 @@ langchain-groq>=0.1.0
 # Optional: LangSmith tracing (if LANGSMITH_API_KEY provided)
 langsmith>=0.1.0
 
+# NEW: Langfuse Integration (if LANGFUSE_PUBLIC_KEY provided)
+langfuse>=2.30.0
+
+# Enhanced system monitoring (optional)
+psutil>=5.9.0  # System metrics
+prometheus-client>=0.19.0  # Metrics export
+
 # OpenAI API Compliance Requirements
 tiktoken>=0.5.0  # Token counting for usage field
 fastapi-sse>=1.1.0  # Server-Sent Events for streaming
