@@ -58,8 +58,7 @@ except ImportError:
     engine = None
     LANGSMITH_AVAILABLE = False
 
-# Initialize the engine after environment variables are loaded
-initialize_engine()
+# Engine will be initialized during FastAPI startup event
 
 # Configure rate limiting
 storage_uri = os.getenv("REDIS_URL", "memory://")
@@ -746,6 +745,11 @@ background_tasks = []
 async def startup_background_tasks():
     """Start background tasks for Virtuous Cycle monitoring."""
     try:
+        # Initialize the engine during FastAPI startup (moved from module level)
+        print("🔧 Initializing LLM engine during startup...")
+        initialize_engine()
+        print("✅ LLM engine initialized successfully")
+
         # Initialize virtuous cycle manager after environment is loaded
         ensure_virtuous_cycle_manager()
 
@@ -758,6 +762,8 @@ async def startup_background_tasks():
 
     except Exception as e:
         print(f"⚠️ Failed to start background tasks: {e}")
+        print(f"   Error details: {type(e).__name__}: {e}")
+        # Don't re-raise - allow app to start even if background tasks fail
 
 
 async def shutdown_background_tasks():
