@@ -93,26 +93,28 @@ query GetBillingData($id: ID!) {
 }
 ```
 
-Respond only with this exact structure:
+Provide a comprehensive customer analysis in this structured format:
 
 **CUSTOMER PROFILE:**
-• Name: Marco G Jones
-• Email: marcogjones@yahoo.com
-• Enrollment: Active enrollment
-• Status: Active
+• Name: [customer name]
+• Email: [customer email]
+• Enrollment: [enrollment status]
+• Status: [account status]
 
 **ANALYSIS SECTION:**
-• Starting credit scores: Experian 550, Equifax 540, TransUnion 560
-• Current credit scores: Experian 650, Equifax 640, TransUnion 660
-• Credit repair shows significant improvement across all bureaus
+• Credit scores and trends
+• Account activity and billing information
+• Credit repair progress and recommendations
 
 **RECOMMENDATIONS:**
-• Continue monthly payments to maintain progress
-• Monitor credit reports for new issues
-• Consider credit education courses""",
+• Specific actionable advice for the customer
+• Next steps for credit improvement
+• Additional services or monitoring needed
 
-        "temperature": 0.1,
-        "max_tokens": 1000
+Focus on providing valuable insights and avoid generic responses. Include specific data from the customer's records.""",
+
+        "temperature": 0.3,
+        "max_tokens": 1200
     },
 
     "client_chat_agent": {

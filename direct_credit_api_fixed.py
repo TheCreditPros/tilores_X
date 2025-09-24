@@ -1124,8 +1124,8 @@ Please analyze this customer data and provide a comprehensive response to the us
                     {"role": "user", "content": data_context}
                 ]
 
-                # Get the final analysis from the LLM - Using GPT-4o-mini for better prompt compliance
-                final_response = self._call_llm_with_messages(messages, "gpt-4o-mini", temperature, max_tokens)
+                # Get the final analysis from the LLM - Using Grok for reliable customer processing
+                final_response = self._call_llm_with_messages(messages, "llama-3.3-70b-versatile", temperature, max_tokens)
                 return final_response
 
             else:
