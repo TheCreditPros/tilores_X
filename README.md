@@ -1,9 +1,9 @@
-# 🚀 Tilores_X - LLM-Driven Orchestration Platform
+# 🚀 Tilores_X - LLM-Driven Orchestration Platform with Langfuse Observability
 
-## 🎯 **CURRENT STATUS: PRODUCTION OPERATIONAL - LLM ORCHESTRATION COMPLETE**
+## 🎯 **CURRENT STATUS: PRODUCTION OPERATIONAL - LANGSMITH REMOVED - LANGFUSE INTEGRATION ACTIVE**
 
-**🚨 BREAKTHROUGH: LLM-Driven Data Orchestration & Cross-Table Synthesis**
-**Last Updated: September 21, 2025**
+**🚨 BREAKTHROUGH: LLM-Driven Data Orchestration & Cross-Table Synthesis with Langfuse Observability**
+**Last Updated: September 24, 2025**
 
 ### **🎉 LATEST BREAKTHROUGH ACHIEVEMENT (September 21, 2025)**
 
@@ -14,6 +14,26 @@
 - ✅ **Multi-Threaded Processing**: Concurrent queries with cross-data synthesis validated
 - ✅ **Auto-Restart Development Daemon**: Zero manual server restarts during development
 - ✅ **Agent-Specific Formatting**: Zoho CS (professional) vs Client Chat (educational) maintained
+
+### **🔧 LANGSMITH REMOVAL & LANGFUSE OBSERVABILITY INTEGRATION (September 24, 2025)**
+
+**Challenge:** Streamline observability infrastructure by removing redundant LangSmith integration and implementing Langfuse as the single observability platform.
+
+**Solution Implemented:**
+
+- ✅ **Complete LangSmith Removal**: Removed `langsmith>=0.1.0` dependency, ~146 lines of code, and all related infrastructure
+- ✅ **Langfuse Integration**: Comprehensive observability with traces, sessions, users, and metadata tracking
+- ✅ **Slash Command Metadata**: Automatic categorization and usage analytics for all `/cs`, `/client` commands
+- ✅ **Production Ready**: Graceful degradation when Langfuse credentials not configured
+- ✅ **Comprehensive Testing**: All functionality verified post-removal, no breaking changes
+
+**Key Features:**
+
+- **Trace Creation**: Automatic trace generation for all slash command interactions
+- **Session Tracking**: User session management with conversation context
+- **User Attribution**: Proper user identification and session correlation
+- **Metadata Enrichment**: Command type, category, and usage pattern analytics
+- **Cost Optimization**: Single observability platform reduces infrastructure overhead
 
 ---
 
@@ -180,6 +200,14 @@ graph TB
 
 ## 🚀 **DEPLOYMENT STATUS**
 
+### **Production Deployment (Railway)**
+
+- ✅ **Live Production**: `https://tilores-x.up.railway.app`
+- ✅ **Health Endpoint**: `GET /health` - Responding correctly
+- ✅ **API Endpoints**: All slash commands and model endpoints functional
+- ✅ **Langfuse Ready**: Metadata tracking prepared for activation
+- ✅ **Multi-Provider LLMs**: 9 models available (OpenAI, Anthropic, Google, Groq)
+
 ### **Local Development**
 
 - ✅ **Auto-Restart Daemon**: Zero manual server restarts during development
@@ -187,6 +215,29 @@ graph TB
 - ✅ **Multi-Threaded Processing**: Concurrent queries validated (2.0-2.4s response times)
 - ✅ **Agent Intelligence**: Zoho CS vs Client Chat formatting maintained
 - ✅ **Real Data Access**: GraphQL returning actual customer records (6648 chars, 291 chars customer records)
+- ✅ **Langfuse Integration**: Comprehensive observability ready for activation
+
+### **Langfuse Observability Activation**
+
+**To enable full Langfuse observability in production:**
+
+1. **Add Environment Variables** to Railway project settings:
+   ```bash
+   LANGFUSE_PUBLIC_KEY=pk-lf-your-public-key
+   LANGFUSE_SECRET_KEY=sk-lf-your-secret-key
+   LANGFUSE_HOST=https://us.cloud.langfuse.com
+   ```
+
+2. **Automatic Activation**: Railway will redeploy automatically when environment variables are added
+
+3. **Features Available**:
+   - **Trace Monitoring**: All slash command interactions automatically traced
+   - **Session Tracking**: User conversations grouped into sessions
+   - **Metadata Analytics**: Command type, category, and usage pattern tracking
+   - **Performance Metrics**: Response times and model usage analytics
+   - **Cost Tracking**: Token usage and API cost monitoring
+
+**Note**: System works perfectly without Langfuse credentials - graceful degradation ensures no functionality loss.
 
 ### **Development Workflow**
 
@@ -312,9 +363,11 @@ The system intelligently combines data from multiple Tilores sources:
 
 - **LLM Orchestration**: ✅ Operational
 - **GraphQL Integration**: ✅ Connected to Tilores API
-- **Multi-Provider LLMs**: ✅ OpenAI, Groq, Google Gemini
+- **Multi-Provider LLMs**: ✅ 9 models available (OpenAI, Anthropic, Google, Groq)
+- **Langfuse Observability**: ✅ Ready for activation (graceful degradation)
 - **Auto-Restart Daemon**: ✅ Background monitoring active
 - **Agent Intelligence**: ✅ Zoho CS + Client Chat formatting
+- **Production Deployment**: ✅ Railway deployment successful
 
 ---
 
@@ -567,5 +620,5 @@ For technical support or questions:
 
 ---
 
-**Last Updated: September 21, 2025**
-**LLM-Driven Orchestration System v2.0**
+**Last Updated: September 24, 2025**
+**LLM-Driven Orchestration System v2.1 with Langfuse Observability**
