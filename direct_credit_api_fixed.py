@@ -500,7 +500,7 @@ Please specify what type of query you want:
                 category_part = command_parts[1] if len(command_parts) > 1 else ""
                 category = category_part.split(' ')[0] if ' ' in category_part else category_part
 
-                # Check for direct email input (e.g., "/cs marcogjones@yahoo.com")
+                # Check for direct email input FIRST (e.g., "/cs marcogjones@yahoo.com")
                 import re
                 email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', category_part)
 
@@ -518,6 +518,7 @@ Please specify what type of query you want:
                     track_slash_command_with_metadata(command, email, response_data=result)
                     return result
 
+                # Only validate categories if it's not an email
                 valid_categories = ['status', 'credit', 'billing']
                 if category not in valid_categories:
                     error_msg = f"❌ **Invalid Category: `{category}`**\n\nValid categories: {', '.join(valid_categories)}\n\nExample: `{matching_prefix} credit what are their scores`"
