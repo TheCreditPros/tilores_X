@@ -19,9 +19,6 @@ langchain-anthropic>=0.1.0
 langchain-google-genai>=0.1.0
 langchain-groq>=0.1.0
 
-# Optional: LangSmith tracing (if LANGSMITH_API_KEY provided)
-langsmith>=0.1.0
-
 # NEW: Langfuse Integration (if LANGFUSE_PUBLIC_KEY provided)
 langfuse>=2.30.0
 
