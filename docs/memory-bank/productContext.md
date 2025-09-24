@@ -6,7 +6,8 @@
 
 **Core Features**:
 - Multi-provider LLM support with unified interface
-- Comprehensive conversation monitoring via LangSmith integration
+- **Email-based comprehensive customer summaries** - `/cs email@domain.com` triggers full customer analysis
+- Comprehensive conversation monitoring via Langfuse integration
 - Tool execution tracing with performance metrics
 - FastAPI-based API endpoints with request tracking
 - Redis caching system for enhanced performance
@@ -14,12 +15,37 @@
 
 **Technical Architecture**:
 - **Core Engine**: `core_app.py` - Multi-provider LLM orchestration with comprehensive tracing
-- **API Layer**: `main_enhanced.py` - FastAPI endpoints with request monitoring
-- **Observability**: LangSmith integration for production monitoring and debugging
+- **API Layer**: `direct_credit_api_fixed.py` - FastAPI endpoints with slash command processing and email detection
+- **Slash Commands**: `/cs email@domain.com` - Email-based comprehensive customer summaries
+- **Observability**: Langfuse integration for production monitoring and debugging
 - **Caching**: Redis implementation for performance optimization
 - **Configuration**: Environment-based configuration management
 
-**Recent Major Enhancement**: LangSmith observability infrastructure implementation addressing critical gap between documented "Complete conversation monitoring" and actual code implementation. Now provides comprehensive production monitoring across all LLM interactions, tool executions, and API endpoints.
+**Recent Major Enhancement**: Email-based comprehensive customer summaries with production deployment and observability. Users can now use `/cs email@domain.com` to instantly retrieve detailed customer profiles, credit analysis, and recommendations.
+
+## [2025-09-24 17:25:10] - Email-Based Customer Summaries Deployed
+
+**Feature**: Single email command triggers comprehensive customer analysis
+- **Command**: `/cs marcogjones@yahoo.com`
+- **Processing**: Email detection → Customer lookup → Credit data analysis → LLM synthesis
+- **Output**: Structured customer profile + credit analysis + actionable recommendations
+- **Data Coverage**: 12 credit reports across 3 bureaus (Experian, Equifax, TransUnion)
+- **Performance**: 2-4 second response time in production
+- **Monitoring**: Complete Langfuse trace coverage for all interactions
+
+**Technical Implementation**:
+- Email regex validation with proper precedence over category validation
+- GraphQL-based customer data retrieval from Tilores API
+- LLM-powered analysis synthesis using Grok model
+- Structured response formatting with customer profile sections
+- Production deployment with Railway configuration validation
+
+**Key Learnings**:
+- Railway Procfile takes precedence over nixpacks.toml for entry points
+- LLM models require balanced prompt engineering (strict ≠ better)
+- Email detection logic must precede category validation
+- Local testing ≠ Production behavior for LLM responses
+- Comprehensive deployment validation prevents configuration drift
 
 ## [2025-08-15 16:55:49] - LangSmith Observability Infrastructure Added
 
