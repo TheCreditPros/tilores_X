@@ -19,19 +19,6 @@ from utils.debug_config import setup_logging
 # Set up module logger
 logger = setup_logging(__name__)
 
-# LangSmith observability imports
-try:
-    from langsmith import Client as LangSmithClient, traceable, wrappers
-    from langchain.callbacks.tracers import LangChainTracer
-
-    LANGSMITH_AVAILABLE = True
-except ImportError:
-    LangSmithClient = None
-    LangChainTracer = None
-    traceable = None
-    wrappers = None
-    LANGSMITH_AVAILABLE = False
-
 # Redis cache for performance optimization (Phase VI)
 try:
     from .redis_cache import cache_manager
@@ -364,17 +351,10 @@ class MultiProviderLLMEngine:
         self.tilores = None
         self.tools = []
 
-        # Initialize LangSmith observability
-        self.langsmith_client = None
-        self.langchain_tracer = None
-
         # Load environment FIRST before any initialization
         self._load_environment()
 
-        # Now initialize LangSmith with loaded environment
-        self._init_langsmith()
-
-        # Initialize Tilores after LangSmith setup
+        # Initialize Tilores
         self._init_tilores()
 
     def _load_environment(self):
@@ -409,52 +389,6 @@ class MultiProviderLLMEngine:
         except Exception as e:
             print(f"⚠️  Error loading .env file: {e}")
 
-    def _init_langsmith(self):
-        """Initialize LangSmith observability with graceful degradation."""
-        if not LANGSMITH_AVAILABLE:
-            print("📊 LangSmith not available - observability disabled")
-            return
-
-        try:
-            import os
-
-            # Check if LangSmith is enabled in environment
-            langsmith_enabled = os.getenv("LANGSMITH_TRACING", "false")
-            if langsmith_enabled.lower() not in ("true", "1", "yes", "on"):
-                print("📊 LangSmith tracing disabled in environment")
-                return
-
-            # Get API key
-            api_key = os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY")
-            if not api_key:
-                print("📊 LangSmith API key not found - tracing disabled")
-                return
-
-            # Set LangChain environment variables for auto-tracing
-            os.environ["LANGCHAIN_TRACING_V2"] = "true"
-            os.environ["LANGCHAIN_API_KEY"] = api_key
-            os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-
-            # Get project name from environment
-            project_name = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT") or "tilores_unified"
-            os.environ["LANGCHAIN_PROJECT"] = project_name
-
-            # Initialize LangSmith client with explicit API key
-            assert LangSmithClient is not None
-            self.langsmith_client = LangSmithClient(api_key=api_key)  # type: ignore[call-arg]
-
-            # Initialize LangChain tracer with project name
-            assert LangChainTracer is not None
-            self.langchain_tracer = LangChainTracer(client=self.langsmith_client, project_name=project_name)  # type: ignore[call-arg]
-
-            print(f"✅ LangSmith initialized - Project: {project_name}")
-
-        except Exception as e:
-            print(f"⚠️  LangSmith initialization failed: {e}")
-            print("📊 Observability disabled - continuing without tracing")
-            self.langsmith_client = None
-            self.langchain_tracer = None
-
     def _init_tilores(self):
         """Initialize Tilores components with error handling and timeout protection"""
         try:
@@ -462,7 +396,7 @@ class MultiProviderLLMEngine:
             import time
 
             # ENVIRONMENT VALIDATION - Prevent configuration drift
-            # (Environment already loaded in __init__ before LangSmith)
+            # (Environment already loaded in __init__)
             print("🔍 Validating environment configuration...")
             required_vars = [
                 "TILORES_API_URL",
@@ -1833,17 +1767,6 @@ def run_chain(
         if engine is None:
             raise RuntimeError("Engine initialization failed")
 
-        # LangSmith: Initialize tracing callbacks if available
-        langsmith_callbacks = []
-        if engine and engine.langsmith_client and engine.langchain_tracer:
-            try:
-                langsmith_callbacks = [engine.langchain_tracer]
-                print(f"📊 LangSmith: Tracing enabled with project: {engine.langchain_tracer.project_name}")
-            except Exception as e:
-                print(f"⚠️ LangSmith callback setup failed: {e}")
-                langsmith_callbacks = []
-        else:
-            print("📊 LangSmith: Tracing not available - client or tracer not initialized")
 
         # Handle both legacy string input and new conversation format
         if isinstance(messages, str):
@@ -2085,7 +2008,7 @@ When using tilores_search, the system automatically optimizes field selection fo
             # Non-streaming path (existing logic)
             print(f"🔍 INVOKING LLM WITH TOOLS: {type(llm_with_tools).__name__}")
 
-            # FIXED: Remove all LangSmith callback handling to prevent conflicts
+            # FIXED: Remove all callback handling to prevent conflicts
             # Direct invocation without callback complications
             response = llm_with_tools.invoke(llm_messages)
             response_any: Any = response  # for typing safety
@@ -2175,12 +2098,6 @@ When using tilores_search, the system automatically optimizes field selection fo
                 tool_id = tool_call.get("id", f"call_{tool_name}")
 
                 def execute_tool():
-                    # LangSmith: Log tool execution start
-                    if langsmith_callbacks and engine.langsmith_client:
-                        try:
-                            print(f"📊 LangSmith: Tracing tool execution: {tool_name}")
-                        except Exception:
-                            pass  # Graceful degradation
 
                     for tool in engine.tools:
                         if tool.name == tool_name:
@@ -2189,12 +2106,6 @@ When using tilores_search, the system automatically optimizes field selection fo
                                 result = tool.invoke(tool_args)
                                 tool_duration = __import__("time").time() - tool_start_time
 
-                                # LangSmith: Log successful tool execution
-                                if langsmith_callbacks and engine.langsmith_client:
-                                    try:
-                                        print(f"📊 LangSmith: Tool {tool_name} completed in " f"{tool_duration:.2f}s")
-                                    except Exception:
-                                        pass  # Graceful degradation
 
                                 # Log successful tool execution for monitoring
                                 provider = engine.get_provider(model) if engine else "unknown"
@@ -2206,12 +2117,6 @@ When using tilores_search, the system automatically optimizes field selection fo
 
                                 traceback.print_exc()
 
-                                # LangSmith: Log tool execution error
-                                if langsmith_callbacks and engine.langsmith_client:
-                                    try:
-                                        print(f"📊 LangSmith: Tool {tool_name} failed: {str(tool_error)}")
-                                    except Exception:
-                                        pass  # Graceful degradation
 
                                 # Log tool execution failure for monitoring
                                 provider = engine.get_provider(model) if engine else "unknown"
@@ -2219,12 +2124,6 @@ When using tilores_search, the system automatically optimizes field selection fo
 
                                 return f"Error executing {tool_name}: {str(tool_error)}"
 
-                    # LangSmith: Log tool not found
-                    if langsmith_callbacks and engine.langsmith_client:
-                        try:
-                            print(f"📊 LangSmith: Tool not found: {tool_name}")
-                        except Exception:
-                            pass  # Graceful degradation
 
                     return f"Tool {tool_name} not found"
 
@@ -2496,6 +2395,3 @@ def get_model_provider(model_name: str) -> str:
     return engine.get_provider(model_name)
 
 
-# Apply LangSmith tracing wrapper if available
-if traceable is not None:
-    run_chain = traceable(name="tilores_llm_chain", run_type="chain")(run_chain)

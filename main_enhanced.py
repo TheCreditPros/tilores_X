@@ -61,9 +61,6 @@ def ensure_virtuous_cycle_manager():
     return virtuous_cycle_manager
 
 
-# LangSmith observability imports - simplified for Railway deployment
-LANGSMITH_AVAILABLE = False
-LangSmithClient = None
 engine = None
 
 # Configure rate limiting
@@ -874,7 +871,6 @@ async def get_autonomous_ai_metrics(request: Request):
 
         return {
             "autonomous_capability_status": {
-                "langsmith_integration": component_status.get("langsmith_client", False),
                 "quality_monitoring": hasattr(manager, "quality_monitor"),
                 "optimization_engine": component_status.get("enhanced_manager", False),
                 "pattern_recognition": True,  # Always available in current implementation
@@ -924,38 +920,6 @@ async def get_monitoring_alerts(request: Request):
             return {"active_alerts": [], "alert_history": []}
     except Exception as e:
         return {"error": f"Failed to get monitoring alerts: {str(e)}"}
-
-
-@app.get("/v1/langsmith/projects/health")
-@limiter.limit("30/minute")
-async def get_langsmith_projects_health(request: Request):
-    """Get LangSmith projects health for dashboard display."""
-    try:
-        # Get basic virtuous cycle status
-        manager = ensure_virtuous_cycle_manager()
-        status = manager.get_status()
-
-        # Check if LangSmith is available
-        langsmith_available = status.get("langsmith_available", False)
-
-        if langsmith_available:
-            return {
-                "projects": {
-                    "tilores-speed-experiments": {
-                        "status": "healthy",
-                        "last_updated": status.get("metrics", {}).get("last_update", "unknown"),
-                        "total_traces": status.get("metrics", {}).get("traces_processed", 0),
-                        "active_sessions": 3,  # Based on known sessions
-                        "quality_score": status.get("metrics", {}).get("current_quality", 0.0),
-                    }
-                },
-                "overall_health": "healthy" if langsmith_available else "unhealthy",
-                "last_check": status.get("metrics", {}).get("last_update", "unknown"),
-            }
-        else:
-            return {"projects": {}, "overall_health": "unhealthy", "last_check": "never"}
-    except Exception as e:
-        return {"error": f"Failed to get LangSmith projects health: {str(e)}"}
 
 
 if __name__ == "__main__":
