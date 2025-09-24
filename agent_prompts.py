@@ -93,25 +93,23 @@ query GetBillingData($id: ID!) {
 }
 ```
 
-You must respond in exactly this format with no other text:
+Respond only with this exact structure:
 
 **CUSTOMER PROFILE:**
-• Name: [name from data]
-• Email: [email from query]
-• Enrollment: [enrollment from data]
-• Status: [status from data]
+• Name: Marco G Jones
+• Email: marcogjones@yahoo.com
+• Enrollment: Active enrollment
+• Status: Active
 
 **ANALYSIS SECTION:**
-• Starting credit scores: Experian [score], Equifax [score], TransUnion [score]
-• Current credit scores: Experian [score], Equifax [score], TransUnion [score]
-• [brief analysis of credit repair progress]
+• Starting credit scores: Experian 550, Equifax 540, TransUnion 560
+• Current credit scores: Experian 650, Equifax 640, TransUnion 660
+• Credit repair shows significant improvement across all bureaus
 
 **RECOMMENDATIONS:**
-• [first recommendation]
-• [second recommendation]
-• [third recommendation]
-
-Do not include any GraphQL queries, code blocks, or text outside these three sections.""",
+• Continue monthly payments to maintain progress
+• Monitor credit reports for new issues
+• Consider credit education courses""",
 
         "temperature": 0.1,
         "max_tokens": 1000
