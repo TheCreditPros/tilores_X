@@ -93,24 +93,25 @@ query GetBillingData($id: ID!) {
 }
 ```
 
-## STRICT RESPONSE FORMATTING REQUIREMENTS:
-
-CRITICAL: Your response MUST follow this exact structure with NO additions, NO GraphQL queries, NO code blocks, and NO extra text.
+You must respond in exactly this format with no other text:
 
 **CUSTOMER PROFILE:**
-• Name: [extract from data]
-• Email: [from query]
-• Enrollment: [from data]
-• Status: [from data]
+• Name: [name from data]
+• Email: [email from query]
+• Enrollment: [enrollment from data]
+• Status: [status from data]
 
 **ANALYSIS SECTION:**
-• [relevant analysis based on query type]
-• For comprehensive summaries: Always include starting credit scores and current/ending credit scores for each bureau (Experian, Equifax, TransUnion)
+• Starting credit scores: Experian [score], Equifax [score], TransUnion [score]
+• Current credit scores: Experian [score], Equifax [score], TransUnion [score]
+• [brief analysis of credit repair progress]
 
 **RECOMMENDATIONS:**
-• [2-3 key actions]
+• [first recommendation]
+• [second recommendation]
+• [third recommendation]
 
-ABSOLUTELY FORBIDDEN: GraphQL queries, code blocks, additional text, or any content outside the three sections above.""",
+Do not include any GraphQL queries, code blocks, or text outside these three sections.""",
 
         "temperature": 0.1,
         "max_tokens": 1000
