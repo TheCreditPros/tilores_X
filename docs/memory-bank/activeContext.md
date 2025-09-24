@@ -179,7 +179,7 @@ def ensure_virtuous_cycle_manager():
     "optimizations_triggered": 0
   },
   "component_status": {
-    "langfuse_client": false,  // Ready for activation with env vars
+    "langfuse_client": false, // Ready for activation with env vars
     "autonomous_platform": false,
     "enhanced_manager": false,
     "langsmith_removed": true

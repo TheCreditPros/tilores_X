@@ -432,9 +432,8 @@ class MultiProviderCreditAPI:
 
         try:
             if command == '/help':
-                # Track help command usage
-                track_slash_command_with_metadata('/help', "")
-                return """🤖 **Tilores Slash Commands - MANDATORY FORMAT**
+                # Prepare help response
+                help_response = """🤖 **Tilores Slash Commands - MANDATORY FORMAT**
 
 **IMPORTANT:** All queries must start with a slash command. No exceptions.
 
@@ -460,11 +459,15 @@ class MultiProviderCreditAPI:
 
 **Format Required:** `/[agent] [category] [your question]`
 **No free-form queries allowed - must use slash commands!**"""
+                # Track help command usage with response
+                track_slash_command_with_metadata('/help', "", response_data=help_response)
+                return help_response
 
             elif command == '/agents':
-                # Track agents command usage
-                track_slash_command_with_metadata('/agents', "")
-                return self._process_tool_query("list agents")
+                # Get agents response and track it
+                agents_response = self._process_tool_query("list agents")
+                track_slash_command_with_metadata('/agents', "", response_data=agents_response)
+                return agents_response
 
             # Check if command starts with a valid prefix
             elif any(command.startswith(prefix + ' ') or command == prefix for prefix in slash_command_prefixes):
@@ -488,7 +491,9 @@ Please specify what type of query you want:
 
                 # This should be a full command with category
                 if ' ' not in command:
-                    return f"❌ **Invalid Format**\n\nPlease use: `{matching_prefix} [category] [your question]`\n\nExample: `{matching_prefix} credit what are their scores`"
+                    error_msg = f"❌ **Invalid Format**\n\nPlease use: `{matching_prefix} [category] [your question]`\n\nExample: `{matching_prefix} credit what are their scores`"
+                    track_slash_command_with_metadata(command, remaining_query or "", response_data=error_msg)
+                    return error_msg
 
                 # Extract category from command
                 command_parts = command.split(' ', 1)
@@ -497,31 +502,41 @@ Please specify what type of query you want:
 
                 valid_categories = ['status', 'credit', 'billing']
                 if category not in valid_categories:
-                    return f"❌ **Invalid Category: `{category}`**\n\nValid categories: {', '.join(valid_categories)}\n\nExample: `{matching_prefix} credit what are their scores`"
+                    error_msg = f"❌ **Invalid Category: `{category}`**\n\nValid categories: {', '.join(valid_categories)}\n\nExample: `{matching_prefix} credit what are their scores`"
+                    track_slash_command_with_metadata(command, remaining_query or "", response_data=error_msg)
+                    return error_msg
 
                 # Store the agent selection for this session
                 self._set_session_agent(query, agent_type)
 
-                # Track slash command usage with metadata
-                track_slash_command_with_metadata(command, remaining_query or "")
-
                 # Process the query with the agent
                 if remaining_query:
                     print(f"🎯 Processing {command} with agent: {agent_type} category: {category} for query: {remaining_query}")
-                    return self._process_agent_query(remaining_query, agent_type, category)
+                    result = self._process_agent_query(remaining_query, agent_type, category)
+                    # Track with response data
+                    track_slash_command_with_metadata(command, remaining_query, response_data=result)
+                    return result
                 else:
                     # No remaining query provided
-                    return f"""✅ **Agent Ready**
+                    success_msg = f"""✅ **Agent Ready**
 
 🤖 **Active Agent:** {'Zoho CS Agent' if agent_type == 'zoho_cs_agent' else 'Client Chat Agent'}
 📝 **Category:** {category.title()}
 🎯 **Ready for your {category} questions!**
 
 💾 **Session stored** - Your agent preference will persist for this conversation."""
+                    track_slash_command_with_metadata(command, remaining_query or "", response_data=success_msg)
+                    return success_msg
 
             else:
-                # Invalid slash command - track it
-                track_slash_command_with_metadata(command, remaining_query or "")
+                # Invalid slash command - track it with response
+                invalid_response = f"""❌ **Invalid Slash Command: `{command}`**
+
+🤖 **Available Commands:**
+{category_list}
+
+**Example:** `/cs credit what are their credit scores`"""
+                track_slash_command_with_metadata(command, remaining_query or "", response_data=invalid_response)
 
                 available_commands = []
                 for prefix in slash_command_prefixes:
@@ -2297,8 +2312,8 @@ def get_slash_command_metadata(command: str, query: str) -> Dict[str, Any]:
 
     return metadata
 
-def track_slash_command_with_metadata(command: str, query: str, user_id: str = None, session_id: str = None):
-    """Track slash command usage with comprehensive metadata and session tracking"""
+def track_slash_command_with_metadata(command: str, query: str, user_id: str = None, session_id: str = None, response_data: str = None):
+    """Track slash command usage with comprehensive metadata, input, and output tracking"""
     if not langfuse_client:
         return
 
@@ -2317,9 +2332,18 @@ def track_slash_command_with_metadata(command: str, query: str, user_id: str = N
             "session_id": session_id
         })
 
-        # Create session trace with proper user and session tracking
+        # Prepare input and output data for LangFuse
+        input_data = {
+            "command": command,
+            "query": query,
+            "user_id": user_id,
+            "session_id": session_id
+        }
+
+        # Create session trace with proper input/output tracking
         with langfuse_client.start_as_current_span(
             name=f"slash_command_{metadata['usage_category']}",
+            input=input_data,
             metadata=metadata
         ) as span:
             # Update trace with user and session info (following docs)
@@ -2365,11 +2389,16 @@ def track_slash_command_with_metadata(command: str, query: str, user_id: str = N
                     "phase": "system_response"
                 })
 
-            # Mark as completed
-            span.update(metadata={
+            # Mark as completed and add output data if available
+            completion_metadata = {
                 "execution_status": "completed",
                 "phase": "finished"
-            })
+            }
+
+            if response_data:
+                span.update(output={"response": response_data})
+
+            span.update(metadata=completion_metadata)
 
         # Flush data to Langfuse
         langfuse_client.flush()

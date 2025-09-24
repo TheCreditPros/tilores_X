@@ -34,7 +34,7 @@ def main():
         print(f"❌ Missing required environment variables: {missing_vars}")
         print("\nPlease set the following environment variables:")
         for var in missing_vars:
-            print(f"  export {var}="your-value-here"")
+            print(f"  export {var}=\"your-value-here\"")
         return 1
 
     print("✅ Environment variables configured")
