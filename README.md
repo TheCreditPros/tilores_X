@@ -222,6 +222,7 @@ graph TB
 **To enable full Langfuse observability in production:**
 
 1. **Add Environment Variables** to Railway project settings:
+
    ```bash
    LANGFUSE_PUBLIC_KEY=pk-lf-your-public-key
    LANGFUSE_SECRET_KEY=sk-lf-your-secret-key
