@@ -107,6 +107,7 @@ Structure as:
 
 **ANALYSIS SECTION:**
 • [relevant analysis based on query type]
+• For comprehensive summaries: Always include starting credit scores and current/ending credit scores for each bureau (Experian, Equifax, TransUnion)
 
 **RECOMMENDATIONS:**
 • [2-3 key actions]

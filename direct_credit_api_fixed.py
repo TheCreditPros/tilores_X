@@ -500,6 +500,24 @@ Please specify what type of query you want:
                 category_part = command_parts[1] if len(command_parts) > 1 else ""
                 category = category_part.split(' ')[0] if ' ' in category_part else category_part
 
+                # Check for direct email input (e.g., "/cs marcogjones@yahoo.com")
+                import re
+                email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', category_part)
+
+                if email_match and matching_prefix in ['/cs', '/cst', '/zoho']:
+                    # Direct email format - create comprehensive customer summary
+                    email = email_match.group()
+                    summary_query = f"my email is {email}, provide complete comprehensive customer analysis with credit repair lifecycle, bureau-specific deletions, new negatives, subsequent deletions, and full progress overview"
+                    print(f"🎯 Direct email format detected: {email} - generating comprehensive summary")
+
+                    # Store the agent selection for this session
+                    self._set_session_agent(query, agent_type)
+
+                    # Process the comprehensive summary directly
+                    result = self._process_agent_query(summary_query, agent_type, "credit")  # Use credit category for comprehensive analysis
+                    track_slash_command_with_metadata(command, email, response_data=result)
+                    return result
+
                 valid_categories = ['status', 'credit', 'billing']
                 if category not in valid_categories:
                     error_msg = f"❌ **Invalid Category: `{category}`**\n\nValid categories: {', '.join(valid_categories)}\n\nExample: `{matching_prefix} credit what are their scores`"
