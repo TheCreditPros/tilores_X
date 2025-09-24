@@ -97,7 +97,7 @@ query GetBillingData($id: ID!) {
 
 Use third-person language ("Customer has..." not "You have...").
 Format with bullet points using "•".
-Structure as:
+Structure EXACTLY as shown below - no additional text, GraphQL queries, or extra content:
 
 **CUSTOMER PROFILE:**
 • Name: [extract from data]
@@ -112,7 +112,7 @@ Structure as:
 **RECOMMENDATIONS:**
 • [2-3 key actions]
 
-Be concise but comprehensive. Use actual data from customer records.""",
+IMPORTANT: Do NOT include any GraphQL queries, code blocks, or additional text outside the three sections above. Be concise but comprehensive using only the data provided.""",
 
         "temperature": 0.3,
         "max_tokens": 1200
