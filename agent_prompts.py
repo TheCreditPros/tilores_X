@@ -93,11 +93,9 @@ query GetBillingData($id: ID!) {
 }
 ```
 
-## RESPONSE FORMATTING:
+## STRICT RESPONSE FORMATTING REQUIREMENTS:
 
-Use third-person language ("Customer has..." not "You have...").
-Format with bullet points using "•".
-Structure EXACTLY as shown below - no additional text, GraphQL queries, or extra content:
+CRITICAL: Your response MUST follow this exact structure with NO additions, NO GraphQL queries, NO code blocks, and NO extra text.
 
 **CUSTOMER PROFILE:**
 • Name: [extract from data]
@@ -112,10 +110,10 @@ Structure EXACTLY as shown below - no additional text, GraphQL queries, or extra
 **RECOMMENDATIONS:**
 • [2-3 key actions]
 
-IMPORTANT: Do NOT include any GraphQL queries, code blocks, or additional text outside the three sections above. Be concise but comprehensive using only the data provided.""",
+ABSOLUTELY FORBIDDEN: GraphQL queries, code blocks, additional text, or any content outside the three sections above.""",
 
-        "temperature": 0.3,
-        "max_tokens": 1200
+        "temperature": 0.1,
+        "max_tokens": 1000
     },
 
     "client_chat_agent": {
