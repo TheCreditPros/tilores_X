@@ -2389,9 +2389,48 @@ def _log_tool_calling_failure(provider: str, reason: str) -> None:
         print(f"⚠️ Tool calling failure monitoring error: {e}")
 
 
+def extract_identifier_llm(user_input: str) -> Optional[Dict[str, str]]:
+    """Extract and normalize identifiers from user input using LLM.
+
+    Returns a dict with 'type' and 'value' keys if an identifier is found,
+    or None if no identifier can be extracted.
+    """
+    import re
+
+    # Simple regex-based extraction for common patterns
+    # Email pattern
+    email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', user_input)
+    if email_match:
+        return {"type": "email", "value": email_match.group()}
+
+    # Client ID pattern (various formats) - more specific to avoid false matches
+    client_id_patterns = [
+        r'\bclient[_-]?id[:\s]*([A-Z0-9\-]{3,})\b',
+        r'\bcustomer[_-]?id[:\s]*([A-Z0-9\-]{3,})\b',
+        r'\bid[:\s]*([A-Z0-9\-]{3,})\b'
+    ]
+
+    for pattern in client_id_patterns:
+        match = re.search(pattern, user_input, re.IGNORECASE)
+        if match:
+            return {"type": "client_id", "value": match.group(1)}
+
+    # Phone number pattern
+    phone_match = re.search(r'\b(\+?1?[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b', user_input)
+    if phone_match:
+        # Reconstruct phone number
+        phone = ''.join(phone_match.groups(''))
+        if phone.startswith('+1'):
+            pass
+        elif len(phone) == 10:
+            phone = f"+1{phone}"
+        return {"type": "phone", "value": phone}
+
+    # No identifier found
+    return None
+
+
 def get_model_provider(model_name: str) -> str:
     """Get provider for a specific model"""
     initialize_engine()
     return engine.get_provider(model_name)
-
-
