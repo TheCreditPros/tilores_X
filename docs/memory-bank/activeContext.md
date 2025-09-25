@@ -11,6 +11,64 @@
 **Date**: September 24, 2025
 **Status**: COMPLETED SUCCESSFULLY - ALL SYSTEMS VERIFIED
 
+#### **REVERSION MEMORY - CRITICAL FOR ROLLBACK**
+
+**⚠️ IMPORTANT**: This section documents the repository state after extensive cleanup. Use this information if reversion is needed.
+
+##### **Git Reference Points:**
+- **Pre-cleanup state**: Commit `61a7192` - "docs: Document final GraphQL cleaning solution and steady state"
+- **File cleanup**: Commit `39bfcd8` - "cleanup: Complete repository cleanup and archive of legacy files"
+- **Folder cleanup**: Commit `935023b` - "cleanup: Complete folder cleanup - removed unused and deprecated directories"
+- **Documentation**: Commit `c5ba6ad` - "docs: Document folder cleanup completion and optimized repository structure"
+
+##### **Removed Folders (128 files deleted):**
+```
+deprecated/          # 72+ explicitly deprecated files
+├── Old experimental code, deprecated APIs, unused scripts
+├── Contents: agenta_*.py, openwebui_*.py, autonomous_*.py, etc.
+
+dashboard/           # Full React/Vite dashboard application
+├── Source code, tests, build configuration, e2e tests
+├── Contents: src/, tests/, e2e-tests/, dist/, dashboard-static/
+
+dashboard-static/    # Compiled dashboard assets
+├── Built JavaScript, CSS, HTML files (13 files)
+├── Contents: assets/*.js, index.html
+
+archive/             # Old deployment reports (13 files)
+├── DAY1-5 reports, langsmith analysis, activation plans
+├── Contents: *.md and *.json deployment documentation
+
+patches/             # Single patch file
+├── roo-guard-env-dump.patch (resolved environment issue)
+```
+
+##### **Current Repository Structure (8 directories):**
+```
+tilores_X/
+├── docs/           # Documentation and guides (comprehensive)
+├── utils/          # Utility functions and tools
+├── .git/           # Version control (preserved)
+├── .github/        # GitHub Actions and workflows
+├── .githooks/      # Git hooks
+├── .pytest_cache/  # Test cache
+├── __pycache__/    # Python bytecode cache
+└── .claude/        # IDE configuration
+```
+
+##### **Reversion Process (if needed):**
+1. **Identify target commit**: Use git log to find desired rollback point
+2. **Soft reset**: `git reset --soft <commit-hash>` to keep changes staged
+3. **Hard reset**: `git reset --hard <commit-hash>` to completely revert
+4. **File restoration**: Use `git checkout <commit-hash> -- <path>` for specific files
+5. **Functionality test**: Run comprehensive tests after reversion
+
+##### **Risk Assessment:**
+- **Low Risk**: All removed content was unused/deprecated
+- **Verified Safe**: Functionality tested after each removal phase
+- **Git Recovery**: All content recoverable via git history
+- **Documentation**: Complete removal log maintained here
+
 #### **Repository Cleanup Actions:**
 
 1. **Root Directory Cleanup** ✅ COMPLETED
