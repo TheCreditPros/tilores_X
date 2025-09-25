@@ -515,6 +515,10 @@ Please specify what type of query you want:
 
                     # Process the comprehensive summary directly
                     result = self._process_agent_query(summary_query, agent_type, "credit")  # Use credit category for comprehensive analysis
+
+                    # Clean up any GraphQL suggestions from the response for email queries
+                    result = self._clean_graphql_suggestions(result)
+
                     track_slash_command_with_metadata(command, email, response_data=result)
                     return result
 
@@ -2142,6 +2146,42 @@ Provide detailed analysis using the actual credit data shown above."""
             "name": "openai",
             **self.providers["openai"]
         }
+
+    def _clean_graphql_suggestions(self, response: str) -> str:
+        """
+        Clean up GraphQL suggestions from LLM responses for email-based queries.
+        This is a safety net to ensure clean customer summaries even if the LLM
+        includes GraphQL suggestions despite prompt instructions.
+        """
+        import re
+
+        # Patterns to remove GraphQL content and query suggestions
+        graphql_patterns = [
+            r'```\s*GRAPHQL_QUERY:.*?(?=```|\*\*|$)[\s\S]*?```',  # Code blocks with GRAPHQL_QUERY
+            r'GRAPHQL_QUERY:.*?(?=\*\*|$)',  # GRAPHQL_QUERY lines
+            r'```\s*query\s+Get.*?(?=```|\*\*|$)[\s\S]*?```',  # GraphQL query blocks
+            r'query\s+Get.*?(?=\*\*|$|\n\n)',  # Loose GraphQL queries
+            r'To further assist.*?(?=\*\*|$|\n\n)',  # Common GraphQL suggestion phrases
+            r'This query will.*?(?=\*\*|$|\n\n)',  # Query explanation phrases
+            r'A follow-up query.*?(?=\*\*|$|\n\n)',  # Follow-up query suggestions
+            r'can be submitted to retrieve.*?(?=\*\*|$|\n\n)',  # Data retrieval suggestions
+            r'using a query such as:.*?(?=\*\*|$|\n\n)',  # Query example suggestions
+            r'GraphQL query can be executed.*?(?=\*\*|$|\n\n)',  # GraphQL execution suggestions
+            r'can be used to.*?(?=\*\*|$|\n\n)',  # Generic query suggestions
+            r'additional queries? can.*?(?=\*\*|$|\n\n)',  # Additional query suggestions
+            r'further queries? can.*?(?=\*\*|$|\n\n)',  # Further query suggestions
+        ]
+
+        cleaned_response = response
+
+        for pattern in graphql_patterns:
+            cleaned_response = re.sub(pattern, '', cleaned_response, flags=re.IGNORECASE | re.DOTALL)
+
+        # Clean up any resulting double newlines or awkward spacing
+        cleaned_response = re.sub(r'\n{3,}', '\n\n', cleaned_response)
+        cleaned_response = cleaned_response.strip()
+
+        return cleaned_response
 
     def _call_llm_with_messages(self, messages: list, model: str, temperature: float, max_tokens: int) -> str:
         """Call LLM API with proper provider routing using messages format"""
