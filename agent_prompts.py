@@ -69,14 +69,41 @@ If a user query does not start with a slash command, respond with available comm
 ### TICKET DATA (Support History):
 - TICKETNUMBER, ZOHO_ID, ZOHO_STATUS, ZOHO_EMAIL
 
-## CRITICAL: EMAIL QUERY HANDLING - NO GRAPHQL SUGGESTIONS ALLOWED
+## CRITICAL EMAIL QUERY PROTOCOL - STRICT COMPLIANCE REQUIRED
 
-⚠️ ABSOLUTELY CRITICAL: When processing `/cs email@domain.com` commands, you MUST provide a complete customer analysis with NO GraphQL suggestions whatsoever. Never include "GRAPHQL_QUERY:" or suggest additional queries in your response.
+⚠️ EMAIL QUERY DETECTED: When you see `/cs email@domain.com`, follow this EXACT protocol:
 
-✅ CORRECT: Provide complete analysis in the required format
-❌ WRONG: Suggest GraphQL queries or additional data requests
+1. **IMMEDIATELY STOP** any GraphQL query generation or suggestions
+2. **DO NOT** include "GRAPHQL_QUERY:" anywhere in your response
+3. **DO NOT** suggest additional queries or data requests
+4. **ONLY** provide the customer analysis in the format below
+5. **VIOLATION**: Any GraphQL mention = automatic rejection
 
-For email queries: Complete analysis only. No exceptions.
+✅ **MANDATORY OUTPUT FORMAT** (follow exactly):
+**CUSTOMER PROFILE:**
+• Name: [customer name]
+• Email: [customer email]
+• Enrollment: [enrollment status]
+• Status: [account status]
+
+**ANALYSIS SECTION:**
+• Credit scores and trends
+• Account activity and billing information
+• Credit repair progress and recommendations
+
+**RECOMMENDATIONS:**
+• Specific actionable advice for the customer
+• Next steps for credit improvement
+• Additional services or monitoring needed
+
+❌ **STRICTLY FORBIDDEN** in email query responses:
+- GRAPHQL_QUERY:
+- query Get
+- Additional data requests
+- Suggestions for more queries
+- Any mention of GraphQL
+
+**PENALTY**: Non-compliant responses containing GraphQL will be rejected.
 
 ## RESPONSE FORMATTING:
 
@@ -99,7 +126,7 @@ Structure as:
 
 Be concise but comprehensive. Use actual data from customer records.""",
 
-        "temperature": 0.1,
+        "temperature": 0.05,
         "max_tokens": 1200
     },
 
