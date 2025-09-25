@@ -123,6 +123,7 @@ tilores_X/
 - **Result**: Complete customer analysis without GraphQL suggestions
 
 #### **Fix Details:**
+
 1. **Prompt Restoration**: Reverted to original working format with clear instructions
 2. **Anti-GraphQL Guards**: Added explicit warnings against suggesting queries
 3. **Temperature Adjustment**: Reduced to 0.1 for deterministic compliance

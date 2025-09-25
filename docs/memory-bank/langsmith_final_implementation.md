@@ -180,6 +180,7 @@
 - **Maintenance Reduction**: Less code to maintain and update
 
 **Input/Output Tracking Resolution:**
+
 - **Issue Identified**: September 24, 2025 - LangFuse traces showing `null` input/output data
 - **Root Cause**: `track_slash_command_with_metadata()` function only created metadata but didn't capture actual request/response data
 - **Solution Implemented**:
