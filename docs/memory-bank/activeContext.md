@@ -116,11 +116,12 @@ tilores_X/
 - **Root Cause**: Prompt regression from multiple formatting iterations
 - **Solution**: Restored original working prompt structure from commit 8918b30
 - **Fix Applied**:
-  - Restored simple, clear prompt format
-  - Added strong anti-GraphQL instructions
-  - Reduced temperature from 0.3 to 0.1 for compliance
-  - Eliminated behavioral conditioning from strict prompts
-- **Result**: Complete customer analysis without GraphQL suggestions
+  - Restored simple, clear prompt format from commit 8918b30
+  - Added strong anti-GraphQL instructions with explicit protocol
+  - Reduced temperature from 0.3 to 0.05 for maximum compliance
+  - Implemented programmatic response cleaning as safety net
+  - Added `_clean_graphql_suggestions()` method with comprehensive regex patterns
+- **Result**: Complete customer analysis without GraphQL suggestions, guaranteed clean output
 
 #### **Fix Details:**
 
